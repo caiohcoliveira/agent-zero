@@ -106,7 +106,7 @@ const CONFIG = {
     },
     skills: ['Crédito', 'Machine Learning', 'Advanced Analytics', 'Ciência de Dados', 'IA'],
     climaxWords: ['Estatística', 'Regressão', 'Classificação', 'Árvores', 'Ensembles', 'Clusters',
-      'Anomalias', 'Embeddings', 'Recomendação', 'Agentes', 'Automação'],
+      'Anomalias', 'Otimização', 'Embeddings', 'Transformers', 'Agentes', 'Automação'],
     climaxLine: 'Dos problemas mais simples aos mais complexos',
     climaxKey: 'Nossa especialidade é *analytics*.',
     climaxSub: 'analytics · criatividade · escala',
@@ -165,10 +165,10 @@ const CONFIG = {
     { scene: 'skills', at: 8.0, text: 'Do issuer ao acquirer… do clássico ao estado da arte.' },
 
     ...['Estatística.', 'Regressão.', 'Classificação.', 'Árvores.', 'Ensembles.', 'Clusters.',
-        'Anomalias.', 'Embeddings.', 'Recomendação.', 'Agentes.', 'Automação.']
-      .map((w, i) => ({ scene: 'climax', at: i * 1.0 + 0.05, text: w, rate: 1.15 })),
-    { scene: 'climax', at: 11.2, text: 'Não importa o desafio. Dos problemas mais simples aos mais complexos…' },
-    { scene: 'climax', at: 16.0, text: '…nossa especialidade é resolver com analytics, criatividade e escala.' },
+        'Anomalias.', 'Otimização.', 'Embeddings.', 'Transformers.', 'Agentes.', 'Automação.']
+      .map((w, i) => ({ scene: 'climax', at: i * 0.85 + 0.05, text: w, rate: 1.2 })),
+    { scene: 'climax', at: 10.4, text: 'Não importa o desafio. Dos problemas mais simples aos mais complexos…' },
+    { scene: 'climax', at: 15.4, text: '…nossa especialidade é resolver com analytics, criatividade e escala.' },
 
     { scene: 'close', at: 1.0, text: 'Se o desafio pede eficiência, escala e valor, a resposta passa por Performance Analytics.' }
   ],

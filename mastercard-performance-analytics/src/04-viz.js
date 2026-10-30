@@ -196,5 +196,16 @@ const VIZ = (() => {
     const s = u * 2.4; line(ctx, mx - s, my - s, mx + s, my + s, fgc, Math.max(1, u * .5)); line(ctx, mx - s, my + s, mx + s, my - s, fgc, Math.max(1, u * .5));
   };
 
+  /** atenção estilo "attention heads": tokens Q (cima) × K (baixo), linhas com peso */
+  V.transformer = (ctx, x, y, w, h, p, o = {}) => {
+    const u = U(w, h), n = 6, t = o.t || 0, fgc = o.theme === 'light' ? INK : C.cream, ty = y + h * .1, by = y + h * .9, xs = i => x + w * (.08 + .84 * i / (n - 1));
+    for (let i = 0; i < n; i++) { let ws = [], sum = 0; for (let j = 0; j < n; j++) { const v = Math.exp(-((i - j - Math.round(Math.sin(t * 1.3 + i * 1.7) * 1.4)) ** 2) / 1.2); ws.push(v); sum += v; }
+      ws.forEach((v, j) => { const wgt = v / sum, a = clamp(p * 2.2 - (i + j) / (2 * n)) * wgt; if (a <= .02) return;
+        ctx.beginPath(); ctx.moveTo(xs(i), ty + u * 5); ctx.bezierCurveTo(xs(i), y + h * .5, xs(j), y + h * .5, xs(j), by - u * 5); ctx.strokeStyle = rgba(i % 2 ? C.yellow : C.orange, clamp(a * 1.6)); ctx.lineWidth = Math.max(1, u * 2.4 * wgt); ctx.stroke(); }); }
+    for (let i = 0; i < n; i++) { const a = E.outBack(clamp(p * 3 - i * .1)); if (a <= 0) continue;
+      [[ty, 'Q'], [by, 'K']].forEach(([yy, lb]) => { const bw = u * 11 * a, bh = u * 8 * a; rr(ctx, xs(i) - bw / 2, yy - bh / 2, bw, bh, u * 1.5); ctx.fillStyle = lb === 'Q' ? C.orange : C.yellow; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1, u * .5); ctx.stroke();
+        if (u > 1.2) text(ctx, lb + (i + 1), xs(i), yy + 1, { size: u * 4, weight: 800, mono: true, color: INK, align: 'center' }); }); }
+  };
+
   return V;
 })();
