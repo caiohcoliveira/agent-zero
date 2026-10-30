@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Performance Analytics — A Interseção</title>
+<!--
+  ============================================================================
+  PERFORMANCE ANALYTICS — "A INTERSEÇÃO"
+  Vídeo animado executivo (~4:00) · 1920×1080 · arquivo único, 100% offline.
+
+  Arquitetura (um único <script>, organizado em seções):
+    1. CONFIG ........ parâmetros editáveis (cores, tempos, textos, narração, áudio, motion)
+    2. CORE .......... easing, interpolação, RNG com seed, cores, primitivas de desenho, câmera
+    3. COMPONENTS .... ícones, agentes, cards, carimbos, chips de capítulo, dashboard
+    4. VIZ ........... visualizações de modelos (gaussiana, regressão, árvore, clusters…)
+    5. AUDIO ......... trilha + SFX sintetizados em Web Audio (sincronizados à timeline)
+    6. VOICE ......... narração via Web Speech API (pt-BR, voz feminina quando disponível)
+    7. SCENES ........ 10 cenas; cada uma é uma função pura draw(ctx, t) → seek perfeito
+    8. PLAYER ........ loop requestAnimationFrame, transições, controles, teclado
+
+  Atalhos: Espaço = play/pause · R = reiniciar · ←/→ = ±5s · F = tela cheia
+           M = som · V = voz · C = legendas
+  ============================================================================
+-->
+<style>
+  :root {
+    --red: #EB001B; --orange: #FF5F00; --yellow: #F79E1B;
+    --ink: #141414; --cream: #F5F1EA; --stone: #8A8378;
+    --ui-bg: rgba(20, 20, 20, 0.72); --ui-fg: #F5F1EA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+  body {
+    font-family: "Segoe UI", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ui-fg); user-select: none; -webkit-user-select: none;
+  }
+  #wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #stage {
+    position: relative; flex: none; width: 1920px; height: 1080px; transform-origin: center center;
+    background: #000; overflow: hidden; box-shadow: 0 0 120px rgba(0,0,0,.6);
+  }
+  #stage canvas { position: absolute; inset: 0; width: 1920px; height: 1080px; display: block; }
+
+  /* ---------- Overlay inicial ---------- */
+  #intro {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 36px; background: radial-gradient(ellipse at center, rgba(20,20,20,.55), rgba(0,0,0,.92));
+    cursor: pointer; transition: opacity .6s ease; z-index: 5;
+  }
+  #intro.hidden { opacity: 0; pointer-events: none; }
+  #intro .logo { position: relative; width: 210px; height: 130px; }
+  #intro .logo span { position: absolute; top: 0; width: 130px; height: 130px; border-radius: 50%; }
+  #intro .logo .a { left: 0; background: var(--red); }
+  #intro .logo .b { right: 0; background: var(--yellow); }
+  #intro .logo .c { left: 80px; width: 50px; background: var(--orange); border-radius: 0;
+    clip-path: path('M25 13.8 A65 65 0 0 1 25 116.2 A65 65 0 0 1 25 13.8 Z'); }
+  #intro h1 { font-size: 92px; font-weight: 800; letter-spacing: -2px; color: #fff; }
+  #intro p { font-size: 30px; font-weight: 300; color: #d9d3ca; letter-spacing: 1px; }
+  #intro .play {
+    margin-top: 12px; display: flex; align-items: center; gap: 22px; padding: 26px 54px 26px 42px;
+    border-radius: 999px; background: var(--orange); color: #fff; font-size: 34px; font-weight: 700;
+    box-shadow: 0 20px 60px rgba(255,95,0,.35); transition: transform .2s ease;
+  }
+  #intro:hover .play { transform: scale(1.04); }
+  #intro .play i { width: 0; height: 0; border-left: 30px solid #fff; border-top: 19px solid transparent; border-bottom: 19px solid transparent; }
+  #intro small { font-size: 20px; color: #8a8378; }
+
+  /* ---------- Controles ---------- */
+  #ui {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(1100px, calc(100vw - 32px));
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-radius: 16px;
+    background: var(--ui-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: opacity .4s ease, transform .4s ease; z-index: 10; font-size: 14px;
+  }
+  #ui.idle { opacity: 0; transform: translateX(-50%) translateY(16px); pointer-events: none; }
+  #ui button {
+    flex: none; height: 36px; min-width: 36px; padding: 0 10px; border: 0; border-radius: 10px;
+    background: rgba(255,255,255,.08); color: var(--ui-fg); font: inherit; font-weight: 600; cursor: pointer;
+  }
+  #ui button:hover { background: rgba(255,255,255,.18); }
+  #ui button.off { opacity: .45; text-decoration: line-through; }
+  #ui button.primary { background: var(--orange); color: #fff; min-width: 44px; }
+  #time { flex: none; font-variant-numeric: tabular-nums; color: #d9d3ca; min-width: 92px; text-align: center; }
+  #bar { position: relative; flex: 1; height: 28px; cursor: pointer; }
+  #bar .track { position: absolute; left: 0; right: 0; top: 12px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.18); }
+  #bar .fill { position: absolute; left: 0; top: 12px; height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--red), var(--orange), var(--yellow)); }
+  #bar .knob { position: absolute; top: 7px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(255,95,0,.35); }
+  #bar .tick { position: absolute; top: 9px; width: 2px; height: 10px; margin-left: -1px; background: rgba(255,255,255,.35); border-radius: 1px; }
+  #bar .tip { position: absolute; bottom: 30px; transform: translateX(-50%); padding: 4px 8px; border-radius: 6px; background: #000; color: #fff; white-space: nowrap; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  #bar:hover .tip { opacity: 1; }
+  #voiceinfo { flex: none; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #8a8378; font-size: 12px; }
+  @media (max-width: 720px) { #voiceinfo { display: none; } #ui { gap: 8px; padding: 8px 10px; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="c" width="1920" height="1080"></canvas>
+    <div id="intro">
+      <div class="logo"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+      <h1>Performance Analytics</h1>
+      <p>A INTERSEÇÃO ENTRE DADOS E DECISÃO</p>
+      <div class="play"><i></i>Assistir</div>
+      <small>~4 min · ative o som · Espaço = play/pause · F = tela cheia</small>
+    </div>
+  </div>
+</div>
+<div id="ui">
+  <button id="bPlay" class="primary" title="Play/Pause (Espaço)">▶</button>
+  <button id="bRestart" title="Reiniciar (R)">↺</button>
+  <span id="time">0:00 / 4:00</span>
+  <div id="bar"><div class="track"></div><div class="fill"></div><div class="knob"></div><div class="tip"></div></div>
+  <button id="bSound" title="Trilha e efeitos (M)">Som</button>
+  <button id="bVoice" title="Narração (V)">Voz</button>
+  <button id="bCC" class="off" title="Legendas (C)">CC</button>
+  <button id="bFull" title="Tela cheia (F)">⛶</button>
+  <span id="voiceinfo"></span>
+</div>
+<script>
+"use strict";

@@ -1,0 +1,97 @@
+# Performance Analytics — "A Interseção"
+
+Vídeo animado executivo de cerca de 4 minutos sobre a track de Performance Analytics.
+
+- **Arquivo final:** [`performance-analytics.html`](performance-analytics.html) — um único HTML, 1920×1080, 100% offline, sem dependências.
+- **Roteiro e storyboard validados:** [`STORYLINE.md`](STORYLINE.md).
+
+## Como assistir
+
+1. Abra `performance-analytics.html` no Chrome ou no Edge (duplo clique).
+2. Clique em **Assistir**. O áudio só pode começar depois de um clique, por regra do navegador.
+3. Tecle **F** para tela cheia.
+
+| Tecla | Ação |
+|---|---|
+| Espaço | play / pause |
+| R | reiniciar |
+| ← / → | voltar / avançar 5 s |
+| F | tela cheia |
+| M | trilha e efeitos on/off |
+| V | narração on/off |
+| C | legendas da narração on/off |
+
+A barra de progresso aceita clique e arraste. Ao passar o mouse, ela mostra o nome da cena.
+
+**Gravar em MP4:** basta gravar a tela em tela cheia (OBS, Xbox Game Bar ou QuickTime) com o áudio do sistema. Como tudo é desenhado em função do tempo, cada execução é idêntica.
+
+## Narração
+
+- A narração usa a **Web Speech API** do navegador e prefere uma voz feminina pt-BR.
+- A qualidade depende das vozes instaladas no sistema:
+  - **Windows / Edge:** "Francisca" e "Thalita" (naturais, exigem internet); "Maria" funciona offline.
+  - **macOS:** "Luciana".
+- O nome da voz em uso aparece na barra de controles.
+- Cada frase dispara no seu próprio cue (`CONFIG.narration`), então a sincronia é feita frase a frase.
+- Termos em inglês recebem grafia fonética (`CONFIG.phonetics`) para soar natural.
+
+**Para usar uma locução gravada:**
+1. Desligue a voz (`CONFIG.audio.voice = false`).
+2. Use os tempos de `CONFIG.narration` como guia de edição.
+3. Embuta o áudio no próprio HTML como `data:` URI.
+
+## Arquitetura
+
+```
+src/
+  00-head.html           HTML + CSS (palco 1920×1080, overlay inicial, controles)
+  01-config.js           ★ CONFIG: cores, tempos das cenas, textos, narração, áudio, motion
+  02-core.js             easing, interpolação, RNG com seed, cores, primitivas, câmera, fundos, granulação
+  03-components.js       ícones vetoriais, agentes (personagens), cards, carimbo ✓, chips, dashboard
+  04-viz.js              visualizações de modelos: gaussiana, regressão, classificação, árvore,
+                         ensemble, clusters, anomalia, embeddings, recomendação, agentes,
+                         pipeline, crédito, forecast, IA
+  05-audio.js            trilha e SFX sintetizados (Web Audio) + sistema de cues
+  06-voice.js            narração (speechSynthesis) e legendas
+  10…17-*.js             as 10 cenas
+  90-player.js           render, transições, loop, controles, teclado
+  99-tail.html
+build.sh                 junta tudo em performance-analytics.html
+```
+
+Depois de editar algo em `src/`, rode `./build.sh`.
+
+**Decisões principais:**
+
+- **Canvas 2D com render puro em função do tempo.** Cada cena é uma função `draw(ctx, t)` sem estado. Por isso o seek e a pausa são perfeitos, a barra de progresso funciona em qualquer ponto e não há acúmulo de erro. A aleatoriedade usa seed, então o resultado é sempre igual.
+- **Timeline central.** As cenas têm `dur`, e os inícios são calculados em sequência. Narração, cues de som e tremores de câmera usam o tempo local de cada cena, então mudar a duração de uma cena desloca tudo o que vem depois.
+- **Áudio amarrado à timeline.** Um scheduler com lookahead agenda, a cada semicolcheia (120 BPM), as notas e os SFX que caem na janela dos próximos ~160 ms. No pause ou seek, os buses são recriados e as notas pendentes são descartadas.
+- **Performance.** Brilhos usam gradientes radiais em vez de `shadowBlur`, e a granulação é uma textura pré-renderizada. O render custa ~1 ms por frame.
+
+## Estratégia de animação
+
+- **Entrar rápido e assentar.** Os elementos entram com `outExpo` ou `outBack`, com um leve overshoot.
+- **Câmera virtual.** Faz zoom, pan e rotação, com tremor nos impactos. A intensidade é controlada por `CONFIG.motion`.
+- **Textura stop motion.** Os snaps de câmera da cena 8 são quantizados "em dois" (15 fps), sobre o resto do filme a 60 fps.
+- **Ritmo claro e escuro.** As cenas alternam entre fundo claro e escuro. A virada mais forte é o apagão literal no caso lights-off.
+- **Fios narrativos:**
+  - as 4 perguntas da cena 2 viram os chips de capítulo, que ganham ✓;
+  - os Agentes reaparecem nos casos 01 e 04, no clímax e no final;
+  - o ponto laranja abre e fecha o filme.
+- **Semântica de cor:** vermelho = negócio / alerta, amarelo = dados, laranja = resposta.
+
+## Parâmetros úteis (`src/01-config.js`)
+
+| Parâmetro | Efeito |
+|---|---|
+| `scenes[].dur` | duração de cada cena (o total é recalculado) |
+| `colors` | paleta |
+| `text` | todos os textos-chave; `*palavra*` = destaque laranja |
+| `narration` | frases e tempos da narração |
+| `motion.intensity`, `motion.shake`, `motion.onTwos`, `motion.grain` | energia do movimento |
+| `audio.music`, `audio.sfx`, `audio.voice`, volumes, `voiceRate` | áudio |
+| `captions` | legendas completas ligadas por padrão |
+
+## Observação sobre os dados
+
+Os números que aparecem em dashboards, reports e KPIs são **ilustrativos**. O vídeo não afirma métricas reais. Se houver números aprovados para divulgação, eles podem entrar nos carimbos ✓ pelo `CONFIG.text`.

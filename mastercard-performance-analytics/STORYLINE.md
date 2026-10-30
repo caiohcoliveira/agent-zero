@@ -1,7 +1,7 @@
 # A Interseção — Storyline v1
 
 **Vídeo:** Performance Analytics · Mastercard · ~4:00 · 1920×1080 · HTML único
-**Status:** em validação (o HTML ainda não foi escrito)
+**Status:** validado (v1.1, com os ajustes do multiagente e dos produtos de principalidade) · HTML implementado em `performance-analytics.html`
 
 ---
 
@@ -124,23 +124,26 @@ A trilha é a 120 BPM, então 1 compasso dura 2s. Todas as cenas começam e term
 **Visual**
 - **0:56–1:00** O chip 01 abre o card *Como gerar insights em escala?*, que gira e vira um **dashboard** com KPIs, linha, barras e mapa.
 - **1:00–1:05** Os gráficos se mexem, mas o dashboard não diz nada. Na tela: **o quê ✓ · o porquê ?**
-- **1:05–1:15** Três **Agentes** saltam do hub e caem no dashboard, achatando e esticando no pouso:
-  - **Monitor** (vermelho): varre os KPIs com um feixe de radar e circula um pico, a *anomalia*.
-  - **Investigador** (amarelo): mergulha no gráfico de barras e abre cada barra em sub-barras até achar a causa.
-  - **Narrador** (laranja): recolhe os sinais, que voam até ele como fichas de luz, e digita um card de insight. Exemplo ilustrativo: *"Queda de 8% no Sul, puxada por e-commerce. Sugestão: revisar a campanha."*
-  - Por cima, linhas finas mostram como os agentes são orquestrados. Para o público técnico aparecem detalhes como `orchestrator`, `tool call` e `context: KPIs`.
-- **1:15–1:22** **Escala.** A câmera abre e mostra que aquele dashboard é um entre 24, numa parede 6×4. Há agentes em todos, e os cards de insight estouram como pipoca, cada um num tom mais agudo.
-- **1:22–1:26** Carimbo **Dashboards que explicam ✓**. O chip 01 recebe o check.
+- **1:05–1:12** O dashboard desliza para a esquerda. O título dele (no header) está vazio, só um placeholder. À direita, três **agentes geradores** caem do alto, achatando e esticando no pouso. Cada um lê o dashboard com um olhar diferente e escreve um rascunho de insight:
+  - **Analista** (amarelo, óculos): *"Volume −8% no Sul, concentrado no e-commerce"*
+  - **Business** (vermelho, gravata): *"Queda no Sul coloca a meta do trimestre em risco"*
+  - **C-Level** (grafite, coroa discreta): *"Sul exige ação: revisar campanha digital"*
+  - Os textos são ilustrativos.
+- **1:12–1:17** Os três rascunhos voam para o **Validador**. Na primeira rodada ele **reprova ✕**: o card treme e uma seta de "refazer" leva tudo de volta aos geradores. Eles refinam, mandam de novo, e ele **aprova ✓**.
+- **1:17–1:21** O **Embalador** (laranja) recebe o insight aprovado, embala em uma faixa de título e encaixa no **header do dashboard**: o insight vira o título.
+- **1:21–1:24** **Escala.** A câmera abre e mostra que aquele dashboard é um entre 24, numa parede 6×4. Os títulos se preenchem em cascata, como pipoca, cada um num tom mais agudo.
+- **1:24–1:26** Carimbo **Dashboards que explicam ✓**. O chip 01 recebe o check.
 
-**Texto em tela:** "Insights em escala" · "Multiagentes para dashboards" · "o quê → o porquê"
+**Texto em tela:** "Insights em escala" · "Multiagentes para dashboards" · "o quê → o porquê" · rótulos dos agentes
 
 **Narração**
 - `0:57` Primeiro desafio: gerar **insights em escala**.
 - `1:01` Um dashboard mostra **o quê**. Mas quem explica **o porquê**?
-- `1:06` Criamos um sistema **multiagente**: um agente monitora os indicadores, outro investiga as causas, e outro traduz tudo em linguagem de negócio.
-- `1:17` Resultado: dashboards que não apenas mostram — **explicam**. Em escala.
+- `1:05` Criamos três agentes geradores, com olhares diferentes — **analista**, **business** e **C-level**.
+- `1:12` Um **validador** confere tudo — e, se não estiver bom, manda refazer.
+- `1:17` Por fim, um agente **embala** o insight, que vira o título do dashboard. Em escala.
 
-**Som:** o groove volta, ticks de digitação acompanham o Narrador, pops sobem de tom e um chime marca o carimbo.
+**Som:** o groove volta; ticks de digitação nos geradores, um "bup-bup" grave na reprovação, um chime na aprovação e pops subindo de tom na cascata.
 
 **Saída:** a parede de dashboards vira um grid de células, que se transforma na matriz da cena 5 (corte por continuidade).
 
@@ -164,9 +167,9 @@ A trilha é a 120 BPM, então 1 compasso dura 2s. Todas as cenas começam e term
 **Texto em tela:** "Recomendação inteligente" · "ALS · Fatoração de Matrizes" · "R ≈ U·Vᵀ" · "fatores latentes" · "propensão"
 
 **Narração**
-- `1:27` Segundo desafio: **recomendação**. Em um cliente do varejo, a pergunta era: quais SKUs e cestas recomendar para cada cliente?
+- `1:27` Segundo desafio: **recomendação**. Num cliente do varejo: quais SKUs e cestas recomendar para cada cliente?
 - `1:33` Cada linha é um cliente. Cada coluna, um produto. E quase toda a matriz… está **vazia**.
-- `1:39` Com fatoração de matrizes — o **ALS** — decompomos essa matriz em fatores ocultos de comportamento, alternando o ajuste entre clientes e produtos até o padrão emergir.
+- `1:39` Com fatoração de matrizes — o **ALS** — decompomos a matriz em fatores ocultos, alternando o ajuste entre clientes e produtos até o padrão emergir.
 - `1:49` As lacunas viram **propensões**.
 - `1:53` E, no espaço latente, cada cliente se aproxima da **cesta certa**.
 
@@ -181,20 +184,24 @@ A trilha é a 120 BPM, então 1 compasso dura 2s. Todas as cenas começam e term
 *A cena tem uma única decolagem, do plano para o espaço. Ela não repete o espaço latente da cena 5: aqui é uma nebulosa 3D só de produtos, com vetores e clusters.*
 
 **Visual**
-- **2:02–2:06** Card *Como medir principalidade?* com a tag **Outro cliente**. O card se desdobra numa prateleira limpa de produtos em tiles separados, sobre fundo claro: *itens isolados*.
+- **2:02–2:06** Card *Como medir principalidade?* com a tag **Issuer**. O card se desdobra numa prateleira limpa de 24 produtos financeiros em tiles separados, sobre fundo claro: *itens isolados*. Os produtos vêm em quatro famílias, que depois viram os clusters:
+  - **Dia a dia:** Conta digital, Conta salário, Pix, Cartão de débito, Cartão de crédito, Débito automático, Cashback
+  - **Investimentos:** CDB, LCI, LCA, Tesouro Direto, Poupança, Fundos, Previdência
+  - **Crédito:** Crédito pessoal, Consignado, Cheque especial, Financiamento imobiliário, Financiamento de veículo, Consórcio
+  - **Proteção:** Seguro de vida, Seguro residencial, Seguro cartão, Capitalização
 - **2:06–2:11** Cada tile vira. No verso aparece um vetor em fonte mono, com números se embaralhando: `[0.82, −0.14, 0.33, 0.07, …]`. Na tela: **produto → vetor**.
 - **2:11–2:16** **Decolagem.** O fundo escurece até um grafite azulado profundo. Os tiles viram pontos de luz e decolam para um espaço 3D, deixando rastros, num whoosh crescente.
   - A câmera começa uma órbita lenta, com profundidade de campo: pontos distantes ficam menores e desfocados.
   - Eixos fracos marcam `dim 1 … dim 128`.
 - **2:16–2:23** **Afinidade.** Os pontos se acomodam em clusters, e halos de nebulosa nas cores da marca acendem em volta de cada grupo. Dois pontos próximos se ligam por uma linha com o arco `cos θ = 0.94`; um ponto distante mostra `0.12`. Na tela: **proximidade = afinidade**.
-- **2:23–2:29** **Principalidade.** Uma trilha luminosa passa pelos produtos que um cliente usa e converge para uma região central brilhante, o *núcleo de principalidade*. A constelação se simplifica num mapa limpo, com rótulos elegantes nos clusters.
+- **2:23–2:29** **Principalidade.** Uma trilha luminosa passa pelos produtos que um cliente usa (Conta digital → Pix → Cartão de crédito → CDB → Previdência) e converge para uma região central brilhante, o *núcleo de principalidade*. A constelação se simplifica num mapa limpo, com rótulos elegantes nos clusters.
 - **2:29–2:32** Carimbo **Afinidade mapeada ✓**. O chip 03 recebe o check.
 
 **Texto em tela:** "Embeddings" · "produto → vetor" · "proximidade = afinidade" · "Mapeando relações entre produtos"
 
 **Narração**
-- `2:03` Terceiro desafio: **principalidade**. Para outro cliente, era preciso entender como os produtos se relacionam.
-- `2:09` Com **embeddings**, deixamos de olhar itens isolados: cada produto vira um vetor — uma coordenada num espaço de muitas dimensões.
+- `2:03` Terceiro desafio: **principalidade** — entender como os produtos financeiros se relacionam.
+- `2:09` Com **embeddings**, deixamos de olhar itens isolados: cada produto vira um vetor, num espaço de muitas dimensões.
 - `2:17` Ali, **proximidade significa afinidade**. Produtos parecidos se agrupam, regiões se formam…
 - `2:24` …e padrões invisíveis viram um **mapa claro** para decisões de principalidade.
 
@@ -221,7 +228,7 @@ A trilha é a 120 BPM, então 1 compasso dura 2s. Todas as cenas começam e term
   1. **Ingestão:** pacotes de dados entram.
   2. **Validação:** portões com ✓; um pacote vermelho é barrado.
   3. **Processamento:** engrenagens transformam os dados.
-  4. **Insights:** os **Agentes do caso 01 voltam**, varrem o report e fixam destaques ("↑ alerta", "novo padrão").
+  4. **Insights:** os **Agentes do caso 01 voltam**: os geradores leem o report, o Validador aprova e o Embalador coloca o destaque no título do report ("↑ alerta", "novo padrão").
   5. **Publicação:** o report se monta sozinho, com capa, KPIs e gráficos.
   6. **Board:** uma sala executiva minimalista recebe o report, que se ilumina.
   
@@ -231,9 +238,9 @@ A trilha é a 120 BPM, então 1 compasso dura 2s. Todas as cenas começam e term
 **Texto em tela:** "Lights-off reporting" · "Fraude" · "Do dado ao board"
 
 **Narração**
-- `2:33` Quarto desafio: **eficiência**. Os reports de fraude para o board exigiam muito trabalho manual: extrair, conferir, formatar… repetir.
+- `2:33` Quarto desafio: **eficiência**. O report de fraude para o board exigia trabalho manual: extrair, conferir, formatar… repetir.
 - `2:42` Então criamos uma automação **lights-off**. *(o CLICK vem logo depois)*
-- `2:46` Os dados chegam, são validados, processados… e o report é publicado automaticamente. E os agentes de insight já destacam **o que importa**.
+- `2:46` Os dados chegam, são validados, processados… e o report é publicado sozinho. E os agentes de insight destacam **o que importa**.
 - `2:55` Do dado ao board — com **velocidade, consistência e escala**.
 
 **Som:**
@@ -368,11 +375,9 @@ A trilha é a 120 BPM, então 1 compasso dura 2s. Todas as cenas começam e term
 ## 7. Pontos para validar
 
 1. **Resultados reais.** Não inventei métricas. Se houver números aprovados para divulgação (horas economizadas no report, ganho na recomendação etc.), eles entram nos carimbos ✓ e deixam o vídeo bem mais forte.
-2. **Multiagente.** Descrevi três papéis: monitor, investigador e narrador.
-   - Isso bate com a arquitetura real?
-   - Os agentes de insight atuam de fato no report de fraude, como mostra a cena 7?
-3. **Principalidade.** Que "produtos" foram mapeados com embeddings: produtos financeiros, categorias de estabelecimento, SKUs? A resposta define os ícones da cena 6. E a trilha que leva ao "núcleo de principalidade" é uma metáfora visual — pode ser assim?
-4. **Anonimização.** Usei "cliente do varejo" e "outro cliente". Fica assim, ou podemos citar o setor ou o nome?
+2. ~~**Multiagente.**~~ **Validado:** 3 geradores (Analista, Business, C-Level) → Validador (pode reprovar e mandar refazer) → Embalador (o insight vira o título do dashboard ou slide).
+3. ~~**Principalidade.**~~ **Validado:** produtos financeiros de um issuer, com nomes brasileiros.
+4. ~~**Anonimização.**~~ **Validado.**
 5. **CTA final.** "Use mais esta track." + "Traga seu próximo desafio." O público é interno (quem aciona a track)? Prefere outro fechamento?
 6. **Voz.** A voz nativa do navegador funciona offline, mas a qualidade depende do sistema (Windows "Maria", macOS "Luciana") e pode soar robótica.
    - Minha proposta: deixar o TTS como padrão, sincronizado frase a frase, com os cues prontos para trocar por uma locução gravada embutida no próprio HTML.
