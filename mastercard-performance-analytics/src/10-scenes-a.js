@@ -17,8 +17,10 @@ function rich(ctx, str, x, y, o = {}) {
 function pill(ctx, x, y, label, o = {}) {
   const size = o.size || 22, w = measure(ctx, label, size, o.weight || 700) + size * 1.6, h = size * 1.9;
   ctx.save(); ctx.globalAlpha *= (o.alpha == null ? 1 : o.alpha); ctx.translate(x, y); ctx.scale(o.scale || 1, o.scale || 1);
+  ctx.rotate(o.rot || 0);
+  if (o.fill && !o.flat) { ctx.save(); ctx.translate(3, 4); rr(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = rgba(INK, .85); ctx.fill(); ctx.restore(); }
   rr(ctx, -w / 2, -h / 2, w, h, h / 2); if (o.fill) { ctx.fillStyle = o.fill; ctx.fill(); }
-  if (o.stroke) { ctx.strokeStyle = o.stroke; ctx.lineWidth = 2; ctx.stroke(); }
+  const st = o.stroke || (o.fill && !o.flat ? INK : null); if (st) { ctx.strokeStyle = st; ctx.lineWidth = o.lw || 2.5; ctx.stroke(); }
   text(ctx, label, 0, 1, { size, weight: o.weight || 700, color: o.color || C.ink, align: 'center' }); ctx.restore(); return w;
 }
 /** íris (abre/fecha) — r = raio do buraco */

@@ -8,13 +8,16 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   ctx.save(); ctx.globalAlpha *= (o.alpha == null ? 1 : o.alpha);
   const gA = ctx.createRadialGradient(ax - R * .3, cy - R * .3, R * .1, ax, cy, R); gA.addColorStop(0, '#FF3347'); gA.addColorStop(1, C.red);
   const gB = ctx.createRadialGradient(bx - R * .3, cy - R * .3, R * .1, bx, cy, R); gB.addColorStop(0, '#FFC25A'); gB.addColorStop(1, C.yellow);
+  const sd = Math.max(5, R * .05); ctx.save(); ctx.translate(sd, sd * 1.15); ctx.beginPath(); ctx.arc(ax, cy, R, 0, TAU); ctx.moveTo(bx + R, cy); ctx.arc(bx, cy, R, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fill('nonzero'); ctx.restore();
   circle(ctx, ax, cy, R, gA); circle(ctx, bx, cy, R, gB);
   if (d < 2 * R) {
     ctx.save(); ctx.beginPath(); ctx.arc(ax, cy, R, 0, TAU); ctx.clip();
     circle(ctx, bx, cy, R, mix(C.orange, '#FFE6C7', hot * .6));
     ctx.restore();
-    if (hot > 0) glow(ctx, cx, cy, R * 1.1, '#FFF2E0', hot * .7);
   }
+  [ax, bx].forEach(c0 => { ctx.save(); ctx.beginPath(); ctx.arc(c0, cy, R, 0, TAU); ctx.clip(); ctx.globalAlpha *= .22; ctx.drawImage(SHADE, c0 - R, cy - R, R * 2, R * 2); ctx.restore(); });
+  const lw = Math.max(2.5, R * .028); circle(ctx, ax, cy, R, null, INK, lw); circle(ctx, bx, cy, R, null, INK, lw);
+  if (hot > 0 && d < 2 * R) glow(ctx, cx, cy, R * 1.1, '#FFF2E0', hot * .7);
   if (o.labels) {
     const ls = Math.max(18, R * .15);
     text(ctx, o.labels[0], ax - R * .42, cy, { size: ls, weight: 800, align: 'center', color: '#FFF', alpha: o.labelA == null ? 1 : o.labelA });

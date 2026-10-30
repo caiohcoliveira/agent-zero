@@ -133,7 +133,7 @@ function kinetic(ctx, str, x, y, t, o = {}) {
       ctx.save(); ctx.globalAlpha *= a;
       const dy = (1 - p) * size * .45 - q * size * .3, s = lerp(.92, 1, p);
       ctx.translate(cx + widths[i] / 2, y + dy); ctx.scale(s, s);
-      text(ctx, wd.w, 0, 0, { size, weight, color: wd.hi ? accent : color, align: 'center', ls });
+      (o.retro ? retroText : text)(ctx, wd.w, 0, 0, { size, weight, color: wd.hi ? accent : color, align: 'center', ls, shadow: o.shadow, depth: o.depth, lw: o.lw });
       ctx.restore();
     }
     cx += widths[i] + sp;
@@ -168,22 +168,21 @@ function shakeAt(T) {
 
 // ---------- fundos ----------
 function bgDark(ctx, t, o = {}) {
-  const base = o.base || C.ink;
-  ctx.fillStyle = base; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(TEX.dark, 0, 0);
+  if (o.base && o.base !== C.ink) { ctx.save(); ctx.globalAlpha = o.baseA == null ? .72 : o.baseA; ctx.fillStyle = o.base; ctx.fillRect(0, 0, W, H); ctx.restore(); }
   const g = ctx.createRadialGradient(W / 2, H * .45, 50, W / 2, H / 2, W * .75);
-  g.addColorStop(0, rgba(o.center || '#2B2622', o.centerA == null ? .9 : o.centerA)); g.addColorStop(1, rgba(base, 0));
+  g.addColorStop(0, rgba(o.center || '#2B2622', o.centerA == null ? .9 : o.centerA * .85)); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  if (o.grid !== false) dotGrid(ctx, t, rgba('#FFFFFF', .05), o.drift);
+  if (o.grid) dotGrid(ctx, t, rgba('#FFFFFF', .05), o.drift);
 }
 function bgLight(ctx, t, o = {}) {
-  ctx.fillStyle = o.base || C.cream; ctx.fillRect(0, 0, W, H);
-  if (o.grid !== false) {
-    ctx.save(); ctx.strokeStyle = 'rgba(20,20,20,0.045)'; ctx.lineWidth = 1; const s = 80, off = ((o.drift || 0) * t) % s;
+  ctx.drawImage(TEX.light, 0, 0);
+  if (o.base) { ctx.save(); ctx.globalAlpha = .35; ctx.fillStyle = o.base; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+  if (o.grid) {
+    ctx.save(); ctx.strokeStyle = 'rgba(26,23,20,0.05)'; ctx.lineWidth = 1; const s = 80, off = ((o.drift || 0) * t) % s;
     ctx.beginPath(); for (let x = -s + off; x < W + s; x += s) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
     for (let y = 0; y < H; y += s) { ctx.moveTo(0, y); ctx.lineTo(W, y); } ctx.stroke(); ctx.restore();
   }
-  const g = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, W * .7);
-  g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(120,100,80,0.10)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 }
 function dotGrid(ctx, t, color, drift = 6) {
   ctx.save(); ctx.fillStyle = color; const s = 48, off = (t * drift) % s;

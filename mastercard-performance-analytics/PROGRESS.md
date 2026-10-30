@@ -10,7 +10,7 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
 ## v2 — ajustes da revisão (ver "O que mudou" no `STORYLINE.md`)
 
 - [x] **E1. Storyline v2 + este plano**
-- [ ] **E2. Sistema visual retrô-moderno / colagem:**
+- [x] **E2. Sistema visual retrô-moderno / colagem:**
   - papel, contornos, sombras chapadas, meio-tom, stickers, fita;
   - camada futurista (neon, grid, scanlines);
   - aplicado aos componentes.

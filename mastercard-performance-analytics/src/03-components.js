@@ -94,7 +94,8 @@ function agent(ctx, x, y, r, o = {}) {
   const g = ctx.createRadialGradient(-r * .35, -r * .4, r * .1, 0, 0, r * 1.05);
   g.addColorStop(0, mix(body, '#FFFFFF', .35)); g.addColorStop(1, body);
   circle(ctx, 0, 0, r, g);
-  if (o.role === 'validador') circle(ctx, 0, 0, r, null, rgba(C.ink, .12), r * .04);
+  ctx.save(); ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.clip(); ctx.globalAlpha *= .18; ctx.drawImage(SHADE, -r, -r, r * 2, r * 2); ctx.restore();
+  circle(ctx, 0, 0, r, null, INK, Math.max(2, r * .075));
   // visor
   const vw = r * 1.36, vh = r * .56, vy = -r * .1;
   rr(ctx, -vw / 2, vy - vh / 2, vw, vh, vh / 2); ctx.fillStyle = C.ink; ctx.fill();
@@ -117,44 +118,51 @@ function agent(ctx, x, y, r, o = {}) {
 // ---------- cards ----------
 function card(ctx, x, y, w, h, o = {}) {
   const dark = o.theme === 'dark';
-  shadowed(ctx, o.blur == null ? 40 : o.blur, `rgba(0,0,0,${dark ? .5 : .16})`, 14, () => { rr(ctx, x, y, w, h, o.r || 22); ctx.fillStyle = o.fill || (dark ? C.ink2 : '#FFFFFF'); ctx.fill(); });
-  if (o.stroke) { rr(ctx, x, y, w, h, o.r || 22); ctx.strokeStyle = o.stroke; ctx.lineWidth = o.lw || 2; ctx.stroke(); }
+  paper(ctx, x, y, w, h, { r: o.r || 22, fill: o.fill || (dark ? '#2A241E' : '#FFFDF8'), halftone: o.halftone,
+    shadow: o.blur === 0 ? 0 : (o.shadow == null ? clamp(w * .012, 4, 10) : o.shadow), shadowColor: dark ? 'rgba(0,0,0,.8)' : rgba(INK, .88),
+    outline: o.stroke || (dark ? 'rgba(243,235,221,.85)' : INK), lw: o.lw || (w < 320 ? 2 : 3) });
 }
-/** card-pergunta (cena 2 e abertura de cada caso) — centrado em (x,y) */
+/** card-pergunta (cena 2 e abertura de cada caso) — papel recortado com fita, centrado em (x,y) */
 function questionCard(ctx, x, y, q, o = {}) {
   const w = o.w || 560, h = o.h || 250, dark = o.theme === 'dark', s = o.scale == null ? 1 : o.scale;
   const accent = [C.yellow, C.red, C.orange, C.red][(+q.n) - 1] || C.orange;
   ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0); ctx.scale(s * (o.flip == null ? 1 : o.flip), s); ctx.globalAlpha *= (o.alpha == null ? 1 : o.alpha);
-  card(ctx, -w / 2, -h / 2, w, h, { theme: o.theme });
-  ctx.save(); rr(ctx, -w / 2, -h / 2, w, h, 22); ctx.clip(); ctx.fillStyle = accent; ctx.fillRect(-w / 2, -h / 2, 12, h); ctx.restore();
-  text(ctx, q.n, -w / 2 + 48, -h / 2 + 52, { size: 30, weight: 800, mono: true, color: accent });
-  if (o.tag) text(ctx, o.tag, -w / 2 + 104, -h / 2 + 53, { size: 18, weight: 700, mono: true, color: dark ? C.stone : C.stone, ls: 2 });
-  icon(ctx, q.icon, w / 2 - 70, -h / 2 + 62, 58, accent);
-  text(ctx, q.q, -w / 2 + 48, 34, { size: 46, weight: 800, color: dark ? C.cream : C.ink, ls: -1, lh: 1.1 });
+  paper(ctx, -w / 2, -h / 2, w, h, { r: 18, fill: dark ? '#2A241E' : '#FFFDF8', outline: dark ? 'rgba(243,235,221,.9)' : INK, shadowColor: dark ? '#000' : rgba(INK, .9), shadow: 10 });
+  ctx.save(); rr(ctx, -w / 2, -h / 2, w, h, 18); ctx.clip(); ctx.fillStyle = accent; ctx.fillRect(-w / 2, -h / 2, 18, h);
+  ctx.globalAlpha *= .22; ctx.drawImage(SHADE, w / 2 - 220, h / 2 - 160, 220, 160); ctx.restore();
+  line(ctx, -w / 2 + 18, -h / 2 + 4, -w / 2 + 18, h / 2 - 4, dark ? 'rgba(243,235,221,.9)' : INK, 3);
+  circle(ctx, -w / 2 + 66, -h / 2 + 56, 30, accent, INK, 3); text(ctx, q.n, -w / 2 + 66, -h / 2 + 57, { size: 26, weight: 900, mono: true, color: q.n === '01' ? INK : '#FFF', align: 'center' });
+  if (o.tag) text(ctx, o.tag, -w / 2 + 112, -h / 2 + 57, { size: 18, weight: 700, mono: true, color: C.stone, ls: 2 });
+  icon(ctx, q.icon, w / 2 - 70, -h / 2 + 62, 58, dark ? accent : INK);
+  text(ctx, q.q, -w / 2 + 48, 38, { size: 46, weight: 900, color: dark ? C.cream : INK, ls: -1, lh: 1.08 });
+  tape(ctx, 0, -h / 2 - 4, 120, 34, -.04, (+q.n) * 7);
   ctx.restore();
 }
-/** carimbo de resultado ✓ — slam com anel */
+/** carimbo de resultado ✓ — sticker retrô com contorno, sombra chapada e anel */
 function stamp(ctx, x, y, label, p, o = {}) {
   if (p <= 0) return;
-  const s = lerp(1.7, 1, E.outExpo(clamp(p * 1.6))), a = clamp(p * 4), dark = o.theme === 'dark';
-  const ring = clamp(p * 1.2);
+  const s = lerp(1.7, 1, E.outExpo(clamp(p * 1.6))), a = clamp(p * 4), dark = o.theme === 'dark', ring = clamp(p * 1.2);
   ctx.save(); ctx.globalAlpha *= a * (o.alpha == null ? 1 : o.alpha);
-  circle(ctx, x - 0, y, 60 + ring * 140, null, rgba(C.orange, (1 - ring) * .7), 4);
-  ctx.translate(x, y); ctx.scale(s, s); ctx.rotate(-.04);
-  const tw = measure(ctx, label, 40, 800) + 150;
-  shadowed(ctx, 30, 'rgba(0,0,0,.25)', 10, () => { rr(ctx, -tw / 2, -44, tw, 88, 44); ctx.fillStyle = dark ? C.cream : C.ink; ctx.fill(); });
-  circle(ctx, -tw / 2 + 44, 0, 30, C.orange); icon(ctx, 'check', -tw / 2 + 44, 1, 38, '#FFF', 13);
-  text(ctx, label, -tw / 2 + 92, 2, { size: 40, weight: 800, color: dark ? C.ink : C.cream, ls: -.5 });
+  circle(ctx, x, y, 60 + ring * 150, null, rgba(C.orange, (1 - ring) * .8), 5);
+  ctx.translate(x, y); ctx.scale(s, s); ctx.rotate(-.05);
+  const tw = measure(ctx, label, 40, 900) + 160;
+  paper(ctx, -tw / 2, -46, tw, 92, { r: 46, fill: dark ? PAPER : '#FFFDF8', shadow: 9, shadowColor: dark ? '#000' : INK, lw: 4 });
+  circle(ctx, -tw / 2 + 48, 0, 32, C.orange, INK, 3.5);
+  ctx.save(); ctx.beginPath(); ctx.arc(-tw / 2 + 48, 0, 32, 0, TAU); ctx.clip(); ctx.globalAlpha *= .3; ctx.drawImage(SHADE, -tw / 2 + 16, -32, 64, 64); ctx.restore();
+  icon(ctx, 'check', -tw / 2 + 48, 1, 40, '#FFF', 14);
+  text(ctx, label, -tw / 2 + 98, 3, { size: 40, weight: 900, color: INK, ls: -.5 });
   ctx.restore();
 }
-/** cabeçalho de caso: tag + título + subtítulo */
+/** cabeçalho de caso: tag (sticker) + título de pôster + subtítulo */
 function caseHeader(ctx, t, c, o = {}) {
   const dark = o.theme === 'dark', x = o.x || 64, y = o.y || 150, out = o.out == null ? Infinity : o.out;
   const a = P(t, 0, .4) * (1 - P(t, out, .4));
   if (a <= 0) return; ctx.save(); ctx.globalAlpha *= a;
-  text(ctx, c.tag, x, y, { size: 20, weight: 700, mono: true, color: C.orange, ls: 3 });
-  kinetic(ctx, c.title, x, y + 52, t - .1, { size: 52, align: 'left', color: dark ? C.cream : C.ink, stagger: .05 });
-  if (c.sub) kinetic(ctx, c.sub, x, y + 100, t - .35, { size: 26, weight: 400, align: 'left', color: dark ? C.sand : C.mute, stagger: .03, ls: 0 });
+  const tw = measure(ctx, c.tag, 18, 700, true, 3) + 28;
+  ctx.save(); ctx.translate(x + tw / 2, y); ctx.rotate(-.02); paper(ctx, -tw / 2, -17, tw, 34, { r: 4, fill: C.orange, shadow: 4, shadowColor: dark ? '#000' : INK, lw: 2 });
+  text(ctx, c.tag, 0, 1, { size: 18, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 3 }); ctx.restore();
+  kinetic(ctx, c.title, x, y + 60, t - .1, { size: 56, align: 'left', color: dark ? '#FFF' : INK, stagger: .05, retro: true, shadow: C.orange, depth: 4, lw: 0 });
+  if (c.sub) kinetic(ctx, c.sub, x, y + 112, t - .35, { size: 26, weight: 500, align: 'left', color: dark ? C.sand : C.mute, stagger: .03, ls: 0 });
   ctx.restore();
 }
 
