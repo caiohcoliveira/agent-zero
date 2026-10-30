@@ -1,9 +1,10 @@
-# Performance Analytics — "A Interseção"
+# Performance Analytics — "A Interseção" (v2)
 
-Vídeo animado executivo de cerca de 4 minutos sobre a track de Performance Analytics.
+Vídeo animado executivo de 4 minutos sobre a track de Performance Analytics, com visual retrô-moderno de colagem na identidade Mastercard e camada futurista nos trechos de modelos.
 
 - **Arquivo final:** [`performance-analytics.html`](performance-analytics.html) — um único HTML, 1920×1080, 100% offline, sem dependências.
-- **Roteiro e storyboard validados:** [`STORYLINE.md`](STORYLINE.md).
+- **Roteiro e storyboard (v2):** [`STORYLINE.md`](STORYLINE.md).
+- **Checkpoint de retomada:** [`PROGRESS.md`](PROGRESS.md).
 
 ## Como assistir
 
@@ -27,7 +28,8 @@ A barra de progresso aceita clique e arraste. Ao passar o mouse, ela mostra o no
 
 ## Narração
 
-- A narração usa a **Web Speech API** do navegador e prefere uma voz feminina pt-BR.
+- A narração vem **desligada por padrão**. Para ligar, use o botão **Voz** ou a tecla **V** (ou `CONFIG.audio.voice = true`).
+- Ela usa a **Web Speech API** do navegador e prefere uma voz feminina pt-BR.
 - A qualidade depende das vozes instaladas no sistema:
   - **Windows / Edge:** "Francisca" e "Thalita" (naturais, exigem internet); "Maria" funciona offline.
   - **macOS:** "Luciana".
@@ -47,13 +49,16 @@ src/
   00-head.html           HTML + CSS (palco 1920×1080, overlay inicial, controles)
   01-config.js           ★ CONFIG: cores, tempos das cenas, textos, narração, áudio, motion
   02-core.js             easing, interpolação, RNG com seed, cores, primitivas, câmera, fundos, granulação
+  03-collage.js          ★ linguagem retrô-moderna: papel, contornos, sombras chapadas, meio-tom, fita,
+                         stickers, tiras de fórmula, recortes; camada futurista (grid neon, sol, scanlines, holo)
   03-components.js       ícones vetoriais, agentes (personagens), cards, carimbo ✓, chips, dashboard
   04-viz.js              visualizações de modelos: gaussiana, regressão, classificação, árvore,
                          ensemble, clusters, anomalia, embeddings, recomendação, agentes,
-                         pipeline, crédito, forecast, IA
+                         pipeline, crédito, forecast, IA, gradiente descendente, atenção (transformer)
   05-audio.js            trilha e SFX sintetizados (Web Audio) + sistema de cues
   06-voice.js            narração (speechSynthesis) e legendas
-  10…17-*.js             as 10 cenas
+  10…17-*.js             as 10 cenas: hook (5 desafios), problema, hub, ALS, embeddings,
+                         lights-off, insights em escala, possibilidades (∞), clímax, split-flap
   90-player.js           render, transições, loop, controles, teclado
   99-tail.html
 build.sh                 junta tudo em performance-analytics.html
@@ -69,6 +74,11 @@ Depois de editar algo em `src/`, rode `./build.sh`.
 - **Performance.** Brilhos usam gradientes radiais em vez de `shadowBlur`, e a granulação é uma textura pré-renderizada. O render custa ~1 ms por frame.
 
 ## Estratégia de animação
+
+- **Visual retrô-moderno de colagem:**
+  - papel recortado com contorno de tinta, sombras chapadas, meio-tom, fita e stickers;
+  - fórmulas reais coladas como easter eggs técnicos (cosseno, gradiente descendente, ALS, atenção, Gini, uplift, Bellman…).
+- **Camada futurista nos trechos de modelos:** grid neon em perspectiva, sol listrado, scanlines e painéis holográficos.
 
 - **Entrar rápido e assentar.** Os elementos entram com `outExpo` ou `outBack`, com um leve overshoot.
 - **Câmera virtual.** Faz zoom, pan e rotação, com tremor nos impactos. A intensidade é controlada por `CONFIG.motion`.
@@ -89,7 +99,8 @@ Depois de editar algo em `src/`, rode `./build.sh`.
 | `text` | todos os textos-chave; `*palavra*` = destaque laranja |
 | `narration` | frases e tempos da narração |
 | `motion.intensity`, `motion.shake`, `motion.onTwos`, `motion.grain` | energia do movimento |
-| `audio.music`, `audio.sfx`, `audio.voice`, volumes, `voiceRate` | áudio |
+| `audio.music`, `audio.sfx`, `audio.voice` (padrão: desligada), volumes, `voiceRate` | áudio |
+| `caseDone` | momento do carimbo ✓ de cada caso (sincroniza os chips) |
 | `captions` | legendas completas ligadas por padrão |
 
 ## Observação sobre os dados

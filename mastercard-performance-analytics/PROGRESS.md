@@ -27,7 +27,9 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   - transformers + GPU + vários modelos + perímetro "o dado nunca sai".
 - [x] **E7. Cena "Possibilidades":** 3 ondas de modelos → ∞.
 - [x] **E8. Clímax** (fórmulas, Otimização, Transformers) **+ fechamento split-flap** (Welcome to…).
-- [ ] **E9. QA completo + README atualizado.**
+- [x] **E9. QA completo + README atualizado.**
+
+**v2 concluída.** Próximo passo: revisão do usuário assistindo à v2. Cada ajuste vira 1 commit + push.
 
 ## Como retomar numa nova sessão
 

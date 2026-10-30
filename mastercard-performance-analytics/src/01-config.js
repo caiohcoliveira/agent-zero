@@ -53,7 +53,7 @@ const CONFIG = {
     { id: 'embed',     dur: 30, theme: 'light', transitionIn: { type: 'iris', dur: 0.9 } },   // caso 02
     { id: 'lightsoff', dur: 26, theme: 'light' },   // caso 03
     { id: 'insights',  dur: 34, theme: 'dark'  },   // caso 04 (alimenta os reports automatizados)
-    { id: 'skills',    dur: 22, theme: 'dark'  },   // possibilidades
+    { id: 'skills',    dur: 22, theme: 'dark'  },   // possibilidades (ondas de modelos → ∞)
     { id: 'climax',    dur: 20, theme: 'dark'  },
     { id: 'close',     dur: 18, theme: 'dark'  }
   ],
@@ -104,16 +104,12 @@ const CONFIG = {
       frontier: ['causal ML', 'uplift modeling', 'reinforcement learning', 'graph fraud', 'graph embeddings',
         'deep recommenders', 'dynamic pricing', 'real-time personalization', 'multi-objective optimization']
     },
-    skills: ['Crédito', 'Machine Learning', 'Advanced Analytics', 'Ciência de Dados', 'IA'],
     climaxWords: ['Estatística', 'Regressão', 'Classificação', 'Árvores', 'Ensembles', 'Clusters',
       'Anomalias', 'Otimização', 'Embeddings', 'Transformers', 'Agentes', 'Automação'],
     climaxLine: 'Dos problemas mais simples aos mais complexos',
     climaxKey: 'Nossa especialidade é *analytics*.',
     climaxSub: 'analytics · criatividade · escala',
-    flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS'],
-    future: 'O futuro da decisão é orientado por *analytics*.',
-    cta: 'Use mais esta *track*.',
-    ctaSub: 'Traga seu próximo desafio.'
+    flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },
 
   // ---------------------------------------------------------------- NARRAÇÃO
