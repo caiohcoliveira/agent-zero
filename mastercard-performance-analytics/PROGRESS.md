@@ -22,7 +22,7 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   - hook com os 5 desafios.
 - [x] **E4. Easter eggs no ALS e nos embeddings:** atualização do ALS, cosseno, gradiente descendente, InfoNCE.
 - [x] **E5. Lights-off:** sem agentes, com easter eggs e mergulho no nó Insights.
-- [ ] **E6. Insights em escala:**
+- [x] **E6. Insights em escala:**
   - destinos (report, dashboard, qualquer processo);
   - transformers + GPU + vários modelos + perímetro "o dado nunca sai".
 - [ ] **E7. Cena "Possibilidades":** 3 ondas de modelos → ∞.
