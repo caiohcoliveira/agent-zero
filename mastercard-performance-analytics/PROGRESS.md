@@ -1,29 +1,38 @@
 # Progresso / checkpoint
 
-Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch `claude/mastercard-analytics-video-4cof1t` (PR #1). Se a conexão cair, retome a partir do último item marcado.
+Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch `claude/mastercard-analytics-video-4cof1t` (PR #1). Se a conexão cair, retome a partir do primeiro item não marcado.
 
-## Etapas
+## v1 (concluída)
 
-- [x] **1. Storyline v1** — `STORYLINE.md` (commit `39960c4`)
-- [x] **2. Validação do storyline** — ajustes aplicados:
-  - multiagente: 3 geradores → Validador → Embalador;
-  - produtos financeiros do issuer com nomes brasileiros;
-  - anonimização mantida.
-- [x] **3. HTML final** — `performance-analytics.html`, gerado a partir de `src/` por `build.sh` (commit `d5fa1df`)
-  - 10 cenas, trilha e SFX em Web Audio, narração pt-BR via Web Speech, controles e legendas
-  - testado: render de 0–240 s sem exceções; play, pause, seek e atalhos sem erros no console
-- [x] **4. Documentação** — `README.md` (como rodar, arquitetura, animação, parâmetros)
-- [ ] **5. Revisão do usuário assistindo ao vídeo** ← *próximo passo*
-- [ ] **6. Ajustes finais da revisão** (cada ajuste = 1 commit + push)
+- [x] Storyline v1 + validação (multiagente; produtos do issuer)
+- [x] HTML v1 (`d5fa1df`) + README + checkpoint
 
-## Em aberto
+## v2 — ajustes da revisão (ver "O que mudou" no `STORYLINE.md`)
 
-- Números reais aprovados para os carimbos ✓. Hoje os resultados são qualitativos e os números de tela são ilustrativos.
-- Voz: usar o TTS do navegador ou uma locução gravada embutida no HTML.
+- [x] **E1. Storyline v2 + este plano**
+- [ ] **E2. Sistema visual retrô-moderno / colagem:**
+  - papel, contornos, sombras chapadas, meio-tom, stickers, fita;
+  - camada futurista (neon, grid, scanlines);
+  - aplicado aos componentes.
+- [ ] **E3. Config v2:**
+  - voz desligada por padrão;
+  - nova ordem dos casos e novos tempos;
+  - nova narração;
+  - trilha por cena;
+  - hook com os 5 desafios.
+- [ ] **E4. Easter eggs no ALS e nos embeddings:** atualização do ALS, cosseno, gradiente descendente, InfoNCE.
+- [ ] **E5. Lights-off:** sem agentes, com easter eggs e mergulho no nó Insights.
+- [ ] **E6. Insights em escala:**
+  - destinos (report, dashboard, qualquer processo);
+  - transformers + GPU + vários modelos + perímetro "o dado nunca sai".
+- [ ] **E7. Cena "Possibilidades":** 3 ondas de modelos → ∞.
+- [ ] **E8. Clímax** (fórmulas, Otimização, Transformers) **+ fechamento split-flap** (Welcome to…).
+- [ ] **E9. QA completo + README atualizado.**
 
 ## Como retomar numa nova sessão
 
 1. Faça checkout da branch `claude/mastercard-analytics-video-4cof1t`.
-2. Leia este arquivo e o `STORYLINE.md`.
-3. Edite os arquivos em `src/` (parâmetros em `src/01-config.js`).
-4. Rode `./build.sh`, depois faça commit e push.
+2. Leia este arquivo e o `STORYLINE.md` (v2).
+3. Continue a partir do primeiro item não marcado. Os parâmetros ficam em `src/01-config.js`.
+4. Rode `./build.sh` e faça a verificação: o render de 0–240 s deve sair sem exceções.
+5. Faça commit e push, e marque o item aqui.
