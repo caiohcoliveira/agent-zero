@@ -9,7 +9,7 @@ const PLAYER = (() => {
   const st = { T: 0, playing: false, startPerf: 0, startT: 0, ended: false };
   const DUR = CONFIG.duration;
   const NAMES = { hook: 'Abertura', problem: 'O problema', hub: 'Performance Analytics', insights: 'Caso 01 · Insights em escala', als: 'Caso 02 · Recomendação (ALS)',
-    embed: 'Caso 03 · Embeddings', lightsoff: 'Caso 04 · Lights-off', skills: 'Capacidades', climax: 'Clímax', close: 'Fechamento' };
+    embed: 'Caso 03 · Embeddings', lightsoff: 'Caso 04 · Lights-off', skills: 'Possibilidades', climax: 'Clímax', close: 'Fechamento' };
 
   function sceneAt(T) { const S = CONFIG.scenes; for (let i = S.length - 1; i >= 0; i--) if (T >= S[i].start) return S[i]; return S[0]; }
   function drawScene(s, t, T) {

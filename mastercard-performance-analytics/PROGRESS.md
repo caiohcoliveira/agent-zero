@@ -25,7 +25,7 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
 - [x] **E6. Insights em escala:**
   - destinos (report, dashboard, qualquer processo);
   - transformers + GPU + vários modelos + perímetro "o dado nunca sai".
-- [ ] **E7. Cena "Possibilidades":** 3 ondas de modelos → ∞.
+- [x] **E7. Cena "Possibilidades":** 3 ondas de modelos → ∞.
 - [ ] **E8. Clímax** (fórmulas, Otimização, Transformers) **+ fechamento split-flap** (Welcome to…).
 - [ ] **E9. QA completo + README atualizado.**
 
