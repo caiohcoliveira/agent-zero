@@ -54,6 +54,7 @@
     themeAt: () => 'dark',
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .7, center: '#2A211B' });
+      collage(ctx, t, { seed: 31, n: 5, theme: 'dark', alpha: .85 * (1 - P(t, T_SPLIT, .5)) + .85 * P(t, T_LAT, .8) });
       const split = P(t, T_SPLIT, 1.4, E.inOutCubic), back = P(t, T_BACK, .8, E.inOutCubic), lat = P(t, T_LAT, 1.2, E.inOutCubic);
       const mergeK = split * (1 - back);
       const RS = { x: lerp(X0, 90, mergeK), y: lerp(Y0, 590 - NR * PITCH * .55 / 2, mergeK), s: lerp(1, .55, mergeK) };
@@ -82,6 +83,7 @@
         if (rowA > 0) { rr(ctx, RS.x - 6, RS.y + 2 * PITCH * RS.s - 2, NC * PITCH * RS.s + 6, PITCH * RS.s, 12); ctx.strokeStyle = rgba(C.orange, rowA); ctx.lineWidth = 4; ctx.globalAlpha = matA; ctx.stroke(); text(ctx, 'cliente', RS.x + NC * PITCH * RS.s + 24, RS.y + 2.5 * PITCH * RS.s, { size: 26, weight: 700, color: C.orange, alpha: rowA }); }
         if (colA > 0) { rr(ctx, RS.x + 5 * PITCH * RS.s + 2, RS.y - 6, PITCH * RS.s - 4, NR * PITCH * RS.s + 6, 12); ctx.strokeStyle = rgba(C.yellow, colA); ctx.lineWidth = 4; ctx.globalAlpha = matA; ctx.stroke(); text(ctx, 'produto (SKU)', RS.x + 5.5 * PITCH * RS.s, RS.y + NR * PITCH * RS.s + 34, { size: 26, weight: 700, color: C.yellow, align: 'center', alpha: colA }); }
         ctx.restore();
+        if (t > T_SWEEP && t < T_LAT + .3) formula(ctx, 'r̂ᵢⱼ = uᵢᵀ vⱼ', X0 + NC * PITCH + 150, Y0 + 60, { size: 24, rot: .04, seed: 12, alpha: win(t, T_SWEEP, T_LAT + .3, .3, .3), scale: E.outBack(P(t, T_SWEEP, .4)) });
         if (t > T_STAR + .3 && t < T_LAT + .3) text(ctx, 'lacunas → propensões', X0 + NC * PITCH / 2, Y0 + NR * PITCH + 50, { size: 32, weight: 800, color: C.orange, align: 'center', alpha: win(t, T_STAR + .3, T_LAT + .3, .4, .3) });
       }
       // ---------- avatares (clientes) e SKUs — viram pontos no espaço latente ----------
@@ -92,7 +94,8 @@
         if (hero) { const pull = P(t, T_PICK + 1.2, 1.4, E.inOutCubic), c = PICKS.reduce((acc, j) => [acc[0] + LPRO[j].x / 3, acc[1] + LPRO[j].y / 3], [0, 0]); x = lerp(x, lerp(L.x, c[0], .45), pull); y = lerp(y, lerp(L.y, c[1], .45), pull); glow(ctx, x, y, 90, C.orange, .6); }
         const rad = lerp(20 * RS.s, hero ? 36 : 27, lat) * a;
         circle(ctx, x, y, rad, lat > .5 ? mix('#3A3532', FC[grp(i)], .55) : '#3A3532', rgba(C.cream, .5), 2); icon(ctx, 'user', x, y, rad * 1.3, C.cream, 9);
-        if (hero && t < T_BASK + 1) PICKS.forEach((j, k) => { const lp = P(t, T_PICK + .4 + k * .25, .4, E.outCubic); if (lp > 0) line(ctx, x, y, lerp(x, LPRO[j].x, lp), lerp(y, LPRO[j].y, lp), rgba(C.orange, .8), 3); });
+        if (hero && t < T_BASK + 1) PICKS.forEach((j, k) => { const lp = P(t, T_PICK + .4 + k * .25, .4, E.outCubic); if (lp > 0) line(ctx, x, y, lerp(x, LPRO[j].x, lp), lerp(y, LPRO[j].y, lp), rgba(C.orange, .8), 3);
+          if (lp >= 1) text(ctx, 'uᵀv = ' + SN[HERO][j].toFixed(2), (x + LPRO[j].x) / 2 + 10, (y + LPRO[j].y) / 2 - 14, { size: 17, weight: 700, mono: true, color: C.yellow, alpha: P(t, T_PICK + .8 + k * .25, .3) }); });
       }
       for (let j = 0; j < NC; j++) {
         const a = E.outBack(P(t, T_GRID + .3 + j * .05, .35)); if (a <= 0) continue;
@@ -140,9 +143,12 @@
           ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.stroke(); circle(ctx, lx + n / HALF.length * lw, ly + lh - lh * Math.pow(.62, n) * .95, 7, C.yellow);
         }
         ctx.restore();
-        const fa = win(t, T_SPLIT + .8, T_BACK + .4, .5, .4) * .55;
-        text(ctx, 'R ≈ U · Vᵀ', W - 70, 170, { size: 40, weight: 700, mono: true, color: C.cream, align: 'right', alpha: fa * 1.4 });
-        text(ctx, 'min Σ (r − uᵀv)² + λ(‖u‖² + ‖v‖²)', W - 70, 222, { size: 24, weight: 500, mono: true, color: C.sand, align: 'right', alpha: fa });
+        const fa = win(t, T_SPLIT + .8, T_BACK + .4, .5, .4);
+        formula(ctx, 'R ≈ U · Vᵀ', W - 230, 160, { size: 30, rot: .03, seed: 5, alpha: fa, scale: E.outBack(P(t, T_SPLIT + .8, .4)) });
+        formula(ctx, 'min Σ (r − uᵀv)² + λ(‖u‖² + ‖v‖²)', W - 360, 236, { size: 20, rot: -.02, seed: 6, alpha: fa, scale: E.outBack(P(t, T_SPLIT + 1.1, .4)) });
+        formula(ctx, 'c = 1 + α·r  · implicit feedback', 300, 880, { size: 19, rot: -.03, seed: 7, alpha: fa, scale: E.outBack(P(t, T_SPLIT + 1.5, .4)) });
+        formula(ctx, 'rank k = 64', 250, 948, { size: 19, rot: .03, seed: 9, alpha: fa, scale: E.outBack(P(t, T_SPLIT + 1.8, .4)) });
+        if (active) formula(ctx, active === 'U' ? 'uᵢ = (VᵀV + λI)⁻¹ Vᵀ rᵢ' : 'vⱼ = (UᵀU + λI)⁻¹ Uᵀ rⱼ', 1200, 905, { neon: true, size: 22, alpha: fa });
       }
       // ---------- cesta ----------
       if (t > T_BASK) {
@@ -153,6 +159,8 @@
         circle(ctx, bx, by, 44 * ba, C.orange); icon(ctx, 'basket', bx, by + 2, 54 * ba, '#FFF', 8);
         if (t > T_DELIV + .6) pill(ctx, bx + 120, by - 40, 'cesta recomendada', { size: 22, fill: C.cream, color: C.ink, scale: E.outBack(P(t, T_DELIV + .6, .4)) });
       }
+      if (t > T_PICK) formula(ctx, 'score = uᵀv  ·  top-k = 3', 330, 960, { size: 19, rot: -.02, seed: 14, alpha: P(t, T_PICK, .4), scale: E.outBack(P(t, T_PICK, .4)) });
+      scanlines(ctx, .1);
       stamp(ctx, W / 2, 960, TX.cases.als.stamp, P(t, T_STAMP, 1.1), { theme: 'dark' });
     }
   };

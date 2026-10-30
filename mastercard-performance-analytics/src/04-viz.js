@@ -181,5 +181,20 @@ const VIZ = (() => {
     const a3 = E.outBack(clamp((p - .7) * 4)); if (a3 > 0) { ctx.save(); ctx.globalAlpha *= clamp(a3); rr(ctx, x + w * .76, y + h * .34, w * .24, h * .32, u * 4); ctx.fillStyle = C.orange; ctx.fill(); icon(ctx, 'spark', x + w * .88, y + h * .5, u * 12, '#FFF'); ctx.restore(); }
   };
 
+  V.gradient = (ctx, x, y, w, h, p, o = {}) => {
+    const u = U(w, h), mx = x + w * .66, my = y + h * .6, fgc = o.theme === 'light' ? C.ink : C.cream;
+    for (let k = 7; k >= 1; k--) { ctx.beginPath(); ctx.ellipse(mx, my, w * .09 * k, h * .075 * k, -.35, 0, TAU);
+      ctx.strokeStyle = k < 3 ? rgba(C.orange, .85) : rgba(fgc, .18 + (7 - k) * .05); ctx.lineWidth = Math.max(1, u * .5); ctx.stroke(); }
+    const N = 14, pts = []; let px = x + w * .08, py = y + h * .14, vx = 0, vy = 0;
+    for (let i = 0; i <= N; i++) { pts.push([px, py]); vx = vx * .5 - (px - mx) * .2; vy = vy * .5 - (py - my) * .2; px += vx; py += vy + (i % 2 ? 1 : -1) * h * .07 * Math.pow(.72, i); }
+    const k = clamp(p) * N, n = Math.min(N - 1, Math.floor(k)), f = k - n;
+    ctx.beginPath(); for (let i = 0; i <= n; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.lineTo(lerp(pts[n][0], pts[n + 1][0], f), lerp(pts[n][1], pts[n + 1][1], f));
+    ctx.strokeStyle = C.yellow; ctx.lineWidth = Math.max(1.5, u * .8); ctx.stroke();
+    for (let i = 0; i <= n; i++) circle(ctx, pts[i][0], pts[i][1], Math.max(1.5, u * .9), C.yellow);
+    const hx = lerp(pts[n][0], pts[n + 1][0], f), hy = lerp(pts[n][1], pts[n + 1][1], f);
+    glow(ctx, hx, hy, u * 9, C.orange, .9); circle(ctx, hx, hy, Math.max(3, u * 2.2), '#FFF', INK, 2);
+    const s = u * 2.4; line(ctx, mx - s, my - s, mx + s, my + s, fgc, Math.max(1, u * .5)); line(ctx, mx - s, my + s, mx + s, my - s, fgc, Math.max(1, u * .5));
+  };
+
   return V;
 })();

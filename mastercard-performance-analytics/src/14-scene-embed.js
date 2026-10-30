@@ -49,12 +49,15 @@
       bgLight(ctx, t, { drift: 6 });
       const dk = P(t, T_DARK, 1.5, E.inOutCubic);
       if (dk > 0) { ctx.save(); ctx.globalAlpha = dk; bgDark(ctx, t, { base: C.night, center: '#1C2436', centerA: .9, grid: false }); ctx.restore();
-        DUST.forEach((d, i) => { const q = proj([d[0] * 2.4, d[1] * 1.6, d[2] * 2.4], t); circle(ctx, q.x, q.y, 1.3 * q.s, rgba('#FFFFFF', .25 * dk * clamp(q.s - .4))); }); }
+        DUST.forEach((d, i) => { const q = proj([d[0] * 2.4, d[1] * 1.6, d[2] * 2.4], t); circle(ctx, q.x, q.y, 1.3 * q.s, rgba('#FFFFFF', .25 * dk * clamp(q.s - .4))); });
+        neonGrid(ctx, t, { horizon: 905, alpha: dk * .4 * (1 - P(t, T_OUT, .3)), speed: .4 }); }
+      else collage(ctx, t, { seed: 41, n: 6, alpha: 1 - P(t, T_SHELF, .6) });
       // card
       if (t < T_SHELF + .2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, T_SHELF - .3, .4);
         questionCard(ctx, W / 2, H / 2, Q('embed'), { tag: 'ISSUER', scale: lerp(1.6, 1.25, sc) * (1 - out * .3), alpha: 1 - out, w: 640, h: 240 }); }
       caseHeader(ctx, t - T_SHELF, TX.cases.embed, { theme: t < 9.8 ? 'light' : 'dark', out: T_OUT - T_SHELF - .3 });
       if (t > T_SHELF + 1.2 && t < T_DARK + .4) text(ctx, 'itens isolados', SX0, SY0 - 34, { size: 20, weight: 700, mono: true, color: C.stone, alpha: win(t, T_SHELF + 1.2, T_FLIP, .4, .4), ls: 2 });
+      if (t > T_FLIP + 1) formula(ctx, 'e = f(produto) ∈ ℝ¹²⁸', 1690, 258, { size: 22, rot: .03, seed: 8, alpha: win(t, T_FLIP + 1, T_DARK + .6, .3, .4), scale: E.outBack(P(t, T_FLIP + 1, .4)) });
       if (t > 7) kinetic(ctx, 'produto → *vetor*', W / 2 + 260, 250, t - 7, { size: 54, color: mix(C.ink, C.cream, dk), out: 3.0 });
       if (t > T_CL + .1) kinetic(ctx, 'proximidade = *afinidade*', W - 80, 250, t - T_CL - .1, { size: 48, align: 'right', color: C.cream, out: T_TRAIL - T_CL });
       // ---- prateleira → vetores → pontos ----
@@ -116,6 +119,17 @@
           circle(ctx, q.x, q.y, 30 + pu * 90, null, rgba(C.orange, (1 - pu) * cp), 3);
           pill(ctx, q.x, q.y + 70, 'núcleo de principalidade', { size: 24, fill: C.orange, color: '#FFF', alpha: cp * (1 - P(t, T_OUT, .2)), scale: E.outBack(cp) }); }
       }
+      // treino: gradiente descendente + InfoNCE (HUD)
+      const gd = win(t, T_LIFT + .2, T_CL + 2.8, .4, .5);
+      if (gd > 0) { holo(ctx, 60, 742, 580, 268, { title: 'TREINO · GRADIENTE DESCENDENTE', alpha: gd });
+        ctx.save(); ctx.globalAlpha *= gd; VIZ.gradient(ctx, 82, 786, 250, 205, P(t, T_LIFT + .4, 4.8), { t, theme: 'dark' });
+        neonText(ctx, 'θ ← θ − η ∇L(θ)', 360, 812, { size: 21, mono: true, weight: 600 }); text(ctx, 'InfoNCE', 360, 862, { size: 16, weight: 700, mono: true, color: C.stone, ls: 2 });
+        neonText(ctx, 'L = −log softmax(s⁺/τ)', 360, 894, { size: 18, mono: true, weight: 600, glow: C.yellow });
+        text(ctx, 'época ' + String(Math.min(40, 1 + Math.floor(P(t, T_LIFT + .4, 4.8) * 39))).padStart(2, '0') + '/40', 360, 950, { size: 18, weight: 700, mono: true, color: C.sand }); ctx.restore(); }
+      const cf = win(t, T_COS1 + .3, T_TRAIL + .2, .4, .4);
+      if (cf > 0) formula(ctx, 'd_cos(a,b) = 1 − a·b / (‖a‖ ‖b‖)', 430, 334, { neon: true, size: 22, rot: -.015, alpha: cf });
+      if (t > T_TRAIL) formula(ctx, 'UMAP · 128D → 3D', W - 210, H - 150, { neon: true, size: 18, alpha: win(t, T_TRAIL, T_OUT, .4, .3) });
+      if (dk > 0) scanlines(ctx, .08 * dk);
       stamp(ctx, W / 2, 960, TX.cases.embed.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .3)), { theme: 'dark' });
       // saída: núcleo cresce até preencher a tela (creme)
       const out = P(t, T_OUT, .8, E.inExpo);
