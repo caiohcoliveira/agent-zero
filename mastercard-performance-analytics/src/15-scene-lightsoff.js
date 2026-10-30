@@ -57,7 +57,7 @@
       // ---------- ANTES ----------
       if (t < T_CLICK) {
         bgLight(ctx, t, { base: '#EFEBE5' });
-        if (t < 3.2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, 2.8, .4); questionCard(ctx, W / 2, H / 2, TX.questions[3], { tag: 'FRAUDE · BOARD', scale: lerp(1.6, 1.25, sc) * (1 - out * .4), alpha: 1 - out, w: 640, h: 240 }); }
+        if (t < 3.2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, 2.8, .4); questionCard(ctx, W / 2, H / 2, Q('lightsoff'), { tag: 'FRAUDE · BOARD', scale: lerp(1.6, 1.25, sc) * (1 - out * .4), alpha: 1 - out, w: 640, h: 240 }); }
         const b = P(t, T_BEFORE, .5);
         if (b > 0) {
           ctx.save(); ctx.globalAlpha = b;
@@ -94,7 +94,7 @@
             rr(ctx, -125, -38, 250, 76, 12); ctx.strokeStyle = i === 3 ? C.red : C.ink; ctx.lineWidth = 5; ctx.stroke(); text(ctx, w, 0, 2, { size: 40, weight: 800, color: i === 3 ? C.red : C.ink, align: 'center' }); ctx.restore(); });
           ctx.restore();
         }
-        caseHeader(ctx, t - T_BEFORE, TX.case4, { theme: 'light' });
+        caseHeader(ctx, t - T_BEFORE, TX.cases.lightsoff, { theme: 'light' });
         // interruptor
         const sw = P(t, T_SWITCH, .7, E.outExpo);
         if (sw > 0) { ctx.save(); ctx.globalAlpha = .55 * sw; ctx.fillStyle = '#E8E2D8'; ctx.fillRect(0, 0, W, H); ctx.restore();
@@ -149,8 +149,8 @@
           ctx.restore(); }
         ctx.restore();
       });
-      if (t > T_CLICK + 1.6) caseHeader(ctx, t - T_CLICK - 1.6, TX.case4, { theme: 'dark', out: T_OUT - T_CLICK - 1.6 });
-      stamp(ctx, W / 2, 250, TX.case4.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .4)), { theme: 'dark' });
+      if (t > T_CLICK + 1.6) caseHeader(ctx, t - T_CLICK - 1.6, TX.cases.lightsoff, { theme: 'dark', out: T_OUT - T_CLICK - 1.6 });
+      stamp(ctx, W / 2, 250, TX.cases.lightsoff.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .4)), { theme: 'dark' });
     }
   };
 })();

@@ -52,7 +52,7 @@
       // ---------- card-pergunta → flip → dashboard ----------
       if (t < T_FLIP + .3) {
         const flip = P(t, T_FLIP, .3, E.inCubic); const sc = E.outBack(P(t, .05, .45));
-        questionCard(ctx, W / 2, H / 2, TX.questions[0], { scale: lerp(1.6, 1.25, sc), flip: 1 - flip, w: 640, h: 240, alpha: P(t, 0, .1) });
+        questionCard(ctx, W / 2, H / 2, Q('insights'), { scale: lerp(1.6, 1.25, sc), flip: 1 - flip, w: 640, h: 240, alpha: P(t, 0, .1) });
       }
       const intro = P(t, T_FLIP + .3, .35, E.outBack);
       let R = lerpR(DA, DB, toLeft); R = lerpR(R, tile(MAIN), toWall);
@@ -77,7 +77,7 @@
       const qa = win(t, 4.8, T_LEFT + .2, .3, .3);
       if (qa > 0) { pill(ctx, 1330, 228, 'o quê  ✓', { size: 26, fill: C.ink, color: C.cream, alpha: qa, scale: E.outBack(P(t, 4.8, .35)) });
         if (t > 6.4) pill(ctx, 1530, 228, 'o porquê  ?', { size: 26, fill: C.red, color: '#FFF', alpha: qa * (.75 + .25 * Math.sin(t * 9)), scale: E.outBack(P(t, 6.4, .35)) }); }
-      caseHeader(ctx, t - .4, TX.case1, { theme: 'light', out: T_WALL - .4 - .4 });
+      caseHeader(ctx, t - .4, TX.cases.insights, { theme: 'light', out: T_WALL - .4 - .4 });
 
       // ---------- agentes ----------
       ctx.save(); ctx.globalAlpha = fade;
@@ -143,7 +143,7 @@
       // carimbo
       const sp = P(t, T_STAMP, 1.1);
       if (sp > 0) { ctx.save(); ctx.globalAlpha = .55 * clamp(sp * 3) * (1 - P(t, T_OUT, .4)); ctx.fillStyle = C.cream; ctx.fillRect(0, 0, W, H); ctx.restore();
-        stamp(ctx, W / 2, H / 2, TX.case1.stamp, sp, { alpha: 1 - P(t, T_OUT, .4) }); }
+        stamp(ctx, W / 2, H / 2, TX.cases.insights.stamp, sp, { alpha: 1 - P(t, T_OUT, .4) }); }
       // saída: escurece; os tiles viram células
       const out = P(t, T_OUT, .9, E.inOutCubic);
       if (out > 0) { ctx.save(); ctx.globalAlpha = out; ctx.fillStyle = C.ink; ctx.fillRect(0, 0, W, H);

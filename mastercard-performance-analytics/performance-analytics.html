@@ -149,12 +149,13 @@ const CONFIG = {
   motion: {
     intensity: 1.0,        // 0.5 = sóbrio · 1 = padrão · 1.4 = mais enérgico
     shake: 1.0,            // tremor de câmera nos impactos
-    onTwos: true,          // elementos animados a 15 fps sobre câmera fluida (textura stop motion)
+    onTwos: true,          // snaps "em dois" (textura stop motion)
     grain: 0.06            // granulação de filme (0 desliga)
   },
 
   audio: {
-    music: true, sfx: true, voice: true,
+    music: true, sfx: true,
+    voice: false,          // narração do navegador: DESLIGADA por padrão (botão "Voz" / tecla V)
     musicVolume: 0.42, sfxVolume: 0.62,
     duckDuringVoice: 0.55, // multiplica a trilha enquanto a narração fala
     voiceRate: 1.07, voicePitch: 1.02,
@@ -166,49 +167,65 @@ const CONFIG = {
 
   captions: false,         // legenda completa da narração (tecla C)
 
-  // ---------------------------------------------------------------- CENAS
+  // ---------------------------------------------------------------- CENAS (ordem = ordem do filme)
   scenes: [
-    { id: 'hook',      dur: 16, theme: 'dark'  },
+    { id: 'hook',      dur: 18, theme: 'dark'  },
     { id: 'problem',   dur: 18, theme: 'light' },
-    { id: 'hub',       dur: 22, theme: 'dark'  },
-    { id: 'insights',  dur: 30, theme: 'light' },
-    { id: 'als',       dur: 36, theme: 'dark'  },
-    { id: 'embed',     dur: 30, theme: 'light', transitionIn: { type: 'iris', dur: 0.9 } },
-    { id: 'lightsoff', dur: 28, theme: 'light' },
-    { id: 'skills',    dur: 22, theme: 'dark'  },
-    { id: 'climax',    dur: 22, theme: 'dark'  },
-    { id: 'close',     dur: 16, theme: 'dark'  }
+    { id: 'hub',       dur: 20, theme: 'dark'  },
+    { id: 'als',       dur: 34, theme: 'dark'  },   // caso 01
+    { id: 'embed',     dur: 30, theme: 'light', transitionIn: { type: 'iris', dur: 0.9 } },   // caso 02
+    { id: 'lightsoff', dur: 26, theme: 'light' },   // caso 03
+    { id: 'insights',  dur: 34, theme: 'dark'  },   // caso 04 (alimenta os reports automatizados)
+    { id: 'skills',    dur: 22, theme: 'dark'  },   // possibilidades
+    { id: 'climax',    dur: 20, theme: 'dark'  },
+    { id: 'close',     dur: 18, theme: 'dark'  }
   ],
+  // momento (local) do carimbo ✓ de cada caso — sincroniza cena e chips de capítulo
+  caseDone: { als: 32.2, embed: 27.0, lightsoff: 21.4, insights: 31.4 },
 
   // ---------------------------------------------------------------- TEXTOS-CHAVE
   text: {
-    hook: ['Mais *dados*.', 'Mais *velocidade*.', 'Mais *decisões*.'],
-    hookWords: ['contexto', 'precisão', 'inteligência'],
+    hookKicker: 'O NOSSO DESAFIO HOJE',
+    hook: ['Eficiência operacional', 'Automação e escala', 'Ciência de dados', 'Inteligência artificial', 'Gerar valor'],
     questions: [
-      { n: '01', q: 'Como gerar insights\nem escala?', icon: 'dashboard', short: 'Insights' },
-      { n: '02', q: 'Como recomendar\nmelhor?', icon: 'basket', short: 'Recomendação' },
-      { n: '03', q: 'Como medir\nprincipalidade?', icon: 'orbit', short: 'Principalidade' },
-      { n: '04', q: 'Como ganhar\neficiência?', icon: 'bolt', short: 'Eficiência' }
+      { id: 'als',       n: '01', q: 'Como recomendar\nmelhor?', icon: 'basket', short: 'Recomendação' },
+      { id: 'embed',     n: '02', q: 'Como medir\nprincipalidade?', icon: 'orbit', short: 'Principalidade' },
+      { id: 'lightsoff', n: '03', q: 'Como ganhar\neficiência?', icon: 'bolt', short: 'Eficiência' },
+      { id: 'insights',  n: '04', q: 'Como gerar insights\nem escala?', icon: 'dashboard', short: 'Insights' }
     ],
     postits: ['Por que caiu?', 'Quem priorizar?', 'E se…?', 'Qual o risco?', 'Onde investir?',
       'Vale a pena?', 'Quanto custa?', 'Qual canal?', 'Para quando?', 'Quem compra?', 'O que mudou?', 'E agora?'],
-    problemKey: 'complexidade → *decisão*',
     brand: 'Performance Analytics',
     circleA: 'Negócio', circleB: 'Dados',
     satellites: ['Modelos', 'Tecnologia', 'Estratégia'],
     chain: ['Dados', 'Insights', 'Decisão', 'Impacto'],
-    case1: { tag: 'CASO 01', title: 'Insights em escala', sub: 'Multiagentes para dashboards', stamp: 'Dashboards que explicam' },
-    case2: { tag: 'CASO 02 · VAREJO', title: 'Recomendação inteligente', sub: 'ALS · Fatoração de Matrizes', stamp: 'Recomendação inteligente' },
-    case3: { tag: 'CASO 03 · ISSUER', title: 'Embeddings', sub: 'Mapeando relações entre produtos', stamp: 'Afinidade mapeada' },
-    case4: { tag: 'CASO 04 · FRAUDE', title: 'Lights-off reporting', sub: 'Do dado ao board', stamp: 'Lights-off reporting' },
+    cases: {
+      als:       { tag: 'CASO 01 · VAREJO', title: 'Recomendação inteligente', sub: 'ALS · Fatoração de Matrizes', stamp: 'Recomendação inteligente' },
+      embed:     { tag: 'CASO 02 · ISSUER', title: 'Embeddings', sub: 'Mapeando relações entre produtos', stamp: 'Afinidade mapeada' },
+      lightsoff: { tag: 'CASO 03 · FRAUDE', title: 'Lights-off reporting', sub: 'Do dado ao board', stamp: 'Lights-off reporting' },
+      insights:  { tag: 'CASO 04 · IA', title: 'Insights em escala', sub: 'Multiagentes · transformers em GPU', stamp: 'Insights em escala' }
+    },
     agents: {
       gen: [
-        { role: 'analista', name: 'Analista', draft: 'Volume −8% no Sul,\nconcentrado no e-commerce' },
-        { role: 'business', name: 'Business', draft: 'Queda no Sul coloca a\nmeta do trimestre em risco' },
-        { role: 'clevel',   name: 'C-Level',  draft: 'Sul exige ação: revisar\na campanha digital' }
+        { role: 'analista', name: 'Analista', draft: 'Fraude +18% no e-commerce,\nconcentrada em 3 MCCs' },
+        { role: 'business', name: 'Business', draft: 'Alta em e-commerce pressiona\nperdas do trimestre' },
+        { role: 'clevel',   name: 'C-Level',  draft: 'E-commerce pede ação:\nrevisar regras de risco' }
       ],
       validator: 'Validador', packer: 'Embalador',
-      headline: 'Sul −8%: e-commerce puxa a queda — revisar campanha digital'
+      headline: 'Fraude: e-commerce +18% em 3 MCCs — revisar regras de risco',
+      processes: [['CRM', 'user'], ['E-mail', 'doc'], ['App', 'card'], ['API', 'nodes'], ['Alertas', 'bolt'], ['Slides', 'chart']]
+    },
+    stack: {
+      models: ['LLM', 'Embeddings', 'Reranker', 'Classificador', 'Guardrails'],
+      perimeter: 'AMBIENTE MASTERCARD', never: 'o dado nunca sai', external: 'APIs externas'
+    },
+    waves: {
+      issuer: ['Fraud', 'Credit Risk', 'Authorization', 'AML', 'Collections'],
+      acquirer: ['Fraud', 'Merchant Risk', 'Authorization Optimization', 'Smart Routing', 'Chargeback'],
+      analytics: ['embeddings', 'anomaly detection', 'spend forecasting', 'customer similarity', 'merchant similarity',
+        'product affinity', 'share of wallet', 'incrementality', 'attribution', 'assortment optimization'],
+      frontier: ['causal ML', 'uplift modeling', 'reinforcement learning', 'graph fraud', 'graph embeddings',
+        'deep recommenders', 'dynamic pricing', 'real-time personalization', 'multi-objective optimization']
     },
     skills: ['Crédito', 'Machine Learning', 'Advanced Analytics', 'Ciência de Dados', 'IA'],
     climaxWords: ['Estatística', 'Regressão', 'Classificação', 'Árvores', 'Ensembles', 'Clusters',
@@ -216,6 +233,7 @@ const CONFIG = {
     climaxLine: 'Dos problemas mais simples aos mais complexos',
     climaxKey: 'Nossa especialidade é *analytics*.',
     climaxSub: 'analytics · criatividade · escala',
+    flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS'],
     future: 'O futuro da decisão é orientado por *analytics*.',
     cta: 'Use mais esta *track*.',
     ctaSub: 'Traga seu próximo desafio.'
@@ -224,60 +242,58 @@ const CONFIG = {
   // ---------------------------------------------------------------- NARRAÇÃO
   // at = segundos desde o início da cena · text = como aparece na legenda
   narration: [
-    { scene: 'hook', at: 4.0,  text: 'Mais dados.' },
-    { scene: 'hook', at: 5.5,  text: 'Mais velocidade.' },
-    { scene: 'hook', at: 7.0,  text: 'Mais decisões.' },
-    { scene: 'hook', at: 9.4,  text: 'Hoje, decidir bem exige muito mais do que informação. Exige contexto, precisão… e inteligência.' },
+    { scene: 'hook', at: 3.4,  text: 'Hoje, o nosso desafio tem cinco nomes.' },
+    { scene: 'hook', at: 6.5,  text: 'Eficiência operacional.' },
+    { scene: 'hook', at: 8.0,  text: 'Automação e escala.' },
+    { scene: 'hook', at: 9.5,  text: 'Ciência de dados.' },
+    { scene: 'hook', at: 11.0, text: 'Inteligência artificial.' },
+    { scene: 'hook', at: 12.6, text: 'E, acima de tudo: gerar valor.' },
 
     { scene: 'problem', at: 0.3,  text: 'Em cada cliente, em cada contexto, a pergunta muda.' },
-    { scene: 'problem', at: 4.0,  text: 'Como gerar insights em escala?' },
-    { scene: 'problem', at: 6.0,  text: 'Como recomendar melhor?' },
-    { scene: 'problem', at: 8.0,  text: 'Como medir principalidade?' },
-    { scene: 'problem', at: 10.0, text: 'Como ganhar eficiência?' },
+    { scene: 'problem', at: 4.0,  text: 'Como recomendar melhor?' },
+    { scene: 'problem', at: 6.0,  text: 'Como medir principalidade?' },
+    { scene: 'problem', at: 8.0,  text: 'Como ganhar eficiência?' },
+    { scene: 'problem', at: 10.0, text: 'Como gerar insights em escala?' },
     { scene: 'problem', at: 12.4, text: 'Mas a necessidade é sempre a mesma: transformar complexidade em decisão.' },
 
     { scene: 'hub', at: 1.0,  text: 'É exatamente aqui que entra a track de Performance Analytics da Mastercard.' },
-    { scene: 'hub', at: 7.6,  text: 'No encontro entre dados e negócio, conectamos modelos, tecnologia e estratégia…' },
-    { scene: 'hub', at: 13.6, text: '…para transformar dados em insights, insights em decisões — e decisões em impacto real.' },
+    { scene: 'hub', at: 7.2,  text: 'No encontro entre dados e negócio, conectamos modelos, tecnologia e estratégia…' },
+    { scene: 'hub', at: 12.8, text: '…para transformar dados em insights, insights em decisões — e decisões em impacto real.' },
 
-    { scene: 'insights', at: 1.0,  text: 'Primeiro desafio: gerar insights em escala.' },
-    { scene: 'insights', at: 4.6,  text: 'Um dashboard mostra o quê. Mas quem explica o porquê?' },
-    { scene: 'insights', at: 9.0,  text: 'Criamos três agentes geradores, com olhares diferentes — analista, business e C-level.' },
-    { scene: 'insights', at: 16.2, text: 'Um validador confere tudo — e, se não estiver bom, manda refazer.' },
-    { scene: 'insights', at: 21.0, text: 'Por fim, um agente embala o insight, que vira o título do dashboard. Em escala.' },
-
-    { scene: 'als', at: 1.0,  text: 'Segundo desafio: recomendação. Num cliente do varejo: quais SKUs e cestas recomendar para cada cliente?' },
+    { scene: 'als', at: 1.0,  text: 'Primeiro desafio: recomendação. Num cliente do varejo: quais SKUs e cestas recomendar para cada cliente?' },
     { scene: 'als', at: 7.2,  text: 'Cada linha é um cliente. Cada coluna, um produto. E quase toda a matriz… está vazia.' },
     { scene: 'als', at: 12.9, text: 'Com fatoração de matrizes — o ALS — decompomos a matriz em fatores ocultos, alternando o ajuste entre clientes e produtos até o padrão emergir.' },
     { scene: 'als', at: 23.0, text: 'As lacunas viram propensões.' },
-    { scene: 'als', at: 27.0, text: 'E, no espaço latente, cada cliente se aproxima da cesta certa.' },
+    { scene: 'als', at: 26.6, text: 'E, no espaço latente, cada cliente se aproxima da cesta certa.' },
 
-    { scene: 'embed', at: 1.0,  text: 'Terceiro desafio: principalidade — entender como os produtos financeiros se relacionam.' },
+    { scene: 'embed', at: 1.0,  text: 'Segundo desafio: principalidade — entender como os produtos financeiros se relacionam.' },
     { scene: 'embed', at: 7.0,  text: 'Com embeddings, deixamos de olhar itens isolados: cada produto vira um vetor, num espaço de muitas dimensões.' },
-    { scene: 'embed', at: 15.0, text: 'Ali, proximidade significa afinidade. Produtos parecidos se agrupam, regiões se formam…' },
+    { scene: 'embed', at: 15.0, text: 'Ali, proximidade — medida pela distância do cosseno — significa afinidade. Produtos parecidos se agrupam…' },
     { scene: 'embed', at: 22.0, text: '…e padrões invisíveis viram um mapa claro para decisões de principalidade.' },
 
-    { scene: 'lightsoff', at: 1.0,  text: 'Quarto desafio: eficiência. O report de fraude para o board exigia trabalho manual: extrair, conferir, formatar… repetir.' },
+    { scene: 'lightsoff', at: 1.0,  text: 'Terceiro desafio: eficiência. O report de fraude para o board exigia trabalho manual: extrair, conferir, formatar… repetir.' },
     { scene: 'lightsoff', at: 9.6,  text: 'Então criamos uma automação lights-off.' },
-    { scene: 'lightsoff', at: 14.2, text: 'Os dados chegam, são validados, processados… e o report é publicado sozinho. E os agentes de insight destacam o que importa.' },
-    { scene: 'lightsoff', at: 23.0, text: 'Do dado ao board — com velocidade, consistência e escala.' },
+    { scene: 'lightsoff', at: 14.0, text: 'Os dados chegam, são validados, processados… e o report é publicado sozinho, do dado ao board.' },
+    { scene: 'lightsoff', at: 22.2, text: 'Mas quem escreve os destaques do report?' },
 
-    { scene: 'skills', at: 1.0,  text: 'E esses são só alguns exemplos.' },
-    { scene: 'skills', at: 4.0,  text: 'Nossa atuação vai de crédito…' },
-    { scene: 'skills', at: 6.4,  text: 'a machine learning…' },
-    { scene: 'skills', at: 8.8,  text: 'de advanced analytics…' },
-    { scene: 'skills', at: 11.2, text: 'a ciência de dados…' },
-    { scene: 'skills', at: 13.6, text: 'e inteligência artificial…' },
-    { scene: 'skills', at: 16.0, text: 'sempre aplicados a problemas reais de negócio.' },
+    { scene: 'insights', at: 0.8,  text: 'Quarto desafio: insights em escala.' },
+    { scene: 'insights', at: 3.4,  text: 'Três agentes geradores — analista, business e C-level — escrevem o insight.' },
+    { scene: 'insights', at: 8.6,  text: 'Um validador confere — e, se não estiver bom, manda refazer.' },
+    { scene: 'insights', at: 12.8, text: 'Um embalador entrega o título pronto: no report, no dashboard, em qualquer processo.' },
+    { scene: 'insights', at: 18.8, text: 'Por trás, transformers puros rodando em GPU, com vários modelos trabalhando juntos…' },
+    { scene: 'insights', at: 24.2, text: '…e o dado nunca sai da Mastercard.' },
+    { scene: 'insights', at: 27.4, text: 'Insights em escala, conectáveis a qualquer processo.' },
+
+    { scene: 'skills', at: 1.0, text: 'E esses são só alguns exemplos.' },
+    { scene: 'skills', at: 8.0, text: 'Do issuer ao acquirer… do clássico ao estado da arte.' },
 
     ...['Estatística.', 'Regressão.', 'Classificação.', 'Árvores.', 'Ensembles.', 'Clusters.',
         'Anomalias.', 'Embeddings.', 'Recomendação.', 'Agentes.', 'Automação.']
       .map((w, i) => ({ scene: 'climax', at: i * 1.0 + 0.05, text: w, rate: 1.15 })),
     { scene: 'climax', at: 11.2, text: 'Não importa o desafio. Dos problemas mais simples aos mais complexos…' },
-    { scene: 'climax', at: 16.8, text: '…nossa especialidade é resolver com analytics, criatividade e escala.' },
+    { scene: 'climax', at: 16.0, text: '…nossa especialidade é resolver com analytics, criatividade e escala.' },
 
-    { scene: 'close', at: 1.0, text: 'Se o desafio pede inteligência, escala e impacto, a resposta passa por Performance Analytics.' },
-    { scene: 'close', at: 7.2, text: 'O futuro da decisão… é orientado por analytics.', rate: 0.95 }
+    { scene: 'close', at: 1.0, text: 'Se o desafio pede eficiência, escala e valor, a resposta passa por Performance Analytics.' }
   ],
 
   // Grafia fonética para o TTS pt-BR ler bem os termos em inglês (ajuste à voz do seu sistema)
@@ -287,8 +303,6 @@ const CONFIG = {
     [/\binsights?\b/gi, 'ínsaits'],
     [/\btrack\b/gi, 'tréc'],
     [/\bdashboards?\b/gi, 'déshbórd'],
-    [/\bmachine learning\b/gi, 'machín lérning'],
-    [/\badvanced\b/gi, 'advénsd'],
     [/\bboard\b/gi, 'bórd'],
     [/\blights-off\b/gi, 'láits óf'],
     [/\bALS\b/g, 'á éle ésse'],
@@ -300,6 +314,10 @@ const CONFIG = {
     [/\bbusiness\b/gi, 'bízness'],
     [/\breports\b/gi, 'ripórts'],
     [/\breport\b/gi, 'ripórt'],
+    [/\btransformers\b/gi, 'transfórmers'],
+    [/\bGPU\b/g, 'gê pê ú'],
+    [/\bissuer\b/gi, 'íxuer'],
+    [/\bacquirer\b/gi, 'akuáirer'],
     [/\bMastercard\b/g, 'Másterkard']
   ]
 };
@@ -313,6 +331,8 @@ const CONFIG = {
   CONFIG.narration.forEach(n => { n.t = CONFIG.sceneById[n.scene].start + n.at; });
   CONFIG.narration.sort((a, b) => a.t - b.t);
 })();
+/** pergunta/capítulo pelo id do caso */
+const Q = id => CONFIG.text.questions.find(q => q.id === id);
 
 /* ===== 02-core.js ===== */
 /* ============================================================================
@@ -860,11 +880,11 @@ function caseHeader(ctx, t, c, o = {}) {
 
 // ---------- CHIPS de capítulo (rastreador de progresso, canto superior esquerdo) ----------
 const CHIPS = (() => {
-  const s = CONFIG.sceneById;
+  const s = CONFIG.sceneById, ids = CONFIG.text.questions.map(q => q.id);
   return {
-    show: [s.insights.start - .2, s.lightsoff.end - .6],
-    active: ['insights', 'als', 'embed', 'lightsoff'].map(id => [s[id].start, s[id].end]),
-    done: [s.insights.start + 27.6, s.als.start + 33.8, s.embed.start + 27.0, s.lightsoff.start + 25.6]
+    show: [s[ids[0]].start - .2, s[ids[ids.length - 1]].end - .6],
+    active: ids.map(id => [s[id].start, s[id].end]),
+    done: ids.map(id => s[id].start + CONFIG.caseDone[id])
   };
 })();
 function chips(ctx, T, theme) {
@@ -1156,26 +1176,28 @@ function cue(sceneId, at, type, opt = {}) {
   if (type === 'impact') IMPACTS.push({ t, size: opt.size == null ? 1 : opt.size });
 }
 
-// Seções da trilha (tempo absoluto em segundos). f = corte do filtro passa-baixa (Hz)
-const MUSIC = [
-  [0, 4,     { pad: 1, f: 700 }],
-  [4, 16,    { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 14000 }],
-  [16, 32,   { kick: 1, hat: 1, bass: 1, pad: 1, f: 950 }],
-  [32, 38,   { pad: 1, f: 800 }],
-  [38, 56,   { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 15000 }],
-  [56, 86,   { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 7000, arpOct: 1 }],
-  [86, 122,  { kick: 1, hat: 1, hat16: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 5200, minor: 1 }],
-  [122, 131, { pad: 1, arp: 1, f: 2600, soft: 1 }],
-  [131, 152, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }],
-  [152, 164, { kick: 1, pluck: 1, f: 3200, comic: 1 }],
-  [164, 166, { f: 400 }],
-  [166, 180, { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 15000 }],
-  [180, 196, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 3000, rise: 1 }],
-  [196, 202, { kick: 1, hat16: 1, roll: 1, bass: 1, pad: 1, f: 9000 }],
-  [202, 224, { kick: 1, hat: 1, hat16: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 16000, big: 1 }],
-  [224, 236, { pad: 1, arp: 1, soft: 1, f: 4200 }],
-  [236, 241, { f: 3000 }]
-];
+// Arranjo da trilha POR CENA (tempo local, múltiplos de 0.125 s). f = corte do filtro passa-baixa (Hz).
+// Flags: kick hat hat16 clap bass arp pad pluck comic roll big soft minor arpOct rise (filtro sobe até o fim da seção)
+const FULL = { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1 };
+const MUSIC_SPEC = {
+  hook:      [[0, { pad: 1, f: 700 }], [4, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [6.5, { ...FULL, f: 14000 }], [17, { pad: 1, f: 1200 }]],
+  problem:   [[0, { kick: 1, hat: 1, bass: 1, pad: 1, f: 950 }], [14, { pad: 1, f: 800 }]],
+  hub:       [[0, { pad: 1, f: 800 }], [4, { ...FULL, f: 15000 }]],
+  als:       [[0, { ...FULL, hat16: 1, f: 5200, minor: 1 }]],
+  embed:     [[0, { pad: 1, arp: 1, soft: 1, f: 2600 }], [9, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }]],
+  lightsoff: [[0, { kick: 1, pluck: 1, comic: 1, f: 3200 }], [12, { f: 400 }], [14, { ...FULL, f: 15000 }], [22, { kick: 1, pad: 1, bass: 1, f: 2000, rise: 1 }]],
+  insights:  [[0, { ...FULL, f: 7000, arpOct: 1 }], [18.5, { pad: 1, arp: 1, soft: 1, kick: 1, f: 3200 }], [26.5, { ...FULL, hat16: 1, f: 15000 }]],
+  skills:    [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 3000, rise: 1 }], [12.5, { ...FULL, hat16: 1, f: 12000 }], [18, { kick: 1, hat16: 1, roll: 1, bass: 1, pad: 1, f: 9000 }]],
+  climax:    [[0, { ...FULL, hat16: 1, big: 1, f: 16000 }]],
+  close:     [[0, { pad: 1, arp: 1, soft: 1, f: 4200 }], [7, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }], [16.5, { f: 3000 }]]
+};
+const MUSIC = (() => {
+  const out = [];
+  CONFIG.scenes.forEach(sc => { const spec = MUSIC_SPEC[sc.id] || [[0, { pad: 1, f: 3000 }]];
+    spec.forEach(([at, f], i) => out.push([sc.start + at, sc.start + (i + 1 < spec.length ? spec[i + 1][0] : sc.dur), f])); });
+  out.push([CONFIG.duration, CONFIG.duration + 1, { f: 3000 }]);
+  return out;
+})();
 const PROG = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];       // Am F C G (vi–IV–I–V)
 const PROG_MIN = [[57, 60, 64], [53, 57, 60], [50, 53, 57], [52, 56, 59]];   // Am F Dm E (mais tenso)
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
@@ -1419,100 +1441,104 @@ function iris(ctx, cx, cy, r, color = '#000') {
 }
 
 /* ---------------------------------------------------------------------------
-   CENA 1 — HOOK (0:00–0:16)
+   CENA 1 — HOOK: os 5 desafios de hoje (0:00–0:18)
+   Ponto laranja → tempestade de recortes de dados → 5 tiras de papel coladas
+   uma a uma → pôster de colagem com "Gerar valor" → o papel claro sobe
    --------------------------------------------------------------------------- */
 (() => {
-  const id = 'hook';
+  const id = 'hook', SL = [6.5, 8.0, 9.5, 11.0, 13.9], T_KICK = 3.5, T_POSTER = 14.5, T_OUT = 16.6;
   [0, .85, 1.7].forEach(t => cue(id, t, 'heart'));
   cue(id, 1.0, 'riser', { dur: 1.0, v: .2 }); cue(id, 2.0, 'impact', { size: .55 }); cue(id, 2.0, 'whoosh', { dur: .8, v: .5 });
-  cue(id, 3.7, 'whoosh', { dur: .3, v: .3 });
-  [4.0, 5.5, 7.0].forEach((t, i) => { cue(id, t, 'impact', { size: .9 + i * .1 }); cue(id, t - .25, 'whoosh', { dur: .25, v: .25 }); });
-  cue(id, 8.5, 'pop', { p: 1.4 }); cue(id, 9.6, 'whoosh', { dur: .6, v: .45 });
-  [12.6, 13.6, 14.6].forEach((t, i) => cue(id, t, 'tick', { f: 2200 + i * 500 }));
-  cue(id, 12.0, 'riser', { dur: 3, v: .25 }); cue(id, 15.0, 'glitch'); cue(id, 15.25, 'whoosh', { dur: .7, dir: 'down', v: .5 });
+  cue(id, T_KICK, 'pop', { p: 1.2 }); cue(id, 4.2, 'riser', { dur: 2.3, v: .3 });
+  SL.forEach((t, i) => { cue(id, t, 'impact', { size: i === 4 ? 1.5 : .75 + i * .1 }); cue(id, t - .22, 'whoosh', { dur: .22, v: .3 }); cue(id, t + .02, 'tick', { f: 900, v: .3 }); });
+  cue(id, 13.95, 'combo'); cue(id, T_POSTER, 'whoosh', { dur: .5, v: .25 }); cue(id, T_OUT, 'whoosh', { dur: .8, dir: 'down', v: .5 }); cue(id, 17.2, 'swell', { dur: .8 });
 
   const r = rng(101), TYPES = ['card', 'kpi', 'spark', 'pill', 'bars', 'dot', 'dot', 'dot', 'ring'];
   const PILLS = ['Nova transação', 'Alerta de risco', 'Pix recebido', 'Meta atingida', 'Novo cliente', 'Pico de volume'];
   const KPIS = ['+12,4%', '98,7%', 'R$ 2,4 mi', '−3,1%', '1,2 mi', '+0,8 p.p.'];
-  const COLS = [C.red, C.orange, C.yellow, C.cream];
+  const COLS = [C.red, C.orange, C.yellow, PAPER];
   const ITEMS = Array.from({ length: 96 }, (_, i) => ({
     type: TYPES[i % TYPES.length], x: (r() * 2 - 1) * 1.15, y: (r() * 2 - 1) * .85, z0: r() * 3, rot: (r() - .5) * .5,
     col: COLS[i % 4], label: PILLS[i % PILLS.length], kpi: KPIS[i % KPIS.length], seed: i
   }));
-  const dist = t => { const a = (1.5 - .32) / 5.4; let d = .32 * Math.max(0, t - 2); if (t > 9.6) d += .5 * a * Math.min(t - 9.6, 5.4) ** 2; return d; };
-
+  const dist = t => { const a = (1.2 - .32) / 6; let d = .32 * Math.max(0, t - 2); if (t > 8) d += .5 * a * Math.min(t - 8, 6) ** 2; return d; };
   function item(ctx, it, s, a) {
     ctx.save(); ctx.globalAlpha *= a; ctx.scale(s, s); ctx.rotate(it.rot);
     switch (it.type) {
-      case 'card': { const g = ctx.createLinearGradient(-90, -55, 90, 55); g.addColorStop(0, it.col); g.addColorStop(1, mix(it.col, '#000', .35));
-        rr(ctx, -90, -56, 180, 112, 12); ctx.fillStyle = g; ctx.fill(); rr(ctx, -66, -18, 34, 26, 5); ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
-        circle(ctx, 50, 32, 16, 'rgba(235,0,27,.85)'); circle(ctx, 70, 32, 16, 'rgba(247,158,27,.85)'); break; }
-      case 'kpi': rr(ctx, -100, -48, 200, 96, 14); ctx.fillStyle = 'rgba(245,241,234,.95)'; ctx.fill();
-        text(ctx, it.kpi, -80, 8, { size: 40, weight: 800, color: C.ink }); text(ctx, 'KPI', -80, -26, { size: 14, weight: 700, color: C.stone, mono: true }); break;
-      case 'spark': { rr(ctx, -110, -50, 220, 100, 14); ctx.fillStyle = 'rgba(30,30,30,.92)'; ctx.fill(); ctx.strokeStyle = it.col; ctx.lineWidth = 5; ctx.beginPath();
-        for (let k = 0; k < 9; k++) ctx.lineTo(-90 + k * 22, 20 - Math.sin(k * 1.3 + it.seed) * 22 - k * 3); ctx.stroke(); break; }
-      case 'pill': { const w = measure(ctx, it.label, 24, 700) + 70; rr(ctx, -w / 2, -26, w, 52, 26); ctx.fillStyle = 'rgba(245,241,234,.95)'; ctx.fill();
-        circle(ctx, -w / 2 + 28, 0, 9, it.col); text(ctx, it.label, -w / 2 + 48, 1, { size: 24, weight: 700, color: C.ink }); break; }
-      case 'bars': [40, 70, 50, 90, 60].forEach((h, k) => { rr(ctx, -60 + k * 26, 40 - h, 18, h, 4); ctx.fillStyle = k === 3 ? it.col : 'rgba(245,241,234,.7)'; ctx.fill(); }); break;
+      case 'card': paper(ctx, -90, -56, 180, 112, { r: 12, fill: it.col, shadow: 7, shadowColor: '#000', lw: 4, halftone: .25 });
+        rr(ctx, -66, -18, 34, 26, 5); ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fill(); circle(ctx, 50, 32, 16, C.red, INK, 3); circle(ctx, 70, 32, 16, C.yellow, INK, 3); break;
+      case 'kpi': paper(ctx, -100, -48, 200, 96, { r: 6, fill: PAPER, shadow: 7, shadowColor: '#000', lw: 4 });
+        text(ctx, it.kpi, -80, 8, { size: 40, weight: 900, color: INK }); text(ctx, 'KPI', -80, -26, { size: 14, weight: 700, color: C.stone, mono: true }); break;
+      case 'spark': { rr(ctx, -110, -50, 220, 100, 10); ctx.fillStyle = '#231E19'; ctx.fill(); ctx.strokeStyle = PAPER; ctx.lineWidth = 3; ctx.stroke();
+        ctx.strokeStyle = it.col; ctx.lineWidth = 6; ctx.beginPath(); for (let k = 0; k < 9; k++) ctx.lineTo(-90 + k * 22, 20 - Math.sin(k * 1.3 + it.seed) * 22 - k * 3); ctx.stroke(); break; }
+      case 'pill': { const w = measure(ctx, it.label, 24, 700) + 70; paper(ctx, -w / 2, -26, w, 52, { r: 26, fill: PAPER, shadow: 5, shadowColor: '#000', lw: 3 });
+        circle(ctx, -w / 2 + 28, 0, 9, it.col, INK, 2); text(ctx, it.label, -w / 2 + 48, 1, { size: 24, weight: 800, color: INK }); break; }
+      case 'bars': [40, 70, 50, 90, 60].forEach((h, k) => { rr(ctx, -60 + k * 26, 40 - h, 18, h, 3); ctx.fillStyle = k === 3 ? it.col : PAPER; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke(); }); break;
       case 'dot': glow(ctx, 0, 0, 40, it.col, .9); circle(ctx, 0, 0, 9, it.col); break;
-      case 'ring': circle(ctx, 0, 0, 34, null, rgba(it.col, .8), 5); break;
+      case 'ring': circle(ctx, 0, 0, 34, null, rgba(it.col, .85), 6); break;
     }
     ctx.restore();
   }
-
   function storm(ctx, t) {
     const d = dist(t), born = P(t, 2, .7, E.outCubic), list = [];
-    for (const it of ITEMS) {
-      let z = 3 - ((it.z0 + d) % 3) + .12; // 3.12 → 0.12 (aproximando)
-      const spread = lerp(.05, 1, born); const sx = W / 2 + it.x * spread * 820 / z, sy = H / 2 + it.y * spread * 520 / z;
-      const a = clamp((3.1 - z) * 1.2) * clamp((z - .14) * 6) * born;
-      list.push({ it, z, sx, sy, a, s: .55 / z });
-    }
+    for (const it of ITEMS) { const z = 3 - ((it.z0 + d) % 3) + .12, spread = lerp(.05, 1, born);
+      list.push({ it, z, sx: W / 2 + it.x * spread * 820 / z, sy: H / 2 + it.y * spread * 520 / z, a: clamp((3.1 - z) * 1.2) * clamp((z - .14) * 6) * born, s: .55 / z }); }
     list.sort((p, q) => q.z - p.z);
     for (const o of list) {
       if (o.a <= .01 || o.sx < -400 || o.sx > W + 400 || o.sy < -300 || o.sy > H + 300) continue;
-      if (o.it.type === 'dot' && t > 2) { const z2 = o.z + .25 + (t > 9.6 ? .4 * P(t, 9.6, 5) : 0); const tx = W / 2 + o.it.x * 820 / z2, ty = H / 2 + o.it.y * 520 / z2; line(ctx, tx, ty, o.sx, o.sy, rgba(o.it.col, o.a * .5), 3 * o.s); }
+      if (o.it.type === 'dot' && t > 2) { const z2 = o.z + .25 + (t > 8 ? .35 * P(t, 8, 6) : 0); line(ctx, W / 2 + o.it.x * 820 / z2, H / 2 + o.it.y * 520 / z2, o.sx, o.sy, rgba(o.it.col, o.a * .5), 3 * o.s); }
       ctx.save(); ctx.translate(o.sx, o.sy); item(ctx, o.it, o.s, o.a); ctx.restore();
     }
+  }
+  // as 5 tiras do pôster
+  const STRIP = [
+    { y: 300, fill: PAPER, col: INK, rot: -.025 }, { y: 425, fill: C.yellow, col: INK, rot: .02 }, { y: 550, fill: PAPER, col: INK, rot: -.015 },
+    { y: 675, fill: C.red, col: '#FFF', rot: .025 }, { y: 845, fill: C.orange, col: '#FFF', rot: -.03, big: 1 }
+  ];
+  function strip(ctx, i, t, fall) {
+    const st = STRIP[i], s0 = SL[i]; if (t < s0) return;
+    const p = P(t, s0, .32, E.outExpo), size = st.big ? 128 : 76, str = TX.hook[i];
+    const tw = measure(ctx, str, size, 900, false, -size * .02), w = tw + (st.big ? 120 : 84), h = size * 1.42;
+    const fy = fall > 0 ? fall * fall * (1700 + i * 260) : 0, frot = fall > 0 ? fall * (i % 2 ? .9 : -.7) : 0;
+    ctx.save(); ctx.translate(W / 2 + Math.sin(t * .8 + i) * 3, st.y + fy); ctx.rotate(st.rot + frot); const sc = lerp(1.55, 1, p); ctx.scale(sc, sc); ctx.globalAlpha *= P(t, s0, .06);
+    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 40 + i, amp: 3.5, fill: st.fill, shadow: st.big ? 14 : 10, shadowColor: '#000', lw: 4, halftone: st.fill === PAPER ? .08 : .18 });
+    if (st.big) retroText(ctx, str, 0, 4, { size, weight: 900, color: '#FFF', align: 'center', shadow: INK, depth: 7, lw: 5, ls: -size * .02 });
+    else text(ctx, str, 0, 3, { size, weight: 900, color: st.col, align: 'center', ls: -size * .02 });
+    if (i < 4) tape(ctx, -w / 2 + 30, -h / 2 + 4, 70, 24, -.6, i + 3);
+    ctx.restore();
   }
 
   SCENES[id] = {
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .6 });
-      const tf = t >= 15 && t < 15.25 ? 15 : t, fall = Math.max(0, t - 15.25);
-      const slamT = [4, 5.5, 7].reduce((a, s) => (t >= s ? s : a), -9), punch = Math.exp(-(t - slamT) * 7) * .07 * M.intensity;
-      const cam = { z: lerp(1, 1.08, t / 16) + (t >= 4 && t < 9.6 ? punch : 0), r: Math.sin(t * .4) * .01 };
+      const tf = t >= 15.8 && t < 16.0 ? 15.8 : t, fall = Math.max(0, t - T_OUT);
+      const slamT = SL.reduce((a, s) => (t >= s ? s : a), -9), punch = Math.exp(-(t - slamT) * 7) * .06 * M.intensity;
+      const cam = { z: lerp(1, 1.08, t / 18) + (t >= SL[0] ? punch : 0), r: Math.sin(t * .4) * .01 };
       ctx.save(); ctx.translate(0, fall * fall * 2400);
       camera(ctx, cam, () => {
-        if (t < 2.2) { // o ponto laranja pulsando
-          const pulse = [0, .85, 1.7].reduce((a, s) => a + Math.exp(-Math.max(0, t - s) * 6) * (t >= s), 0);
-          glow(ctx, W / 2, H / 2, 120 + pulse * 80, C.orange, .7); circle(ctx, W / 2, H / 2, 16 + pulse * 8 - P(t, 2, .2) * 16, C.orange);
-        }
+        if (t < 2.2) { const pulse = [0, .85, 1.7].reduce((a, s) => a + Math.exp(-Math.max(0, t - s) * 6) * (t >= s), 0);
+          glow(ctx, W / 2, H / 2, 120 + pulse * 80, C.orange, .7); circle(ctx, W / 2, H / 2, 16 + pulse * 8 - P(t, 2, .2) * 16, C.orange); }
         if (t >= 2) { const k = P(t, 2, .7); circle(ctx, W / 2, H / 2, k * 900, null, rgba(C.orange, (1 - k) * .8), 6); }
         storm(ctx, tf);
       });
       ctx.restore();
-      // slams
-      if (t >= 4 && t < 10.3) {
-        ctx.save(); ctx.globalAlpha = .55 * win(t, 4, 10.2, .15, .4); ctx.fillStyle = C.ink; ctx.fillRect(0, 0, W, H); ctx.restore();
-        const L = TX.hook, acc = [C.yellow, C.orange, C.red];
-        if (t < 8.5) {
-          const i = t < 5.5 ? 0 : t < 7 ? 1 : 2, s0 = [4, 5.5, 7][i], p = P(t, s0, .32, E.outExpo);
-          ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(lerp(1.4, 1, p), lerp(1.4, 1, p)); ctx.globalAlpha = P(t, s0, .06);
-          rich(ctx, L[i], 0, 0, { size: 170, accent: acc[i] }); ctx.restore();
-        } else {
-          const out = P(t, 9.6, .6, E.inExpo);
-          L.forEach((l, i) => { const p = P(t, 8.5 + i * .06, .4, E.outExpo); ctx.save(); ctx.translate(W / 2, H / 2 + (i - 1) * 150 * lerp(.6, 1, p)); ctx.scale(lerp(.6, 1, p) * (1 + out * 2.5), lerp(.6, 1, p) * (1 + out * 2.5));
-            ctx.globalAlpha = (1 - out); rich(ctx, l, 0, 0, { size: 120, accent: acc[i] }); ctx.restore(); });
-        }
-      }
-      // palavras-chave da narração
-      TX.hookWords.forEach((w, i) => { const s = 12.6 + i; const a = P(t, s, .3) * (1 - P(t, 15, .2)); if (a <= 0) return;
-        pill(ctx, W / 2 + (i - 1) * 300, 930 - (1 - P(t, s, .4, E.outBack)) * 30, w, { size: 30, fill: i === 2 ? C.orange : 'rgba(245,241,234,.12)', color: i === 2 ? '#FFF' : C.cream, alpha: a }); });
-      if (t >= 15 && t < 15.25) flash(ctx, .12);
-      // painel claro sobe (transição para a cena 2)
-      const up = P(t, 15.25, .75, E.inOutCubic);
-      if (up > 0) { ctx.fillStyle = C.cream; ctx.fillRect(0, H - H * up, W, H * up + 2); }
+      // véu escuro: a tempestade vira fundo do pôster
+      const veil = P(t, T_KICK, .8) * (1 - P(t, T_OUT + .3, .4));
+      if (veil > 0) { ctx.save(); ctx.globalAlpha = .62 * veil; ctx.fillStyle = '#100D0A'; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+      collage(ctx, t, { seed: 11, n: 8, theme: 'dark', alpha: P(t, T_POSTER, .6) * (1 - P(t, T_OUT, .3)) });
+      // kicker
+      if (t > T_KICK) { const kp = E.outBack(P(t, T_KICK, .4)), fy = fall * fall * 1500;
+        ctx.save(); ctx.translate(W / 2, 170 + fy); ctx.rotate(-.02 + fall * .6); ctx.scale(kp, kp);
+        const kw = measure(ctx, TX.hookKicker, 26, 800, true, 5) + 60; paper(ctx, -kw / 2, -26, kw, 52, { r: 4, fill: INK, outline: PAPER, shadow: 6, shadowColor: C.orange, lw: 2.5 });
+        text(ctx, TX.hookKicker, 0, 2, { size: 26, weight: 800, mono: true, color: PAPER, align: 'center', ls: 5 }); ctx.restore(); }
+      // as tiras (staggered fall na saída)
+      for (let i = 0; i < 5; i++) strip(ctx, i, t, Math.max(0, fall - i * .05));
+      // "Gerar valor": círculo de marcador desenhado à mão
+      const mk = P(t, 14.3, .7, E.inOutCubic) * (1 - P(t, T_OUT, .2));
+      if (mk > 0) { ctx.save(); ctx.translate(W / 2, STRIP[4].y); ctx.rotate(-.05); ctx.beginPath(); ctx.ellipse(0, 0, 560, 140, 0, -1.2, -1.2 + TAU * 1.04 * mk); ctx.strokeStyle = C.yellow; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
+      if (t >= 15.8 && t < 16.0) flash(ctx, .1);
+      const up = P(t, 17.2, .8, E.inOutCubic);
+      if (up > 0) { ctx.save(); ctx.beginPath(); ctx.rect(0, H - H * up, W, H * up + 2); ctx.clip(); bgLight(ctx, t); ctx.restore(); line(ctx, 0, H - H * up, W, H - H * up, INK, 4); }
     }
   };
 })();
@@ -1537,11 +1563,12 @@ function iris(ctx, cx, cy, r, color = '#000') {
     draw(ctx, t) {
       const shake = P(t, 10.8, 3.6) * (1 - P(t, 14.6, .3));
       bgLight(ctx, t, { drift: 10 });
+      collage(ctx, t, { seed: 21, n: 6, alpha: 1 - P(t, 14.6, .6) });
       const mag = P(t, 14.6, .9, E.inExpo);
       camera(ctx, { z: 1 + shake * .02 + mag * .04, x: W / 2 + Math.sin(t * 40) * shake * 4, y: H / 2 + Math.cos(t * 37) * shake * 3 }, () => {
         // clientes
         CL.forEach(([ic, x], i) => { const a = E.outBack(P(t, .4 + i * .5, .5)) * (1 - P(t, 14.6, .5)); if (a <= 0) return;
-          circle(ctx, x, 170, 46 * a, '#FFFFFF', rgba(C.ink, .12), 2); icon(ctx, ic, x, 170, 50 * a, C.ink);
+          circle(ctx, x + 5, 176, 46 * a, rgba(INK, .85)); circle(ctx, x, 170, 46 * a, '#FFFDF8', INK, 3); icon(ctx, ic, x, 170, 50 * a, C.ink);
           const lp = P(t, 4 + i * 2 - .5, .5, E.outCubic); if (lp > 0) { const [qx, qy] = POS[i]; line(ctx, x, 220, lerp(x, qx, lp), lerp(220, qy - 125, lp), rgba(C.ink, .18), 2, [6, 8]); } });
         // cards-pergunta
         TX.questions.forEach((q, i) => {
@@ -1554,7 +1581,7 @@ function iris(ctx, cx, cy, r, color = '#000') {
         POST.forEach(p => { if (t < p.t) return; const a = E.outBack(P(t, p.t, .3)); const k = mag;
           const x = lerp(p.x, W / 2, k), y = lerp(p.y, H / 2, k);
           ctx.save(); ctx.translate(x, y); ctx.rotate(p.rot + k * 2); ctx.scale(a * (1 - k), a * (1 - k));
-          shadowed(ctx, 16, 'rgba(0,0,0,.14)', 6, () => { ctx.fillStyle = p.c; ctx.fillRect(-100, -56, 200, 112); });
+          paper(ctx, -100, -56, 200, 112, { r: 2, fill: p.c, shadow: 6, lw: 2.5 });
           text(ctx, p.q, 0, 2, { size: 28, weight: 700, color: C.ink, align: 'center' }); ctx.restore(); });
       });
       // os 4 chips no canto (viram o rastreador de capítulos)
@@ -1606,11 +1633,11 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   cue(id, .2, 'whoosh', { dur: 3.4, v: .22 }); cue(id, 1.6, 'riser', { dur: 2.4, v: .3 });
   cue(id, 4.0, 'impact', { size: 1.4 }); cue(id, 4.0, 'shimmer', { dur: 1.6 }); cue(id, 4.2, 'whoosh', { dur: 1.1, v: .25 });
   cue(id, 6.6, 'whoosh', { dur: 1.1, dir: 'down', v: .25 });
-  const SAT_T = [9.9, 10.6, 11.3], CHAIN_T = [14.2, 15.4, 16.9, 18.6];
+  const SAT_T = [9.8, 10.5, 11.2], CHAIN_T = [13.5, 14.6, 15.9, 17.4];
   SAT_T.forEach((t, i) => cue(id, t, 'chime', { f: 784 * Math.pow(2, i * 2 / 12), up: 5 }));
-  [11.6, 11.8, 12.0, 12.2].forEach((t, i) => cue(id, t, 'pop', { p: 1.1 + i * .12 }));
+  [11.4, 11.6, 11.8, 12.0].forEach((t, i) => cue(id, t, 'pop', { p: 1.1 + i * .12 }));
   CHAIN_T.forEach((t, i) => cue(id, t, i === 3 ? 'ding' : 'chime', { f: [880, 988, 1175, 1318][i] }));
-  cue(id, 18.6, 'impact', { size: .5 }); cue(id, 20.0, 'whoosh', { dur: 1.4, v: .55 }); cue(id, 20.6, 'swell', { dur: 1.3 });
+  cue(id, 17.4, 'impact', { size: .5 }); cue(id, 18.4, 'whoosh', { dur: 1.4, v: .55 }); cue(id, 18.9, 'swell', { dur: 1.1 });
 
   const HUB = { x: W / 2, y: 430 }, SAT = [[-2.6, 'Modelos', 'tree'], [-Math.PI / 2, 'Tecnologia', 'gear'], [-.54, 'Estratégia', 'trend']];
   const CHAIN = [['Dados', 'db'], ['Insights', 'spark'], ['Decisão', 'check'], ['Impacto', 'trend']];
@@ -1620,7 +1647,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   SCENES[id] = {
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: lerp(.3, .9, P(t, 4, 1)), center: '#3A2416' });
-      const shrink = P(t, 6.6, 1.3, E.inOutCubic), dive = P(t, 20, 1.6, E.inExpo);
+      const shrink = P(t, 6.6, 1.3, E.inOutCubic), dive = P(t, 18.4, 1.5, E.inExpo);
       const R = lerp(270, 138, shrink), cy = lerp(H / 2 - 40, HUB.y, shrink);
       let d = lerp(2300, 560, P(t, .2, 3.6, E.inOutCubic)); if (t >= 3.8) d = lerp(560, 330, P(t, 3.8, .28, E.outExpo));
       d *= R / 270;
@@ -1664,18 +1691,18 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   };
   function drawChips(ctx, t, dive, front) {
       TX.questions.forEach((q, i) => {
-        const p = P(t, 11.6 + i * .2, .8, E.outExpo); if (p <= 0) return;
+        const p = P(t, 11.4 + i * .2, .8, E.outExpo); if (p <= 0) return;
         let [x, y] = chipPos(t, i); x = lerp(64 + i * 190, x, p); y = lerp(64, y, p);
         const lb = `${q.n}  ${q.short}`, w = measure(ctx, lb, 18, 700) + 36;
         if (i === 0 && dive > 0) { if (!front) return;
-          const [ox, oy] = chipPos(20, 0), ex = lerp(ox, W / 2, dive), ey = lerp(oy, H / 2, dive), ew = lerp(w, W + 40, dive), eh = lerp(40, H + 40, dive);
-          rr(ctx, ex - ew / 2, ey - eh / 2, ew, eh, lerp(20, 0, dive)); ctx.fillStyle = mix(C.cream, C.cream, 0); ctx.fill();
-          if (dive < .4) text(ctx, lb, ex, ey, { size: 18 * (1 + dive * 3), weight: 700, color: C.ink, align: 'center', alpha: 1 - dive * 2.5 });
+          const [ox, oy] = chipPos(18.4, 0), ex = lerp(ox, W / 2, dive), ey = lerp(oy, H / 2, dive), ew = lerp(w, W + 40, dive), eh = lerp(40, H + 40, dive);
+          rr(ctx, ex - ew / 2, ey - eh / 2, ew, eh, lerp(20, 0, dive)); ctx.fillStyle = mix(C.orange, '#16130F', clamp(dive * 1.6)); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
+          if (dive < .4) text(ctx, lb, ex, ey, { size: 18 * (1 + dive * 3), weight: 700, color: '#FFF', align: 'center', alpha: 1 - dive * 2.5 });
           return;
         }
         const isFront = Math.sin(chipAng(t, i)) > 0 || p < 1; if (isFront !== front) return;
-        const k = isFront ? 1 : .8, hi = i === 0 && t > 19.4;
-        pill(ctx, x, y, lb, { size: 18, scale: k, fill: hi ? C.cream : (isFront ? 'rgba(30,30,30,.85)' : 'rgba(30,30,30,.6)'), stroke: rgba(C.cream, isFront ? .45 : .2), color: hi ? C.ink : C.cream, alpha: (1 - dive) * (isFront ? 1 : .55) });
+        const k = isFront ? 1 : .8, hi = i === 0 && t > 17.9;
+        pill(ctx, x, y, lb, { size: 18, scale: k, fill: hi ? C.orange : (isFront ? 'rgba(30,30,30,.85)' : 'rgba(30,30,30,.6)'), stroke: rgba(C.cream, isFront ? .45 : .2), color: hi ? '#FFF' : C.cream, alpha: (1 - dive) * (isFront ? 1 : .55) });
       });
   }
 })();
@@ -1735,7 +1762,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
       // ---------- card-pergunta → flip → dashboard ----------
       if (t < T_FLIP + .3) {
         const flip = P(t, T_FLIP, .3, E.inCubic); const sc = E.outBack(P(t, .05, .45));
-        questionCard(ctx, W / 2, H / 2, TX.questions[0], { scale: lerp(1.6, 1.25, sc), flip: 1 - flip, w: 640, h: 240, alpha: P(t, 0, .1) });
+        questionCard(ctx, W / 2, H / 2, Q('insights'), { scale: lerp(1.6, 1.25, sc), flip: 1 - flip, w: 640, h: 240, alpha: P(t, 0, .1) });
       }
       const intro = P(t, T_FLIP + .3, .35, E.outBack);
       let R = lerpR(DA, DB, toLeft); R = lerpR(R, tile(MAIN), toWall);
@@ -1760,7 +1787,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
       const qa = win(t, 4.8, T_LEFT + .2, .3, .3);
       if (qa > 0) { pill(ctx, 1330, 228, 'o quê  ✓', { size: 26, fill: C.ink, color: C.cream, alpha: qa, scale: E.outBack(P(t, 4.8, .35)) });
         if (t > 6.4) pill(ctx, 1530, 228, 'o porquê  ?', { size: 26, fill: C.red, color: '#FFF', alpha: qa * (.75 + .25 * Math.sin(t * 9)), scale: E.outBack(P(t, 6.4, .35)) }); }
-      caseHeader(ctx, t - .4, TX.case1, { theme: 'light', out: T_WALL - .4 - .4 });
+      caseHeader(ctx, t - .4, TX.cases.insights, { theme: 'light', out: T_WALL - .4 - .4 });
 
       // ---------- agentes ----------
       ctx.save(); ctx.globalAlpha = fade;
@@ -1826,7 +1853,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
       // carimbo
       const sp = P(t, T_STAMP, 1.1);
       if (sp > 0) { ctx.save(); ctx.globalAlpha = .55 * clamp(sp * 3) * (1 - P(t, T_OUT, .4)); ctx.fillStyle = C.cream; ctx.fillRect(0, 0, W, H); ctx.restore();
-        stamp(ctx, W / 2, H / 2, TX.case1.stamp, sp, { alpha: 1 - P(t, T_OUT, .4) }); }
+        stamp(ctx, W / 2, H / 2, TX.cases.insights.stamp, sp, { alpha: 1 - P(t, T_OUT, .4) }); }
       // saída: escurece; os tiles viram células
       const out = P(t, T_OUT, .9, E.inOutCubic);
       if (out > 0) { ctx.save(); ctx.globalAlpha = out; ctx.fillStyle = C.ink; ctx.fillRect(0, 0, W, H);
@@ -1860,7 +1887,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   const STARS = SN.map((row, i) => row.map((v, j) => [v, j]).filter(([, j]) => !OBS[i][j]).sort((a, b) => b[0] - a[0]).slice(0, 2).map(a => a[1]));
   // ---- tempos ----
   const T_GRID = 3.2, T_BUY = 5.0, T_ROW = 7.9, T_COL = 9.0, T_Q = 10.4, T_SPLIT = 13.0, T_ALS = 15.4, T_BACK = 22.0, T_SWEEP = 22.8, T_STAR = 24.4;
-  const T_LAT = 27.0, T_PICK = 28.8, T_BASK = 31.8, T_DELIV = 32.8, T_STAMP = 33.8;
+  const T_LAT = 27.0, T_PICK = 28.4, T_BASK = 30.4, T_DELIV = 31.2, T_STAMP = CONFIG.caseDone.als;
   const HALF = [1.2, 1.2, .9, .9, .6, .6, .45, .45], HT = HALF.reduce((a, d, i) => (a.push((a[i - 1] || T_ALS) + (i ? HALF[i - 1] : 0)), a), []).map((v, i) => i === 0 ? T_ALS : v);
   // ---- cues ----
   cue(id, .2, 'whoosh', { dur: .4, v: .3 }); cue(id, .35, 'impact', { size: .3 }); cue(id, 3.0, 'glitch'); cue(id, 3.0, 'whoosh', { dur: .5, v: .35 });
@@ -1900,10 +1927,10 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
       const matA = (1 - mergeK * .55) * (1 - P(t, T_LAT, .7));
       // ---------- card + estilhaço ----------
       if (t < 3.4) { const sc = E.outBack(P(t, .05, .45)), sh = P(t, 3.0, .4);
-        questionCard(ctx, W / 2, H / 2, TX.questions[1], { theme: 'dark', tag: 'VAREJO', scale: lerp(1.6, 1.25, sc) * (1 + sh * .2), alpha: 1 - sh, w: 640, h: 240 }); }
+        questionCard(ctx, W / 2, H / 2, Q('als'), { theme: 'dark', tag: 'VAREJO', scale: lerp(1.6, 1.25, sc) * (1 + sh * .2), alpha: 1 - sh, w: 640, h: 240 }); }
       if (t >= 3.0 && t < 4.2) { const k = P(t, 3.0, 1.0, E.outCubic); for (let n = 0; n < 24; n++) { const i = n % NR, j = (n * 5) % NC, c = cellRect(i, j, { x: X0, y: Y0, s: 1 });
         const sx = W / 2 + (hash(n) - .5) * 600, sy = H / 2 + (hash(n + 3) - .5) * 220; rr(ctx, lerp(sx, c.x, k), lerp(sy, c.y, k), CELL, CELL, 8); ctx.fillStyle = rgba(C.cream, .5 * (1 - k)); ctx.fill(); } }
-      caseHeader(ctx, t - 3.4, TX.case2, { theme: 'dark', out: 35 - 3.4 });
+      caseHeader(ctx, t - 3.4, TX.cases.als, { theme: 'dark', out: 33.2 - 3.4 });
       // ---------- matriz R ----------
       if (t >= T_GRID && matA > 0) {
         ctx.save(); ctx.globalAlpha = matA;
@@ -1947,7 +1974,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
         ctx.save(); ctx.globalAlpha = lat * .5; [180, 340, 500].forEach(rad => { ctx.beginPath(); ctx.ellipse(LC.x, LC.y, rad * 1.5, rad * .62, 0, 0, TAU); ctx.strokeStyle = 'rgba(245,241,234,.07)'; ctx.lineWidth = 2; ctx.setLineDash([4, 10]); ctx.stroke(); }); ctx.setLineDash([]); ctx.restore();
         ['gosto A', 'gosto B', 'gosto C'].forEach((g, k) => { const c = { x: LC.x + DIR[k][0] * 420, y: LC.y + DIR[k][1] * 420 * .6 }; glow(ctx, c.x, c.y, 330, FC[k], .16 * lat);
           text(ctx, g, c.x + (k === 2 ? 270 : DIR[k][0] * 300), c.y + (k === 2 ? 20 : 30), { size: 22, weight: 700, mono: true, color: FC[k], align: 'center', alpha: lat * .8 }); });
-        text(ctx, 'espaço latente', W - 70, H - 70, { size: 24, weight: 700, mono: true, color: C.stone, align: 'right', alpha: lat * (1 - P(t, 35.2, .5)) });
+        text(ctx, 'espaço latente', W - 70, H - 70, { size: 24, weight: 700, mono: true, color: C.stone, align: 'right', alpha: lat * (1 - P(t, 33.3, .5)) });
       }
       // ---------- U e Vᵀ (fatoração + ALS) ----------
       if (mergeK > 0 && t < T_LAT) {
@@ -1992,7 +2019,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
         circle(ctx, bx, by, 44 * ba, C.orange); icon(ctx, 'basket', bx, by + 2, 54 * ba, '#FFF', 8);
         if (t > T_DELIV + .6) pill(ctx, bx + 120, by - 40, 'cesta recomendada', { size: 22, fill: C.cream, color: C.ink, scale: E.outBack(P(t, T_DELIV + .6, .4)) });
       }
-      stamp(ctx, W / 2, 960, TX.case2.stamp, P(t, T_STAMP, 1.1), { theme: 'dark' });
+      stamp(ctx, W / 2, 960, TX.cases.als.stamp, P(t, T_STAMP, 1.1), { theme: 'dark' });
     }
   };
 })();
@@ -2022,7 +2049,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   const CORE = [.05, -.32, .0];
   const DUST = Array.from({ length: 140 }, (_, i) => [hash(i) * 2 - 1, hash(i + 300) * 2 - 1, hash(i + 600) * 2 - 1]);
   // ---- tempos ----
-  const T_SHELF = 3.4, T_FLIP = 6.0, T_DARK = 9.0, T_DOT = 9.6, T_LIFT = 10.6, T_AX = 13.0, T_CL = 15.2, T_COS1 = 17.5, T_COS2 = 19.6, T_TRAIL = 21.8, T_CORE = 25.4, T_STAMP = 27.0, T_OUT = 29.2;
+  const T_SHELF = 3.4, T_FLIP = 6.0, T_DARK = 9.0, T_DOT = 9.6, T_LIFT = 10.6, T_AX = 13.0, T_CL = 15.2, T_COS1 = 17.5, T_COS2 = 19.6, T_TRAIL = 21.8, T_CORE = 25.4, T_STAMP = CONFIG.caseDone.embed, T_OUT = 29.2;
   const TW = 250, TH = 116, GX = 20, GY = 22, SX0 = (W - (6 * TW + 5 * GX)) / 2, SY0 = 330;
   const slot = k => ({ x: SX0 + (k % 6) * (TW + GX), y: SY0 + Math.floor(k / 6) * (TH + GY) });
   // ---- cues ----
@@ -2052,8 +2079,8 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
         DUST.forEach((d, i) => { const q = proj([d[0] * 2.4, d[1] * 1.6, d[2] * 2.4], t); circle(ctx, q.x, q.y, 1.3 * q.s, rgba('#FFFFFF', .25 * dk * clamp(q.s - .4))); }); }
       // card
       if (t < T_SHELF + .2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, T_SHELF - .3, .4);
-        questionCard(ctx, W / 2, H / 2, TX.questions[2], { tag: 'ISSUER', scale: lerp(1.6, 1.25, sc) * (1 - out * .3), alpha: 1 - out, w: 640, h: 240 }); }
-      caseHeader(ctx, t - T_SHELF, TX.case3, { theme: t < 9.8 ? 'light' : 'dark', out: T_OUT - T_SHELF - .3 });
+        questionCard(ctx, W / 2, H / 2, Q('embed'), { tag: 'ISSUER', scale: lerp(1.6, 1.25, sc) * (1 - out * .3), alpha: 1 - out, w: 640, h: 240 }); }
+      caseHeader(ctx, t - T_SHELF, TX.cases.embed, { theme: t < 9.8 ? 'light' : 'dark', out: T_OUT - T_SHELF - .3 });
       if (t > T_SHELF + 1.2 && t < T_DARK + .4) text(ctx, 'itens isolados', SX0, SY0 - 34, { size: 20, weight: 700, mono: true, color: C.stone, alpha: win(t, T_SHELF + 1.2, T_FLIP, .4, .4), ls: 2 });
       if (t > 7) kinetic(ctx, 'produto → *vetor*', W / 2 + 260, 250, t - 7, { size: 54, color: mix(C.ink, C.cream, dk), out: 3.0 });
       if (t > T_CL + .1) kinetic(ctx, 'proximidade = *afinidade*', W - 80, 250, t - T_CL - .1, { size: 48, align: 'right', color: C.cream, out: T_TRAIL - T_CL });
@@ -2116,7 +2143,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
           circle(ctx, q.x, q.y, 30 + pu * 90, null, rgba(C.orange, (1 - pu) * cp), 3);
           pill(ctx, q.x, q.y + 70, 'núcleo de principalidade', { size: 24, fill: C.orange, color: '#FFF', alpha: cp * (1 - P(t, T_OUT, .2)), scale: E.outBack(cp) }); }
       }
-      stamp(ctx, W / 2, 960, TX.case3.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .3)), { theme: 'dark' });
+      stamp(ctx, W / 2, 960, TX.cases.embed.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .3)), { theme: 'dark' });
       // saída: núcleo cresce até preencher a tela (creme)
       const out = P(t, T_OUT, .8, E.inExpo);
       if (out > 0) { const q = proj(CORE, t); circle(ctx, q.x, q.y, lerp(20, 2300, out), C.cream); }
@@ -2186,7 +2213,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
       // ---------- ANTES ----------
       if (t < T_CLICK) {
         bgLight(ctx, t, { base: '#EFEBE5' });
-        if (t < 3.2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, 2.8, .4); questionCard(ctx, W / 2, H / 2, TX.questions[3], { tag: 'FRAUDE · BOARD', scale: lerp(1.6, 1.25, sc) * (1 - out * .4), alpha: 1 - out, w: 640, h: 240 }); }
+        if (t < 3.2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, 2.8, .4); questionCard(ctx, W / 2, H / 2, Q('lightsoff'), { tag: 'FRAUDE · BOARD', scale: lerp(1.6, 1.25, sc) * (1 - out * .4), alpha: 1 - out, w: 640, h: 240 }); }
         const b = P(t, T_BEFORE, .5);
         if (b > 0) {
           ctx.save(); ctx.globalAlpha = b;
@@ -2223,7 +2250,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
             rr(ctx, -125, -38, 250, 76, 12); ctx.strokeStyle = i === 3 ? C.red : C.ink; ctx.lineWidth = 5; ctx.stroke(); text(ctx, w, 0, 2, { size: 40, weight: 800, color: i === 3 ? C.red : C.ink, align: 'center' }); ctx.restore(); });
           ctx.restore();
         }
-        caseHeader(ctx, t - T_BEFORE, TX.case4, { theme: 'light' });
+        caseHeader(ctx, t - T_BEFORE, TX.cases.lightsoff, { theme: 'light' });
         // interruptor
         const sw = P(t, T_SWITCH, .7, E.outExpo);
         if (sw > 0) { ctx.save(); ctx.globalAlpha = .55 * sw; ctx.fillStyle = '#E8E2D8'; ctx.fillRect(0, 0, W, H); ctx.restore();
@@ -2278,8 +2305,8 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
           ctx.restore(); }
         ctx.restore();
       });
-      if (t > T_CLICK + 1.6) caseHeader(ctx, t - T_CLICK - 1.6, TX.case4, { theme: 'dark', out: T_OUT - T_CLICK - 1.6 });
-      stamp(ctx, W / 2, 250, TX.case4.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .4)), { theme: 'dark' });
+      if (t > T_CLICK + 1.6) caseHeader(ctx, t - T_CLICK - 1.6, TX.cases.lightsoff, { theme: 'dark', out: T_OUT - T_CLICK - 1.6 });
+      stamp(ctx, W / 2, 250, TX.cases.lightsoff.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .4)), { theme: 'dark' });
     }
   };
 })();

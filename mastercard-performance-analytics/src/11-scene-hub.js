@@ -31,11 +31,11 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   cue(id, .2, 'whoosh', { dur: 3.4, v: .22 }); cue(id, 1.6, 'riser', { dur: 2.4, v: .3 });
   cue(id, 4.0, 'impact', { size: 1.4 }); cue(id, 4.0, 'shimmer', { dur: 1.6 }); cue(id, 4.2, 'whoosh', { dur: 1.1, v: .25 });
   cue(id, 6.6, 'whoosh', { dur: 1.1, dir: 'down', v: .25 });
-  const SAT_T = [9.9, 10.6, 11.3], CHAIN_T = [14.2, 15.4, 16.9, 18.6];
+  const SAT_T = [9.8, 10.5, 11.2], CHAIN_T = [13.5, 14.6, 15.9, 17.4];
   SAT_T.forEach((t, i) => cue(id, t, 'chime', { f: 784 * Math.pow(2, i * 2 / 12), up: 5 }));
-  [11.6, 11.8, 12.0, 12.2].forEach((t, i) => cue(id, t, 'pop', { p: 1.1 + i * .12 }));
+  [11.4, 11.6, 11.8, 12.0].forEach((t, i) => cue(id, t, 'pop', { p: 1.1 + i * .12 }));
   CHAIN_T.forEach((t, i) => cue(id, t, i === 3 ? 'ding' : 'chime', { f: [880, 988, 1175, 1318][i] }));
-  cue(id, 18.6, 'impact', { size: .5 }); cue(id, 20.0, 'whoosh', { dur: 1.4, v: .55 }); cue(id, 20.6, 'swell', { dur: 1.3 });
+  cue(id, 17.4, 'impact', { size: .5 }); cue(id, 18.4, 'whoosh', { dur: 1.4, v: .55 }); cue(id, 18.9, 'swell', { dur: 1.1 });
 
   const HUB = { x: W / 2, y: 430 }, SAT = [[-2.6, 'Modelos', 'tree'], [-Math.PI / 2, 'Tecnologia', 'gear'], [-.54, 'Estratégia', 'trend']];
   const CHAIN = [['Dados', 'db'], ['Insights', 'spark'], ['Decisão', 'check'], ['Impacto', 'trend']];
@@ -45,7 +45,7 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   SCENES[id] = {
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: lerp(.3, .9, P(t, 4, 1)), center: '#3A2416' });
-      const shrink = P(t, 6.6, 1.3, E.inOutCubic), dive = P(t, 20, 1.6, E.inExpo);
+      const shrink = P(t, 6.6, 1.3, E.inOutCubic), dive = P(t, 18.4, 1.5, E.inExpo);
       const R = lerp(270, 138, shrink), cy = lerp(H / 2 - 40, HUB.y, shrink);
       let d = lerp(2300, 560, P(t, .2, 3.6, E.inOutCubic)); if (t >= 3.8) d = lerp(560, 330, P(t, 3.8, .28, E.outExpo));
       d *= R / 270;
@@ -89,18 +89,18 @@ function intersection(ctx, cx, cy, R, d, o = {}) {
   };
   function drawChips(ctx, t, dive, front) {
       TX.questions.forEach((q, i) => {
-        const p = P(t, 11.6 + i * .2, .8, E.outExpo); if (p <= 0) return;
+        const p = P(t, 11.4 + i * .2, .8, E.outExpo); if (p <= 0) return;
         let [x, y] = chipPos(t, i); x = lerp(64 + i * 190, x, p); y = lerp(64, y, p);
         const lb = `${q.n}  ${q.short}`, w = measure(ctx, lb, 18, 700) + 36;
         if (i === 0 && dive > 0) { if (!front) return;
-          const [ox, oy] = chipPos(20, 0), ex = lerp(ox, W / 2, dive), ey = lerp(oy, H / 2, dive), ew = lerp(w, W + 40, dive), eh = lerp(40, H + 40, dive);
-          rr(ctx, ex - ew / 2, ey - eh / 2, ew, eh, lerp(20, 0, dive)); ctx.fillStyle = mix(C.cream, C.cream, 0); ctx.fill();
-          if (dive < .4) text(ctx, lb, ex, ey, { size: 18 * (1 + dive * 3), weight: 700, color: C.ink, align: 'center', alpha: 1 - dive * 2.5 });
+          const [ox, oy] = chipPos(18.4, 0), ex = lerp(ox, W / 2, dive), ey = lerp(oy, H / 2, dive), ew = lerp(w, W + 40, dive), eh = lerp(40, H + 40, dive);
+          rr(ctx, ex - ew / 2, ey - eh / 2, ew, eh, lerp(20, 0, dive)); ctx.fillStyle = mix(C.orange, '#16130F', clamp(dive * 1.6)); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
+          if (dive < .4) text(ctx, lb, ex, ey, { size: 18 * (1 + dive * 3), weight: 700, color: '#FFF', align: 'center', alpha: 1 - dive * 2.5 });
           return;
         }
         const isFront = Math.sin(chipAng(t, i)) > 0 || p < 1; if (isFront !== front) return;
-        const k = isFront ? 1 : .8, hi = i === 0 && t > 19.4;
-        pill(ctx, x, y, lb, { size: 18, scale: k, fill: hi ? C.cream : (isFront ? 'rgba(30,30,30,.85)' : 'rgba(30,30,30,.6)'), stroke: rgba(C.cream, isFront ? .45 : .2), color: hi ? C.ink : C.cream, alpha: (1 - dive) * (isFront ? 1 : .55) });
+        const k = isFront ? 1 : .8, hi = i === 0 && t > 17.9;
+        pill(ctx, x, y, lb, { size: 18, scale: k, fill: hi ? C.orange : (isFront ? 'rgba(30,30,30,.85)' : 'rgba(30,30,30,.6)'), stroke: rgba(C.cream, isFront ? .45 : .2), color: hi ? '#FFF' : C.cream, alpha: (1 - dive) * (isFront ? 1 : .55) });
       });
   }
 })();

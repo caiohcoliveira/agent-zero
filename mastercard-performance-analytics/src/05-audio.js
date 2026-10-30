@@ -13,26 +13,28 @@ function cue(sceneId, at, type, opt = {}) {
   if (type === 'impact') IMPACTS.push({ t, size: opt.size == null ? 1 : opt.size });
 }
 
-// Seções da trilha (tempo absoluto em segundos). f = corte do filtro passa-baixa (Hz)
-const MUSIC = [
-  [0, 4,     { pad: 1, f: 700 }],
-  [4, 16,    { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 14000 }],
-  [16, 32,   { kick: 1, hat: 1, bass: 1, pad: 1, f: 950 }],
-  [32, 38,   { pad: 1, f: 800 }],
-  [38, 56,   { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 15000 }],
-  [56, 86,   { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 7000, arpOct: 1 }],
-  [86, 122,  { kick: 1, hat: 1, hat16: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 5200, minor: 1 }],
-  [122, 131, { pad: 1, arp: 1, f: 2600, soft: 1 }],
-  [131, 152, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }],
-  [152, 164, { kick: 1, pluck: 1, f: 3200, comic: 1 }],
-  [164, 166, { f: 400 }],
-  [166, 180, { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 15000 }],
-  [180, 196, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 3000, rise: 1 }],
-  [196, 202, { kick: 1, hat16: 1, roll: 1, bass: 1, pad: 1, f: 9000 }],
-  [202, 224, { kick: 1, hat: 1, hat16: 1, clap: 1, bass: 1, arp: 1, pad: 1, f: 16000, big: 1 }],
-  [224, 236, { pad: 1, arp: 1, soft: 1, f: 4200 }],
-  [236, 241, { f: 3000 }]
-];
+// Arranjo da trilha POR CENA (tempo local, múltiplos de 0.125 s). f = corte do filtro passa-baixa (Hz).
+// Flags: kick hat hat16 clap bass arp pad pluck comic roll big soft minor arpOct rise (filtro sobe até o fim da seção)
+const FULL = { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1 };
+const MUSIC_SPEC = {
+  hook:      [[0, { pad: 1, f: 700 }], [4, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [6.5, { ...FULL, f: 14000 }], [17, { pad: 1, f: 1200 }]],
+  problem:   [[0, { kick: 1, hat: 1, bass: 1, pad: 1, f: 950 }], [14, { pad: 1, f: 800 }]],
+  hub:       [[0, { pad: 1, f: 800 }], [4, { ...FULL, f: 15000 }]],
+  als:       [[0, { ...FULL, hat16: 1, f: 5200, minor: 1 }]],
+  embed:     [[0, { pad: 1, arp: 1, soft: 1, f: 2600 }], [9, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }]],
+  lightsoff: [[0, { kick: 1, pluck: 1, comic: 1, f: 3200 }], [12, { f: 400 }], [14, { ...FULL, f: 15000 }], [22, { kick: 1, pad: 1, bass: 1, f: 2000, rise: 1 }]],
+  insights:  [[0, { ...FULL, f: 7000, arpOct: 1 }], [18.5, { pad: 1, arp: 1, soft: 1, kick: 1, f: 3200 }], [26.5, { ...FULL, hat16: 1, f: 15000 }]],
+  skills:    [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 3000, rise: 1 }], [12.5, { ...FULL, hat16: 1, f: 12000 }], [18, { kick: 1, hat16: 1, roll: 1, bass: 1, pad: 1, f: 9000 }]],
+  climax:    [[0, { ...FULL, hat16: 1, big: 1, f: 16000 }]],
+  close:     [[0, { pad: 1, arp: 1, soft: 1, f: 4200 }], [7, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }], [16.5, { f: 3000 }]]
+};
+const MUSIC = (() => {
+  const out = [];
+  CONFIG.scenes.forEach(sc => { const spec = MUSIC_SPEC[sc.id] || [[0, { pad: 1, f: 3000 }]];
+    spec.forEach(([at, f], i) => out.push([sc.start + at, sc.start + (i + 1 < spec.length ? spec[i + 1][0] : sc.dur), f])); });
+  out.push([CONFIG.duration, CONFIG.duration + 1, { f: 3000 }]);
+  return out;
+})();
 const PROG = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];       // Am F C G (vi–IV–I–V)
 const PROG_MIN = [[57, 60, 64], [53, 57, 60], [50, 53, 57], [52, 56, 59]];   // Am F Dm E (mais tenso)
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);

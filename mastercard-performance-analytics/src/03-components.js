@@ -168,11 +168,11 @@ function caseHeader(ctx, t, c, o = {}) {
 
 // ---------- CHIPS de capítulo (rastreador de progresso, canto superior esquerdo) ----------
 const CHIPS = (() => {
-  const s = CONFIG.sceneById;
+  const s = CONFIG.sceneById, ids = CONFIG.text.questions.map(q => q.id);
   return {
-    show: [s.insights.start - .2, s.lightsoff.end - .6],
-    active: ['insights', 'als', 'embed', 'lightsoff'].map(id => [s[id].start, s[id].end]),
-    done: [s.insights.start + 27.6, s.als.start + 33.8, s.embed.start + 27.0, s.lightsoff.start + 25.6]
+    show: [s[ids[0]].start - .2, s[ids[ids.length - 1]].end - .6],
+    active: ids.map(id => [s[id].start, s[id].end]),
+    done: ids.map(id => s[id].start + CONFIG.caseDone[id])
   };
 })();
 function chips(ctx, T, theme) {

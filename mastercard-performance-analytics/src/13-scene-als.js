@@ -21,7 +21,7 @@
   const STARS = SN.map((row, i) => row.map((v, j) => [v, j]).filter(([, j]) => !OBS[i][j]).sort((a, b) => b[0] - a[0]).slice(0, 2).map(a => a[1]));
   // ---- tempos ----
   const T_GRID = 3.2, T_BUY = 5.0, T_ROW = 7.9, T_COL = 9.0, T_Q = 10.4, T_SPLIT = 13.0, T_ALS = 15.4, T_BACK = 22.0, T_SWEEP = 22.8, T_STAR = 24.4;
-  const T_LAT = 27.0, T_PICK = 28.8, T_BASK = 31.8, T_DELIV = 32.8, T_STAMP = 33.8;
+  const T_LAT = 27.0, T_PICK = 28.4, T_BASK = 30.4, T_DELIV = 31.2, T_STAMP = CONFIG.caseDone.als;
   const HALF = [1.2, 1.2, .9, .9, .6, .6, .45, .45], HT = HALF.reduce((a, d, i) => (a.push((a[i - 1] || T_ALS) + (i ? HALF[i - 1] : 0)), a), []).map((v, i) => i === 0 ? T_ALS : v);
   // ---- cues ----
   cue(id, .2, 'whoosh', { dur: .4, v: .3 }); cue(id, .35, 'impact', { size: .3 }); cue(id, 3.0, 'glitch'); cue(id, 3.0, 'whoosh', { dur: .5, v: .35 });
@@ -61,10 +61,10 @@
       const matA = (1 - mergeK * .55) * (1 - P(t, T_LAT, .7));
       // ---------- card + estilhaço ----------
       if (t < 3.4) { const sc = E.outBack(P(t, .05, .45)), sh = P(t, 3.0, .4);
-        questionCard(ctx, W / 2, H / 2, TX.questions[1], { theme: 'dark', tag: 'VAREJO', scale: lerp(1.6, 1.25, sc) * (1 + sh * .2), alpha: 1 - sh, w: 640, h: 240 }); }
+        questionCard(ctx, W / 2, H / 2, Q('als'), { theme: 'dark', tag: 'VAREJO', scale: lerp(1.6, 1.25, sc) * (1 + sh * .2), alpha: 1 - sh, w: 640, h: 240 }); }
       if (t >= 3.0 && t < 4.2) { const k = P(t, 3.0, 1.0, E.outCubic); for (let n = 0; n < 24; n++) { const i = n % NR, j = (n * 5) % NC, c = cellRect(i, j, { x: X0, y: Y0, s: 1 });
         const sx = W / 2 + (hash(n) - .5) * 600, sy = H / 2 + (hash(n + 3) - .5) * 220; rr(ctx, lerp(sx, c.x, k), lerp(sy, c.y, k), CELL, CELL, 8); ctx.fillStyle = rgba(C.cream, .5 * (1 - k)); ctx.fill(); } }
-      caseHeader(ctx, t - 3.4, TX.case2, { theme: 'dark', out: 35 - 3.4 });
+      caseHeader(ctx, t - 3.4, TX.cases.als, { theme: 'dark', out: 33.2 - 3.4 });
       // ---------- matriz R ----------
       if (t >= T_GRID && matA > 0) {
         ctx.save(); ctx.globalAlpha = matA;
@@ -108,7 +108,7 @@
         ctx.save(); ctx.globalAlpha = lat * .5; [180, 340, 500].forEach(rad => { ctx.beginPath(); ctx.ellipse(LC.x, LC.y, rad * 1.5, rad * .62, 0, 0, TAU); ctx.strokeStyle = 'rgba(245,241,234,.07)'; ctx.lineWidth = 2; ctx.setLineDash([4, 10]); ctx.stroke(); }); ctx.setLineDash([]); ctx.restore();
         ['gosto A', 'gosto B', 'gosto C'].forEach((g, k) => { const c = { x: LC.x + DIR[k][0] * 420, y: LC.y + DIR[k][1] * 420 * .6 }; glow(ctx, c.x, c.y, 330, FC[k], .16 * lat);
           text(ctx, g, c.x + (k === 2 ? 270 : DIR[k][0] * 300), c.y + (k === 2 ? 20 : 30), { size: 22, weight: 700, mono: true, color: FC[k], align: 'center', alpha: lat * .8 }); });
-        text(ctx, 'espaço latente', W - 70, H - 70, { size: 24, weight: 700, mono: true, color: C.stone, align: 'right', alpha: lat * (1 - P(t, 35.2, .5)) });
+        text(ctx, 'espaço latente', W - 70, H - 70, { size: 24, weight: 700, mono: true, color: C.stone, align: 'right', alpha: lat * (1 - P(t, 33.3, .5)) });
       }
       // ---------- U e Vᵀ (fatoração + ALS) ----------
       if (mergeK > 0 && t < T_LAT) {
@@ -153,7 +153,7 @@
         circle(ctx, bx, by, 44 * ba, C.orange); icon(ctx, 'basket', bx, by + 2, 54 * ba, '#FFF', 8);
         if (t > T_DELIV + .6) pill(ctx, bx + 120, by - 40, 'cesta recomendada', { size: 22, fill: C.cream, color: C.ink, scale: E.outBack(P(t, T_DELIV + .6, .4)) });
       }
-      stamp(ctx, W / 2, 960, TX.case2.stamp, P(t, T_STAMP, 1.1), { theme: 'dark' });
+      stamp(ctx, W / 2, 960, TX.cases.als.stamp, P(t, T_STAMP, 1.1), { theme: 'dark' });
     }
   };
 })();

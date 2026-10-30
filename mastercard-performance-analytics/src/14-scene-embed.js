@@ -22,7 +22,7 @@
   const CORE = [.05, -.32, .0];
   const DUST = Array.from({ length: 140 }, (_, i) => [hash(i) * 2 - 1, hash(i + 300) * 2 - 1, hash(i + 600) * 2 - 1]);
   // ---- tempos ----
-  const T_SHELF = 3.4, T_FLIP = 6.0, T_DARK = 9.0, T_DOT = 9.6, T_LIFT = 10.6, T_AX = 13.0, T_CL = 15.2, T_COS1 = 17.5, T_COS2 = 19.6, T_TRAIL = 21.8, T_CORE = 25.4, T_STAMP = 27.0, T_OUT = 29.2;
+  const T_SHELF = 3.4, T_FLIP = 6.0, T_DARK = 9.0, T_DOT = 9.6, T_LIFT = 10.6, T_AX = 13.0, T_CL = 15.2, T_COS1 = 17.5, T_COS2 = 19.6, T_TRAIL = 21.8, T_CORE = 25.4, T_STAMP = CONFIG.caseDone.embed, T_OUT = 29.2;
   const TW = 250, TH = 116, GX = 20, GY = 22, SX0 = (W - (6 * TW + 5 * GX)) / 2, SY0 = 330;
   const slot = k => ({ x: SX0 + (k % 6) * (TW + GX), y: SY0 + Math.floor(k / 6) * (TH + GY) });
   // ---- cues ----
@@ -52,8 +52,8 @@
         DUST.forEach((d, i) => { const q = proj([d[0] * 2.4, d[1] * 1.6, d[2] * 2.4], t); circle(ctx, q.x, q.y, 1.3 * q.s, rgba('#FFFFFF', .25 * dk * clamp(q.s - .4))); }); }
       // card
       if (t < T_SHELF + .2) { const sc = E.outBack(P(t, .05, .45)), out = P(t, T_SHELF - .3, .4);
-        questionCard(ctx, W / 2, H / 2, TX.questions[2], { tag: 'ISSUER', scale: lerp(1.6, 1.25, sc) * (1 - out * .3), alpha: 1 - out, w: 640, h: 240 }); }
-      caseHeader(ctx, t - T_SHELF, TX.case3, { theme: t < 9.8 ? 'light' : 'dark', out: T_OUT - T_SHELF - .3 });
+        questionCard(ctx, W / 2, H / 2, Q('embed'), { tag: 'ISSUER', scale: lerp(1.6, 1.25, sc) * (1 - out * .3), alpha: 1 - out, w: 640, h: 240 }); }
+      caseHeader(ctx, t - T_SHELF, TX.cases.embed, { theme: t < 9.8 ? 'light' : 'dark', out: T_OUT - T_SHELF - .3 });
       if (t > T_SHELF + 1.2 && t < T_DARK + .4) text(ctx, 'itens isolados', SX0, SY0 - 34, { size: 20, weight: 700, mono: true, color: C.stone, alpha: win(t, T_SHELF + 1.2, T_FLIP, .4, .4), ls: 2 });
       if (t > 7) kinetic(ctx, 'produto → *vetor*', W / 2 + 260, 250, t - 7, { size: 54, color: mix(C.ink, C.cream, dk), out: 3.0 });
       if (t > T_CL + .1) kinetic(ctx, 'proximidade = *afinidade*', W - 80, 250, t - T_CL - .1, { size: 48, align: 'right', color: C.cream, out: T_TRAIL - T_CL });
@@ -116,7 +116,7 @@
           circle(ctx, q.x, q.y, 30 + pu * 90, null, rgba(C.orange, (1 - pu) * cp), 3);
           pill(ctx, q.x, q.y + 70, 'núcleo de principalidade', { size: 24, fill: C.orange, color: '#FFF', alpha: cp * (1 - P(t, T_OUT, .2)), scale: E.outBack(cp) }); }
       }
-      stamp(ctx, W / 2, 960, TX.case3.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .3)), { theme: 'dark' });
+      stamp(ctx, W / 2, 960, TX.cases.embed.stamp, P(t, T_STAMP, 1.1) * (1 - P(t, T_OUT, .3)), { theme: 'dark' });
       // saída: núcleo cresce até preencher a tela (creme)
       const out = P(t, T_OUT, .8, E.inExpo);
       if (out > 0) { const q = proj(CORE, t); circle(ctx, q.x, q.y, lerp(20, 2300, out), C.cream); }

@@ -14,7 +14,7 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   - papel, contornos, sombras chapadas, meio-tom, stickers, fita;
   - camada futurista (neon, grid, scanlines);
   - aplicado aos componentes.
-- [ ] **E3. Config v2:**
+- [x] **E3. Config v2:**
   - voz desligada por padrão;
   - nova ordem dos casos e novos tempos;
   - nova narração;
