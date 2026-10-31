@@ -1,18 +1,36 @@
-# A Linha — Storyline v3.1
+# A Linha — Storyline v3.2
 
 **Sessão:** 20 min, sendo ~9 min de vídeo e 11 min de fala das apresentadoras, em 4 paradas
 **Vídeo:** HTML único offline, 1920×1080, em **modo apresentação**: trechos de vídeo e paradas em loop, controlados pelo teclado ou pelo passador de slides
-**Status:** **proposta em validação**. Nada da v3 foi implementado. O HTML atual ainda é a v2, cujo roteiro está no histórico (commit `20e1d96`).
+**Status:** **proposta em validação**. As cenas da v3 ainda não foram implementadas; o HTML já carrega o bloco de dados. O vídeo atual ainda é a v2, cujo roteiro está no histórico (commit `20e1d96`).
 
 Marcadores usados no texto:
 - **[v2]** reaproveita uma cena da v2, com ajustes;
 - **[nova]** cena nova;
-- **[fictício]** número inventado, que deve ser trocado;
-- **[a confirmar]** depende de material ou de confirmação de vocês.
+- **[a confirmar]** depende de material ou de confirmação de vocês;
+- **[dados]** número ou resultado que vem de `data/presentation.json` (ver a seção "Dados").
 
 ---
 
-## Ajustes desta rodada (v3 → v3.1)
+## Ajustes desta rodada (v3.1 → v3.2): dados reais
+
+1. **Fonte única dos números:** tudo que é número ou resultado vem de `data/presentation.json`.
+   - O build injeta o arquivo num bloco JSON no topo do HTML. Para trocar uma informação, basta editar o bloco e salvar.
+   - O arquivo real fica fora do Git, porque o repositório é público. O repositório guarda só um exemplo com a mesma estrutura.
+2. **Estação 02:**
+   - a evolução da receita por período vira o visual dominante;
+   - o marco do Brasil entra como destaque;
+   - as provas de escala complementam.
+3. **Estação 03:** um mapa de capabilities por tipo de cliente (Emissores, Adquirentes, Merchants), com cada capability ligada a um case.
+4. **Estação 04:** quatro cases, cada um com a moldura Problema → Solução analítica → Insight/Decisão → Impacto e **um** número-manchete.
+   - Cliente Banana (cestas);
+   - Cliente Manga (principalidade);
+   - Lights-off;
+   - Insight Agent.
+5. **Estação 05:** a progressão Análise manual → Analytics avançado → Motores produtizados → Ativos de IA escaláveis, com o indicador de escala de cada exemplo.
+6. **Os valores não aparecem neste documento:** ele aponta os campos do JSON, para não publicar dados internos.
+
+## Ajustes da rodada anterior (v3 → v3.1)
 
 1. **Paradas = pausas para as apresentadoras falarem.** O vídeo não congela: a animação continua em loop infinito pelo tempo que for preciso.
 2. **Parada 0 no mapa do metrô**, para apresentar o roteiro (por onde vamos passar).
@@ -114,12 +132,12 @@ Os tempos de fala somam 11 min (2 + 3,5 + 3,5 + 2). Por isso o vídeo fica com ~
 ### Parada 1 · retomada do trecho 1 (3:30 de fala)
 - **Cena:** o ∞ do fim da estação 03 encolhe e vira a baldeação. O trem para, e a câmera entra na plataforma, que tem 3 cartazes na parede, um por estação percorrida.
 - **Cartaz 01:** "Da pergunta de negócio ao valor medido". A cadeia Dados → Decisões → Impacto → Valor pulsa elo a elo.
-- **Cartaz 02:** o placar **23** pessoas · **140+** projetos · **62%** dos engagements · receita **×6**. De vez em quando, uma plaqueta re-vira.
-- **Cartaz 03:** o Venn de analytics com as tracks. As lentes laranjas acendem em sequência, com a faixa "portfólio em 3 ondas".
+- **Cartaz 02:** a curva de receita por período, com o multiplicador do período e o selo do marco do Brasil (vs. período anterior e vs. budget) [dados].
+- **Cartaz 03:** o mapa de capabilities por tipo de cliente, com as ligações para os cases acendendo em sequência.
 
 ### Parada 2 · retomada do trecho 2 (3:30 de fala)
-- **Cartaz 04:** os 3 comprovantes de impacto lado a lado (ticket +14% · +11 p.p. de clientes principais · 10 dias → 15 min), balançando como papel pendurado.
-- **Cartaz 05:** "Insights em escala · transformers em GPU · o dado nunca sai". Os agentes passam o título de mão em mão, em loop, e o perímetro pulsa.
+- **Cartaz 04:** os 4 cards de case lado a lado, cada um com o seu número-manchete [dados], balançando como papel pendurado.
+- **Cartaz 05:** a escada Manual → Avançado → Produtizado → IA escalável, com o pipeline do Insight Agent em destaque e o perímetro "o dado nunca sai" pulsando [dados].
 - **Cartaz 06:** as 4 colunas da Prática, com o selo "v4.0".
 
 ### Encerramento (2:00 de fala)
@@ -173,148 +191,129 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - Do diagnóstico à mensuração: dimensionamos, explicamos, construímos e provamos.
 - Transformamos dados em decisões, decisões em impacto… e impacto em valor para o cliente.
 
-#### Estação 02 — Our Evolution & Business Impact (70s) [nova] [fictício]
+#### Estação 02 — Our Evolution & Business Impact (70s) [nova] [dados]
 1. **Chegada (4s).**
-2. **Linha do tempo 2022 → 2026 (32s):** um trilho com 5 estações-ano. Em cada uma:
-   - um selo postal com o marco;
-   - bonequinhos recortados empilhando o time: 4 → 7 → 11 → 16 → 23;
-   - um contador de engagements com analytics subindo de 15% para 62%;
-   - por cima, uma linha neon de receita sobe.
-3. **Placar split-flap (10s):** **23** pessoas · **140+** projetos · **62%** dos engagements · **US$ 12,4 mi** de receita.
-4. **Relevância (8s):** numa fileira de 10 cards de engagement, 6 ganham o sticker laranja de analytics.
-5. **Onde atuamos (12s)** [nova]: colagem com os segmentos atendidos e a contagem de clientes de cada um: issuers 18 · adquirentes 6 · varejo 9 · fintechs 5 · outros 3.
-6. **Saída (4s).**
-
-**Marcos** [a confirmar]:
-- 2022: a track nasce, com 4 pessoas, e o 1º modelo de fraude entra em produção;
-- 2023: 1º recomendador no varejo;
-- 2024: índice de principalidade;
-- 2025: reports lights-off para o board;
-- 2026: agentes de insights e transformers privados em GPU.
-
-**Easter egg:** `CAGR = (12,4 / 2,1)^(1/4) − 1 ≈ 56%`
+2. **Receita por período (o visual dominante, ~30s):**
+   - um gráfico de barras em papel recortado, uma barra por período (`revenue_performance_analytics_usd_millions`), subindo uma a uma no tempo da música;
+   - a projeção do período seguinte aparece tracejada, como "forecast";
+   - um selo mostra o multiplicador do período (número-manchete da seção 2) e as variações ano a ano (`revenue_growth`);
+   - easter egg: a fórmula do crescimento composto colada ao lado da curva.
+3. **Marco do Brasil (o destaque, ~16s):**
+   - um carimbo grande com os dois multiplicadores: vs. período anterior e vs. budget (`brazil_2023_milestone`);
+   - por baixo, as barras por trimestre, comparando realizado do período anterior, budget e realizado;
+   - os motivadores (`drivers`) entram como notas de rodapé, se vocês quiserem mostrá-los [a confirmar].
+4. **Provas de escala (~16s):** três fichas de colagem, uma por iniciativa (`scale_proof_points`):
+   - Cliente Banana: clientes modelados, subgrupos de SKU e interações;
+   - Cliente Manga: associados PF, clusters look-alike e tempo de desenvolvimento;
+   - Insight Agent: adquirentes no pipeline, clientes + PoCs e projetos user-pay.
+5. **Saída (4s).**
 
 **Narração opcional:**
 - Próxima estação: a nossa evolução.
-- Em quatro anos, o time foi de quatro para vinte e três pessoas…
-- …e cada ano deixou um marco, do primeiro modelo em produção aos agentes de IA.
-- Mais de cento e quarenta projetos entregues — e uma receita seis vezes maior.
-- Hoje, analytics está em seis de cada dez engagements.
+- A receita cresceu período após período…
+- …e o Brasil fechou acima do período anterior e acima do budget.
+- Com escala de verdade, nos três exemplos.
 
-#### Estação 03 — What We Bring to the Market (80s) [nova + v2]
+#### Estação 03 — What We Bring to the Market (80s) [nova + v2] [dados]
 1. **Chegada (4s).**
-2. **Analytics × as demais tracks (16s):** analytics no centro e as outras tracks em volta, como círculos em meio-tom. Cada sobreposição acende uma lente laranja com a oferta conjunta [a confirmar os nomes]:
-   - Estratégia ∩ Analytics → business case com dados
-   - Marketing & Fidelidade ∩ Analytics → segmentação e recomendação
-   - Risco & Fraude ∩ Analytics → modelos de fraude e crédito
-   - Digital & Pagamentos ∩ Analytics → personalização em tempo real
-   - Operações ∩ Analytics → automação lights-off
-3. **Tipos de projeto (12s):** 5 bilhetes de embarque carimbados:
-   - Diagnóstico & sizing
-   - Modelos preditivos
-   - Segmentação & personalização
-   - Test & learn / incrementalidade
-   - Automação & IA
-4. **Portfólio em 3 ondas (36s, mostrado e não verbalizado):**
-   - **PRODUTOS:** painéis Issuer e Acquirer;
-   - **CAPABILITIES:** stickers analíticos;
-   - **FRONTEIRA:** tags neon do estado da arte e fórmulas soltas.
-5. **Mosaico infinito ∞ (8s).**
-6. **Saída (4s):** o ∞ encolhe e vira a baldeação, o que abre a **Parada 1**.
+2. **Analytics × as demais tracks (12s):** o Venn com analytics no centro e as outras tracks em volta, mais curto que na v3.1 [a confirmar os nomes].
+3. **Mapa de capabilities (~30s):**
+   - três colunas, uma por tipo de cliente (`client_types`), como plataformas de uma estação;
+   - cada capability (`capabilities_demonstrated_in_cases`) vira um sticker, com os métodos em letra miúda como easter eggs: UMAP, K-Means, ALS, BM25, cosseno, LLMs locais…;
+   - um fio liga cada capability ao case em que ela aparece, e o case acende. É a prévia da estação 04;
+   - a coluna de cada capability depende do case [a confirmar]: Cliente Manga → Emissores; Insight Agent → Adquirentes; Cliente Banana → Merchants; Lights-off → ?
+4. **Portfólio em 3 ondas (~22s, sem voz) [a confirmar se fica]:** as ondas da v2 (produtos Issuer/Acquirer → capabilities → fronteira), terminando no ∞.
+5. **Saída (4s):** o ∞ (ou o mapa) vira a baldeação e abre a **Parada 1**.
 
 **Narração opcional:**
 - Próxima estação: o que levamos ao mercado.
 - Analytics não joga sozinha: complementa e potencializa cada track da consultoria.
-- Do diagnóstico à automação, entregamos projetos de ponta a ponta…
-- …com um portfólio de produtos e capabilities que não para de crescer.
+- Para emissores, adquirentes e merchants, cada capability já tem um case para mostrar.
 
 ### Trecho 2 · laranja · tema B (3:50)
 
-#### Estação 04 — Analytics in Action: From Data to Impact (6s de abertura) [nova]
-- **Visual:** três fichas de caso se abrem em leque (VAREJO · ISSUER · FRAUDE), com a régua **PROBLEMA → INSIGHT → ENTREGA → IMPACTO**.
+#### Estação 04 — Analytics in Action: From Data to Impact (5s de abertura) [nova]
+- **Visual:** quatro fichas de case se abrem em leque (BANANA · MANGA · LIGHTS-OFF · INSIGHT AGENT), com a régua **PROBLEMA → SOLUÇÃO ANALÍTICA → INSIGHT/DECISÃO → IMPACTO** (`case_structure`).
 
 **Moldura de caso:**
 - **Régua no topo:** avança de etapa em etapa.
-- **Abertura:** o problema na língua do cliente, num post-it grande.
-- **Miolo:** a parte técnica da v2, com os easter eggs.
-- **Fecho:** o **comprovante de impacto**, impresso como cupom de maquininha (é Mastercard, afinal), com o carimbo ✓.
-- **Parceria:** cada caso ganha um sticker "com a track de …" [a confirmar].
+- **Problema:** o desafio de negócio em uma frase, num post-it grande (`business_problem`).
+- **Solução analítica:** a parte técnica, com os métodos do case como easter eggs (`analytics_solution`).
+- **Insight/Decisão:** o que a análise mostrou e o que mudou na decisão.
+- **Impacto:** o card fecha com **um** número-manchete, impresso como comprovante de maquininha, com o carimbo ✓. O número vem do item da seção 4 em `headline_numbers_for_slides` ou, na falta dele, do `headline` do case.
 
-#### Caso 1 · Varejo — recomendação (42s) [v2] [fictício]
-- **Problema:** "12 milhões de clientes, 1 folheto para todos". A conversão de campanha é de 1,8%.
-- **Miolo (v2):**
-  1. matriz cliente×SKU esparsa;
-  2. R ≈ U·Vᵀ;
-  3. alternância do ALS;
-  4. as lacunas viram propensões;
-  5. espaço latente.
-- **Insight:** clientes parecidos montam cestas parecidas.
-- **Entrega:** top-3 SKUs por cliente, toda semana, no app e no CRM.
-- **Comprovante:**
-  - ticket médio +14%;
-  - conversão de 1,8% para 4,3%;
-  - +R$ 48 mi/ano de receita incremental.
-- **Easter eggs:** `uᵢ = (VᵀV + λI)⁻¹Vᵀrᵢ` · `c = 1 + α·r` · `k = 64` · `score = uᵀv` · `top-k`
+#### Caso Cliente Banana · cestas de produtos [v2 adaptado] [dados]
+- **Problema:** aumentar a transversalidade entre Cliente Banana, Cliente Maçã e Cliente Pera: quais cestas de SKUs estratégicos, para quais clientes, com quais produtos que motivam a visita.
+- **Desafios de dado** (3 post-its riscados):
+  - só compras registradas, sem preferência declarada;
+  - itens onipresentes de baixo valor (sacola, pão) dominando o sinal;
+  - o mesmo produto com nomes diferentes entre BUs.
+- **Solução** (miolo da v2, ajustado):
+  1. 24 meses de compras CPF × SKU numa matriz esparsa;
+  2. o BM25 pondera a relevância e "apaga" a sacola e o pão;
+  3. o ALS fatoriza a matriz em vetores de clientes e de produtos;
+  4. o cosseno produto × produto forma as cestas, e o cosseno cliente × cesta escolhe o público;
+  5. as três cestas temáticas aparecem como sacolas de colagem: Café + chocolate · Churrasco · Destilados.
+- **Insight/Decisão:** as cestas temáticas viram mecânicas de campanha nos testes da Mesa de Performance.
+- **Impacto:**
+  - o número-manchete da conversão contra a 2ª melhor campanha;
+  - o ranking de conversão por mecânica como gráfico de barras (`conversion_by_mechanic`), com as cestas em laranja.
+- **Easter eggs:** a fórmula do BM25, `R ≈ U·Vᵀ`, `cos θ = a·b / ‖a‖‖b‖` e a escala do modelo (`model_scale`).
 
-#### Caso 2 · Issuer — principalidade (40s) [v2] [fictício]
-- **Problema:** "4 em cada 10 clientes recebem o salário em outro banco". Quem nos tem como banco principal?
-- **Miolo (v2):**
-  1. prateleira de 24 produtos financeiros;
-  2. cada produto vira um vetor;
-  3. gradiente descendente;
-  4. espaço neon 3D;
-  5. clusters;
-  6. distância do cosseno.
-- **Insight:** existe uma trilha até a principalidade: conta digital → Pix → cartão de crédito → cashback → CDB → previdência.
-- **Entrega:** índice de principalidade e próximo melhor produto para cada cliente.
-- **Comprovante:**
-  - +11 p.p. de clientes principais em 6 meses;
-  - +R$ 320 mi em captação;
-  - churn −18%.
+#### Caso Cliente Manga · motor de principalidade [v2 adaptado] [dados]
+- **Problema:** recomendar produtos olhando não só afinidade e conversão, mas também o impacto esperado de cada recomendação na principalidade.
+- **Solução:**
+  1. segmentação look-alike: o UMAP projeta os associados e o K-Means forma 8 segmentos. O espaço 3D neon da v2 vira o UMAP;
+  2. fatoração de matrizes (ALS), com cross-sell e upsell em paralelo;
+  3. uma camada ΔP reprioriza a lista pelo ganho esperado de principalidade.
+- **Insight/Decisão:** uma lista curta, reordenada por ΔP, rende mais principalidade do que a lista "pura" de afinidade.
+- **Impacto:**
+  - o número-manchete do ganho teórico de principalidade contra o controle (backtest);
+  - o destaque do melhor segmento;
+  - o selo "produtizado" no ambiente do cliente, com retreino semestral, pipeline mensal e ajuste diário.
+- **Easter eggs:**
+  - as métricas de qualidade da segmentação como fórmulas coladas: trustworthiness do UMAP, silhouette, Calinski-Harabasz, Davies-Bouldin e estabilidade dos clusters em 3 e 6 meses;
+  - MLflow.
 
-#### Caso 3 · Fraude — lights-off reporting (36s) [v2] [fictício]
-- **Problema:** "10 dias de fechamento manual, 2 analistas, todo mês". Aparece o "antes" caricato da v2.
-- **Insight:** 9 de cada 10 passos se repetiam todo mês.
-- **Entrega:** CLICK — as luzes apagam e um pipeline neon leva do dado ao board.
-- **Comprovante:**
-  - de 10 dias para 15 minutos;
-  - ~1.900 h/ano devolvidas à análise;
-  - zero toque manual.
-- **Fecho (v2):** o nó Insights pulsa com um "?" ("Mas quem escreve os destaques?") e a câmera mergulha nele.
+#### Caso Lights-off Fraud Reporting [v2] [a confirmar: o JSON só traz o nome]
+- **Cena da v2 mantida:** o "antes" manual, o CLICK das luzes apagando e o pipeline do dado ao board.
+- **Sem número por enquanto:** fica assim até chegarem problema, solução e impacto. Os números fictícios da v3.1 saem.
 
-**Narração opcional dos casos:**
-- Caso um, no varejo: doze milhões de clientes… e o mesmo folheto para todos.
-- Com fatoração de matrizes — o ALS — as lacunas viram propensões.
-- Resultado: ticket médio catorze por cento maior.
-- Caso dois, num issuer: quem nos tem como banco principal?
-- Com embeddings e a distância do cosseno, aparece uma trilha até a principalidade.
-- Em seis meses, onze pontos a mais de clientes principais.
-- Caso três: o report de fraude para o board. Dez dias de trabalho manual, todo mês.
-- Apagamos as luzes: de dez dias para quinze minutos.
-- Mas quem escreve os destaques do report?
+#### Caso Insight Agent · insights de Market Share e Share of Wallet [v2 adaptado] [dados]
+- **Problema:**
+  - o produto de Market Share e Share of Wallet para adquirentes dependia de insights escritos à mão;
+  - os dados não podem sair do ambiente Mastercard, o que exclui APIs externas de IA.
+- **Solução** (miolo da v2, ajustado ao circuito real):
+  1. um circuito multiagente com IA local em GPU: **geradores → julgadores → corretores → insights validados** [a confirmar como ficam os nomes da v2: Analista, Business e C-Level, Validador, Embalador];
+  2. dois modelos locais e guardrails (Regex e BERT);
+  3. um score de qualidade do insight, com Random Forest sobre features de NLP.
+- **Insight/Decisão:** com a qualidade medida automaticamente, dá para atender o pipeline inteiro sem crescer o time.
+- **Impacto:**
+  - o número-manchete do pipeline de adquirentes;
+  - clientes, PoCs e projetos user-pay como fichas.
+- **Easter eggs:**
+  - o MAE do score, inclusive fora do tempo;
+  - `Attention(Q,K,V)`;
+  - `egress: 0 B`.
 
-#### Estação 05 — Scaling Our Impact Through Data, AI & Innovation (62s) [v2 + nova]
-1. **IA (20s, v2):**
-   - Analista, Business e C-Level escrevem o insight;
-   - o Validador reprova, manda refazer e aprova;
-   - o Embalador entrega o título, que vai para o report, o dashboard e qualquer processo.
-2. **Por baixo do capô (12s, v2, futurista):**
-   - transformer com mapa de atenção;
+#### Estação 05 — Scaling Our Impact Through Data, AI & Innovation (62s) [v2 + nova] [dados]
+1. **A escada (~30s):** quatro degraus de colagem, cada um mais neon que o anterior. Cada degrau mostra o indicador de escala do exemplo (`innovation_examples[].scale_indicator`).
+   - **Análise manual:** planilhas, o "antes" da v2;
+   - **Analytics avançado:** Cliente Banana (espaço latente: BM25 + ALS + cosseno);
+   - **Motores produtizados:** Cliente Manga (jobs semestral, mensal e diário) e Lights-off (reporting automatizado);
+   - **Ativos de IA escaláveis:** Insight Agent (IA local multiagente + score de qualidade).
+2. **Por baixo do capô (~16s, v2, futurista):**
    - a GPU acende;
-   - vários modelos;
-   - o perímetro "Ambiente Mastercard", com pacotes que batem na borda e voltam;
-   - easter egg novo: `egress: 0 B`.
-3. **Escala (8s)** [fictício]: o mesmo motor aparece plugado em vários processos, com o contador "12.480 insights/mês".
-4. **Inovação (14s)** [nova]:
-   - uma esteira retrô de fábrica: LAB → PILOTO → PRODUTO → ESCALA;
-   - os itens [a confirmar]: RL para pricing (lab) · graph fraud (piloto) · uplift modeling (produto) · agentes de insights (escala).
-5. **Transições (8s).**
+   - os modelos locais e os guardrails;
+   - o perímetro "Ambiente Mastercard", com pacotes que batem na borda e voltam.
+3. **Escala (~10s):** o mesmo motor plugado nos adquirentes do pipeline. Os já ativos acendem e os que faltam conquistar piscam: "sem crescer o time".
+4. **Transições (6s).**
 
 **Narração opcional:**
 - Próxima estação: escalar o impacto, com dados, IA e inovação.
-- Três agentes — analista, business e C-level — escrevem o insight. Um validador confere; um embalador entrega.
-- Por trás, transformers puros em GPU, com vários modelos trabalhando juntos… e o dado nunca sai da Mastercard.
-- E a esteira não para: do laboratório ao piloto, do produto à escala.
+- Da análise manual ao analytics avançado, dos motores produtizados aos ativos de IA.
+- IA rodando localmente: o dado nunca sai da Mastercard.
+- Escala, sem crescer o time.
 
 #### Estação 06 — A Prática (44s) [nova] [a confirmar: materiais da Nat]
 1. **Pilares (12s):**
@@ -437,45 +436,54 @@ As faixas foram escolhidas por vocês na Pixabay. A licença da Pixabay libera u
   - paradas em silêncio;
   - SFX de metrô nas transições: plim-plom, portas e apito.
 - **Voz e legenda:** desligadas por padrão (teclas V e C).
-- **Dados:** todos os números fictícios ficam em `CONFIG.data`, para trocar num lugar só.
+- **Dados:** todos os números vêm de `data/presentation.json`, embutido no topo do HTML (bloco `pa-data`). Ver a seção "Dados".
 - **Aviso opcional:** uma notinha "dados ilustrativos" nas telas com número.
 
 ---
 
-## Dados fictícios (para trocar pelos reais)
+## Dados
 
-| Onde | Indicador | Valor fictício |
-|------|-----------|----------------|
-| 02 | Tamanho do time, 2022 → 2026 | 4 · 7 · 11 · 16 · 23 |
-| 02 | Projetos entregues | 140+ |
-| 02 | Engagements com analytics | 15% (2022) → 62% (2026) |
-| 02 | Receita de projetos com analytics | US$ 2,1 mi → US$ 12,4 mi (×6) |
-| 02 | Clientes por segmento | issuers 18 · adquirentes 6 · varejo 9 · fintechs 5 · outros 3 |
-| Caso 1 | Base de clientes | 12 mi |
-| Caso 1 | Conversão de campanha | 1,8% → 4,3% |
-| Caso 1 | Ticket médio | +14% |
-| Caso 1 | Receita incremental | +R$ 48 mi/ano |
-| Caso 2 | Clientes multibancarizados | 40% |
-| Caso 2 | Clientes principais | +11 p.p. em 6 meses |
-| Caso 2 | Captação | +R$ 320 mi |
-| Caso 2 | Churn | −18% |
-| Caso 3 | Fechamento do report | 10 dias → 15 min |
-| Caso 3 | Esforço repetível | 9 de cada 10 passos |
-| Caso 3 | Horas devolvidas à análise | ~1.900 h/ano |
-| 05 | Volume do motor de insights | 12.480 insights/mês |
+- **Onde ficam:** em `data/presentation.json`, fora do Git porque o repositório é público. O build injeta o arquivo num bloco `<script type="application/json" id="pa-data">` no topo do HTML.
+- **Para trocar um número:** edite o JSON (ou o bloco no HTML pronto) e salve. Um item de `headline_numbers_for_slides` aceita um campo `display`, que fixa o texto exato de tela.
+- **Formatação:** os números saem em pt-BR automaticamente:
+  - multiplicadores com 2 casas (`1,5×`);
+  - "MM" vira mil ou mi;
+  - o ponto decimal vira vírgula.
+- **Repositório:**
+  - guarda `data/presentation.sample.json`, com a mesma estrutura e números fictícios;
+  - o `performance-analytics.html` do repositório é montado com esse exemplo;
+  - a versão com os dados reais sai em `dist/performance-analytics.html`, só local.
 
-Moedas: US$ para os números internos da track e R$ para o impacto no cliente.
+| Estação | O que aparece | Campo do JSON (dentro de `presentation_structure`, pela seção) |
+|---|---|---|
+| 02 | receita por período e projeção | `revenue_performance_analytics_usd_millions` |
+| 02 | variações ano a ano | `revenue_growth` |
+| 02 | marco do Brasil e trimestres | `brazil_2023_milestone` |
+| 02 | provas de escala | `scale_proof_points` |
+| 03 | tipos de cliente e capabilities | `client_types`, `capabilities_demonstrated_in_cases` |
+| 04 | os 4 cases | `cases[]` |
+| 05 | progressão e indicadores | `innovation_examples[]` |
+| 02, 04, 05 | números-manchete | `headline_numbers_for_slides[]` (na raiz, filtrado por `section`) |
+| todas | contexto e títulos | `presentation_context` e `title` de cada seção |
 
 ---
 
 ## O que preciso de vocês
 
-1. **Trilha:** a escolha dos temas A e B (faixa real ou tema original).
-2. **Estação 06 · Prática:** os materiais da Nat (pilares, entregas relevantes e evoluções).
-3. **Demais tracks da consultoria:** os nomes e a oferta conjunta de cada uma com analytics (estação 03).
-4. **Estação 02:** os marcos e números reais, quando puderem.
-5. **Esteira de inovação (05):** o que está hoje em lab, em piloto, em produto e em escala.
-6. **Pré-show:** se querem o loop de espera antes de começar.
+1. **Publicação dos dados:** o JSON traz números internos, mesmo mascarados. Ele pode ir para o repositório público? A recomendação é um repositório privado, porque um fork não pode virar privado.
+2. **Inconsistências no JSON:**
+   - clientes + PoCs do Insight Agent;
+   - associados recomendados contra a população do Cliente Manga;
+   - projeção do período seguinte igual à do período atual.
+3. **Lights-off:** problema, solução e impacto.
+4. **Mapa de capabilities:** em que tipo de cliente entra cada case, principalmente o Lights-off.
+5. **Insight Agent:** os nomes dos agentes no vídeo, considerando o fluxo real e os nomes da v2.
+6. **Estação 03:** as 3 ondas de modelos continuam depois do mapa?
+7. **Estação 02:** time e presença nos engagements saíram, porque não estão no JSON. Querem mandar esses números?
+8. **Trilha:** as 6 perguntas sobre duração e encaixe das músicas (seção "Trilha").
+9. **Estação 06 · Prática:** os materiais da Nat.
+10. **Demais tracks:** os nomes e a oferta conjunta (estação 03).
+11. **Pré-show:** querem o loop de espera antes de começar?
 
 ---
 
@@ -493,4 +501,4 @@ Moedas: US$ para os números internos da track e R$ para o impacto no cliente.
   - colunas clássicas em gravura de meio-tom;
   - esteira de fábrica;
   - mesa de board recortada.
-- **Números de tela:** fictícios até a troca. As fórmulas são reais e servem de easter eggs para o público técnico.
+- **Números de tela:** vêm do JSON de dados (seção "Dados"). As fórmulas são reais e servem de easter eggs para o público técnico.

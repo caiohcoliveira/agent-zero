@@ -48,6 +48,7 @@ A barra de progresso aceita clique e arraste. Ao passar o mouse, ela mostra o no
 src/
   00-head.html           HTML + CSS (palco 1920×1080, overlay inicial, controles)
   01-config.js           ★ CONFIG: cores, tempos das cenas, textos, narração, áudio, motion
+  01-data.js             ★ DADOS: lê o bloco JSON "pa-data" do topo do HTML, acessos seguros e formatação pt-BR
   02-core.js             easing, interpolação, RNG com seed, cores, primitivas, câmera, fundos, granulação
   03-collage.js          ★ linguagem retrô-moderna: papel, contornos, sombras chapadas, meio-tom, fita,
                          stickers, tiras de fórmula, recortes; camada futurista (grid neon, sol, scanlines, holo)
@@ -61,7 +62,10 @@ src/
                          lights-off, insights em escala, possibilidades (∞), clímax, split-flap
   90-player.js           render, transições, loop, controles, teclado
   99-tail.html
-build.sh                 junta tudo em performance-analytics.html
+data/
+  presentation.json        dados reais do vídeo (fora do Git: o repositório é público)
+  presentation.sample.json exemplo público com a mesma estrutura
+build.sh                 junta tudo num HTML único e injeta o JSON de dados no topo
 ```
 
 Depois de editar algo em `src/`, rode `./build.sh`.
@@ -103,6 +107,16 @@ Depois de editar algo em `src/`, rode `./build.sh`.
 | `caseDone` | momento do carimbo ✓ de cada caso (sincroniza os chips) |
 | `captions` | legendas completas ligadas por padrão |
 
-## Observação sobre os dados
+## Dados do vídeo
 
-Os números que aparecem em dashboards, reports e KPIs são **ilustrativos**. O vídeo não afirma métricas reais. Se houver números aprovados para divulgação, eles podem entrar nos carimbos ✓ pelo `CONFIG.text`.
+Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no bloco `<script type="application/json" id="pa-data">`.
+
+- **No HTML pronto:** abra o arquivo num editor de texto, mude o valor no bloco `pa-data` e salve.
+- **No projeto:**
+  1. edite `data/presentation.json`;
+  2. rode `./build.sh`, que gera dois arquivos:
+     - `performance-analytics.html`, com os dados de exemplo (`data/presentation.sample.json`). É a versão que vai para o Git.
+     - `dist/performance-analytics.html`, com os dados reais. Fica só na máquina local.
+- **Formatação:** é automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita um campo `display` para fixar o texto exato de tela.
+- **Campos faltando:** se um campo faltar, a cena mostra "—" em vez de quebrar.
+- **Sigilo:** `data/presentation.json`, `dist/` e `musica/` estão no `.gitignore`. O repositório é público, então dados internos e arquivos de música não entram nele.

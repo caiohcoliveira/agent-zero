@@ -1,0 +1,4 @@
+# O repositório é público: dados reais e arquivos de música ficam só na máquina local.
+data/presentation.json
+dist/
+musica/
