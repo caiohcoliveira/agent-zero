@@ -34,6 +34,7 @@ São ~5:50 de vídeo no total.
 | 1 a 7 | vai para a estação | vai para a estação |
 | Home ou R / End | volta ao pré-show / vai ao encerramento | idem |
 | F · M · V · C | tela cheia · som · narração · legendas | idem |
+| Q | qualidade: automática → leve → máxima | idem |
 
 A barra de progresso mostra as estações (traços) e as paradas (losangos). Ela aceita clique e arraste, para quem opera. Os controles somem sozinhos durante as paradas e o vídeo e voltam ao mover o mouse.
 
@@ -108,7 +109,8 @@ build.sh           atalho para tools/build.py
 **Decisões principais:**
 - **Render puro em função do tempo.** Cada cena é `draw(ctx, t)` sem estado, e a música vira dados (`BT`) também em função do tempo. Por isso o seek é exato e o resultado é sempre igual.
 - **Paradas com relógio próprio.** O loop usa o tempo desde a entrada na parada, e a transição entre cartazes é uma câmera que viaja na plataforma, sem corte.
-- **Leveza:** brilhos com gradiente radial e granulação pré-renderizada. A separação RGB só roda nos quadros em que a música pede.
+- **Leveza:** brilhos com gradiente radial e granulação pré-renderizada. A separação RGB só roda nos picos da música.
+- **Qualidade adaptativa:** se a máquina não segurar ~30 quadros por segundo, o player tira sozinho a separação RGB, a granulação, as scanlines e o zoom de câmera. A tecla Q força o modo leve ou o máximo. Em notebook com aceleração de vídeo do Chrome/Edge, roda no máximo.
 
 ## Parâmetros úteis (`src/01-config.js`)
 

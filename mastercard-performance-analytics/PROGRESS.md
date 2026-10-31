@@ -63,7 +63,13 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
 - [x] **S5. Abertura + Parada 0 + trecho 1** (`src/20-open.js`, `src/21-trecho1.js`): estações 01–03 e Parada 1.
 - [x] **S6. Trecho 2** (`src/22-cases.js`, `src/23-scale.js`): 4 cases, estações 05 e 06 e Parada 2.
 - [x] **S7. Trecho 3** (`src/24-final.js`): estação 07, clímax, letreiro final e encerramento.
-- [ ] **S8. QA completo + README:** varredura de render, navegação com passador, loops; README e roteiro atualizados.
+- [x] **S8. QA completo + README:**
+  - render de 0–350 s e de todas as paradas e itens, sem exceções e com o console limpo;
+  - navegação testada: pré-show → abertura → Parada 0 (10 itens, ←) → embarque, setas ignoradas no vídeo, teclas 1–7, End;
+  - corrigido um brilho que travava a abertura;
+  - qualidade adaptativa para máquinas sem aceleração de vídeo.
+
+**v3 concluída.** Próximo passo: revisão do usuário. Os materiais pendentes (Practice, Lights-off, demais tracks) entram pelo JSON.
 
 ## Como retomar numa nova sessão
 

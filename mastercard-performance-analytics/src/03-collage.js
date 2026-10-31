@@ -37,7 +37,8 @@ const SHADE = makeCanvas(400, 400, (g, w, h) => { g.fillStyle = '#000';
   for (let y = 0; y < h; y += 11) for (let x = (y / 11) % 2 ? 5.5 : 0; x < w; x += 11) { const k = clamp((x + y) / (w + h) * 1.7 - .5); if (k <= 0) continue; g.beginPath(); g.arc(x, y, k * 4.8, 0, TAU); g.fill(); } });
 const SCAN = makeCanvas(4, 4, g => { g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(0, 0, 4, 1); });
 let _scanPat = null;
-function scanlines(ctx, a = .25) { if (a <= 0) return; if (!_scanPat) _scanPat = ctx.createPattern(SCAN, 'repeat'); ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = _scanPat; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+function scanlines(ctx, a = .25) {
+  if (QUALITY.low) return; if (a <= 0) return; if (!_scanPat) _scanPat = ctx.createPattern(SCAN, 'repeat'); ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = _scanPat; ctx.fillRect(0, 0, W, H); ctx.restore(); }
 
 /** retângulo de papel rasgado (bordas irregulares determinísticas) */
 function tornRect(ctx, x, y, w, h, seed = 1, amp = 2.5, step = 16) {

@@ -105,7 +105,16 @@ const PLAYER = (() => {
   function gotoStop(i) { if (st.playing) pause(); enterStop(i); }
   function jumpStation(k) { const T = CONFIG.stationStart[k]; if (T == null) return; if (st.playing) pause(); st.mode = 'play'; st.T = T; play(); }
 
-  function loop() {
+  // qualidade adaptativa: média móvel do intervalo entre quadros; abaixo de ~30 qps desliga os efeitos caros
+  let lastF = 0, ema = 16, slow = 0, fast = 0;
+  function governor(now) {
+    if (lastF) { const dt = Math.min(200, now - lastF); ema = ema * .9 + dt * .1; }
+    lastF = now; if (QUALITY.forced != null) { QUALITY.low = QUALITY.forced; return; }
+    if (ema > 33) { if (++slow > 45) { QUALITY.low = true; slow = fast = 0; } } else slow = 0;
+    if (QUALITY.low && ema < 15) { if (++fast > 240) { QUALITY.low = false; fast = 0; } } else fast = 0;
+  }
+  function loop(ts) {
+    governor(ts || performance.now());
     if (st.mode === 'play' && st.playing) {
       const T = now();
       if (st.next && T >= st.next.T) enterStop(st.next.index);
@@ -156,6 +165,7 @@ const PLAYER = (() => {
     else if (k === 'm' || k === 'M') $('bSound').onclick();
     else if (k === 'v' || k === 'V') $('bVoice').onclick();
     else if (k === 'c' || k === 'C') $('bCC').onclick();
+    else if (k === 'q' || k === 'Q') { QUALITY.forced = QUALITY.forced == null ? !QUALITY.low : QUALITY.forced ? false : null; $('voiceinfo').textContent = QUALITY.forced == null ? 'Qualidade: automática' : QUALITY.forced ? 'Qualidade: leve' : 'Qualidade: máxima'; }
   });
   let idleT = 0; function poke() { ui.classList.remove('idle'); document.body.style.cursor = ''; clearTimeout(idleT);
     idleT = setTimeout(() => { if (st.playing || st.mode === 'stop') { ui.classList.add('idle'); document.body.style.cursor = 'none'; } }, 2600); }

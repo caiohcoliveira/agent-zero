@@ -83,7 +83,7 @@ function scribble(ctx, kind, x, y, s, col, seed = 1, p = 1, o = {}) {
   if (p <= 0) return;
   ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0); ctx.globalAlpha *= o.alpha == null ? 1 : o.alpha;
   ctx.lineCap = ctx.lineJoin = 'round'; ctx.strokeStyle = col; ctx.lineWidth = s * (o.lw || .09);
-  if (o.glow) { ctx.shadowColor = col; ctx.shadowBlur = s * .25; }
+  if (o.glow) { ctx.shadowColor = col; ctx.shadowBlur = Math.min(18, s * .2); }
   const L = s * 12; ctx.setLineDash([L * p, L]); const [jx, jy] = boil(seed, 1.2);
   ctx.translate(jx, jy); ctx.beginPath();
   if (kind === 'star') { for (let k = 0; k <= 10; k++) { const a = -Math.PI / 2 + k * TAU / 10, rad = k % 2 ? s * .22 : s * .5; ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); } }
@@ -155,15 +155,15 @@ const FX = (() => {
       const b = BT, m = BX() * (cfgOf(s).camera == null ? 1 : cfgOf(s).camera); if (!m || !b.on) return;
       const z = 1 + m * (.014 * b.beat * (.4 + .6 * b.low) + .03 * b.down * b.level + .045 * b.drop + .018 * b.hit);
       const rot = m * (.005 * Math.sin(b.bar * TAU) * b.level + .012 * b.hit * (b.i % 2 ? 1 : -1));
-      ctx.translate(m * 9 * b.hit * Math.sin(b.i * 1.7), m * 7 * b.snare * Math.cos(b.i * 2.3)); ctx.rotate(rot); ctx.scale(z, z);
+      ctx.translate(m * 9 * b.hit * Math.sin(b.i * 1.7), m * 7 * b.snare * Math.cos(b.i * 2.3)); if (QUALITY.low) return; ctx.rotate(rot); ctx.scale(z, z);
     },
     /** cor: calor no 1º tempo, linhas de foco e RGB nos picos, inversão (impact frame) nas viradas */
     post(ctx, T, s) {
       const b = BT, m = BX(), cfg = cfgOf(s); if (!m || !b.on) { vignette(ctx, .2); return; }
-      if (b.down > .05) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = .3 * b.down * b.level * m; ctx.fillStyle = C.orange; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+      if (b.down > .25 && !QUALITY.low) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = .3 * b.down * b.level * m; ctx.fillStyle = C.orange; ctx.fillRect(0, 0, W, H); ctx.restore(); }
       if (cfg.lines !== false && b.hit > .6) focusLines(ctx, (b.hit - .6) / .4 * m, b.i);
       const ab = m * (6 * b.hit + 3.5 * b.snare * b.level + 16 * b.drop) * (cfg.chroma == null ? 1 : cfg.chroma);
-      if (ab > 1.6) chroma(ctx, Math.min(ab, 22));
+      if (ab > 4.5 && !QUALITY.low) chroma(ctx, Math.min(ab, 22));
       if (cfg.invert !== false && (b.drop > .82 || (b.hit > .93 && b.down > .9 && b.di % 4 === 0))) {
         ctx.save(); ctx.globalCompositeOperation = 'difference'; ctx.fillStyle = b.di % 2 ? '#FFFFFF' : '#FFE0B8'; ctx.fillRect(0, 0, W, H); ctx.restore();
       }

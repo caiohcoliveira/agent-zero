@@ -193,5 +193,7 @@ function sceneAt(T) { const S = CONFIG.scenes; for (let i = S.length - 1; i >= 0
 /** estação (1–7) no instante T; 0 antes da primeira */
 function stationAt(T) { for (let k = 7; k >= 1; k--) if (CONFIG.stationStart[k] != null && T >= CONFIG.stationStart[k]) return k; return 0; }
 const TX = CONFIG.text;
+/** qualidade adaptativa: o player liga `low` se a máquina não segurar ~30 qps (tira RGB, granulação e scanlines) */
+const QUALITY = { low: false, forced: null };
 /** cenas dos trechos (draw(ctx, t, T)) e das paradas (draw(ctx, tl, item, prevItem, p)) — registradas pelos arquivos de cena */
 const SCENES = {}, STOPSCN = {};

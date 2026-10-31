@@ -198,6 +198,7 @@ const GRAIN = (() => {
   g.putImageData(img, 0, 0); return cv;
 })();
 function grain(ctx, T) {
+  if (QUALITY.low) return;
   if (!M.grain) return;
   ctx.save(); ctx.globalAlpha = M.grain; ctx.globalCompositeOperation = 'overlay';
   const ox = Math.floor(hash(Math.floor(T * 15)) * 256), oy = Math.floor(hash(Math.floor(T * 15) + 5) * 256);
