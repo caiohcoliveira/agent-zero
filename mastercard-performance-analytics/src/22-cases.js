@@ -44,7 +44,7 @@ const headlineFor = re => { const h = (DATA.headline_numbers_for_slides || []).f
 
 /* ---------- abertura da 04 + case Cliente Banana (cestas) ---------- */
 (() => {
-  const id = 's04', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
+  const id = 'banana', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
   const T_FAN = bt(0) + .3, T_PROB = bt(2), T_DC = [bt(5), bt(6), bt(7)], T_MAT = bt(8), T_BM = bt(10), T_ALS = bt(11), T_CES = bt(13), T_TENSE = bt(15), T_DROP = bt(16);
   const FAN = [['BANANA', C.yellow], ['MANGA', C.orange], ['LIGHTS-OFF', '#F3EBDD'], ['INSIGHT AGENT', C.red]];
   const DC = ['só compras, sem preferência declarada', 'sacola e pão dominavam o sinal', 'mesmo produto, nomes diferentes'];

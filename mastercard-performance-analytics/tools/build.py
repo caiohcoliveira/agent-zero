@@ -26,7 +26,7 @@ def data_block(path):
 def music_blocks(prev):
     out = []
     for mid in MUSIC_IDS:
-        src = ROOT / 'musica' / f'{mid}.mp3'
+        src = ROOT / 'musica' / ('tech-edit.mp3' if mid == 'tech' else f'{mid}.mp3')  # tech: remontagem (tools/edit_tech.py)
         if src.exists():
             mp3 = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(src), '-map_metadata', '-1', '-ac', '2',
                                   '-b:a', '128k', '-f', 'mp3', '-'], capture_output=True, check=True).stdout

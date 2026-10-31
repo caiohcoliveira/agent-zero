@@ -54,23 +54,25 @@ const CONFIG = {
   plays: [
     { id: 1, track: null },                    // abertura: trilha sintetizada
     { id: 2, track: 'funk', from: 0 },         // "Vintage Film Funk" inteira (1:59)
-    { id: 3, track: 'tech', from: 20.058 },    // "Technology" a partir do compasso de 0:20 (2:29)
+    { id: 3, track: 'tech', from: 0 },         // "Technology" remontada para os cases (tools/edit_tech.py, 4:24)
     { id: 4, track: 'piano', from: 7.48 }      // "Epic Piano" a partir do primeiro impacto (1:07)
   ],
 
   // ---------------------------------------------------------------- CENAS (ordem = ordem do filme)
   // dur casado com os compassos da faixa do play; station = estação da linha (1–7)
   scenes: [
-    { id: 'open',      play: 1, dur: 15,     theme: 'dark' },
+    { id: 'open',      play: 1, dur: 10,     theme: 'dark' },                   // plataforma → trem → embarque → mapa
     { id: 's01',       play: 2, dur: 33.88,  station: 1, theme: 'light' },
     { id: 's02',       play: 2, dur: 37.08,  station: 2, theme: 'dark' },
     { id: 's03',       play: 2, dur: 48.524, station: 3, theme: 'dark' },   // ∞ em 36.96 (saída da música)
-    { id: 's04',       play: 3, dur: 40.001, station: 4, theme: 'dark' },   // abertura da 04 + Cliente Banana; impacto no drop (35.56)
-    { id: 'manga',     play: 3, dur: 26.668, station: 4, theme: 'dark' },
-    { id: 'lightsoff', play: 3, dur: 17.778, station: 4, theme: 'light' },
-    { id: 'insight',   play: 3, dur: 26.668, station: 4, theme: 'dark' },
-    { id: 's05',       play: 3, dur: 17.778, station: 5, theme: 'dark' },
-    { id: 's06',       play: 3, dur: 19.983, station: 6, theme: 'light' },  // saída suave da música
+    // estação 04: cada case tem parte calma (problema e dados) → construção (como fizemos) → drop (solução e impacto)
+    { id: 's04',       play: 3, dur: 8.889,  station: 4, theme: 'dark' },   // título da seção + "os cases de impacto"
+    { id: 'banana',    play: 3, dur: 53.333, station: 4, theme: 'dark' },   // drop em 35.56
+    { id: 'manga',     play: 3, dur: 53.333, station: 4, theme: 'dark' },   // drop em 35.56
+    { id: 'lightsoff', play: 3, dur: 53.334, station: 4, theme: 'light' },  // drop em 35.56 (o interruptor)
+    { id: 'insight',   play: 3, dur: 62.222, station: 4, theme: 'dark' },   // drop em 35.56 (milhares de páginas)
+    { id: 's05',       play: 3, dur: 13.337, station: 5, theme: 'dark' },
+    { id: 's06',       play: 3, dur: 19.93,  station: 6, theme: 'light' },  // saída suave da música
     { id: 's07',       play: 4, dur: 28.8,   station: 7, theme: 'dark' },
     { id: 'climax',    play: 4, dur: 12,     theme: 'dark' },
     { id: 'close',     play: 4, dur: 26.378, theme: 'dark' }                // último acorde em 14.08
