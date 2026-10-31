@@ -22,97 +22,101 @@ STOPSCN.preshow = {
   }
 };
 
-/* ---------- abertura (15s, trilha sintetizada a 120 BPM; drop em 4.5) ---------- */
+/* ---------- abertura (10s, trilha sintetizada a 120 BPM): plataforma → trem chega → portas abrem → bilhete → mapa ---------- */
 (() => {
-  const id = 'open', SL = [4.5, 5.5, 6.5, 7.5, 9.0], COLS = [C.red, C.yellow, C.orange, '#F3EBDD', C.orange];
-  const T_KICK = 1.0, T_DROP = 4.5, T_POSTER = 10.5, T_GO = 12.5;
-  cue(id, T_KICK, 'pop', { p: 1.1 }); cue(id, T_DROP, 'impact', { size: 1.2 });
-  SL.forEach((t0, i) => cue(id, t0, 'hit', { size: i === 4 ? .9 : .45 }));
-  cue(id, SL[4] + .3, 'riser', { dur: .9, v: .2 }); cue(id, T_GO, 'whoosh', { dur: 1.4, v: .4 }); cue(id, 14.2, 'chime', { f: 784, up: 7 });
-  const DOOD = [['zigzag', 260, 230, 140, C.yellow], ['star', 1650, 220, 110, C.orange], ['arrow', 1580, 880, 150, C.red], ['spiral', 300, 860, 110, C.orange], ['crown', 1700, 560, 110, C.yellow], ['x', 200, 560, 80, C.red]];
-
+  const id = 'open', T_ARR = .9, T_STOP = 4.3, T_DOOR = 4.5, T_TIX = 5.0, T_PUNCH = 6.0, T_DIVE = 7.0, T_MAP = 7.6;
+  const L = 1500, S = 1.18, TY = 900 - 400 * S, DOOR = L * .5, PLAT = TX.line.padEnd(27, ' ');
+  cue(id, .3, 'type', { n: 22, gap: .03 }); cue(id, T_ARR, 'whoosh', { dur: 3.2, v: .35 }); cue(id, T_STOP - .2, 'heart', {});
+  cue(id, T_DOOR, 'impact', { size: .8 }); cue(id, T_DOOR + .05, 'chime', { f: 987.8, up: -4 }); cue(id, T_TIX, 'pop', { p: 1, v: .2 }); cue(id, T_PUNCH, 'click', { v: 1 });
+  cue(id, T_DIVE, 'whoosh', { dur: 1.2, v: .4 }); cue(id, T_MAP + .4, 'shimmer', { dur: 2 });
+  /** quadro final do mapa (igual ao começo da Parada 0) */
+  function mapFrame(ctx, t, rev, a) {
+    ctx.save(); ctx.globalAlpha *= a;
+    bgDark(ctx, t, { centerA: .9, center: '#33200F' }); glow(ctx, 960, 590, 900, C.orange, .14);
+    metroMap(ctx, t, { reveal: rev, train: 0 });
+    FLAP.board(ctx, W / 2, 112, [TX.line], [-10], t, { tw: 40, th: 58, hiFrom: [5] });
+    ctx.restore();
+  }
   SCENES[id] = {
     themeAt: () => 'dark',
+    peaks: [[T_DOOR - .1, T_DOOR + 1.2]],
+    caps: [[.4, T_DOOR - .1, 'Bem-vindos à *Linha Performance Analytics*', 'PLATAFORMA 1'],
+      [T_DOOR + .2, T_DIVE + .2, 'Bilhete validado: partimos dos *dados* e chegamos ao *valor*', 'EMBARQUE'],
+      [T_MAP + .3, 10.2, '7 estações e 2 paradas para conversa ao longo do caminho', 'O MAPA DA LINHA']],
     draw(ctx, t) {
-      const go = E.inOutCubic(P(t, T_GO, 2.3)), b = BT;
-      bgDark(ctx, t, { centerA: .9, center: '#33200F' });
-      collage(ctx, t, { seed: 23, n: 8, theme: 'dark', alpha: .75 * (1 - go) });
-      // respingos do drop
-      if (t >= T_DROP) [[420, 300, 120, C.orange], [1500, 380, 150, C.red], [1240, 820, 110, C.yellow], [620, 860, 90, C.red]]
-        .forEach(([x, y, r, c], i) => splat(ctx, x, y, r * (1 + .06 * b.low), c, 50 + i, E.outBack(P(t, T_DROP + i * .06, .3)), .75 * (1 - go)));
-      // rabiscos que se desenham na subida e vibram com a batida
-      DOOD.forEach(([k, x, y, s, c], i) => scribble(ctx, k, x, y, s * (1 + .08 * b.beat), c, 90 + i, P(t, 2.5 + i * .3, .6), { alpha: .8 * (1 - go), glow: true, rot: .1 * Math.sin(t + i) }));
-      // ponto laranja que pulsa até o drop
-      const pre = 1 - P(t, T_DROP - .2, .3);
-      if (pre > 0) { const r = 22 + 10 * Math.sin(t * 6) * P(t, 2.5, 2) + 40 * P(t, 2.5, 2, E.inQuad);
-        glow(ctx, W / 2, H / 2, r * 6, C.orange, .6 * pre); circle(ctx, W / 2, H / 2, r * pre, C.orange); inkCircle(ctx, W / 2, H / 2, r * pre, 5, 3); }
-      // kicker
-      const kp = E.outBack(P(t, T_KICK, .4));
-      if (kp > 0) { ctx.save(); ctx.globalAlpha *= 1 - go; ctx.translate(W / 2, lerp(H / 2 - 120, 210, P(t, T_DROP - .3, .5, E.inOutCubic))); ctx.rotate(-.03); ctx.scale(kp, kp);
-        const kw = measure(ctx, TX.hookKicker || '', 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
-        text(ctx, TX.hookKicker || '', 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
-      // as 5 tiras batem no tempo
-      (TX.hook || []).forEach((s, i) => {
-        const p = P(t, SL[i], .28), big = i === 4; if (p <= 0) return;
-        const y0 = 330 + i * 112 + (big ? 22 : 0), size = big ? 104 : 74, w = measure(ctx, s, size, 900) + 120, rot = [-.02, .015, -.012, .02, -.025][i];
-        const sl = E.outBack(p), x = W / 2 + (1 - E.outExpo(p)) * (i % 2 ? 900 : -900);
-        ctx.save(); ctx.globalAlpha *= 1 - (big ? E.inCubic(P(t, T_GO + .6, 1.2)) : go); ctx.translate(x, y0); ctx.rotate(rot); ctx.scale(lerp(1.35, 1, sl), lerp(1.35, 1, sl));
-        const vib = 1 + .02 * b.beat * (i === b.i % 5 ? 2 : 1); ctx.scale(vib, vib);
-        brush(ctx, -w / 2, -size * .62, w, size * 1.24, COLS[i], 11 + i, 1);
-        inkRect(ctx, -w / 2 - 4, -size * .66, w + 8, size * 1.32, 6, 3, i);
-        const light = i === 1 || i === 3; retroText(ctx, s, 0, 0, light ? { size, weight: 900, color: INK, align: 'center', depth: 0, lw: 0 } : { size, weight: 900, color: '#FFF', outline: INK, align: 'center', depth: 5, lw: 4 });
+      const dive = E.inCubic(P(t, T_DIVE, .9)), mapA = P(t, T_MAP - .2, .6);
+      if (mapA < 1) {
+        ctx.save();
+        if (dive > 0) { const z = 1 + dive * 5, fx = 0, fy = 0; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -(TY + 170 * S)); ctx.translate(0, (TY + 170 * S - H / 2) * (1 - dive)); }
+        platform(ctx, t, { sign: 'PLATAFORMA 1 · LINHA PERFORMANCE ANALYTICS', doodles: [['star', 140, 330, 70, C.yellow], ['arrow', 1790, 300, 90, C.orange]] });
+        // painel de partidas
+        FLAP.board(ctx, W / 2, 290, [PLAT, PLAT], [.3, 99], t, { tw: 34, th: 50, hiFrom: [5, 5], header: 'PARTIDA', headerCol: C.red });
+        // o trem chega da direita e freia com a porta no centro
+        const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(W + 60, W / 2 - DOOR * S, arr), sway = (1 - arr) * Math.sin(t * 30) * 2;
+        if (t > T_ARR) trainCar(ctx, x, TY + sway, S, { len: L, doors: [L * .17, DOOR, L * .83], open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1 });
+        if (t > T_ARR && arr < .97) { const r = rng(3); ctx.save(); ctx.globalAlpha = .45 * (1 - arr); for (let k = 0; k < 14; k++) { const ly = TY + r() * 420 * S, lx = x + r() * L * S; line(ctx, lx, ly, lx + 300 + r() * 400, ly, 'rgba(255,240,220,.6)', 3); } ctx.restore(); }
         ctx.restore();
-      });
-      // marcador laranja circulando "Gerar valor" → vira o trem
-      const mk = P(t, SL[4] + .3, .8), y4 = 330 + 4 * 112 + 22;
-      if (mk > 0) {
-        const fly = go, cx = lerp(W / 2, MAP.at(0)[0], fly), cy = lerp(y4, MAP.at(0)[1], fly), sc = lerp(1, .05, E.inQuad(fly));
-        ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc * .4); scribble(ctx, 'circle', 0, 0, 640, C.orange, 7, mk, { lw: .028, glow: true }); ctx.restore();
-        if (fly > .85) { const a = (fly - .85) / .15; glow(ctx, cx, cy, 90, C.orange, .6 * a); circle(ctx, cx, cy, 16 * a, C.orange); inkCircle(ctx, cx, cy, 16 * a, 4, 77); }
+        // bilhete validado
+        const tp = E.outBack(P(t, T_TIX, .45)) * (1 - P(t, T_DIVE - .1, .4));
+        if (tp > 0) ticket(ctx, W / 2 + 40, 640 + (1 - tp) * 300, tp, { punch: P(t, T_PUNCH, .3), rot: -.04 });
+        if (dive > .55) flash(ctx, (dive - .55) / .45 * .9, '#FFD9A0');
       }
-      // o mapa começa a ser traçado
-      if (go > .5) metroMap(ctx, t, { reveal: .12 * E.inOutCubic((go - .5) * 2), alpha: clamp((go - .5) * 3), future: false });
+      if (mapA > 0) mapFrame(ctx, t, E.inOutCubic(P(t, T_MAP, 2.2)), mapA);
       scanlines(ctx, .05);
     }
   };
 })();
 
-/* ---------- parada 0: o mapa da linha (roteiro) ---------- */
+/* ---------- parada 0: o mapa da linha, interativo (clique numa estação → detalhe; → embarca) ---------- */
 STOPSCN.stop0 = (() => {
-  const SEQ = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7];
-  const view = item => {
-    if (!item) return { x: W / 2, y: H / 2, s: 1 };
-    const n = MAP.node(SEQ[item - 1]); return { x: lerp(W / 2, n.x, .62), y: lerp(H / 2, n.y, .62), s: 1.24 };
-  };
-  function infoCard(ctx, k, a, tl) {
-    if (a <= 0) return;
+  const KEYS = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7];
+  const view = k => { if (k == null) return { x: W / 2, y: H / 2, s: 1 }; const n = MAP.node(k); return { x: lerp(W / 2, n.x, .8), y: lerp(H / 2, n.y, .8), s: 1.45 }; };
+  const camOf = ui => { const e = E.inOutCubic(ui.selP), a = view(ui.prevSel), b = view(ui.sel); return { x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), s: lerp(a.s, b.s, e) }; };
+  const toScreen = (c, x, y) => [W / 2 + (x - c.x) * c.s, H / 2 + (y - c.y) * c.s];
+  function detail(ctx, k, a, tl, cam) {
+    if (a <= 0 || k == null) return;
     const n = MAP.node(k), isStop = typeof k === 'string', st = isStop ? null : TX.stations[k - 1];
-    const title = isStop ? TX.stop.label : st.title, sub = isStop ? TX.stop.talkStop : st.teaser;
-    const w = Math.max(measure(ctx, title, 30, 900), measure(ctx, sub, 22, 600)) + 80, h = 120;
-    const x = clamp(n.x - w / 2, 40, W - w - 40), y = n.y + (n.y > 700 ? -h - 70 : n.y < 450 ? 70 : 64);
-    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 30); ctx.rotate(Math.sin(tl * .8) * .01 - .01);
-    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 70, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3, tape: [[.5, 0, .1]] });
-    if (!isStop) { retroText(ctx, st.n, -w / 2 + 34, -18, { size: 30, weight: 900, color: C.orange, depth: 2, lw: 2 }); }
-    text(ctx, title, isStop ? 0 : -w / 2 + (isStop ? 40 : 84), -18, { size: 30, weight: 900, color: INK, align: isStop ? 'center' : 'left' });
-    text(ctx, sub, isStop ? 0 : -w / 2 + 40, 26, { size: 22, weight: 600, color: '#4A4038', align: isStop ? 'center' : 'left' });
+    const title = isStop ? TX.stopInfo[k][0] : st.title, sub = isStop ? TX.stopInfo[k][1] : st.teaser, see = isStop ? [] : st.see || [];
+    const w = 840, h = 230 + see.length * 58, [sx] = toScreen(cam, n.x, n.y), x = sx < W / 2 ? W - w - 70 : 70, y = H / 2 - h / 2 + 20;
+    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 40); ctx.rotate(-.008 + Math.sin(tl * .8) * .004);
+    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 70, fill: '#F6EEDF', shadow: 14, shadowColor: '#000', lw: 4, tape: [[.5, 0, .05]] });
+    rr(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 100, 10); ctx.fillStyle = isStop ? C.yellow : k <= 3 ? C.red : k <= 6 ? C.orange : C.yellow; ctx.fill(); inkRect(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 100, 10, 3, 5);
+    const light = isStop || k === 7;
+    if (!isStop) retroText(ctx, st.n, -w / 2 + 64, -h / 2 + 76, { size: 48, weight: 900, color: '#FFF', depth: 3, lw: 3 });
+    const ttl = measure(ctx, title, 32, 900) > w - 200 ? twoLines(title) : title;
+    text(ctx, ttl, isStop ? 0 : -w / 2 + 134, -h / 2 + 76, { size: 32, weight: 900, color: light ? INK : '#FFF', align: isStop ? 'center' : 'left', lh: 1.08 });
+    text(ctx, sub, -w / 2 + 40, -h / 2 + 166, { size: 26, weight: 700, color: '#4A4038' });
+    see.forEach((l, i) => { const yy = -h / 2 + 226 + i * 58; circle(ctx, -w / 2 + 52, yy, 9, C.orange, INK, 2.5); text(ctx, l, -w / 2 + 76, yy + 1, { size: Math.min(26, 26 * (w - 120) / measure(ctx, l, 26, 800)), weight: 800, color: INK }); });
     ctx.restore();
   }
   return {
-    draw(ctx, tl, item, prevItem, p) {
-      const e = E.inOutCubic(p), a = view(prevItem), b = view(item), vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e);
+    draw(ctx, tl, item, prevItem, p, ui) {
+      ui = ui || { sel: null, prevSel: null, selP: 1, hover: null };
+      const cam = camOf(ui), zoomed = ui.sel != null || ui.selP < 1;
       bgDark(ctx, tl, { centerA: .9, center: '#33200F' });
-      collage(ctx, tl * .5, { seed: 31, n: 6, theme: 'dark', alpha: .55 * P(tl, .2, 1.5) });
-      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
-      const rev = lerp(.12, 1, E.inOutCubic(P(tl, 0, 2.4)));
+      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(cam.s, cam.s); ctx.translate(-cam.x, -cam.y);
       glow(ctx, 960, 590, 900, C.orange, .12 + .05 * BT.breath);
-      metroMap(ctx, tl, { reveal: rev, hi: item ? SEQ[item - 1] : null, train: 0 });
-      if (item) infoCard(ctx, SEQ[item - 1], E.outCubic(p), tl);
-      if (prevItem && prevItem !== item) infoCard(ctx, SEQ[prevItem - 1], 1 - E.outCubic(p * 1.6), tl);
+      metroMap(ctx, tl, { reveal: 1, hi: ui.sel != null ? ui.sel : ui.hover, train: 0 });
       ctx.restore();
-      const ba = (1 - E.inOutCubic(item ? (prevItem ? 1 : p) : (prevItem ? 1 - p : 0))) * E.outCubic(P(tl, 0, .6));
-      if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 112 - 40 * (1 - ba), [TX.line], [.3], tl, { tw: 40, th: 58, hiFrom: [5] }); ctx.restore(); }
-      hint(ctx, tl, item === 9 ? TX.stop.go : '→');
+      const out = ui.sel == null ? 1 - E.outCubic(ui.selP) : 0, inn = ui.sel != null ? E.outCubic(ui.selP) : 0;
+      detail(ctx, ui.prevSel, ui.prevSel !== ui.sel ? out : 0, tl, cam); detail(ctx, ui.sel, inn, tl, cam);
+      const ba = ui.sel == null ? E.inOutCubic(ui.selP) : 1 - E.inOutCubic(ui.selP);
+      if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 112, [TX.line], [-10], tl, { tw: 40, th: 58, hiFrom: [5] }); ctx.restore(); }
+      const ha = .55 + .2 * Math.sin(tl * 2.4);
+      text(ctx, ui.sel == null ? 'clique numa estação para ver o que vamos mostrar' : 'clique fora do cartão para voltar ao mapa', W / 2, H - 50, { size: 24, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: ha });
+      hint(ctx, tl, TX.stop.go);
       scanlines(ctx, .05);
+    },
+    /** alvo sob o ponteiro (coordenadas do palco) */
+    hit(x, y, ui) {
+      const cam = camOf(ui); let best = null, bd = 70 * cam.s;
+      KEYS.forEach(k => { const n = MAP.node(k), [sx, sy] = toScreen(cam, n.x, n.y), d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = k; } });
+      return best;
+    },
+    click(target, ui, ctl) { ctl.select(target === ui.sel ? null : target); return true; },
+    key(k, ui, ctl) {
+      if (ui.sel != null && (k === 'Escape' || k === 'ArrowLeft' || k === 'PageUp' || k === 'ArrowRight' || k === 'PageDown')) { ctl.select(null); return true; }
+      return false;
     }
   };
 })();

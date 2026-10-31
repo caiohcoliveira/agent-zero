@@ -16,6 +16,14 @@ const PLAYER = (() => {
   const DUR = CONFIG.duration, SHOW = CONFIG.mode !== 'reel', STOPS = CONFIG.stops, ITEM_DUR = 1.1;
   const st = { T: 0, playing: false, startPerf: 0, startT: 0, ended: false,
     mode: SHOW ? 'stop' : 'play', stop: 0, item: 0, prevItem: 0, itemAt: performance.now(), stopAt: performance.now(), next: null };
+  // estado interativo das paradas: seleção (zoom), popup de slide e alvo sob o ponteiro
+  const UI = { sel: null, prevSel: null, selAt: 0, selP: 1, pop: null, prevPop: null, popAt: 0, popP: 1, hover: null };
+  const resetUI = () => Object.assign(UI, { sel: null, prevSel: null, selAt: 0, selP: 1, pop: null, prevPop: null, popAt: 0, popP: 1, hover: null });
+  const CTL = {
+    select(v) { if (v === UI.sel) return; UI.prevSel = UI.sel; UI.sel = v; UI.selAt = performance.now(); poke(); },
+    popup(v) { if (v === UI.pop) return; UI.prevPop = UI.pop; UI.pop = v; UI.popAt = performance.now(); poke(); },
+    next: () => next(), depart: () => depart(), setItem: k => setItem(k)
+  };
   const NAME = s => s.station ? `${TX.stations[s.station - 1].n} · ${TX.stations[s.station - 1].short}` : ({ open: 'Abertura', climax: 'Clímax', close: 'Letreiro final' })[s.id] || s.id;
   const STOP_NAME = { preshow: 'Pré-show', stop0: 'Parada 0 · roteiro', stop1: 'Parada 1 · retomada', stop2: 'Parada 2 · retomada', end: 'Encerramento' };
 
@@ -46,8 +54,9 @@ const PLAYER = (() => {
   function renderStop(id, tl, item, prevItem, p) {
     BT = BEAT.idle(tl); NOW = tl;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-    const impl = STOPSCN[id];
-    if (impl) impl.draw(ctx, tl, item, prevItem, p);
+    const impl = STOPSCN[id], now = performance.now();
+    UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35);
+    if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }
     grain(ctx, tl * 30);
   }
@@ -87,7 +96,7 @@ const PLAYER = (() => {
   function toggle() { if (st.mode === 'stop') return next(); st.playing ? pause() : play(); }
   function enterStop(i) {
     if (st.playing) { st.playing = false; AUDIO.stop(); VOICE.pause(); }
-    st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null;
+    st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
     syncUI(); poke();
   }
   function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); poke(); }
@@ -149,9 +158,21 @@ const PLAYER = (() => {
   $('bCC').onclick = () => { CONFIG.captions = !CONFIG.captions; syncUI(); };
   $('bFull').onclick = () => { const el = document.documentElement; document.fullscreenElement ? document.exitFullscreen() : (el.requestFullscreen && el.requestFullscreen()); };
   intro.onclick = () => play();
-  cv.addEventListener('click', () => { if (st.mode === 'stop') next(); });
+  // clique e ponteiro nas paradas: a cena da parada decide o alvo (hit) e a ação (click); sem alvo, o clique segue viagem
+  const stagePt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+  const stopImpl = () => st.mode === 'stop' ? STOPSCN[STOPS[st.stop].id] : null;
+  cv.addEventListener('click', e => {
+    if (st.mode !== 'stop') return; const impl = stopImpl();
+    if (impl && impl.hit) { const [x, y] = stagePt(e), tg = impl.hit(x, y, UI); if (impl.click(tg, UI, CTL)) return; }
+    next();
+  });
+  cv.addEventListener('pointermove', e => {
+    const impl = stopImpl(); if (!impl || !impl.hit) { if (UI.hover != null) UI.hover = null; cv.style.cursor = ''; return; }
+    const [x, y] = stagePt(e); UI.hover = impl.hit(x, y, UI); cv.style.cursor = UI.hover != null ? 'pointer' : '';
+  });
   window.addEventListener('keydown', e => {
-    const k = e.key;
+    const k = e.key, impl = stopImpl();
+    if (impl && impl.key && impl.key(k, UI, CTL)) { e.preventDefault(); return; }
     if (k === 'ArrowRight' || k === 'PageDown' || k === 'Enter' || e.code === 'Space') {
       e.preventDefault();
       if (st.mode === 'stop') next(); else if (e.code === 'Space' || k === 'Enter') { if (!intro.classList.contains('hidden')) play(); else toggle(); }
@@ -179,7 +200,8 @@ const PLAYER = (() => {
 
   // ganchos para testes e exportação
   window.__render = T => renderPlay(T);
-  window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1) => renderStop(id, tl, item, prevItem, p);
+  window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1, ui) => { const keep = { ...UI }; if (ui) Object.assign(UI, { selAt: -1e9, popAt: -1e9 }, ui); renderStop(id, tl, item, prevItem, p); Object.assign(UI, keep); };
+  window.__ui = UI; window.__ctl = CTL;
   window.__seek = seek; window.__state = st; window.__next = next; window.__prev = prev; window.__gotoStop = gotoStop; window.__jump = jumpStation;
   return { play, pause, seek, frameAt, next, prev };
 })();

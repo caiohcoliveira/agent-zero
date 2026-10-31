@@ -83,7 +83,7 @@ const CONFIG = {
   // after = cena depois da qual o vídeo para · items = quantos passos o → percorre antes do embarque
   stops: [
     { id: 'preshow', after: null,    items: 1 },
-    { id: 'stop0',   after: 'open',  items: 10 },  // mapa: visão geral + 9 destaques (7 estações e 2 paradas)
+    { id: 'stop0',   after: 'open',  items: 1 },   // mapa interativo: clique numa estação para ver o detalhe; → embarca
     { id: 'stop1',   after: 's03',   items: 4 },   // plataforma + cartazes 01, 02, 03
     { id: 'stop2',   after: 's06',   items: 4 },   // plataforma + cartazes 04, 05, 06
     { id: 'end',     after: 'close', items: 2 }    // letreiro final + cartaz 07
@@ -94,14 +94,22 @@ const CONFIG = {
     line: 'LINHA PERFORMANCE ANALYTICS',
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
-      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor' },
-      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil' },
-      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam' },
-      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido' },
-      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis' },
-      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar' },
-      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar' }
+      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor',
+        see: ['As perguntas de negócio que chegam até nós', 'Negócio × Dados: onde analytics entra', 'Diagnóstico → Estratégia → Implementação → Mensuração'] },
+      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil',
+        see: ['Evolução do faturamento da track, ano a ano', 'Brasil: acima do período anterior e do orçamento'] },
+      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam',
+        see: ['Alguns de nossos últimos projetos, por tipo de cliente', 'Modelos preditivos e prescritivos que levamos a bancos e fintechs'] },
+      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido',
+        see: ['Cliente Banana · cestas de produtos', 'Cliente Manga · motor de principalidade', 'Lights-off · relatórios de fraude sem trabalho manual', 'Insight Agent · agentes de IA que escrevem insights'] },
+      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis',
+        see: ['A escada: manual → avançado → produtizado → IA escalável', 'IA local: o dado nunca sai da Mastercard'] },
+      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar',
+        see: ['Os pilares da prática', 'Entregas e evoluções'] },
+      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar',
+        see: ['Mais perto das decisões estratégicas', 'Mais integrados às demais tracks', 'Mais escaláveis e diferenciados'] }
     ],
+    stopInfo: { p1: ['Parada 1 · conversa', 'retomamos as estações 01, 02 e 03'], p2: ['Parada 2 · conversa', 'retomamos as estações 04, 05 e 06'] },
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
     circleA: 'Negócio', circleB: 'Dados',

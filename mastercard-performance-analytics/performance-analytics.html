@@ -709,7 +709,7 @@ const CONFIG = {
   // after = cena depois da qual o vídeo para · items = quantos passos o → percorre antes do embarque
   stops: [
     { id: 'preshow', after: null,    items: 1 },
-    { id: 'stop0',   after: 'open',  items: 10 },  // mapa: visão geral + 9 destaques (7 estações e 2 paradas)
+    { id: 'stop0',   after: 'open',  items: 1 },   // mapa interativo: clique numa estação para ver o detalhe; → embarca
     { id: 'stop1',   after: 's03',   items: 4 },   // plataforma + cartazes 01, 02, 03
     { id: 'stop2',   after: 's06',   items: 4 },   // plataforma + cartazes 04, 05, 06
     { id: 'end',     after: 'close', items: 2 }    // letreiro final + cartaz 07
@@ -720,14 +720,22 @@ const CONFIG = {
     line: 'LINHA PERFORMANCE ANALYTICS',
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
-      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor' },
-      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil' },
-      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam' },
-      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido' },
-      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis' },
-      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar' },
-      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar' }
+      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor',
+        see: ['As perguntas de negócio que chegam até nós', 'Negócio × Dados: onde analytics entra', 'Diagnóstico → Estratégia → Implementação → Mensuração'] },
+      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil',
+        see: ['Evolução do faturamento da track, ano a ano', 'Brasil: acima do período anterior e do orçamento'] },
+      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam',
+        see: ['Alguns de nossos últimos projetos, por tipo de cliente', 'Modelos preditivos e prescritivos que levamos a bancos e fintechs'] },
+      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido',
+        see: ['Cliente Banana · cestas de produtos', 'Cliente Manga · motor de principalidade', 'Lights-off · relatórios de fraude sem trabalho manual', 'Insight Agent · agentes de IA que escrevem insights'] },
+      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis',
+        see: ['A escada: manual → avançado → produtizado → IA escalável', 'IA local: o dado nunca sai da Mastercard'] },
+      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar',
+        see: ['Os pilares da prática', 'Entregas e evoluções'] },
+      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar',
+        see: ['Mais perto das decisões estratégicas', 'Mais integrados às demais tracks', 'Mais escaláveis e diferenciados'] }
     ],
+    stopInfo: { p1: ['Parada 1 · conversa', 'retomamos as estações 01, 02 e 03'], p2: ['Parada 2 · conversa', 'retomamos as estações 04, 05 e 06'] },
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
     circleA: 'Negócio', circleB: 'Dados',
@@ -1741,7 +1749,7 @@ function cue(sceneId, at, type, opt = {}) {
 // Flags: kick hat hat16 clap bass arp pad pluck comic roll big soft minor arpOct rise (filtro sobe até o fim da seção)
 const FULL = { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1 };
 const MUSIC_SPEC = {
-  open: [[0, { pad: 1, f: 700 }], [2.5, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [4.5, { ...FULL, f: 14000 }], [13, { pad: 1, f: 1400 }]]
+  open: [[0, { pad: 1, f: 700 }], [2.5, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [4.5, { ...FULL, f: 14000 }], [9, { pad: 1, f: 1400 }]]
 };
 const FALLBACK_SPEC = [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 6000 }]], SILENT_SPEC = [[0, { f: 3000 }]];
 const MUSIC = (() => {
@@ -2710,97 +2718,101 @@ STOPSCN.preshow = {
   }
 };
 
-/* ---------- abertura (15s, trilha sintetizada a 120 BPM; drop em 4.5) ---------- */
+/* ---------- abertura (10s, trilha sintetizada a 120 BPM): plataforma → trem chega → portas abrem → bilhete → mapa ---------- */
 (() => {
-  const id = 'open', SL = [4.5, 5.5, 6.5, 7.5, 9.0], COLS = [C.red, C.yellow, C.orange, '#F3EBDD', C.orange];
-  const T_KICK = 1.0, T_DROP = 4.5, T_POSTER = 10.5, T_GO = 12.5;
-  cue(id, T_KICK, 'pop', { p: 1.1 }); cue(id, T_DROP, 'impact', { size: 1.2 });
-  SL.forEach((t0, i) => cue(id, t0, 'hit', { size: i === 4 ? .9 : .45 }));
-  cue(id, SL[4] + .3, 'riser', { dur: .9, v: .2 }); cue(id, T_GO, 'whoosh', { dur: 1.4, v: .4 }); cue(id, 14.2, 'chime', { f: 784, up: 7 });
-  const DOOD = [['zigzag', 260, 230, 140, C.yellow], ['star', 1650, 220, 110, C.orange], ['arrow', 1580, 880, 150, C.red], ['spiral', 300, 860, 110, C.orange], ['crown', 1700, 560, 110, C.yellow], ['x', 200, 560, 80, C.red]];
-
+  const id = 'open', T_ARR = .9, T_STOP = 4.3, T_DOOR = 4.5, T_TIX = 5.0, T_PUNCH = 6.0, T_DIVE = 7.0, T_MAP = 7.6;
+  const L = 1500, S = 1.18, TY = 900 - 400 * S, DOOR = L * .5, PLAT = TX.line.padEnd(27, ' ');
+  cue(id, .3, 'type', { n: 22, gap: .03 }); cue(id, T_ARR, 'whoosh', { dur: 3.2, v: .35 }); cue(id, T_STOP - .2, 'heart', {});
+  cue(id, T_DOOR, 'impact', { size: .8 }); cue(id, T_DOOR + .05, 'chime', { f: 987.8, up: -4 }); cue(id, T_TIX, 'pop', { p: 1, v: .2 }); cue(id, T_PUNCH, 'click', { v: 1 });
+  cue(id, T_DIVE, 'whoosh', { dur: 1.2, v: .4 }); cue(id, T_MAP + .4, 'shimmer', { dur: 2 });
+  /** quadro final do mapa (igual ao começo da Parada 0) */
+  function mapFrame(ctx, t, rev, a) {
+    ctx.save(); ctx.globalAlpha *= a;
+    bgDark(ctx, t, { centerA: .9, center: '#33200F' }); glow(ctx, 960, 590, 900, C.orange, .14);
+    metroMap(ctx, t, { reveal: rev, train: 0 });
+    FLAP.board(ctx, W / 2, 112, [TX.line], [-10], t, { tw: 40, th: 58, hiFrom: [5] });
+    ctx.restore();
+  }
   SCENES[id] = {
     themeAt: () => 'dark',
+    peaks: [[T_DOOR - .1, T_DOOR + 1.2]],
+    caps: [[.4, T_DOOR - .1, 'Bem-vindos à *Linha Performance Analytics*', 'PLATAFORMA 1'],
+      [T_DOOR + .2, T_DIVE + .2, 'Bilhete validado: partimos dos *dados* e chegamos ao *valor*', 'EMBARQUE'],
+      [T_MAP + .3, 10.2, '7 estações e 2 paradas para conversa ao longo do caminho', 'O MAPA DA LINHA']],
     draw(ctx, t) {
-      const go = E.inOutCubic(P(t, T_GO, 2.3)), b = BT;
-      bgDark(ctx, t, { centerA: .9, center: '#33200F' });
-      collage(ctx, t, { seed: 23, n: 8, theme: 'dark', alpha: .75 * (1 - go) });
-      // respingos do drop
-      if (t >= T_DROP) [[420, 300, 120, C.orange], [1500, 380, 150, C.red], [1240, 820, 110, C.yellow], [620, 860, 90, C.red]]
-        .forEach(([x, y, r, c], i) => splat(ctx, x, y, r * (1 + .06 * b.low), c, 50 + i, E.outBack(P(t, T_DROP + i * .06, .3)), .75 * (1 - go)));
-      // rabiscos que se desenham na subida e vibram com a batida
-      DOOD.forEach(([k, x, y, s, c], i) => scribble(ctx, k, x, y, s * (1 + .08 * b.beat), c, 90 + i, P(t, 2.5 + i * .3, .6), { alpha: .8 * (1 - go), glow: true, rot: .1 * Math.sin(t + i) }));
-      // ponto laranja que pulsa até o drop
-      const pre = 1 - P(t, T_DROP - .2, .3);
-      if (pre > 0) { const r = 22 + 10 * Math.sin(t * 6) * P(t, 2.5, 2) + 40 * P(t, 2.5, 2, E.inQuad);
-        glow(ctx, W / 2, H / 2, r * 6, C.orange, .6 * pre); circle(ctx, W / 2, H / 2, r * pre, C.orange); inkCircle(ctx, W / 2, H / 2, r * pre, 5, 3); }
-      // kicker
-      const kp = E.outBack(P(t, T_KICK, .4));
-      if (kp > 0) { ctx.save(); ctx.globalAlpha *= 1 - go; ctx.translate(W / 2, lerp(H / 2 - 120, 210, P(t, T_DROP - .3, .5, E.inOutCubic))); ctx.rotate(-.03); ctx.scale(kp, kp);
-        const kw = measure(ctx, TX.hookKicker || '', 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
-        text(ctx, TX.hookKicker || '', 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
-      // as 5 tiras batem no tempo
-      (TX.hook || []).forEach((s, i) => {
-        const p = P(t, SL[i], .28), big = i === 4; if (p <= 0) return;
-        const y0 = 330 + i * 112 + (big ? 22 : 0), size = big ? 104 : 74, w = measure(ctx, s, size, 900) + 120, rot = [-.02, .015, -.012, .02, -.025][i];
-        const sl = E.outBack(p), x = W / 2 + (1 - E.outExpo(p)) * (i % 2 ? 900 : -900);
-        ctx.save(); ctx.globalAlpha *= 1 - (big ? E.inCubic(P(t, T_GO + .6, 1.2)) : go); ctx.translate(x, y0); ctx.rotate(rot); ctx.scale(lerp(1.35, 1, sl), lerp(1.35, 1, sl));
-        const vib = 1 + .02 * b.beat * (i === b.i % 5 ? 2 : 1); ctx.scale(vib, vib);
-        brush(ctx, -w / 2, -size * .62, w, size * 1.24, COLS[i], 11 + i, 1);
-        inkRect(ctx, -w / 2 - 4, -size * .66, w + 8, size * 1.32, 6, 3, i);
-        const light = i === 1 || i === 3; retroText(ctx, s, 0, 0, light ? { size, weight: 900, color: INK, align: 'center', depth: 0, lw: 0 } : { size, weight: 900, color: '#FFF', outline: INK, align: 'center', depth: 5, lw: 4 });
+      const dive = E.inCubic(P(t, T_DIVE, .9)), mapA = P(t, T_MAP - .2, .6);
+      if (mapA < 1) {
+        ctx.save();
+        if (dive > 0) { const z = 1 + dive * 5, fx = 0, fy = 0; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -(TY + 170 * S)); ctx.translate(0, (TY + 170 * S - H / 2) * (1 - dive)); }
+        platform(ctx, t, { sign: 'PLATAFORMA 1 · LINHA PERFORMANCE ANALYTICS', doodles: [['star', 140, 330, 70, C.yellow], ['arrow', 1790, 300, 90, C.orange]] });
+        // painel de partidas
+        FLAP.board(ctx, W / 2, 290, [PLAT, PLAT], [.3, 99], t, { tw: 34, th: 50, hiFrom: [5, 5], header: 'PARTIDA', headerCol: C.red });
+        // o trem chega da direita e freia com a porta no centro
+        const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(W + 60, W / 2 - DOOR * S, arr), sway = (1 - arr) * Math.sin(t * 30) * 2;
+        if (t > T_ARR) trainCar(ctx, x, TY + sway, S, { len: L, doors: [L * .17, DOOR, L * .83], open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1 });
+        if (t > T_ARR && arr < .97) { const r = rng(3); ctx.save(); ctx.globalAlpha = .45 * (1 - arr); for (let k = 0; k < 14; k++) { const ly = TY + r() * 420 * S, lx = x + r() * L * S; line(ctx, lx, ly, lx + 300 + r() * 400, ly, 'rgba(255,240,220,.6)', 3); } ctx.restore(); }
         ctx.restore();
-      });
-      // marcador laranja circulando "Gerar valor" → vira o trem
-      const mk = P(t, SL[4] + .3, .8), y4 = 330 + 4 * 112 + 22;
-      if (mk > 0) {
-        const fly = go, cx = lerp(W / 2, MAP.at(0)[0], fly), cy = lerp(y4, MAP.at(0)[1], fly), sc = lerp(1, .05, E.inQuad(fly));
-        ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc * .4); scribble(ctx, 'circle', 0, 0, 640, C.orange, 7, mk, { lw: .028, glow: true }); ctx.restore();
-        if (fly > .85) { const a = (fly - .85) / .15; glow(ctx, cx, cy, 90, C.orange, .6 * a); circle(ctx, cx, cy, 16 * a, C.orange); inkCircle(ctx, cx, cy, 16 * a, 4, 77); }
+        // bilhete validado
+        const tp = E.outBack(P(t, T_TIX, .45)) * (1 - P(t, T_DIVE - .1, .4));
+        if (tp > 0) ticket(ctx, W / 2 + 40, 640 + (1 - tp) * 300, tp, { punch: P(t, T_PUNCH, .3), rot: -.04 });
+        if (dive > .55) flash(ctx, (dive - .55) / .45 * .9, '#FFD9A0');
       }
-      // o mapa começa a ser traçado
-      if (go > .5) metroMap(ctx, t, { reveal: .12 * E.inOutCubic((go - .5) * 2), alpha: clamp((go - .5) * 3), future: false });
+      if (mapA > 0) mapFrame(ctx, t, E.inOutCubic(P(t, T_MAP, 2.2)), mapA);
       scanlines(ctx, .05);
     }
   };
 })();
 
-/* ---------- parada 0: o mapa da linha (roteiro) ---------- */
+/* ---------- parada 0: o mapa da linha, interativo (clique numa estação → detalhe; → embarca) ---------- */
 STOPSCN.stop0 = (() => {
-  const SEQ = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7];
-  const view = item => {
-    if (!item) return { x: W / 2, y: H / 2, s: 1 };
-    const n = MAP.node(SEQ[item - 1]); return { x: lerp(W / 2, n.x, .62), y: lerp(H / 2, n.y, .62), s: 1.24 };
-  };
-  function infoCard(ctx, k, a, tl) {
-    if (a <= 0) return;
+  const KEYS = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7];
+  const view = k => { if (k == null) return { x: W / 2, y: H / 2, s: 1 }; const n = MAP.node(k); return { x: lerp(W / 2, n.x, .8), y: lerp(H / 2, n.y, .8), s: 1.45 }; };
+  const camOf = ui => { const e = E.inOutCubic(ui.selP), a = view(ui.prevSel), b = view(ui.sel); return { x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), s: lerp(a.s, b.s, e) }; };
+  const toScreen = (c, x, y) => [W / 2 + (x - c.x) * c.s, H / 2 + (y - c.y) * c.s];
+  function detail(ctx, k, a, tl, cam) {
+    if (a <= 0 || k == null) return;
     const n = MAP.node(k), isStop = typeof k === 'string', st = isStop ? null : TX.stations[k - 1];
-    const title = isStop ? TX.stop.label : st.title, sub = isStop ? TX.stop.talkStop : st.teaser;
-    const w = Math.max(measure(ctx, title, 30, 900), measure(ctx, sub, 22, 600)) + 80, h = 120;
-    const x = clamp(n.x - w / 2, 40, W - w - 40), y = n.y + (n.y > 700 ? -h - 70 : n.y < 450 ? 70 : 64);
-    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 30); ctx.rotate(Math.sin(tl * .8) * .01 - .01);
-    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 70, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3, tape: [[.5, 0, .1]] });
-    if (!isStop) { retroText(ctx, st.n, -w / 2 + 34, -18, { size: 30, weight: 900, color: C.orange, depth: 2, lw: 2 }); }
-    text(ctx, title, isStop ? 0 : -w / 2 + (isStop ? 40 : 84), -18, { size: 30, weight: 900, color: INK, align: isStop ? 'center' : 'left' });
-    text(ctx, sub, isStop ? 0 : -w / 2 + 40, 26, { size: 22, weight: 600, color: '#4A4038', align: isStop ? 'center' : 'left' });
+    const title = isStop ? TX.stopInfo[k][0] : st.title, sub = isStop ? TX.stopInfo[k][1] : st.teaser, see = isStop ? [] : st.see || [];
+    const w = 840, h = 230 + see.length * 58, [sx] = toScreen(cam, n.x, n.y), x = sx < W / 2 ? W - w - 70 : 70, y = H / 2 - h / 2 + 20;
+    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 40); ctx.rotate(-.008 + Math.sin(tl * .8) * .004);
+    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 70, fill: '#F6EEDF', shadow: 14, shadowColor: '#000', lw: 4, tape: [[.5, 0, .05]] });
+    rr(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 100, 10); ctx.fillStyle = isStop ? C.yellow : k <= 3 ? C.red : k <= 6 ? C.orange : C.yellow; ctx.fill(); inkRect(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 100, 10, 3, 5);
+    const light = isStop || k === 7;
+    if (!isStop) retroText(ctx, st.n, -w / 2 + 64, -h / 2 + 76, { size: 48, weight: 900, color: '#FFF', depth: 3, lw: 3 });
+    const ttl = measure(ctx, title, 32, 900) > w - 200 ? twoLines(title) : title;
+    text(ctx, ttl, isStop ? 0 : -w / 2 + 134, -h / 2 + 76, { size: 32, weight: 900, color: light ? INK : '#FFF', align: isStop ? 'center' : 'left', lh: 1.08 });
+    text(ctx, sub, -w / 2 + 40, -h / 2 + 166, { size: 26, weight: 700, color: '#4A4038' });
+    see.forEach((l, i) => { const yy = -h / 2 + 226 + i * 58; circle(ctx, -w / 2 + 52, yy, 9, C.orange, INK, 2.5); text(ctx, l, -w / 2 + 76, yy + 1, { size: Math.min(26, 26 * (w - 120) / measure(ctx, l, 26, 800)), weight: 800, color: INK }); });
     ctx.restore();
   }
   return {
-    draw(ctx, tl, item, prevItem, p) {
-      const e = E.inOutCubic(p), a = view(prevItem), b = view(item), vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e);
+    draw(ctx, tl, item, prevItem, p, ui) {
+      ui = ui || { sel: null, prevSel: null, selP: 1, hover: null };
+      const cam = camOf(ui), zoomed = ui.sel != null || ui.selP < 1;
       bgDark(ctx, tl, { centerA: .9, center: '#33200F' });
-      collage(ctx, tl * .5, { seed: 31, n: 6, theme: 'dark', alpha: .55 * P(tl, .2, 1.5) });
-      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
-      const rev = lerp(.12, 1, E.inOutCubic(P(tl, 0, 2.4)));
+      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(cam.s, cam.s); ctx.translate(-cam.x, -cam.y);
       glow(ctx, 960, 590, 900, C.orange, .12 + .05 * BT.breath);
-      metroMap(ctx, tl, { reveal: rev, hi: item ? SEQ[item - 1] : null, train: 0 });
-      if (item) infoCard(ctx, SEQ[item - 1], E.outCubic(p), tl);
-      if (prevItem && prevItem !== item) infoCard(ctx, SEQ[prevItem - 1], 1 - E.outCubic(p * 1.6), tl);
+      metroMap(ctx, tl, { reveal: 1, hi: ui.sel != null ? ui.sel : ui.hover, train: 0 });
       ctx.restore();
-      const ba = (1 - E.inOutCubic(item ? (prevItem ? 1 : p) : (prevItem ? 1 - p : 0))) * E.outCubic(P(tl, 0, .6));
-      if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 112 - 40 * (1 - ba), [TX.line], [.3], tl, { tw: 40, th: 58, hiFrom: [5] }); ctx.restore(); }
-      hint(ctx, tl, item === 9 ? TX.stop.go : '→');
+      const out = ui.sel == null ? 1 - E.outCubic(ui.selP) : 0, inn = ui.sel != null ? E.outCubic(ui.selP) : 0;
+      detail(ctx, ui.prevSel, ui.prevSel !== ui.sel ? out : 0, tl, cam); detail(ctx, ui.sel, inn, tl, cam);
+      const ba = ui.sel == null ? E.inOutCubic(ui.selP) : 1 - E.inOutCubic(ui.selP);
+      if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 112, [TX.line], [-10], tl, { tw: 40, th: 58, hiFrom: [5] }); ctx.restore(); }
+      const ha = .55 + .2 * Math.sin(tl * 2.4);
+      text(ctx, ui.sel == null ? 'clique numa estação para ver o que vamos mostrar' : 'clique fora do cartão para voltar ao mapa', W / 2, H - 50, { size: 24, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: ha });
+      hint(ctx, tl, TX.stop.go);
       scanlines(ctx, .05);
+    },
+    /** alvo sob o ponteiro (coordenadas do palco) */
+    hit(x, y, ui) {
+      const cam = camOf(ui); let best = null, bd = 70 * cam.s;
+      KEYS.forEach(k => { const n = MAP.node(k), [sx, sy] = toScreen(cam, n.x, n.y), d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = k; } });
+      return best;
+    },
+    click(target, ui, ctl) { ctl.select(target === ui.sel ? null : target); return true; },
+    key(k, ui, ctl) {
+      if (ui.sel != null && (k === 'Escape' || k === 'ArrowLeft' || k === 'PageUp' || k === 'ArrowRight' || k === 'PageDown')) { ctl.select(null); return true; }
+      return false;
     }
   };
 })();
@@ -3798,6 +3810,14 @@ const PLAYER = (() => {
   const DUR = CONFIG.duration, SHOW = CONFIG.mode !== 'reel', STOPS = CONFIG.stops, ITEM_DUR = 1.1;
   const st = { T: 0, playing: false, startPerf: 0, startT: 0, ended: false,
     mode: SHOW ? 'stop' : 'play', stop: 0, item: 0, prevItem: 0, itemAt: performance.now(), stopAt: performance.now(), next: null };
+  // estado interativo das paradas: seleção (zoom), popup de slide e alvo sob o ponteiro
+  const UI = { sel: null, prevSel: null, selAt: 0, selP: 1, pop: null, prevPop: null, popAt: 0, popP: 1, hover: null };
+  const resetUI = () => Object.assign(UI, { sel: null, prevSel: null, selAt: 0, selP: 1, pop: null, prevPop: null, popAt: 0, popP: 1, hover: null });
+  const CTL = {
+    select(v) { if (v === UI.sel) return; UI.prevSel = UI.sel; UI.sel = v; UI.selAt = performance.now(); poke(); },
+    popup(v) { if (v === UI.pop) return; UI.prevPop = UI.pop; UI.pop = v; UI.popAt = performance.now(); poke(); },
+    next: () => next(), depart: () => depart(), setItem: k => setItem(k)
+  };
   const NAME = s => s.station ? `${TX.stations[s.station - 1].n} · ${TX.stations[s.station - 1].short}` : ({ open: 'Abertura', climax: 'Clímax', close: 'Letreiro final' })[s.id] || s.id;
   const STOP_NAME = { preshow: 'Pré-show', stop0: 'Parada 0 · roteiro', stop1: 'Parada 1 · retomada', stop2: 'Parada 2 · retomada', end: 'Encerramento' };
 
@@ -3828,8 +3848,9 @@ const PLAYER = (() => {
   function renderStop(id, tl, item, prevItem, p) {
     BT = BEAT.idle(tl); NOW = tl;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-    const impl = STOPSCN[id];
-    if (impl) impl.draw(ctx, tl, item, prevItem, p);
+    const impl = STOPSCN[id], now = performance.now();
+    UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35);
+    if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }
     grain(ctx, tl * 30);
   }
@@ -3869,7 +3890,7 @@ const PLAYER = (() => {
   function toggle() { if (st.mode === 'stop') return next(); st.playing ? pause() : play(); }
   function enterStop(i) {
     if (st.playing) { st.playing = false; AUDIO.stop(); VOICE.pause(); }
-    st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null;
+    st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
     syncUI(); poke();
   }
   function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); poke(); }
@@ -3931,9 +3952,21 @@ const PLAYER = (() => {
   $('bCC').onclick = () => { CONFIG.captions = !CONFIG.captions; syncUI(); };
   $('bFull').onclick = () => { const el = document.documentElement; document.fullscreenElement ? document.exitFullscreen() : (el.requestFullscreen && el.requestFullscreen()); };
   intro.onclick = () => play();
-  cv.addEventListener('click', () => { if (st.mode === 'stop') next(); });
+  // clique e ponteiro nas paradas: a cena da parada decide o alvo (hit) e a ação (click); sem alvo, o clique segue viagem
+  const stagePt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+  const stopImpl = () => st.mode === 'stop' ? STOPSCN[STOPS[st.stop].id] : null;
+  cv.addEventListener('click', e => {
+    if (st.mode !== 'stop') return; const impl = stopImpl();
+    if (impl && impl.hit) { const [x, y] = stagePt(e), tg = impl.hit(x, y, UI); if (impl.click(tg, UI, CTL)) return; }
+    next();
+  });
+  cv.addEventListener('pointermove', e => {
+    const impl = stopImpl(); if (!impl || !impl.hit) { if (UI.hover != null) UI.hover = null; cv.style.cursor = ''; return; }
+    const [x, y] = stagePt(e); UI.hover = impl.hit(x, y, UI); cv.style.cursor = UI.hover != null ? 'pointer' : '';
+  });
   window.addEventListener('keydown', e => {
-    const k = e.key;
+    const k = e.key, impl = stopImpl();
+    if (impl && impl.key && impl.key(k, UI, CTL)) { e.preventDefault(); return; }
     if (k === 'ArrowRight' || k === 'PageDown' || k === 'Enter' || e.code === 'Space') {
       e.preventDefault();
       if (st.mode === 'stop') next(); else if (e.code === 'Space' || k === 'Enter') { if (!intro.classList.contains('hidden')) play(); else toggle(); }
@@ -3961,7 +3994,8 @@ const PLAYER = (() => {
 
   // ganchos para testes e exportação
   window.__render = T => renderPlay(T);
-  window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1) => renderStop(id, tl, item, prevItem, p);
+  window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1, ui) => { const keep = { ...UI }; if (ui) Object.assign(UI, { selAt: -1e9, popAt: -1e9 }, ui); renderStop(id, tl, item, prevItem, p); Object.assign(UI, keep); };
+  window.__ui = UI; window.__ctl = CTL;
   window.__seek = seek; window.__state = st; window.__next = next; window.__prev = prev; window.__gotoStop = gotoStop; window.__jump = jumpStation;
   return { play, pause, seek, frameAt, next, prev };
 })();

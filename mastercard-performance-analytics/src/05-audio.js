@@ -18,7 +18,7 @@ function cue(sceneId, at, type, opt = {}) {
 // Flags: kick hat hat16 clap bass arp pad pluck comic roll big soft minor arpOct rise (filtro sobe até o fim da seção)
 const FULL = { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1 };
 const MUSIC_SPEC = {
-  open: [[0, { pad: 1, f: 700 }], [2.5, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [4.5, { ...FULL, f: 14000 }], [13, { pad: 1, f: 1400 }]]
+  open: [[0, { pad: 1, f: 700 }], [2.5, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [4.5, { ...FULL, f: 14000 }], [9, { pad: 1, f: 1400 }]]
 };
 const FALLBACK_SPEC = [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 6000 }]], SILENT_SPEC = [[0, { f: 3000 }]];
 const MUSIC = (() => {
