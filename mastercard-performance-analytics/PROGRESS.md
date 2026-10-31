@@ -71,10 +71,41 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
 
 **v3 concluída.** Próximo passo: revisão do usuário. Os materiais pendentes (Practice, Lights-off, demais tracks) entram pelo JSON.
 
+## v4 — revisão do usuário (ver "O que mudou" no `STORYLINE.md`)
+
+Ordem pensada para não haver retrabalho: primeiro o que muda os tempos (a música), depois o que todas as cenas usam, depois cada play, e por último os slides das paradas, que dependem das cenas prontas.
+
+- [x] **E1. Música da estação 04 + linha do tempo:**
+  - "Technology" remontada (`tools/edit_tech.py`), com calma → construção → drop por case;
+  - cases de 53 a 62 s;
+  - abertura de 10 s.
+- [x] **E2. Fundações:**
+  - batida contida, com picos por cena;
+  - legendas de tela e cartões de conexão;
+  - textos em português;
+  - vagão, trem entre estações e painel "próxima estação".
+- [x] **E3. Embarque + Parada 0 clicável.** O player trata clique, ponteiro e teclas nas paradas.
+- [x] **E4. Estações 01–03:**
+  - pergunta e conclusão na 01;
+  - título do gráfico e cartão de conexão na 02;
+  - projetos e ML preditivo/prescritivo na 03.
+- [x] **E5. Os 4 cases reescritos + estações 05/06** (problema → dados → estratégia → como → solução no drop → impacto).
+- [x] **E6. Estação 07, clímax e encerramento** com legendas.
+- [x] **E7. Paradas clicáveis:**
+  - zoom no cartaz;
+  - miniaturas das cenas montadas;
+  - popup que fecha.
+- [x] **E8. QA:**
+  - render de 0 a 461 s e de todas as paradas, sem exceções;
+  - testes de clique (mapa, cartaz, miniatura, popup, Esc, setas) e de navegação;
+  - README, STORYLINE e PROGRESS atualizados.
+
+**v4 concluída.** Próximo passo: revisão do usuário.
+
 ## Como retomar numa nova sessão
 
 1. Faça checkout da branch `claude/mastercard-analytics-video-4cof1t`.
-2. Leia este arquivo, o `README.md` (arquitetura v3) e o `STORYLINE.md` (v3.3).
+2. Leia este arquivo, o `README.md` (arquitetura) e o `STORYLINE.md` (v4).
 3. Continue a partir do primeiro item não marcado. Os parâmetros ficam em `src/01-config.js`.
-4. Rode `./build.sh` e faça a verificação: o render da duração inteira deve sair sem exceções. Os MP3 das músicas não estão no Git (`musica/`): se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado.
+4. Rode `./build.sh` e faça a verificação: o render da duração inteira deve sair sem exceções. Os MP3 das músicas não estão no Git (`musica/`): se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado. A faixa da estação 04 é `musica/tech-edit.mp3`, gerada por `tools/edit_tech.py` a partir de `musica/tech.mp3`.
 5. Faça commit e push, e marque o item aqui.

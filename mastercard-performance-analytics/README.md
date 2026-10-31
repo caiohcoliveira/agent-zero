@@ -1,9 +1,11 @@
-# Performance Analytics — "A Linha" (v3)
+# Performance Analytics — "A Linha" (v4)
 
-Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há paradas em loop, para as apresentadoras falarem. O visual é retrô-moderno, de colagem, com traço de tinta no espírito de Arcane. A câmera, as cores e os elementos reagem às batidas das músicas.
+Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há paradas em loop, para as apresentadoras falarem. O visual é retrô-moderno, de colagem, com traço de tinta no espírito de Arcane.
+
+O vídeo roda **sem narrador**: cada cena tem legenda e uma conclusão escrita. A música marca os tempos das cenas, mas os efeitos de batida ficam contidos e só crescem nos clímax.
 
 - **Arquivo final:** [`performance-analytics.html`](performance-analytics.html), um único HTML 1920×1080, 100% offline, com dados e músicas embutidos.
-- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v3.3).
+- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v4).
 - **Checkpoint de retomada:** [`PROGRESS.md`](PROGRESS.md).
 
 ## Como apresentar
@@ -15,21 +17,34 @@ Vídeo executivo animado para a reunião da área. A track vira uma linha de met
 | Momento | O que acontece | Duração |
 |---|---|---|
 | Pré-show | loop de espera | até a primeira tecla |
-| Play 1 · abertura | os 5 desafios → o mapa da linha (trilha sintetizada) | 0:15 |
-| **Parada 0** · roteiro | o mapa em loop; cada → destaca uma estação | fala |
+| Play 1 · embarque | plataforma, o trem chega, bilhete validado → o mapa da linha | 0:10 |
+| **Parada 0** · mapa | **clique numa estação** para ver o detalhe; → embarca | fala |
 | Play 2 · estações 01–03 | "Vintage Film Funk" | 1:59 |
-| **Parada 1** · retomada | plataforma com os cartazes 01, 02 e 03 | fala |
-| Play 3 · estações 04–06 | "Technology" (a partir de 0:20) | 2:29 |
-| **Parada 2** · retomada | cartazes 04, 05 e 06 | fala |
+| **Parada 1** · retomada | plataforma com os cartazes 01, 02 e 03 (clicáveis) | fala |
+| Play 3 · estações 04–06 | "Technology" remontada para os cases | 4:24 |
+| **Parada 2** · retomada | cartazes 04, 05 e 06 (clicáveis) | fala |
 | Play 4 · 07, clímax e letreiro | "Epic Piano" (a partir de 0:07) | 1:07 |
-| **Encerramento** | letreiro "Performance Analytics" vivo; → mostra o cartaz 07 | fala |
+| **Encerramento** | letreiro vivo; clique ou → abre o cartaz 07 | fala |
 
-São ~5:50 de vídeo no total.
+São ~7:40 de vídeo no total.
+
+**Nas paradas, com o mouse:**
+- **Parada 0:**
+  - clique numa estação para aproximar e ver o cartão com o que ela mostra;
+  - clique fora, Esc ou uma seta para voltar.
+- **Paradas 1, 2 e encerramento:**
+  - clique num cartaz para dar zoom na estação;
+  - embaixo aparecem as **cenas montadas** da estação, em miniaturas;
+  - clique numa miniatura para abrir a cena num **popup**;
+  - para fechar, use ✕, Esc ou clique fora;
+  - para trocar de cena, use ‹ › ou as setas;
+  - clique fora do zoom para voltar à plataforma.
 
 | Tecla | Na parada | Durante o vídeo |
 |---|---|---|
-| → · PageDown · espaço · Enter · clique | próximo cartaz; no último, embarca no próximo play | só espaço/Enter: pausa |
-| ← · PageUp | cartaz anterior | — (setas não pulam o vídeo) |
+| → · PageDown · espaço · Enter | próximo cartaz; no último, embarca no próximo play (com popup aberto: próxima cena) | só espaço/Enter: pausa |
+| ← · PageUp | cartaz anterior (com popup aberto: cena anterior) | — (setas não pulam o vídeo) |
+| Esc | fecha o popup, o cartão ou o zoom | — |
 | P | — | pausa/retoma (emergência) |
 | 1 a 7 | vai para a estação | vai para a estação |
 | Home ou R / End | volta ao pré-show / vai ao encerramento | idem |
@@ -59,6 +74,7 @@ Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no 
 ## Música e batidas
 
 - **Faixas (Pixabay):** berrydeep "Vintage Film Funk", kulakovka "Technology" e twisterium "Epic Piano Background".
+  - "Technology" é **remontada** por `tools/edit_tech.py`: cortes nos compassos com crossfade, para que cada case tenha parte calma → construção → drop, e o drop caia na solução. O resultado é `musica/tech-edit.mp3`.
   - Entram embutidas no HTML, recodificadas a 128 kbps, como parte do vídeo.
   - Os MP3 avulsos ficam em `musica/`, fora do Git, porque a licença não permite redistribuir a faixa solta.
 - **Sincronia:** `tools/music.py` analisa as faixas e gera `src/07-beats.js`, com batidas, compassos, envelopes de grave e caixa, picos e mudanças de seção.
@@ -68,7 +84,10 @@ Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no 
   - **câmera:** soco de zoom nos tempos fortes, balanço no compasso e tranco nos picos;
   - **cores:** calor no 1º tempo, separação RGB nas caixas e picos, linhas de foco e quadros invertidos (*impact frames*) nas viradas de seção;
   - **elementos:** pulsam com o grave, e o traço de tinta "ferve" mais forte nas caixas.
-- **Intensidade:** `CONFIG.motion.beat` (0 desliga).
+- **Intensidade:**
+  - `CONFIG.motion.beat` (0 desliga);
+  - `CONFIG.motion.beatBase` é o nível fora dos clímax (0,15);
+  - cada cena declara os seus picos em `SCENES[id].peaks`.
 - **Paradas:** ficam em silêncio. A abertura usa a trilha sintetizada a 120 BPM. Se uma faixa faltar no HTML, o play correspondente usa um groove sintetizado de reserva.
 
 ## Arquitetura
@@ -87,10 +106,11 @@ src/
   07-beats.js      gerado por tools/music.py: batidas e envelopes das faixas
   08-music.js      toca as faixas em sincronia e expõe BEAT/BT
   09-fx.js         câmera e pós-processamento guiados pela música; traço de tinta, respingos, grafites, pinceladas
-  10-ui.js         split-flap, mapa do metrô, mini-mapa, letreiro de estação, plataforma, cartazes, régua e comprovante
-  20-open.js       pré-show, abertura e Parada 0
+  10-ui.js         split-flap, mapa do metrô, mini-mapa, letreiro de estação, plataforma, cartazes, slides montados + popup, régua e comprovante
+  11-station.js    vagão, trem que passa entre estações, painel "próxima estação", bilhete, legendas de tela e cartões de conexão
+  20-open.js       pré-show, embarque e Parada 0 (mapa clicável)
   21-trecho1.js    estações 01, 02, 03 e Parada 1
-  22-cases.js      estação 04: Banana, Manga, Lights-off, Insight Agent
+  22-cases.js      estação 04: abertura e os 4 cases (problema → dados → estratégia → como → solução → impacto)
   23-scale.js      estações 05 e 06 e Parada 2
   24-final.js      estação 07, clímax, letreiro final e encerramento
   90-player.js     modo apresentação: plays, paradas em loop, navegação, controles
@@ -99,6 +119,7 @@ src/
 data/presentation.json
 tools/build.py     monta o HTML (python3; ffmpeg para as músicas)
 tools/music.py     analisa as músicas (requer librosa)
+tools/edit_tech.py remonta "Technology" para os cases (requer numpy e ffmpeg)
 build.sh           atalho para tools/build.py
 ```
 
@@ -120,7 +141,10 @@ build.sh           atalho para tools/build.py
 | `plays[].from` | de onde cada faixa começa |
 | `scenes[].dur` | duração de cada cena; casada com os compassos da faixa |
 | `stops[].items` | quantos passos o → percorre em cada parada |
-| `text` | todos os textos fixos (estações, desafios, rótulos) |
+| `text` | todos os textos fixos (estações, casos de ML, rótulos) |
+| `motion.beatBase` | quanto a batida mexe fora dos clímax |
+| `SCENES[id].caps` / `.peaks` | legendas e picos de batida de cada cena (nos arquivos de cena) |
+| `SLIDES` (`src/10-ui.js`) | quais momentos de cada estação viram cenas montadas nas paradas |
 | `motion.beat`, `motion.intensity`, `motion.grain` | quanto a música mexe nos visuais, energia, granulação |
 | `audio.tracks.*.gain`, `audio.trackVolume` | volume das faixas (já equalizadas) |
 | `audio.voice`, `captions` | narração e legendas (desligadas por padrão) |
