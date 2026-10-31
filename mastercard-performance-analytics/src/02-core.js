@@ -41,6 +41,7 @@ const noise1 = (x) => { const i = Math.floor(x), f = x - i; return lerp(hash(i),
 const _rgbCache = {};
 function rgb(hex) {
   if (_rgbCache[hex]) return _rgbCache[hex];
+  if (hex.startsWith('rgb')) { const m = hex.match(/[\d.]+/g).map(Number); return (_rgbCache[hex] = [m[0], m[1], m[2]]); }
   const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
   return (_rgbCache[hex] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]);
 }
