@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Performance Analytics — A Interseção</title>
+<title>Performance Analytics — A Linha</title>
 <!--
   ============================================================================
   DADOS DO VÍDEO (JSON) — os números e textos das cenas vêm deste bloco.
@@ -100,6 +100,7 @@
   #bar .tick { position: absolute; top: 9px; width: 2px; height: 10px; margin-left: -1px; background: rgba(255,255,255,.35); border-radius: 1px; }
   #bar .tip { position: absolute; bottom: 30px; transform: translateX(-50%); padding: 4px 8px; border-radius: 6px; background: #000; color: #fff; white-space: nowrap; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .15s; }
   #bar:hover .tip { opacity: 1; }
+  #bar .stop { position: absolute; top: 8px; width: 12px; height: 12px; margin-left: -6px; transform: rotate(45deg); background: #FF5F00; border: 2px solid #fff; border-radius: 2px; }
   #voiceinfo { flex: none; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #8a8378; font-size: 12px; }
   @media (max-width: 720px) { #voiceinfo { display: none; } #ui { gap: 8px; padding: 8px 10px; } }
 </style>
@@ -111,16 +112,16 @@
     <div id="intro">
       <div class="logo"><span class="a"></span><span class="b"></span><span class="c"></span></div>
       <h1>Performance Analytics</h1>
-      <p>A INTERSEÇÃO ENTRE DADOS E DECISÃO</p>
+      <p>MASTERCARD ADVISORS · LINHA PERFORMANCE ANALYTICS</p>
       <div class="play"><i></i>Assistir</div>
-      <small>~4 min · ative o som · Espaço = play/pause · F = tela cheia</small>
+      <small>ative o som · → ou clique para começar · F = tela cheia</small>
     </div>
   </div>
 </div>
 <div id="ui">
   <button id="bPlay" class="primary" title="Play/Pause (Espaço)">▶</button>
   <button id="bRestart" title="Reiniciar (R)">↺</button>
-  <span id="time">0:00 / 4:00</span>
+  <span id="time">0:00</span>
   <div id="bar"><div class="track"></div><div class="fill"></div><div class="knob"></div><div class="tip"></div></div>
   <button id="bSound" title="Trilha e efeitos (M)">Som</button>
   <button id="bVoice" title="Narração (V)">Voz</button>
@@ -128,5 +129,7 @@
   <button id="bFull" title="Tela cheia (F)">⛶</button>
   <span id="voiceinfo"></span>
 </div>
+<!-- MÚSICAS (base64, geradas pelo build a partir de musica/) -->
+<!--PA_MUSIC-->
 <script>
 "use strict";

@@ -47,17 +47,15 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   - padrões assumidos e campos para completar no JSON (Prática, Lights-off, `other_tracks`).
 
   Ver "Decisões desta rodada (v3.3)" no `STORYLINE.md`. **Sem perguntas em aberto.**
-- [ ] **S2. Config v3:**
-  - cenas, tempos e textos;
-  - números lidos do bloco de dados (`src/01-data.js`);
-  - trechos e paradas;
-  - narração opcional.
-- [ ] **S3. Player em modo apresentação:**
-  - trechos lineares + paradas em loop;
-  - cartazes navegáveis com setas ou passador;
-  - transições contínuas;
-  - `mode: 'show' | 'reel'`;
-  - atalhos de operador.
+- [x] **S2. Linha do tempo v3 + músicas:**
+  - `src/01-config.js` com 4 plays, 13 cenas casadas aos compassos e 5 paradas;
+  - `tools/music.py` gera `src/07-beats.js` (batidas, compassos, envelopes, picos, seções);
+  - `src/08-music.js` toca as faixas em sincronia e expõe `BEAT`/`BT` para os visuais;
+  - `tools/build.py` embute as músicas (MP3 em `musica/`, fora do Git; sem a pasta, reaproveita as do HTML atual).
+- [x] **S3. Player em modo apresentação** (`src/90-player.js`):
+  - pré-show, paradas em loop com itens, embarque e setas ignoradas durante o vídeo;
+  - teclas 1–7, P, Home/End e barra com estações e paradas;
+  - cenas antigas da v2 movidas para `src/legacy/` (referência; fora do build).
 - [ ] **S4. Componentes:**
   - letreiro de estação;
   - mapa e mini-mapa;

@@ -166,34 +166,6 @@ function caseHeader(ctx, t, c, o = {}) {
   ctx.restore();
 }
 
-// ---------- CHIPS de capítulo (rastreador de progresso, canto superior esquerdo) ----------
-const CHIPS = (() => {
-  const s = CONFIG.sceneById, ids = CONFIG.text.questions.map(q => q.id);
-  return {
-    show: [s[ids[0]].start - .2, s[ids[ids.length - 1]].end - .6],
-    active: ids.map(id => [s[id].start, s[id].end]),
-    done: ids.map(id => s[id].start + CONFIG.caseDone[id])
-  };
-})();
-function chips(ctx, T, theme) {
-  const a = P(T, CHIPS.show[0], .5) * (1 - P(T, CHIPS.show[1], .5)); if (a <= 0) return;
-  const dark = theme === 'dark'; let x = 64; const y = 64;
-  ctx.save(); ctx.globalAlpha *= a;
-  CONFIG.text.questions.forEach((q, i) => {
-    const act = T >= CHIPS.active[i][0] && T < CHIPS.active[i][1], dn = T >= CHIPS.done[i];
-    const pop = dn ? E.outBack(P(T, CHIPS.done[i], .45)) : 1;
-    const label = `${q.n}  ${q.short}`, w = measure(ctx, label, 17, 700) + (dn ? 62 : 36);
-    ctx.save(); ctx.translate(x + w / 2, y); ctx.scale(lerp(1, 1, pop) * (dn ? lerp(1.25, 1, P(T, CHIPS.done[i], .45, E.outCubic)) : 1), 1);
-    rr(ctx, -w / 2, -19, w, 38, 19);
-    ctx.fillStyle = dn ? C.orange : act ? (dark ? C.cream : C.ink) : 'rgba(0,0,0,0)'; ctx.fill();
-    ctx.strokeStyle = dn ? C.orange : rgba(dark ? C.cream : C.ink, act ? 0 : .3); ctx.lineWidth = 2; ctx.stroke();
-    const fg = dn ? '#FFF' : act ? (dark ? C.ink : C.cream) : rgba(dark ? C.cream : C.ink, .55);
-    text(ctx, label, -w / 2 + 18, 1, { size: 17, weight: 700, color: fg });
-    if (dn) icon(ctx, 'check', w / 2 - 22, 1, 20, '#FFF', 14);
-    ctx.restore(); x += w + 12;
-  });
-  ctx.restore();
-}
 
 // ---------- DASHBOARD ----------
 /**

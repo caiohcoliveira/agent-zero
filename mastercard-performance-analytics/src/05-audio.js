@@ -13,24 +13,17 @@ function cue(sceneId, at, type, opt = {}) {
   if (type === 'impact') IMPACTS.push({ t, size: opt.size == null ? 1 : opt.size });
 }
 
-// Arranjo da trilha POR CENA (tempo local, múltiplos de 0.125 s). f = corte do filtro passa-baixa (Hz).
+// Trilha sintetizada: só na abertura. Nos plays com faixa embutida (src/08-music.js) ela fica muda;
+// se a faixa não estiver no HTML, entra um groove de reserva.
 // Flags: kick hat hat16 clap bass arp pad pluck comic roll big soft minor arpOct rise (filtro sobe até o fim da seção)
 const FULL = { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1 };
 const MUSIC_SPEC = {
-  hook:      [[0, { pad: 1, f: 700 }], [4, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [6.5, { ...FULL, f: 14000 }], [17, { pad: 1, f: 1200 }]],
-  problem:   [[0, { kick: 1, hat: 1, bass: 1, pad: 1, f: 950 }], [14, { pad: 1, f: 800 }]],
-  hub:       [[0, { pad: 1, f: 800 }], [4, { ...FULL, f: 15000 }]],
-  als:       [[0, { ...FULL, hat16: 1, f: 5200, minor: 1 }]],
-  embed:     [[0, { pad: 1, arp: 1, soft: 1, f: 2600 }], [9, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }]],
-  lightsoff: [[0, { kick: 1, pluck: 1, comic: 1, f: 3200 }], [12, { f: 400 }], [14, { ...FULL, f: 15000 }], [22, { kick: 1, pad: 1, bass: 1, f: 2000, rise: 1 }]],
-  insights:  [[0, { ...FULL, f: 7000, arpOct: 1 }], [18.5, { pad: 1, arp: 1, soft: 1, kick: 1, f: 3200 }], [26.5, { ...FULL, hat16: 1, f: 15000 }]],
-  skills:    [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 3000, rise: 1 }], [12.5, { ...FULL, hat16: 1, f: 12000 }], [18, { kick: 1, hat16: 1, roll: 1, bass: 1, pad: 1, f: 9000 }]],
-  climax:    [[0, { ...FULL, hat16: 1, big: 1, f: 16000 }]],
-  close:     [[0, { pad: 1, arp: 1, soft: 1, f: 4200 }], [7, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 9000 }], [16.5, { f: 3000 }]]
+  open: [[0, { pad: 1, f: 700 }], [2.5, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [4.5, { ...FULL, f: 14000 }], [13, { pad: 1, f: 1400 }]]
 };
+const FALLBACK_SPEC = [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 6000 }]], SILENT_SPEC = [[0, { f: 3000 }]];
 const MUSIC = (() => {
-  const out = [];
-  CONFIG.scenes.forEach(sc => { const spec = MUSIC_SPEC[sc.id] || [[0, { pad: 1, f: 3000 }]];
+  const out = [], hasTrack = sc => { const p = CONFIG.playById[sc.play]; return !!(p && p.track && document.getElementById('music-' + p.track)); };
+  CONFIG.scenes.forEach(sc => { const spec = MUSIC_SPEC[sc.id] || (hasTrack(sc) ? SILENT_SPEC : FALLBACK_SPEC);
     spec.forEach(([at, f], i) => out.push([sc.start + at, sc.start + (i + 1 < spec.length ? spec[i + 1][0] : sc.dur), f])); });
   out.push([CONFIG.duration, CONFIG.duration + 1, { f: 3000 }]);
   return out;
@@ -67,6 +60,7 @@ const AUDIO = {
     if (!this.ready) return; const n = this.ctx.currentTime;
     this.music.gain.setTargetAtTime(CONFIG.audio.music ? CONFIG.audio.musicVolume * this.duck : 0, n, .08);
     this.sfx.gain.setTargetAtTime(CONFIG.audio.sfx ? CONFIG.audio.sfxVolume : 0, n, .05);
+    TRACK.apply();
   },
   setDuck(on) { this.duck = on ? CONFIG.audio.duckDuringVoice : 1; this.applyToggles(); },
 
@@ -81,9 +75,10 @@ const AUDIO = {
     this.filter.frequency.setValueAtTime(f0, this.ctx.currentTime);
     if (sec[2].rise) this.filter.frequency.exponentialRampToValueAtTime(14000, this.ctxTime(sec[1]));
     clearInterval(this.timer); this.timer = setInterval(() => this.pump(), 25); this.pump();
+    TRACK.schedule(videoT);
   },
   stop() {
-    this.playing = false; clearInterval(this.timer);
+    this.playing = false; clearInterval(this.timer); TRACK.stopAll();
     if (this.ready) { this.music.gain.cancelScheduledValues(0); this.sfx.gain.cancelScheduledValues(0); this.ctx.suspend(); this.rebuildBuses(); }
   },
   /** ao pausar/seek, descarta notas já agendadas recriando os buses */
