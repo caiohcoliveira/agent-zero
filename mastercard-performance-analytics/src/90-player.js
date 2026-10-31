@@ -27,10 +27,10 @@ const PLAYER = (() => {
   }
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
-  function frameAt(c, T) { const s = sceneAt(T); const keep = BT; BT = BEAT.at(T); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); BT = keep; }
+  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
 
   function renderPlay(T) {
-    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T);
+    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
     const s = sceneAt(T), t = T - s.start, sh = shakeAt(T), fx = typeof FX !== 'undefined';
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.save(); ctx.translate(sh.x, sh.y); ctx.translate(W / 2, H / 2); ctx.rotate(sh.r);
@@ -44,7 +44,7 @@ const PLAYER = (() => {
     grain(ctx, T);
   }
   function renderStop(id, tl, item, prevItem, p) {
-    BT = BEAT.idle(tl);
+    BT = BEAT.idle(tl); NOW = tl;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     const impl = STOPSCN[id];
     if (impl) impl.draw(ctx, tl, item, prevItem, p);

@@ -2078,6 +2078,554 @@ const BEAT = (() => {
 /** estado da música no quadro atual (o player atualiza a cada render) */
 let BT = BEAT.quiet;
 
+/* ===== 09-fx.js ===== */
+/* ============================================================================
+   9. FX + ESTILO — a música mexe na câmera, nas cores e nos elementos;
+   traço de tinta "fervendo", respingos, grafites e pinceladas (pegada Arcane/Fortiche)
+   ----------------------------------------------------------------------------
+   Tudo é função do tempo: BT (estado da música) e NOW (relógio da animação),
+   atualizados pelo player a cada quadro.
+   ========================================================================== */
+let NOW = 0;
+const BX = () => CONFIG.motion.beat;
+
+/* ---------- utilitários de cena (texto rico, pílula, círculos Mastercard) ---------- */
+function rich(ctx, str, x, y, o = {}) {
+  const size = o.size || 120, weight = o.weight || 800, ls = o.ls == null ? -size * .025 : o.ls;
+  const parts = str.split(/(\*[^*]+\*)/).filter(Boolean).map(p => ({ s: p.replace(/\*/g, ''), hi: p[0] === '*' }));
+  const ws = parts.map(p => measure(ctx, p.s, size, weight, false, ls)), total = ws.reduce((a, b) => a + b, 0);
+  let cx = o.align === 'left' ? x : o.align === 'right' ? x - total : x - total / 2;
+  parts.forEach((p, i) => {
+    const op = { size, weight, ls, color: p.hi ? (o.accent || C.orange) : (o.color || C.white), alpha: o.alpha };
+    if (o.retro) retroText(ctx, p.s, cx, y, { ...op, shadow: o.shadow, depth: o.depth, lw: o.lw }); else text(ctx, p.s, cx, y, op);
+    cx += ws[i];
+  });
+  return total;
+}
+function pill(ctx, x, y, label, o = {}) {
+  const size = o.size || 22, w = measure(ctx, label, size, o.weight || 700) + size * 1.6, h = size * 1.9;
+  ctx.save(); ctx.globalAlpha *= (o.alpha == null ? 1 : o.alpha); ctx.translate(x, y); ctx.scale(o.scale || 1, o.scale || 1); ctx.rotate(o.rot || 0);
+  if (o.fill && !o.flat) { ctx.save(); ctx.translate(3, 4); rr(ctx, -w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = rgba(INK, .85); ctx.fill(); ctx.restore(); }
+  rr(ctx, -w / 2, -h / 2, w, h, h / 2); if (o.fill) { ctx.fillStyle = o.fill; ctx.fill(); }
+  const st = o.stroke || (o.fill && !o.flat ? INK : null); if (st) { ctx.strokeStyle = st; ctx.lineWidth = o.lw || 2.5; ctx.stroke(); }
+  text(ctx, label, 0, 1, { size, weight: o.weight || 700, color: o.color || C.ink, align: 'center' }); ctx.restore(); return w;
+}
+/** os dois círculos da Mastercard (Negócio × Dados); d = distância entre centros */
+function intersection(ctx, cx, cy, R, d, o = {}) {
+  const ax = cx - d / 2, bx = cx + d / 2, hot = o.hot || 0, A = o.alpha == null ? 1 : o.alpha;
+  glow(ctx, ax, cy, R * 1.5, C.red, .25 * A); glow(ctx, bx, cy, R * 1.5, C.yellow, .2 * A);
+  ctx.save(); ctx.globalAlpha *= A;
+  const gA = ctx.createRadialGradient(ax - R * .3, cy - R * .3, R * .1, ax, cy, R); gA.addColorStop(0, '#FF3347'); gA.addColorStop(1, C.red);
+  const gB = ctx.createRadialGradient(bx - R * .3, cy - R * .3, R * .1, bx, cy, R); gB.addColorStop(0, '#FFC25A'); gB.addColorStop(1, C.yellow);
+  const sd = Math.max(5, R * .05); ctx.save(); ctx.translate(sd, sd * 1.15); ctx.beginPath(); ctx.arc(ax, cy, R, 0, TAU); ctx.moveTo(bx + R, cy); ctx.arc(bx, cy, R, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fill('nonzero'); ctx.restore();
+  circle(ctx, ax, cy, R, gA); circle(ctx, bx, cy, R, gB);
+  if (d < 2 * R) { ctx.save(); ctx.beginPath(); ctx.arc(ax, cy, R, 0, TAU); ctx.clip(); circle(ctx, bx, cy, R, mix(C.orange, '#FFE6C7', hot * .6)); ctx.restore(); }
+  [ax, bx].forEach(c0 => { ctx.save(); ctx.beginPath(); ctx.arc(c0, cy, R, 0, TAU); ctx.clip(); ctx.globalAlpha *= .22; ctx.drawImage(SHADE, c0 - R, cy - R, R * 2, R * 2); ctx.restore(); });
+  const lw = Math.max(2.5, R * .03); inkCircle(ctx, ax, cy, R, lw, 1); inkCircle(ctx, bx, cy, R, lw, 2);
+  if (hot > 0 && d < 2 * R) glow(ctx, cx, cy, R * 1.1, '#FFF2E0', hot * .7);
+  if (o.labels) {
+    const ls = Math.max(18, R * .15), la = o.labelA == null ? 1 : o.labelA;
+    text(ctx, o.labels[0], ax - R * .42, cy, { size: ls, weight: 800, align: 'center', color: '#FFF', alpha: la });
+    text(ctx, o.labels[1], bx + R * .42, cy, { size: ls, weight: 800, align: 'center', color: C.ink, alpha: la });
+  }
+  ctx.restore();
+}
+
+/* ---------- traço de tinta "fervendo" (line boil a 12 qps, mais forte nas caixas) ---------- */
+function boil(seed, amp = 1.6) {
+  const f = Math.floor(NOW * 12), a = amp * (1 + 1.6 * BT.snare * BX());
+  return [(hash(f * 13 + seed * 7.1) - .5) * a, (hash(f * 17 + seed * 3.3 + 9) - .5) * a];
+}
+/** contorno de tinta sobre um caminho já definido por pathFn: traço cheio + traço solto deslocado */
+function ink(ctx, pathFn, lw = 3, seed = 1, color = INK) {
+  ctx.save(); ctx.lineJoin = ctx.lineCap = 'round'; ctx.strokeStyle = color;
+  pathFn(); ctx.lineWidth = lw; ctx.stroke();
+  const [dx, dy] = boil(seed); ctx.translate(dx, dy); pathFn(); ctx.lineWidth = lw * .45; ctx.globalAlpha *= .75; ctx.stroke();
+  ctx.restore();
+}
+function inkCircle(ctx, x, y, r, lw = 3, seed = 1, color = INK) { ink(ctx, () => { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); }, lw, seed, color); }
+function inkRect(ctx, x, y, w, h, r = 8, lw = 3, seed = 1, color = INK) { ink(ctx, () => rr(ctx, x, y, w, h, r), lw, seed, color); }
+
+/** respingo de tinta (spray/splat): bolha irregular + gotas + escorridos; p = revelação */
+function splat(ctx, x, y, r, col, seed = 1, p = 1, a = 1) {
+  if (p <= 0 || a <= 0) return;
+  const R = rng(seed);
+  ctx.save(); ctx.translate(x, y); ctx.scale(p, p); ctx.globalAlpha *= a; ctx.fillStyle = col;
+  ctx.beginPath(); const n = 16;
+  for (let k = 0; k <= n; k++) { const ang = k / n * TAU, rad = r * (.62 + .5 * R()); const px = Math.cos(ang) * rad, py = Math.sin(ang) * rad; k ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+  ctx.closePath(); ctx.fill();
+  for (let k = 0; k < 14; k++) { const ang = R() * TAU, dd = r * (1.05 + R() * 1.3), rs = r * (.04 + R() * .12); circle(ctx, Math.cos(ang) * dd, Math.sin(ang) * dd, rs, col); }
+  for (let k = 0; k < 3; k++) { const dx = (R() - .5) * r * 1.1, len = r * (.5 + R() * 1.2) * p, w = r * (.08 + R() * .07);
+    rr(ctx, dx - w / 2, 0, w, r * .5 + len, w / 2); ctx.fill(); circle(ctx, dx, r * .5 + len, w * .9, col); }
+  ctx.restore();
+}
+/** grafite rabiscado (estilo pichação da Jinx), revelado pelo traço; kind: star arrow crown spiral zigzag circle heart bang x */
+function scribble(ctx, kind, x, y, s, col, seed = 1, p = 1, o = {}) {
+  if (p <= 0) return;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0); ctx.globalAlpha *= o.alpha == null ? 1 : o.alpha;
+  ctx.lineCap = ctx.lineJoin = 'round'; ctx.strokeStyle = col; ctx.lineWidth = s * (o.lw || .09);
+  if (o.glow) { ctx.shadowColor = col; ctx.shadowBlur = s * .25; }
+  const L = s * 12; ctx.setLineDash([L * p, L]); const [jx, jy] = boil(seed, 1.2);
+  ctx.translate(jx, jy); ctx.beginPath();
+  if (kind === 'star') { for (let k = 0; k <= 10; k++) { const a = -Math.PI / 2 + k * TAU / 10, rad = k % 2 ? s * .22 : s * .5; ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); } }
+  else if (kind === 'arrow') { ctx.moveTo(-s * .5, s * .15); ctx.quadraticCurveTo(-s * .1, -s * .35, s * .45, -s * .1); ctx.moveTo(s * .2, -s * .3); ctx.lineTo(s * .45, -s * .1); ctx.lineTo(s * .22, s * .12); }
+  else if (kind === 'crown') { ctx.moveTo(-s * .45, s * .25); ctx.lineTo(-s * .45, -s * .2); ctx.lineTo(-s * .2, s * .02); ctx.lineTo(0, -s * .32); ctx.lineTo(s * .2, s * .02); ctx.lineTo(s * .45, -s * .2); ctx.lineTo(s * .45, s * .25); ctx.closePath(); }
+  else if (kind === 'spiral') { for (let k = 0; k < 60; k++) { const a = k * .32, rad = s * .02 + k * s * .008; ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); } }
+  else if (kind === 'zigzag') { for (let k = 0; k <= 6; k++) ctx.lineTo(-s * .5 + k * s / 6, (k % 2 ? -1 : 1) * s * .14); }
+  else if (kind === 'circle') { for (let k = 0; k <= 46; k++) { const a = k / 40 * TAU, rad = s * .48 * (1 + .06 * Math.sin(k * 1.7)); ctx.lineTo(Math.cos(a) * rad * 1.15, Math.sin(a) * rad * .78); } }
+  else if (kind === 'heart') { ctx.moveTo(0, s * .32); ctx.bezierCurveTo(-s * .55, -s * .05, -s * .3, -s * .48, 0, -s * .18); ctx.bezierCurveTo(s * .3, -s * .48, s * .55, -s * .05, 0, s * .32); }
+  else if (kind === 'bang') { ctx.moveTo(0, -s * .45); ctx.lineTo(0, s * .15); ctx.moveTo(0, s * .34); ctx.lineTo(0, s * .36); }
+  else { ctx.moveTo(-s * .35, -s * .35); ctx.lineTo(s * .35, s * .35); ctx.moveTo(s * .35, -s * .35); ctx.lineTo(-s * .35, s * .35); }
+  ctx.stroke(); ctx.restore();
+}
+/** pincelada pintada (fundo de títulos/cartões): faixas sobrepostas com borda irregular */
+function brush(ctx, x, y, w, h, col, seed = 1, p = 1) {
+  if (p <= 0) return;
+  const R = rng(seed), n = 5, A0 = ctx.globalAlpha;
+  ctx.save(); ctx.beginPath(); ctx.rect(x - 20, y - 30, (w + 40) * p, h + 60); ctx.clip();
+  for (let k = 0; k < n; k++) {
+    const yy = y + k * h / n - h * .05, hh = h / n * 1.5, c = mix(col, k % 2 ? '#000000' : '#FFFFFF', .06 + R() * .06);
+    ctx.beginPath(); ctx.moveTo(x - 10 + R() * 14, yy + R() * 6);
+    for (let s = 1; s <= 12; s++) ctx.lineTo(x + w * s / 12, yy + (R() - .5) * 7);
+    for (let s = 12; s >= 0; s--) ctx.lineTo(x + w * s / 12 + (s === 0 ? R() * 16 : 0), yy + hh + (R() - .5) * 7);
+    ctx.closePath(); ctx.fillStyle = c; ctx.globalAlpha = A0 * .92; ctx.fill();
+  }
+  ctx.globalAlpha = A0 * .18; for (let k = 0; k < 26; k++) { const yy = y + R() * h; line(ctx, x + R() * w * .2, yy, x + w * (.6 + R() * .4), yy + (R() - .5) * 3, '#000', 1); }
+  ctx.restore();
+}
+/** hachura (sombra desenhada) dentro do caminho */
+function hatch(ctx, pathFn, x, y, w, h, o = {}) {
+  ctx.save(); pathFn(); ctx.clip(); ctx.strokeStyle = o.color || INK; ctx.globalAlpha *= o.alpha == null ? .35 : o.alpha; ctx.lineWidth = o.lw || 1.6;
+  const g = o.gap || 9, a = o.angle == null ? .8 : o.angle; ctx.beginPath();
+  for (let k = -h; k < w + h; k += g) { ctx.moveTo(x + k, y + h); ctx.lineTo(x + k + h * a, y); }
+  if (o.cross) for (let k = -h; k < w + h; k += g * 1.4) { ctx.moveTo(x + k, y); ctx.lineTo(x + k + h * a, y + h); }
+  ctx.stroke(); ctx.restore();
+}
+/** título pintado: pincelada + letras com contorno de tinta e sombra chapada + respingos */
+function paintTitle(ctx, str, x, y, o = {}) {
+  const size = o.size || 96, w = measure(ctx, str, size, 900) + size * .8, p = o.p == null ? 1 : o.p;
+  const bx = o.align === 'left' ? x - size * .3 : x - w / 2;
+  brush(ctx, bx, y - size * .62, w, size * 1.24, o.bg || C.orange, o.seed || 3, E.outCubic(clamp(p * 1.4)));
+  if (o.splat !== false) splat(ctx, bx + w - size * .2, y - size * .45, size * .32, o.splatCol || C.yellow, (o.seed || 3) + 5, E.outBack(clamp(p * 2 - .6)), .9);
+  const ap = clamp(p * 2 - .4); if (ap <= 0) return;
+  ctx.save(); ctx.globalAlpha *= ap;
+  retroText(ctx, str, o.align === 'left' ? x : x, y + (1 - E.outBack(ap)) * size * .3, { size, weight: 900, color: o.color || '#FFF', align: o.align || 'center', ls: o.ls || 0 });
+  ctx.restore();
+}
+
+/* ---------- FX de batida: câmera e pós-processamento ---------- */
+const FX = (() => {
+  const R = makeCanvas(W, H, () => {}), rc = R.getContext('2d'), CY = makeCanvas(W, H, () => {}), cc = CY.getContext('2d');
+  function chroma(ctx, d) {
+    const cv = ctx.canvas;
+    rc.globalCompositeOperation = 'copy'; rc.drawImage(cv, 0, 0); rc.globalCompositeOperation = 'multiply'; rc.fillStyle = '#FF0000'; rc.fillRect(0, 0, W, H);
+    cc.globalCompositeOperation = 'copy'; cc.drawImage(cv, 0, 0); cc.globalCompositeOperation = 'multiply'; cc.fillStyle = '#00FFFF'; cc.fillRect(0, 0, W, H);
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'copy'; ctx.drawImage(R, -d, 0); ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(CY, d * .6, d * .25); ctx.restore();
+  }
+  function focusLines(ctx, a, seed) {
+    const r = rng(seed * 7 + 3); ctx.save(); ctx.globalAlpha = clamp(a) * .55; ctx.fillStyle = '#FFF4E8';
+    for (let k = 0; k < 46; k++) { const ang = r() * TAU, w = .006 + r() * .012, r0 = 420 + r() * 260;
+      ctx.beginPath(); ctx.moveTo(W / 2 + Math.cos(ang) * r0, H / 2 + Math.sin(ang) * r0);
+      ctx.lineTo(W / 2 + Math.cos(ang - w) * 1500, H / 2 + Math.sin(ang - w) * 1500); ctx.lineTo(W / 2 + Math.cos(ang + w) * 1500, H / 2 + Math.sin(ang + w) * 1500); ctx.fill(); }
+    ctx.restore();
+  }
+  const cfgOf = s => (SCENES[s.id] && SCENES[s.id].fx) || {};
+  return {
+    /** soco de zoom no tempo forte, balanço no compasso, tranco e inclinação nos picos */
+    camera(ctx, T, s) {
+      const b = BT, m = BX() * (cfgOf(s).camera == null ? 1 : cfgOf(s).camera); if (!m || !b.on) return;
+      const z = 1 + m * (.014 * b.beat * (.4 + .6 * b.low) + .03 * b.down * b.level + .045 * b.drop + .018 * b.hit);
+      const rot = m * (.005 * Math.sin(b.bar * TAU) * b.level + .012 * b.hit * (b.i % 2 ? 1 : -1));
+      ctx.translate(m * 9 * b.hit * Math.sin(b.i * 1.7), m * 7 * b.snare * Math.cos(b.i * 2.3)); ctx.rotate(rot); ctx.scale(z, z);
+    },
+    /** cor: calor no 1º tempo, linhas de foco e RGB nos picos, inversão (impact frame) nas viradas */
+    post(ctx, T, s) {
+      const b = BT, m = BX(), cfg = cfgOf(s); if (!m || !b.on) { vignette(ctx, .2); return; }
+      if (b.down > .05) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = .3 * b.down * b.level * m; ctx.fillStyle = C.orange; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+      if (cfg.lines !== false && b.hit > .6) focusLines(ctx, (b.hit - .6) / .4 * m, b.i);
+      const ab = m * (6 * b.hit + 3.5 * b.snare * b.level + 16 * b.drop) * (cfg.chroma == null ? 1 : cfg.chroma);
+      if (ab > 1.6) chroma(ctx, Math.min(ab, 22));
+      if (cfg.invert !== false && (b.drop > .82 || (b.hit > .93 && b.down > .9 && b.di % 4 === 0))) {
+        ctx.save(); ctx.globalCompositeOperation = 'difference'; ctx.fillStyle = b.di % 2 ? '#FFFFFF' : '#FFE0B8'; ctx.fillRect(0, 0, W, H); ctx.restore();
+      }
+      vignette(ctx, .16 + .2 * b.low * m);
+    },
+    chroma, focusLines
+  };
+})();
+
+/* ===== 10-ui.js ===== */
+/* ============================================================================
+   10. UI DA LINHA — letreiro split-flap, mapa do metrô, mini-mapa, plataforma
+   e cartazes das paradas, régua e comprovante dos cases, sobreposição dos trechos
+   ========================================================================== */
+
+/* ---------- grade musical da cena ---------- */
+const GRIDS = {};
+/** tempos LOCAIS (s) das batidas e compassos da cena, tirados da faixa do play (ou de 120 BPM na abertura) */
+function grid(id) {
+  if (GRIDS[id]) return GRIDS[id];
+  const s = CONFIG.sceneById[id], p = CONFIG.playById[s.play];
+  if (!p.track) { const per = 60 / CONFIG.bpm, n = Math.ceil(s.dur / per); return GRIDS[id] = { beats: Array.from({ length: n }, (_, i) => i * per), bars: Array.from({ length: Math.ceil(n / 4) }, (_, i) => i * per * 4) }; }
+  const d = BEATS[p.track], off = p.from + (s.start - p.start), loc = arr => arr.map(x => +(x - off).toFixed(3)).filter(x => x >= -1e-3 && x < s.dur);
+  return GRIDS[id] = { beats: loc(d.beats), bars: loc(d.down) };
+}
+
+/* ---------- split-flap ---------- */
+const FLAP = {
+  CH: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+  /** estado da placa i no instante t: frases (já com o mesmo comprimento) trocam nos tempos `times` */
+  state(i, t, phrases, times, step = .055) {
+    let k = -1; times.forEach((t0, j) => { if (t >= t0) k = j; });
+    if (k < 0) return { cur: ' ', nxt: ' ', q: 0, k };
+    const target = phrases[k][i] || ' ', prev = k <= 0 ? ' ' : (phrases[k - 1][i] || ' ');
+    const start = times[k] + i * .03, dur = prev === target ? 0 : .25 + hash(i * 7 + k) * .4;
+    if (t < start) return { cur: prev, nxt: prev, q: 0, k: k - 1 };
+    if (t >= start + dur) return { cur: target, nxt: target, q: 0, k };
+    const f = (t - start) / step, n = Math.floor(f), last = Math.floor(dur / step);
+    const rc = m => (m <= 0 ? prev : m >= last ? target : FLAP.CH[Math.floor(hash(i * 31 + k * 7 + m) * FLAP.CH.length)]);
+    return { cur: rc(n), nxt: rc(n + 1), q: f - n, k };
+  },
+  tile(ctx, x, y, w, h, st, hi, glowA = 0) {
+    const mid = y + h / 2, col = hi ? C.orange : '#F6EDDD', fnt = font(h * .66, 900);
+    paper(ctx, x, y, w, h, { r: Math.max(3, h * .07), fill: '#1F1A15', outline: '#000', shadow: Math.max(2, h * .045), shadowColor: '#000', lw: Math.max(1.5, h * .018) });
+    if (glowA > 0 && hi) glow(ctx, x + w / 2, mid, w * 1.2, C.orange, .35 * glowA);
+    const ch = (c, top) => { ctx.save(); ctx.beginPath(); ctx.rect(x, top ? y : mid, w, h / 2); ctx.clip(); ctx.font = fnt; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = col; ctx.fillText(c, x + w / 2, mid + h * .03); ctx.restore(); };
+    ch(st.nxt, true); ch(st.cur, false);
+    if (st.q > 0 && st.cur !== st.nxt) {
+      ctx.save(); ctx.translate(0, mid);
+      if (st.q < .5) { ctx.scale(1, 1 - st.q * 2); ctx.translate(0, -mid); ctx.fillStyle = '#26201A'; ctx.fillRect(x + 2, y + 2, w - 4, h / 2 - 2); ch(st.cur, true); }
+      else { ctx.scale(1, (st.q - .5) * 2); ctx.translate(0, -mid); ctx.fillStyle = '#26201A'; ctx.fillRect(x + 2, mid, w - 4, h / 2 - 2); ch(st.nxt, false); }
+      ctx.restore();
+    }
+    line(ctx, x + 2, mid, x + w - 2, mid, 'rgba(0,0,0,.85)', Math.max(1.5, h * .025));
+  },
+  /** letreiro inteiro: frases trocando nos tempos `times`, a partir da placa `hiFrom[k]` em laranja */
+  board(ctx, cx, cy, phrases, times, t, o = {}) {
+    const len = Math.max(...phrases.map(s => s.length)), ph = phrases.map(s => s.padEnd(len, ' '));
+    const tw = o.tw || 60, th = o.th || tw * 1.45, gap = o.gap == null ? tw * .1 : o.gap, bw = len * (tw + gap) - gap, bx = cx - bw / 2, pad = tw * .4;
+    paper(ctx, bx - pad, cy - th / 2 - pad - (o.header ? th * .45 : 0), bw + pad * 2, th + pad * 2 + (o.header ? th * .45 : 0), { r: tw * .25, fill: '#14110E', outline: '#000', shadow: tw * .15, shadowColor: '#000', lw: 3 });
+    if (o.header) { ctx.save(); ctx.translate(bx + o.header.length * th * .11 + 10, cy - th / 2 - th * .3); ctx.rotate(-.015);
+      const hw = measure(ctx, o.header, th * .2, 800, true, 3) + th * .4; paper(ctx, -hw / 2, -th * .16, hw, th * .32, { r: 4, fill: o.headerCol || C.red, shadow: 3, shadowColor: '#000', lw: 2 });
+      text(ctx, o.header, 0, 1, { size: th * .2, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 3 }); ctx.restore(); }
+    for (let i = 0; i < len; i++) { const s = FLAP.state(i, t, ph, times), k = Math.max(0, s.k); FLAP.tile(ctx, bx + i * (tw + gap), cy - th / 2, tw, th, s, o.hiFrom ? i >= o.hiFrom[k] && s.cur !== ' ' : false, o.glowA || 0); }
+    return { x: bx - pad, y: cy - th / 2 - pad, w: bw + pad * 2, h: th + pad * 2 };
+  }
+};
+
+/* ---------- mapa do metrô ---------- */
+/** quebra um rótulo em duas linhas no espaço mais perto do meio */
+function twoLines(s) { const sp = [...s].map((c, i) => c === ' ' ? i : -1).filter(i => i > 0); if (!sp.length) return s; const m = sp.reduce((a, b) => Math.abs(b - s.length / 2) < Math.abs(a - s.length / 2) ? b : a); return s.slice(0, m) + '\n' + s.slice(m + 1); }
+// nós: partida, 01, 02, 03, parada 1, 04, 05, 06, parada 2, 07, e a linha seguindo para o futuro
+const MAP = (() => {
+  const nodes = [
+    { k: 'start', x: 170, y: 300 }, { k: 1, x: 430, y: 300 }, { k: 2, x: 700, y: 300 }, { k: 3, x: 970, y: 300 }, { k: 'p1', x: 1290, y: 300 },
+    { k: 4, x: 1290, y: 600 }, { k: 5, x: 1000, y: 600 }, { k: 6, x: 710, y: 600 }, { k: 'p2', x: 420, y: 600 },
+    { k: 7, x: 560, y: 880 }, { k: 'end', x: 980, y: 880 }
+  ];
+  // caminho: retas entre nós + curvas nas viradas
+  const path = [[170, 300], [1290, 300], [1560, 300], [1660, 380], [1660, 520], [1560, 600], [420, 600], [260, 600], [180, 680], [180, 800], [260, 880], [980, 880]];
+  const seg = []; let L = 0;
+  for (let i = 1; i < path.length; i++) { const [x0, y0] = path[i - 1], [x1, y1] = path[i], l = Math.hypot(x1 - x0, y1 - y0); seg.push({ x0, y0, x1, y1, l, a: L }); L += l; }
+  const at = u => { const d = clamp(u) * L; for (const s of seg) if (d <= s.a + s.l) { const f = (d - s.a) / s.l; return [lerp(s.x0, s.x1, f), lerp(s.y0, s.y1, f)]; } const s = seg[seg.length - 1]; return [s.x1, s.y1]; };
+  const uOf = (x, y) => { let best = 0, bd = 1e9; for (const s of seg) for (let f = 0; f <= 1; f += .02) { const px = lerp(s.x0, s.x1, f), py = lerp(s.y0, s.y1, f), d = Math.hypot(px - x, py - y); if (d < bd) { bd = d; best = (s.a + f * s.l) / L; } } return best; };
+  nodes.forEach(n => { n.u = uOf(n.x, n.y); });
+  const colAt = u => u < nodes[4].u ? C.red : u < nodes[8].u ? C.orange : C.yellow;
+  return { nodes, path, L, at, colAt, node: k => nodes.find(n => n.k === k) };
+})();
+
+/** mapa completo: reveal = quanto da linha já foi traçada (0–1) · hi = nó em destaque · train = posição do trem (0–1) */
+function metroMap(ctx, t, o = {}) {
+  const rev = o.reveal == null ? 1 : o.reveal, hi = o.hi, A = o.alpha == null ? 1 : o.alpha; if (A <= 0) return;
+  ctx.save(); ctx.globalAlpha *= A;
+  // linha: contorno de tinta + cor do trecho, desenhada até `rev`
+  const drawLine = (lw, colFn) => {
+    const steps = 220; let prev = MAP.at(0);
+    for (let s = 1; s <= steps; s++) { const u = s / steps; if (u > rev + 1e-6) break; const p = MAP.at(u);
+      ctx.beginPath(); ctx.moveTo(prev[0], prev[1]); ctx.lineTo(p[0], p[1]); ctx.strokeStyle = colFn(u); ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke(); prev = p; }
+  };
+  ctx.save(); ctx.translate(6, 8); drawLine(38, () => 'rgba(0,0,0,.55)'); ctx.restore();
+  drawLine(38, () => INK); drawLine(24, u => MAP.colAt(u));
+  // trecho final pontilhado rumo ao futuro
+  if (rev >= .999 && o.future !== false) { ctx.save(); ctx.setLineDash([16, 18]); ctx.lineDashOffset = -t * 40; line(ctx, 1010, 880, 1760, 880, rgba(C.yellow, .8), 10); ctx.restore();
+    text(ctx, 'FUTURO →', 1700, 840, { size: 22, weight: 800, mono: true, color: C.yellow, align: 'right', ls: 3, alpha: .9 }); }
+  // estações e baldeações
+  MAP.nodes.forEach(n => {
+    if (n.k === 'start' || n.k === 'end') return;
+    const show = E.outBack(clamp((rev - n.u) * 14 + .3)); if (show <= 0) return;
+    const isHi = hi === n.k, pulse = isHi ? 1 + .08 * Math.sin(t * 5) : 1;
+    ctx.save(); ctx.translate(n.x, n.y); ctx.scale(show * pulse, show * pulse);
+    if (typeof n.k === 'string') intersection(ctx, 0, 0, 30, 36, { hot: isHi ? .6 : 0 });
+    else { circle(ctx, 4, 5, 26, 'rgba(0,0,0,.6)'); circle(ctx, 0, 0, 26, isHi ? C.yellow : '#FFF8EE'); inkCircle(ctx, 0, 0, 26, 6, n.k);
+      text(ctx, TX.stations[n.k - 1].n, 0, 1, { size: 20, weight: 900, color: INK, align: 'center' }); }
+    ctx.restore();
+    if (isHi) glow(ctx, n.x, n.y, 120, C.orange, .45);
+    // rótulo
+    const la = clamp((rev - n.u) * 10); if (la <= 0) return;
+    const above = n.y < 450 ? -1 : 1, ly = n.y + above * (typeof n.k === 'string' ? 56 : 74);
+    if (typeof n.k === 'string') text(ctx, TX.stop.label, n.x, ly, { size: 22, weight: 800, mono: true, color: C.yellow, align: 'center', ls: 3, alpha: la });
+    else { const st = TX.stations[n.k - 1]; text(ctx, twoLines(st.short), n.x, ly, { size: isHi ? 26 : 22, weight: 900, color: isHi ? '#FFF' : '#EBDFCF', align: 'center', ls: .5, alpha: la, lh: 1.05 }); }
+  });
+  // trem (ponto laranja com brilho)
+  if (o.train != null) { const [x, y] = MAP.at(o.train); glow(ctx, x, y, 90, C.orange, .6); circle(ctx, x, y, 16, C.orange); inkCircle(ctx, x, y, 16, 4, 77); circle(ctx, x - 5, y - 5, 4, '#FFE0C0'); }
+  ctx.restore();
+}
+
+/** mini-mapa no canto durante os trechos: 7 estações + 2 baldeações, trem andando */
+function miniMap(ctx, T, a = 1) {
+  if (a <= 0) return;
+  const seq = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7], x0 = 64, x1 = 520, y = 62, dx = (x1 - x0) / (seq.length - 1);
+  const k = stationAt(T), s = sceneAt(T);
+  // posição do trem: índice da estação atual + progresso na estação
+  const order = seq.indexOf(k), ks = CONFIG.stationStart[k] || 0, ke = k < 7 ? (CONFIG.stationStart[k + 1] || CONFIG.duration) : CONFIG.duration;
+  const prog = clamp((T - ks) / (ke - ks)), pos = order < 0 ? 0 : order + prog * (k === 3 || k === 6 ? 1 : (k === 7 ? .9 : 1));
+  ctx.save(); ctx.globalAlpha *= a;
+  rr(ctx, x0 - 34, y - 30, x1 - x0 + 68, 60, 30); ctx.fillStyle = 'rgba(14,11,9,.62)'; ctx.fill();
+  for (let i = 0; i < seq.length - 1; i++) line(ctx, x0 + i * dx, y, x0 + (i + 1) * dx, y, i < 3 ? C.red : i < 7 ? C.orange : C.yellow, 8);
+  seq.forEach((n, i) => { const x = x0 + i * dx;
+    if (typeof n === 'string') { circle(ctx, x - 5, y, 9, C.red, INK, 2); circle(ctx, x + 5, y, 9, C.yellow, INK, 2); }
+    else { const cur = n === k; circle(ctx, x, y, cur ? 13 : 9, cur ? C.yellow : '#FFF8EE', INK, 2.5); if (cur) text(ctx, TX.stations[n - 1].n, x, y + 1, { size: 12, weight: 900, color: INK, align: 'center' }); } });
+  const tx = x0 + pos * dx; glow(ctx, tx, y, 40, C.orange, .55 + .3 * BT.beat); circle(ctx, tx, y, 7 + 2 * BT.beat, C.orange, '#FFF', 2);
+  if (k) text(ctx, TX.stations[k - 1].short, x1 + 48, y + 1, { size: 15, weight: 800, mono: true, color: '#FFF', ls: 2, alpha: .9 });
+  ctx.restore();
+}
+
+/** letreiro da estação: desce no início de cada estação, vira as placas e sobe para o mini-mapa */
+function stationBoard(ctx, T) {
+  for (let k = 1; k <= 7; k++) {
+    const Ts = CONFIG.stationStart[k]; if (Ts == null || T < Ts || T > Ts + 4) continue;
+    const t = T - Ts, st = TX.stations[k - 1], ph = [`${st.n} ${st.short}`];
+    const din = E.outBack(P(t, 0, .5)), dout = E.inCubic(P(t, 3.3, .6));
+    const y = lerp(-120, 118, din) - 200 * dout, s = lerp(1, .5, dout);
+    ctx.save(); ctx.globalAlpha *= 1 - dout; ctx.translate(W / 2, y); ctx.scale(s, s);
+    FLAP.board(ctx, 0, 0, ph, [.15], t, { tw: 40, th: 58, hiFrom: [3], header: `ESTAÇÃO ${st.n}`, headerCol: C.red });
+    const title = (SEC(k).title || st.short), pa = P(t, .9, .4);
+    if (pa > 0) { ctx.save(); ctx.globalAlpha *= pa; ctx.translate(0, 70 + (1 - E.outBack(pa)) * 20); ctx.rotate(-.01);
+      const tw = measure(ctx, title, 26, 800) + 60; paper(ctx, -tw / 2, -22, tw, 44, { torn: true, seed: 40 + k, fill: PAPER, shadow: 5, shadowColor: '#000', lw: 2.5 });
+      text(ctx, title, 0, 1, { size: 26, weight: 800, color: INK, align: 'center' }); ctx.restore(); }
+    ctx.restore();
+  }
+}
+// "plim-plom" de metrô e o tac-tac das placas a cada estação
+CONFIG.scenes.forEach(s => {
+  if (!s.station || CONFIG.stationStart[s.station] !== s.start) return;
+  cue(s.id, 0, 'chime', { f: 987.8, up: -4 }); cue(s.id, .18, 'type', { n: 14, gap: .028 });
+});
+
+/** sobreposição dos trechos: mini-mapa (depois da abertura) + letreiro de estação */
+function overlayPlay(ctx, T, s) {
+  if (s.play > 1) miniMap(ctx, T, P(T, CONFIG.playById[2].start, .6) * (SCENES[s.id] && SCENES[s.id].hideMap ? .0 : 1));
+  stationBoard(ctx, T);
+}
+
+/* ---------- plataforma das paradas ---------- */
+function platform(ctx, tl, o = {}) {
+  ctx.fillStyle = '#17120F'; ctx.fillRect(0, 0, W, H);
+  // azulejos de metrô (tijolinho) pintados à mão
+  const r = rng(o.seed || 5), tw = 120, th = 58;
+  for (let row = 0; row * th < 860; row++) for (let c = -1; c * tw < W + tw; c++) {
+    const x = c * tw + (row % 2 ? tw / 2 : 0), y = row * th + 40, v = r();
+    rr(ctx, x + 3, y + 3, tw - 6, th - 6, 6); ctx.fillStyle = v < .08 ? '#3A2A1E' : v < .16 ? '#2B2420' : '#231D19'; ctx.fill();
+  }
+  ctx.save(); ctx.globalAlpha = .18; ctx.drawImage(SHADE, 0, 0, W, 900); ctx.restore();
+  // faixa de neon que respira
+  const br = BT.breath == null ? .5 : BT.breath;
+  ctx.save(); ctx.shadowColor = C.orange; ctx.shadowBlur = 30 + 20 * br; line(ctx, 60, 70, W - 60, 70, rgba('#FFB070', .75 + .25 * br), 6); ctx.restore();
+  // placa esmaltada com o nome da parada
+  if (o.sign) { const sw = measure(ctx, o.sign, 34, 900, false, 4) + 180;
+    paper(ctx, W / 2 - sw / 2, 104, sw, 76, { r: 14, fill: '#F3EBDD', shadow: 8, shadowColor: '#000', lw: 4 });
+    intersection(ctx, W / 2 - sw / 2 + 62, 142, 20, 24);
+    text(ctx, o.sign, W / 2 + 34, 143, { size: 34, weight: 900, color: INK, align: 'center', ls: 4 }); }
+  // chão da plataforma com a faixa amarela de segurança
+  const fy = 900; ctx.fillStyle = '#0F0C0A'; ctx.fillRect(0, fy, W, H - fy);
+  ctx.fillStyle = C.yellow; for (let x = 0; x < W; x += 60) { ctx.save(); ctx.translate(x, fy + 16); ctx.transform(1, 0, -.5, 1, 0, 0); ctx.fillRect(0, 0, 36, 22); ctx.restore(); }
+  line(ctx, 0, fy, W, fy, INK, 6);
+  // grafites que respiram nas paredes
+  (o.doodles || []).forEach((d, i) => scribble(ctx, d[0], d[1], d[2], d[3], d[4] || C.orange, 300 + i, 1, { rot: d[5] || 0, alpha: .55 + .2 * Math.sin(tl * 1.3 + i), glow: true }));
+}
+/** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
+const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz
+function poster(ctx, x, y, w, h, n, tl, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0);
+  paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 60 + n, amp: 3, fill: '#F6EEDF', shadow: 14, shadowColor: '#000', lw: 4, halftone: .05, tape: [[.15, 0, -.4], [.85, 0, .35]] });
+  const st = TX.stations[n - 1];
+  rr(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 74, 8); ctx.fillStyle = n <= 3 ? C.red : n <= 6 ? C.orange : C.yellow; ctx.fill(); inkRect(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 74, 8, 3, n);
+  retroText(ctx, st.n, -w / 2 + 54, -h / 2 + 63, { size: 46, weight: 900, color: '#FFF', depth: 3, lw: 3 });
+  text(ctx, st.short, -w / 2 + 120, -h / 2 + 63, { size: Math.min(26, (w - 170) / st.short.length * 1.7), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
+  ctx.save(); ctx.translate(0, 40); ctx.beginPath(); ctx.rect(-w / 2 + 20, -h / 2 + 70, w - 40, h - 120); ctx.clip();
+  if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, SEC(n).title || st.short, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
+  ctx.restore(); ctx.restore();
+}
+/** parada de retomada: plataforma + 3 cartazes; item 0 = visão geral, item k = zoom no cartaz k */
+function recapStop(ctx, tl, item, prevItem, p, o) {
+  const views = [{ x: W / 2, y: H / 2, s: 1 }, ...o.posters.map((n, i) => ({ x: 360 + i * 600, y: 540, s: 1.52 }))];
+  const e = E.inOutCubic(p), a = views[Math.min(prevItem, views.length - 1)], b = views[Math.min(item, views.length - 1)];
+  const vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e) * (1 + .006 * Math.sin(tl * .7));
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
+  platform(ctx, tl, { sign: o.sign, doodles: o.doodles });
+  o.posters.forEach((n, i) => poster(ctx, 360 + i * 600, 560, 500, 640, n, tl, { rot: [-.02, .012, -.01][i] }));
+  ctx.restore();
+  // entrada: o último quadro do trecho se dissolve na plataforma
+  if (o.from != null && tl < 1.4) { ctx.save(); ctx.globalAlpha = 1 - E.inOutCubic(tl / 1.4); const z = 1 + tl * .25; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); }
+  hint(ctx, tl, item === views.length - 1 ? TX.stop.go : '→', item);
+}
+/** dica discreta para quem apresenta (canto inferior direito) */
+function hint(ctx, tl, label, item) {
+  const a = .35 + .25 * Math.sin(tl * 2.4); text(ctx, label, W - 60, H - 46, { size: 20, weight: 700, mono: true, color: '#FFF', align: 'right', ls: 2, alpha: a });
+}
+
+/* ---------- cases: régua, comprovante ---------- */
+/** régua Problema → Solução → Insight → Impacto; step = etapa atual (0–3), p = progresso da etapa */
+function caseRuler(ctx, step, p, o = {}) {
+  const labels = TX.caseSteps, x0 = o.x == null ? W / 2 - 560 : o.x, w = o.w || 1120, y = o.y || 1010, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
+  if (A <= 0) return;
+  ctx.save(); ctx.globalAlpha *= A;
+  line(ctx, x0, y, x0 + w, y, 'rgba(255,255,255,.25)', 6); line(ctx, x0, y, x0 + dx * clamp(step + p, 0, labels.length - 1), y, C.orange, 6);
+  labels.forEach((l, i) => { const x = x0 + i * dx, done = i < step, cur = i === Math.floor(step);
+    circle(ctx, x, y, cur ? 15 + 3 * BT.beat : 11, done ? C.yellow : cur ? C.orange : '#3A322B', INK, 3);
+    if (done) icon(ctx, 'check', x, y, 16, INK, 6);
+    text(ctx, l, x, y - 30, { size: cur ? 18 : 15, weight: 800, mono: true, color: cur ? '#FFF' : '#BFB3A3', align: 'center', ls: 2 }); });
+  ctx.restore();
+}
+/** comprovante de maquininha: linhas impressas de cima para baixo + número-manchete e carimbo ✓ */
+function receipt(ctx, x, y, o) {
+  const w = o.w || 400, lines = o.lines || [], lh = 30, h = 120 + lines.length * lh + (o.headline ? 150 : 0), p = clamp(o.p == null ? 1 : o.p);
+  if (p <= 0) return;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0);
+  const vis = h * p; ctx.beginPath(); ctx.rect(-w / 2 - 20, -30, w + 40, vis + 40); ctx.clip();
+  // papel térmico com borda serrilhada
+  const tooth = 14; ctx.beginPath(); ctx.moveTo(-w / 2, 0); ctx.lineTo(w / 2, 0); ctx.lineTo(w / 2, h);
+  for (let k = 0; k <= w / tooth; k++) ctx.lineTo(w / 2 - k * tooth, h + (k % 2 ? 0 : 10)); ctx.closePath();
+  ctx.save(); ctx.translate(8, 10); ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fill(); ctx.restore(); ctx.fillStyle = '#FBF7EF'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
+  text(ctx, o.title || 'COMPROVANTE DE IMPACTO', 0, 34, { size: 18, weight: 800, mono: true, color: INK, align: 'center', ls: 3 });
+  line(ctx, -w / 2 + 20, 56, w / 2 - 20, 56, INK, 2, [6, 6]);
+  lines.forEach((l, i) => { const ly = 80 + i * lh; text(ctx, l[0], -w / 2 + 24, ly, { size: 17, weight: 600, mono: true, color: '#3A332C' }); if (l[1] != null) text(ctx, l[1], w / 2 - 24, ly, { size: 17, weight: 800, mono: true, color: INK, align: 'right' }); });
+  if (o.headline) { const hy = 96 + lines.length * lh; line(ctx, -w / 2 + 20, hy, w / 2 - 20, hy, INK, 2, [6, 6]);
+    retroText(ctx, o.headline, 0, hy + 62, { size: o.hlSize || 64, weight: 900, color: C.orange, align: 'center', depth: 4, lw: 3 });
+    if (o.hlLabel) text(ctx, o.hlLabel, 0, hy + 116, { size: 16, weight: 700, mono: true, color: '#3A332C', align: 'center' }); }
+  ctx.restore();
+}
+
+/* ===== 20-open.js ===== */
+/* ============================================================================
+   20. PRÉ-SHOW · ABERTURA · PARADA 0 (mapa da linha)
+   ========================================================================== */
+
+/* ---------- pré-show (loop de espera) ---------- */
+STOPSCN.preshow = {
+  draw(ctx, tl) {
+    bgDark(ctx, tl, { centerA: .85, center: '#2E2016' });
+    collage(ctx, tl * .6, { seed: 17, n: 7, theme: 'dark', alpha: .7 });
+    const br = BT.breath, ctxTitle = (DATA.presentation_context || {});
+    // grafites respirando ao redor
+    [['star', 300, 250, 90, C.yellow], ['arrow', 1600, 300, 120, C.orange], ['spiral', 1660, 820, 90, C.red], ['crown', 260, 820, 100, C.orange], ['zigzag', 960, 960, 160, C.yellow]]
+      .forEach(([k, x, y, s, c], i) => scribble(ctx, k, x, y, s, c, 400 + i, 1, { alpha: .5 + .3 * Math.sin(tl * 1.1 + i), glow: true, rot: Math.sin(tl * .4 + i) * .1 }));
+    intersection(ctx, W / 2, 285, 92, 120, { hot: .25 + .25 * br });
+    paintTitle(ctx, 'PERFORMANCE ANALYTICS', W / 2, 520, { size: 104, bg: C.orange, seed: 7, p: 1 });
+    text(ctx, (ctxTitle.organization || 'Mastercard Advisors').toUpperCase() + '  ·  ' + TX.line, W / 2, 625, { size: 24, weight: 800, mono: true, color: '#F3E6D6', align: 'center', ls: 4 });
+    const tt = tl % 16, ph = [TX.line, TX.stop.preshow, TX.line].map(s => s.padEnd(27, ' '));
+    FLAP.board(ctx, W / 2, 790, ph, [-100, .4, 8.4], tt, { tw: 46, th: 66, hiFrom: [0, 0, 0] });
+    glow(ctx, W / 2, 285, 300, C.orange, .25 + .2 * br);
+    hint(ctx, tl, '→  para começar');
+    scanlines(ctx, .05);
+  }
+};
+
+/* ---------- abertura (15s, trilha sintetizada a 120 BPM; drop em 4.5) ---------- */
+(() => {
+  const id = 'open', SL = [4.5, 5.5, 6.5, 7.5, 9.0], COLS = [C.red, C.yellow, C.orange, '#F3EBDD', C.orange];
+  const T_KICK = 1.0, T_DROP = 4.5, T_POSTER = 10.5, T_GO = 12.5;
+  cue(id, T_KICK, 'pop', { p: 1.1 }); cue(id, T_DROP, 'impact', { size: 1.2 });
+  SL.forEach((t0, i) => cue(id, t0, 'hit', { size: i === 4 ? .9 : .45 }));
+  cue(id, SL[4] + .3, 'riser', { dur: .9, v: .2 }); cue(id, T_GO, 'whoosh', { dur: 1.4, v: .4 }); cue(id, 14.2, 'chime', { f: 784, up: 7 });
+  const DOOD = [['zigzag', 260, 230, 140, C.yellow], ['star', 1650, 220, 110, C.orange], ['arrow', 1580, 880, 150, C.red], ['spiral', 300, 860, 110, C.orange], ['crown', 1700, 560, 110, C.yellow], ['x', 200, 560, 80, C.red]];
+
+  SCENES[id] = {
+    themeAt: () => 'dark',
+    draw(ctx, t) {
+      const go = E.inOutCubic(P(t, T_GO, 2.3)), b = BT;
+      bgDark(ctx, t, { centerA: .9, center: '#33200F' });
+      collage(ctx, t, { seed: 23, n: 8, theme: 'dark', alpha: .75 * (1 - go) });
+      // respingos do drop
+      if (t >= T_DROP) [[420, 300, 120, C.orange], [1500, 380, 150, C.red], [1240, 820, 110, C.yellow], [620, 860, 90, C.red]]
+        .forEach(([x, y, r, c], i) => splat(ctx, x, y, r * (1 + .06 * b.low), c, 50 + i, E.outBack(P(t, T_DROP + i * .06, .3)), .75 * (1 - go)));
+      // rabiscos que se desenham na subida e vibram com a batida
+      DOOD.forEach(([k, x, y, s, c], i) => scribble(ctx, k, x, y, s * (1 + .08 * b.beat), c, 90 + i, P(t, 2.5 + i * .3, .6), { alpha: .8 * (1 - go), glow: true, rot: .1 * Math.sin(t + i) }));
+      // ponto laranja que pulsa até o drop
+      const pre = 1 - P(t, T_DROP - .2, .3);
+      if (pre > 0) { const r = 22 + 10 * Math.sin(t * 6) * P(t, 2.5, 2) + 40 * P(t, 2.5, 2, E.inQuad);
+        glow(ctx, W / 2, H / 2, r * 6, C.orange, .6 * pre); circle(ctx, W / 2, H / 2, r * pre, C.orange); inkCircle(ctx, W / 2, H / 2, r * pre, 5, 3); }
+      // kicker
+      const kp = E.outBack(P(t, T_KICK, .4));
+      if (kp > 0) { ctx.save(); ctx.globalAlpha *= 1 - go; ctx.translate(W / 2, lerp(H / 2 - 120, 210, P(t, T_DROP - .3, .5, E.inOutCubic))); ctx.rotate(-.03); ctx.scale(kp, kp);
+        const kw = measure(ctx, TX.hookKicker, 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
+        text(ctx, TX.hookKicker, 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
+      // as 5 tiras batem no tempo
+      TX.hook.forEach((s, i) => {
+        const p = P(t, SL[i], .28), big = i === 4; if (p <= 0) return;
+        const y0 = 330 + i * 112 + (big ? 22 : 0), size = big ? 104 : 74, w = measure(ctx, s, size, 900) + 120, rot = [-.02, .015, -.012, .02, -.025][i];
+        const sl = E.outBack(p), x = W / 2 + (1 - E.outExpo(p)) * (i % 2 ? 900 : -900);
+        ctx.save(); ctx.globalAlpha *= 1 - (big ? E.inCubic(P(t, T_GO + .6, 1.2)) : go); ctx.translate(x, y0); ctx.rotate(rot); ctx.scale(lerp(1.35, 1, sl), lerp(1.35, 1, sl));
+        const vib = 1 + .02 * b.beat * (i === b.i % 5 ? 2 : 1); ctx.scale(vib, vib);
+        brush(ctx, -w / 2, -size * .62, w, size * 1.24, COLS[i], 11 + i, 1);
+        inkRect(ctx, -w / 2 - 4, -size * .66, w + 8, size * 1.32, 6, 3, i);
+        const light = i === 1 || i === 3; retroText(ctx, s, 0, 0, light ? { size, weight: 900, color: INK, align: 'center', depth: 0, lw: 0 } : { size, weight: 900, color: '#FFF', outline: INK, align: 'center', depth: 5, lw: 4 });
+        ctx.restore();
+      });
+      // marcador laranja circulando "Gerar valor" → vira o trem
+      const mk = P(t, SL[4] + .3, .8), y4 = 330 + 4 * 112 + 22;
+      if (mk > 0) {
+        const fly = go, cx = lerp(W / 2, MAP.at(0)[0], fly), cy = lerp(y4, MAP.at(0)[1], fly), sc = lerp(1, .05, E.inQuad(fly));
+        ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc * .4); scribble(ctx, 'circle', 0, 0, 640, C.orange, 7, mk, { lw: .028, glow: true }); ctx.restore();
+        if (fly > .85) { const a = (fly - .85) / .15; glow(ctx, cx, cy, 90, C.orange, .6 * a); circle(ctx, cx, cy, 16 * a, C.orange); inkCircle(ctx, cx, cy, 16 * a, 4, 77); }
+      }
+      // o mapa começa a ser traçado
+      if (go > .5) metroMap(ctx, t, { reveal: .12 * E.inOutCubic((go - .5) * 2), alpha: clamp((go - .5) * 3), future: false });
+      scanlines(ctx, .05);
+    }
+  };
+})();
+
+/* ---------- parada 0: o mapa da linha (roteiro) ---------- */
+STOPSCN.stop0 = (() => {
+  const SEQ = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7];
+  const view = item => {
+    if (!item) return { x: W / 2, y: H / 2, s: 1 };
+    const n = MAP.node(SEQ[item - 1]); return { x: lerp(W / 2, n.x, .62), y: lerp(H / 2, n.y, .62), s: 1.24 };
+  };
+  function infoCard(ctx, k, a, tl) {
+    if (a <= 0) return;
+    const n = MAP.node(k), isStop = typeof k === 'string', st = isStop ? null : TX.stations[k - 1];
+    const title = isStop ? TX.stop.label : (SEC(k).title || st.short), sub = isStop ? TX.stop.talkStop : st.teaser;
+    const w = Math.max(measure(ctx, title, 30, 900), measure(ctx, sub, 22, 600)) + 80, h = 120;
+    const x = clamp(n.x - w / 2, 40, W - w - 40), y = n.y + (n.y > 700 ? -h - 70 : n.y < 450 ? 70 : 64);
+    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 30); ctx.rotate(Math.sin(tl * .8) * .01 - .01);
+    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 70, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3, tape: [[.5, 0, .1]] });
+    if (!isStop) { retroText(ctx, st.n, -w / 2 + 34, -18, { size: 30, weight: 900, color: C.orange, depth: 2, lw: 2 }); }
+    text(ctx, title, isStop ? 0 : -w / 2 + (isStop ? 40 : 84), -18, { size: 30, weight: 900, color: INK, align: isStop ? 'center' : 'left' });
+    text(ctx, sub, isStop ? 0 : -w / 2 + 40, 26, { size: 22, weight: 600, color: '#4A4038', align: isStop ? 'center' : 'left' });
+    ctx.restore();
+  }
+  return {
+    draw(ctx, tl, item, prevItem, p) {
+      const e = E.inOutCubic(p), a = view(prevItem), b = view(item), vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e);
+      bgDark(ctx, tl, { centerA: .9, center: '#33200F' });
+      collage(ctx, tl * .5, { seed: 31, n: 6, theme: 'dark', alpha: .55 * P(tl, .2, 1.5) });
+      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
+      const rev = lerp(.12, 1, E.inOutCubic(P(tl, 0, 2.4)));
+      glow(ctx, 960, 590, 900, C.orange, .12 + .05 * BT.breath);
+      metroMap(ctx, tl, { reveal: rev, hi: item ? SEQ[item - 1] : null, train: 0 });
+      if (item) infoCard(ctx, SEQ[item - 1], E.outCubic(p), tl);
+      if (prevItem && prevItem !== item) infoCard(ctx, SEQ[prevItem - 1], 1 - E.outCubic(p * 1.6), tl);
+      ctx.restore();
+      const ba = (1 - E.inOutCubic(item ? (prevItem ? 1 : p) : (prevItem ? 1 - p : 0))) * E.outCubic(P(tl, 0, .6));
+      if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 112 - 40 * (1 - ba), [TX.line], [.3], tl, { tw: 40, th: 58, hiFrom: [5] }); ctx.restore(); }
+      hint(ctx, tl, item === 9 ? TX.stop.go : '→');
+      scanlines(ctx, .05);
+    }
+  };
+})();
+
 /* ===== 90-player.js ===== */
 /* ============================================================================
    9. PLAYER — modo apresentação
@@ -2108,10 +2656,10 @@ const PLAYER = (() => {
   }
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
-  function frameAt(c, T) { const s = sceneAt(T); const keep = BT; BT = BEAT.at(T); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); BT = keep; }
+  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
 
   function renderPlay(T) {
-    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T);
+    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
     const s = sceneAt(T), t = T - s.start, sh = shakeAt(T), fx = typeof FX !== 'undefined';
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.save(); ctx.translate(sh.x, sh.y); ctx.translate(W / 2, H / 2); ctx.rotate(sh.r);
@@ -2125,7 +2673,7 @@ const PLAYER = (() => {
     grain(ctx, T);
   }
   function renderStop(id, tl, item, prevItem, p) {
-    BT = BEAT.idle(tl);
+    BT = BEAT.idle(tl); NOW = tl;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     const impl = STOPSCN[id];
     if (impl) impl.draw(ctx, tl, item, prevItem, p);
