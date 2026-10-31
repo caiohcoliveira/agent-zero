@@ -223,7 +223,7 @@ function hint(ctx, tl, label, item) {
 /* ---------- cases: régua, comprovante ---------- */
 /** régua das etapas do case (canto superior direito); step = etapa atual, p = progresso da etapa */
 function caseRuler(ctx, step, p, o = {}) {
-  const labels = TX.caseSteps, x0 = o.x == null ? W - 700 : o.x, w = o.w || 600, y = o.y || 58, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
+  const labels = o.labels || TX.caseSteps, x0 = o.x == null ? W - 700 : o.x, w = o.w || 600, y = o.y || 58, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
   if (A <= 0) return;
   ctx.save(); ctx.globalAlpha *= A;
   line(ctx, x0, y, x0 + w, y, 'rgba(255,255,255,.25)', 6); line(ctx, x0, y, x0 + dx * clamp(step + p, 0, labels.length - 1), y, C.orange, 6);

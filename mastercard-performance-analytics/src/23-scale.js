@@ -11,7 +11,7 @@ function ptScale(s) {
 /* ---------- 05 · Scaling Our Impact Through Data, AI & Innovation ---------- */
 (() => {
   const id = 's05', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
-  const T_STEP = [bt(1), bt(2), bt(3), bt(4)], T_GLOW = bt(5), T_KEY = bt(6);
+  const T_STEP = [.5, bt(1), bt(2), bt(3)], T_GLOW = bt(4), T_KEY = bt(4) + .7;
   const EX = () => {
     const ex = SEC(5).innovation_examples || [], f = re => ex.find(e => re.test(e.example || '')) || {};
     return [[{ name: 'planilhas · retrabalho', ind: 'insights escritos à mão' }], [{ name: 'Cliente Banana', ind: ptScale(f(/Banana/).scale_indicator) }],
@@ -22,6 +22,9 @@ function ptScale(s) {
 
   SCENES[id] = {
     themeAt: () => 'dark',
+    peaks: [[T_GLOW - .1, T_GLOW + 1.2, .6]],
+    caps: [[.8, T_GLOW - .2, 'Como escalamos: do trabalho manual a *ativos de IA* que rodam sozinhos', 'ESCALA'],
+      [T_GLOW + .1, 13.4, 'Cada degrau leva o mesmo time a *mais clientes* — com o dado protegido', 'ESCALA']],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .85, center: '#2A170C' });
       const gl = P(t, T_GLOW, 1);
@@ -69,6 +72,8 @@ function ptScale(s) {
 (() => {
   const id = 's06', G = grid(id), B = G.bars, bt = k => (B[k] != null ? B[k] : B[B.length - 1] + (k - B.length + 1) * 2.22);
   const T_COL = [bt(0) + .3, bt(1), bt(2), bt(3)], T_PED = bt(4), T_DEL = bt(4) + 1.4, T_LOG = bt(4) + 4.2, T_BOARD = 16.2;
+  const CAPS = [[1, T_PED - .2, 'Os *pilares* que sustentam a prática de analytics', 'A PRÁTICA'], [T_PED + .2, T_LOG - .2, 'O que a prática já *entregou*', 'ENTREGAS'],
+    [T_LOG, T_BOARD - .3, 'E como a prática *evoluiu*, versão a versão', 'EVOLUÇÕES'], [T_BOARD, 20, 'Segunda parada: conversa sobre as estações *04, 05 e 06*', 'PARADA 2']];
   T_COL.forEach((t0, i) => cue(id, t0, 'pop', { p: .7 + i * .12, v: .2 })); cue(id, T_PED, 'impact', { size: .8 });
   for (let k = 0; k < 5; k++) cue(id, T_DEL + k * .45, 'hit', { size: .25 }); cue(id, T_LOG, 'type', { n: 40, gap: .05 }); cue(id, T_BOARD, 'type', { n: 22, gap: .025 });
   const S = () => SEC(6);
@@ -87,7 +92,7 @@ function ptScale(s) {
   }
 
   SCENES[id] = {
-    themeAt: () => 'light', fx: { invert: false, chroma: .5 },
+    themeAt: () => 'light', fx: { invert: false, chroma: .5 }, caps: CAPS,
     draw(ctx, t) {
       bgLight(ctx, t); collage(ctx, t, { seed: 97, n: 6, theme: 'light', alpha: .7 });
       const pil = S().pillars || [], cx = 560, yb = 900, gap = 190, colH = 430;
