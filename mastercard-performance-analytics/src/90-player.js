@@ -37,7 +37,7 @@ const PLAYER = (() => {
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
   function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
   /** slide "montado" para as paradas: o quadro do trecho sem batida, com a legenda daquele momento */
-  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
+  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
 
   function renderPlay(T) {
     T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
@@ -49,6 +49,7 @@ const PLAYER = (() => {
     drawScene(s, t, T);
     ctx.restore();
     if (fx) FX.post(ctx, T, s);
+    PAINT.post(ctx);
     if (typeof overlayPlay === 'function') overlayPlay(ctx, T, s, themeOf(s, t));
     if (CONFIG.captions) caption(VOICE.caption(T));
     grain(ctx, T);
@@ -59,6 +60,7 @@ const PLAYER = (() => {
     const impl = STOPSCN[id], now = performance.now();
     UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35);
     if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
+    if (!(impl && impl.noPaint)) PAINT.post(ctx);
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }
     grain(ctx, tl * 30);
   }

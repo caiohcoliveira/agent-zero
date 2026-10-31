@@ -32,6 +32,7 @@ const CONFIG = {
     onTwos: true,          // snaps "em dois" (textura stop motion)
     grain: 0.06,           // granulação de filme (0 desliga)
     beat: 1.0,             // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
+    paint: 1.0,            // acabamento pintado: pinceladas, gradação de cor e brilho (0 desliga)
     beatBase: 0.15         // fora dos clímax a batida fica contida nesse nível (os picos de cada cena ficam em SCENES[id].peaks)
   },
 

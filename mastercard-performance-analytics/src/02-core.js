@@ -175,6 +175,7 @@ function bgDark(ctx, t, o = {}) {
   g.addColorStop(0, rgba(o.center || '#2B2622', o.centerA == null ? .9 : o.centerA * .85)); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if (o.grid) dotGrid(ctx, t, rgba('#FFFFFF', .05), o.drift);
+  if (o.atmos !== false && typeof atmos === 'function') atmos(ctx, t, { alpha: o.atmosA == null ? .85 : o.atmosA, light: o.light });
 }
 function bgLight(ctx, t, o = {}) {
   ctx.drawImage(TEX.light, 0, 0);
@@ -184,6 +185,7 @@ function bgLight(ctx, t, o = {}) {
     ctx.beginPath(); for (let x = -s + off; x < W + s; x += s) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
     for (let y = 0; y < H; y += s) { ctx.moveTo(0, y); ctx.lineTo(W, y); } ctx.stroke(); ctx.restore();
   }
+  if (o.atmos !== false && typeof atmos === 'function') atmos(ctx, t, { alpha: o.atmosA == null ? .55 : o.atmosA, bokeh: 3, dust: 30 });
 }
 function dotGrid(ctx, t, color, drift = 6) {
   ctx.save(); ctx.fillStyle = color; const s = 48, off = (t * drift) % s;

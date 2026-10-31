@@ -62,6 +62,9 @@ function paper(ctx, x, y, w, h, o = {}) {
   const path = () => (o.torn ? tornRect(ctx, x, y, w, h, o.seed || 1, o.amp || 2.5) : rr(ctx, x, y, w, h, o.r == null ? 10 : o.r));
   if (sh) { ctx.save(); ctx.translate(sh, sh * 1.15); path(); ctx.fillStyle = o.shadowColor || rgba(INK, .9); ctx.fill(); ctx.restore(); }
   path(); ctx.fillStyle = o.fill || '#FFFDF8'; ctx.fill();
+  // volume pintado: luz do alto à esquerda, sombra embaixo à direita
+  if (o.volume !== false && !QUALITY.low && w > 30 && h > 20) { ctx.save(); path(); ctx.clip(); const g = ctx.createLinearGradient(x, y, x + w * .5, y + h);
+    g.addColorStop(0, 'rgba(255,246,228,.2)'); g.addColorStop(.55, 'rgba(255,246,228,0)'); g.addColorStop(1, 'rgba(40,16,6,.24)'); ctx.fillStyle = g; ctx.fillRect(x - 4, y - 4, w + 8, h + 8); ctx.restore(); }
   if (o.halftone) { ctx.save(); path(); ctx.clip(); ctx.globalAlpha *= o.halftone; ctx.drawImage(SHADE, x, y, w, h); ctx.restore(); }
   if (o.outline !== false) { path(); ctx.strokeStyle = o.outline || INK; ctx.lineWidth = o.lw || 3; ctx.lineJoin = 'round'; ctx.stroke(); }
   if (o.tape) o.tape.forEach(([fx, fy, rot], k) => tape(ctx, x + fx * w, y + fy * h, 90, 28, rot, (o.seed || 1) + k));
