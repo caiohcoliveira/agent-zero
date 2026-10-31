@@ -1,6 +1,6 @@
-# A Linha — Storyline v3.2
+# A Linha — Storyline v3.3
 
-**Sessão:** 20 min, sendo ~9 min de vídeo e 11 min de fala das apresentadoras, em 4 paradas
+**Sessão:** até 20 min, sendo ~5:45 de vídeo em 4 plays e 11 min de fala das apresentadoras, em 4 paradas
 **Vídeo:** HTML único offline, 1920×1080, em **modo apresentação**: trechos de vídeo e paradas em loop, controlados pelo teclado ou pelo passador de slides
 **Status:** **proposta em validação**. As cenas da v3 ainda não foram implementadas; o HTML já carrega o bloco de dados. O vídeo atual ainda é a v2, cujo roteiro está no histórico (commit `20e1d96`).
 
@@ -12,11 +12,39 @@ Marcadores usados no texto:
 
 ---
 
-## Ajustes desta rodada (v3.1 → v3.2): dados reais
+## Decisões desta rodada (v3.2 → v3.3)
+
+1. **Dados:** o JSON vai para o Git, embutido no HTML e editável, com os números mascarados.
+   - Os valores ficam como estão, porque divergências podem vir do mascaramento.
+   - Os números originais são trocados só na cópia local do HTML.
+2. **Duração por play** (o vídeo segue as músicas):
+   - **Play 1 · abertura (~15s):** os 5 desafios e o mapa; depois, a Parada 0.
+   - **Play 2 · trecho 1 (2:00):** "Vintage Film Funk" inteira.
+   - **Play 3 · trecho 2 (~2:30):** "Technology" a partir de 0:20, encurtando a intro suave.
+   - **Play 4 · trecho 3 (~1:00):** o piano a partir do primeiro impacto (~0:07). O último acorde fecha o letreiro, e o decaimento entra no encerramento.
+
+   No total, são ~5:45 de vídeo; com as falas (11 min), a sessão fica em ~16:45.
+3. **Padrões assumidos** (recomendações sem objeção):
+   - abertura com o som sintetizado atual;
+   - clímax curto, no ritmo do piano;
+   - por cima das músicas, só os efeitos essenciais, mais baixos;
+   - silêncio nas paradas e no encerramento;
+   - músicas embutidas no HTML, com os MP3 avulsos fora do Git (a licença da Pixabay não permite redistribuir a faixa solta);
+   - pré-show incluído: a tela inicial vira um loop de espera.
+4. **Estação 02:** sem time e sem presença nos engagements, porque esses números não estão no JSON.
+5. **Estação 03:**
+   - o mapa de capabilities é o centro;
+   - as 3 ondas viram um relance de ~6s antes do ∞;
+   - o Venn das tracks só aparece com nomes em `other_tracks`; sem nomes, entram cartões genéricos "demais tracks".
+6. **Insight Agent:** Analista, Business e C-Level (geradores) → Julgadores → Corretores → insight validado.
+7. **Lights-off:** fica sem número. "Automated Reporting" entra no mapa como faixa transversal aos três tipos de cliente, até `client_type` ser preenchido no JSON.
+8. **Prática:** um rascunho na seção 6 do JSON, a substituir pelos materiais da Nat.
+
+## Ajustes da rodada v3.1 → v3.2: dados reais
 
 1. **Fonte única dos números:** tudo que é número ou resultado vem de `data/presentation.json`.
    - O build injeta o arquivo num bloco JSON no topo do HTML. Para trocar uma informação, basta editar o bloco e salvar.
-   - O arquivo real fica fora do Git, porque o repositório é público. O repositório guarda só um exemplo com a mesma estrutura.
+   - O JSON vai para o Git com os números mascarados (ver as decisões da v3.3).
 2. **Estação 02:**
    - a evolução da receita por período vira o visual dominante;
    - o marco do Brasil entra como destaque;
@@ -28,7 +56,7 @@ Marcadores usados no texto:
    - Lights-off;
    - Insight Agent.
 5. **Estação 05:** a progressão Análise manual → Analytics avançado → Motores produtizados → Ativos de IA escaláveis, com o indicador de escala de cada exemplo.
-6. **Os valores não aparecem neste documento:** ele aponta os campos do JSON, para não publicar dados internos.
+6. **Fonte única:** este documento aponta os campos do JSON, e os valores ficam só no JSON.
 
 ## Ajustes da rodada anterior (v3 → v3.1)
 
@@ -73,17 +101,17 @@ Marcadores usados no texto:
 | Momento | O que acontece | Vídeo | Fala |
 |---|---|---|---|
 | Pré-show (opcional) | loop de espera enquanto a plateia chega | — | — |
-| **Abertura** | os 5 desafios → chegada ao mapa da linha | 0:30 | |
+| **Play 1 · abertura** | os 5 desafios → chegada ao mapa da linha | ~0:15 | |
 | **Parada 0 · roteiro** | mapa em loop; → destaca cada estação | | 2:00 |
-| **Trecho 1** · tema A | estações 01, 02 e 03 | 3:30 | |
+| **Play 2 · trecho 1** · "Vintage Film Funk" | estações 01, 02 e 03 | 2:00 | |
 | **Parada 1 · retomada** | cartazes das estações 01, 02 e 03 | | 3:30 |
-| **Trecho 2** · tema B | estação 04 (3 casos), 05 e 06 | 3:50 | |
+| **Play 3 · trecho 2** · "Technology" | estação 04 (4 cases), 05 e 06 | ~2:30 | |
 | **Parada 2 · retomada** | cartazes das estações 04, 05 e 06 | | 3:30 |
-| **Trecho 3** (curto) | estação 07, clímax e letreiro final | 1:10 | |
+| **Play 4 · trecho 3** · "Epic Piano" | estação 07, clímax e letreiro final | ~1:00 | |
 | **Encerramento** | letreiro "Performance Analytics" em loop | | 2:00 |
-| **Total** | | **9:00** | **11:00** |
+| **Total** | | **~5:45** | **11:00** |
 
-Os tempos de fala somam 11 min (2 + 3,5 + 3,5 + 2). Por isso o vídeo fica com ~9 min, para a sessão fechar em 20. Se a fala final cair para 1 min, o vídeo pode ir a 10. A duração exata de cada trecho vai acompanhar a edição da música escolhida.
+Com as falas, a sessão fica em ~16:45, com folga dentro dos 20 min. As trocas de estação caem no início de blocos de 8 compassos da música de cada trecho.
 
 ---
 
@@ -148,15 +176,17 @@ Os tempos de fala somam 11 min (2 + 3,5 + 3,5 + 2). Por isso o vídeo fica com ~
 
 ## Os trechos
 
+As durações entre parênteses são aproximadas. Elas fecham no compasso da música de cada trecho, e os tempos internos de cada estação encolhem na mesma proporção.
+
 As frases de "Narração opcional" valem como texto de apoio. A voz do navegador continua desligada por padrão. Os tempos finos de cada frase serão definidos na implementação, sincronizados à música escolhida.
 
-### Abertura (0:30)
+### Play 1 · abertura (~0:15)
 
 #### Pré-show (opcional) [nova]
 - Loop de espera antes de começar: o ponto laranja pulsando sobre o papel e o letreiro "PERFORMANCE ANALYTICS · EMBARQUE EM INSTANTES".
 - → começa a abertura.
 
-#### Os 5 desafios (18s) [v2]
+#### Os 5 desafios (~12s) [v2]
 - **Visual:** como na v2:
   1. o ponto laranja vira uma tempestade de recortes de dados;
   2. aparece o sticker "O NOSSO DESAFIO HOJE";
@@ -165,15 +195,15 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - **Na tela:** Eficiência operacional · Automação e escala · Ciência de dados · Inteligência artificial · Gerar valor
 - **Narração opcional:** "Hoje, o nosso desafio tem cinco nomes." + os 5 nomes.
 
-#### Chegada ao mapa (12s) [nova]
+#### Chegada ao mapa (~3s) [nova]
 - O círculo de "Gerar valor" encolhe e vira o trem.
 - O mapa se monta em colagem, e o letreiro vira para "LINHA PERFORMANCE ANALYTICS".
 - O trem para na estação de partida, o que abre a **Parada 0**.
 - **Narração opcional:** "A nossa track é uma linha com sete estações… e duas paradas para conversar."
 
-### Trecho 1 · vermelho · tema A (3:30)
+### Play 2 · trecho 1 · vermelho · "Vintage Film Funk" (2:00)
 
-#### Estação 01 — Analytics as a Strategic Consulting Capability (60s) [v2 reescrita + nova]
+#### Estação 01 — Analytics as a Strategic Consulting Capability (~37s) [v2 reescrita + nova]
 1. **Chegada (4s):** o letreiro vira para "01 · STRATEGIC CAPABILITY".
 2. **Perguntas de negócio (10s):** post-its se acumulam num quadro de cortiça: "Por que caiu?", "Quem priorizar?", "Onde investir?", "Qual o risco?", "E se…?".
 3. **Negócio × Dados (10s):** os círculos Mastercard em meio-tom colidem, e a interseção laranja acende: "Performance Analytics".
@@ -191,7 +221,7 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - Do diagnóstico à mensuração: dimensionamos, explicamos, construímos e provamos.
 - Transformamos dados em decisões, decisões em impacto… e impacto em valor para o cliente.
 
-#### Estação 02 — Our Evolution & Business Impact (70s) [nova] [dados]
+#### Estação 02 — Our Evolution & Business Impact (~35s) [nova] [dados]
 1. **Chegada (4s).**
 2. **Receita por período (o visual dominante, ~30s):**
    - um gráfico de barras em papel recortado, uma barra por período (`revenue_performance_analytics_usd_millions`), subindo uma a uma no tempo da música;
@@ -214,7 +244,7 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - …e o Brasil fechou acima do período anterior e acima do budget.
 - Com escala de verdade, nos três exemplos.
 
-#### Estação 03 — What We Bring to the Market (80s) [nova + v2] [dados]
+#### Estação 03 — What We Bring to the Market (~47s, com a saída) [nova + v2] [dados]
 1. **Chegada (4s).**
 2. **Analytics × as demais tracks (12s):** o Venn com analytics no centro e as outras tracks em volta, mais curto que na v3.1 [a confirmar os nomes].
 3. **Mapa de capabilities (~30s):**
@@ -230,7 +260,7 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - Analytics não joga sozinha: complementa e potencializa cada track da consultoria.
 - Para emissores, adquirentes e merchants, cada capability já tem um case para mostrar.
 
-### Trecho 2 · laranja · tema B (3:50)
+### Play 3 · trecho 2 · laranja · "Technology" (~2:30)
 
 #### Estação 04 — Analytics in Action: From Data to Impact (5s de abertura) [nova]
 - **Visual:** quatro fichas de case se abrem em leque (BANANA · MANGA · LIGHTS-OFF · INSIGHT AGENT), com a régua **PROBLEMA → SOLUÇÃO ANALÍTICA → INSIGHT/DECISÃO → IMPACTO** (`case_structure`).
@@ -275,7 +305,7 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
   - as métricas de qualidade da segmentação como fórmulas coladas: trustworthiness do UMAP, silhouette, Calinski-Harabasz, Davies-Bouldin e estabilidade dos clusters em 3 e 6 meses;
   - MLflow.
 
-#### Caso Lights-off Fraud Reporting [v2] [a confirmar: o JSON só traz o nome]
+#### Caso Lights-off Fraud Reporting [v2] [dados: campos vazios no JSON, para preencher se quiserem]
 - **Cena da v2 mantida:** o "antes" manual, o CLICK das luzes apagando e o pipeline do dado ao board.
 - **Sem número por enquanto:** fica assim até chegarem problema, solução e impacto. Os números fictícios da v3.1 saem.
 
@@ -296,7 +326,7 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
   - `Attention(Q,K,V)`;
   - `egress: 0 B`.
 
-#### Estação 05 — Scaling Our Impact Through Data, AI & Innovation (62s) [v2 + nova] [dados]
+#### Estação 05 — Scaling Our Impact Through Data, AI & Innovation (~20s) [v2 + nova] [dados]
 1. **A escada (~30s):** quatro degraus de colagem, cada um mais neon que o anterior. Cada degrau mostra o indicador de escala do exemplo (`innovation_examples[].scale_indicator`).
    - **Análise manual:** planilhas, o "antes" da v2;
    - **Analytics avançado:** Cliente Banana (espaço latente: BM25 + ALS + cosseno);
@@ -315,7 +345,7 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - IA rodando localmente: o dado nunca sai da Mastercard.
 - Escala, sem crescer o time.
 
-#### Estação 06 — A Prática (44s) [nova] [a confirmar: materiais da Nat]
+#### Estação 06 — A Prática (~22s) [nova] [dados: rascunho na seção 6 do JSON, a substituir pelos materiais da Nat]
 1. **Pilares (12s):**
    - 4 colunas clássicas de papel recortado, com estética de gravura em meio-tom, sobem do chão;
    - o frontão "A PRÁTICA" cai por cima com um baque;
@@ -335,9 +365,9 @@ As frases de "Narração opcional" valem como texto de apoio. A voz do navegador
 - Entregas que ficam: playbooks, bibliotecas, formação.
 - E uma prática que evolui como software: versão após versão.
 
-### Trecho 3 · amarelo · curto (1:10)
+### Play 4 · trecho 3 · amarelo · "Epic Piano" (~1:00)
 
-#### Estação 07 — The Future of Analytics (36s) [nova]
+#### Estação 07 — The Future of Analytics (~30s) [nova]
 O trilho passa da última estação e segue para um horizonte neon, com sol synthwave e grid. Aparecem três placas de "próximas paradas":
 1. **Mais conectados às decisões estratégicas dos clientes:** uma mesa de board recortada, em que uma cadeira vazia ganha o sticker laranja "Analytics". É o lugar na mesa.
 2. **Mais integrados às demais tracks:** os círculos da estação 03 se aproximam até as lentes laranjas se fundirem.
@@ -348,11 +378,11 @@ O trilho passa da última estação e segue para um horizonte neon, com sol synt
 - Mais perto das decisões estratégicas dos clientes, mais integrados a cada track…
 - …e com soluções cada vez mais escaláveis e diferenciadas. É esse o papel que queremos ocupar.
 
-#### Clímax (16s) [v2]
+#### Clímax (~10s) [v2]
 - 12 cortes no beat, cada um com uma fórmula: Estatística · Regressão · Classificação · Árvores · Ensembles · Clusters · Anomalias · Otimização · Embeddings · Transformers · Agentes · Automação.
 - Fecha com "Nossa especialidade é analytics".
 
-#### Letreiro final — split-flap (18s) [v2]
+#### Letreiro final — split-flap (~16s) [v2]
 - Sob o cabeçalho "PRÓXIMA PARADA", o letreiro vira: WELCOME TO THE FUTURE → WELCOME TO **AI** → WELCOME TO **ANALYTICS** → PERFORMANCE **ANALYTICS**.
 - Em seguida, vira o **Encerramento** em loop.
 
@@ -406,16 +436,7 @@ As faixas foram escolhidas por vocês na Pixabay. A licença da Pixabay libera u
   - último acorde → "PERFORMANCE ANALYTICS";
   - decaimento → encerramento.
 
-**Em aberto (perguntas feitas ao usuário):**
-1. **Duração:** as faixas somam ~6:03, contra 8:30 de trechos planejados. Opções:
-   - o vídeo segue a música e fica com ~6:35 (recomendado);
-   - as faixas são esticadas até 9:00;
-   - meio-termo, com ~7:45.
-2. **Abertura:** fica com o som sintetizado atual ou com o começo do funk?
-3. **Clímax:** pode seguir o ritmo do piano, ficando mais épico e menos frenético?
-4. **Efeitos sonoros por cima das faixas:** manter só o essencial, mais baixo?
-5. **Paradas e encerramento:** silêncio total ou ambiência baixa?
-6. **Repositório:** o HTML com música embutida pode ir para o repositório público, ou fica só uma versão local?
+**Decidido:** veja "Decisões desta rodada (v3.3)" no topo. Nos plays 3 e 4, a música é cortada como descrito lá.
 
 ---
 
@@ -443,16 +464,17 @@ As faixas foram escolhidas por vocês na Pixabay. A licença da Pixabay libera u
 
 ## Dados
 
-- **Onde ficam:** em `data/presentation.json`, fora do Git porque o repositório é público. O build injeta o arquivo num bloco `<script type="application/json" id="pa-data">` no topo do HTML.
+- **Onde ficam:** em `data/presentation.json`, que vai para o Git com os números mascarados. O build injeta o arquivo num bloco `<script type="application/json" id="pa-data">` no topo do HTML.
 - **Para trocar um número:** edite o JSON (ou o bloco no HTML pronto) e salve. Um item de `headline_numbers_for_slides` aceita um campo `display`, que fixa o texto exato de tela.
 - **Formatação:** os números saem em pt-BR automaticamente:
   - multiplicadores com 2 casas (`1,5×`);
   - "MM" vira mil ou mi;
   - o ponto decimal vira vírgula.
-- **Repositório:**
-  - guarda `data/presentation.sample.json`, com a mesma estrutura e números fictícios;
-  - o `performance-analytics.html` do repositório é montado com esse exemplo;
-  - a versão com os dados reais sai em `dist/performance-analytics.html`, só local.
+- **Números originais:** como o repositório é público, troque pelos originais só na cópia local do HTML. Edições feitas direto no HTML não voltam para o `data/presentation.json`. Se quiser que uma mudança siga adiante, mande o JSON atualizado.
+- **Campos para completar depois:**
+  - `other_tracks`, na seção 3;
+  - os campos vazios do case Lights-off, na seção 4;
+  - a Prática, na seção 6.
 
 | Estação | O que aparece | Campo do JSON (dentro de `presentation_structure`, pela seção) |
 |---|---|---|
@@ -470,20 +492,10 @@ As faixas foram escolhidas por vocês na Pixabay. A licença da Pixabay libera u
 
 ## O que preciso de vocês
 
-1. **Publicação dos dados:** o JSON traz números internos, mesmo mascarados. Ele pode ir para o repositório público? A recomendação é um repositório privado, porque um fork não pode virar privado.
-2. **Inconsistências no JSON:**
-   - clientes + PoCs do Insight Agent;
-   - associados recomendados contra a população do Cliente Manga;
-   - projeção do período seguinte igual à do período atual.
-3. **Lights-off:** problema, solução e impacto.
-4. **Mapa de capabilities:** em que tipo de cliente entra cada case, principalmente o Lights-off.
-5. **Insight Agent:** os nomes dos agentes no vídeo, considerando o fluxo real e os nomes da v2.
-6. **Estação 03:** as 3 ondas de modelos continuam depois do mapa?
-7. **Estação 02:** time e presença nos engagements saíram, porque não estão no JSON. Querem mandar esses números?
-8. **Trilha:** as 6 perguntas sobre duração e encaixe das músicas (seção "Trilha").
-9. **Estação 06 · Prática:** os materiais da Nat.
-10. **Demais tracks:** os nomes e a oferta conjunta (estação 03).
-11. **Pré-show:** querem o loop de espera antes de começar?
+Não há perguntas em aberto. Os itens abaixo entram pelo JSON quando chegarem, sem travar a implementação:
+1. **Estação 06 · Prática:** os materiais da Nat (seção 6: `pillars`, `deliveries`, `evolutions`).
+2. **Lights-off:** se quiserem número, os campos `business_problem`, `analytics_solution` e `business_results.headline` do case, e `client_type` para o mapa.
+3. **Demais tracks:** nomes em `other_tracks` (seção 3), se quiserem o Venn com nomes.
 
 ---
 

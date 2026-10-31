@@ -14,74 +14,492 @@
 -->
 <script type="application/json" id="pa-data">
 {
-  "_leia-me": "Exemplo público com a mesma estrutura do arquivo real. Os dados reais ficam em data/presentation.json, que não vai para o Git (o repositório é público). Os números abaixo são fictícios.",
   "presentation_context": {
     "title": "Performance Analytics | Analytics as a Strategic Consulting Capability",
     "organization": "Mastercard Advisors",
     "track": "Performance Analytics",
+    "objective": "Narrativa executiva sobre a evolução de Performance Analytics: relevância estratégica, crescimento, portfolio, cases com impacto mensurável, inovação e visão de futuro.",
     "case_structure": "Business Problem -> Analytics Solution -> Insight/Decision -> Business Impact"
   },
   "presentation_structure": [
     {
       "section": 1,
-      "title": "Analytics as a Strategic Consulting Capability"
+      "title": "Analytics as a Strategic Consulting Capability",
+      "objective": "O papel de Analytics na consultoria e como transformamos dados em decisões, impacto e valor para clientes."
     },
     {
       "section": 2,
       "title": "Our Evolution & Business Impact",
+      "objective": "Evolução da track: crescimento, resultados, relevância nos engagements e principais marcos.",
       "revenue_performance_analytics_usd_millions": {
-        "2023": 1.0,
-        "2024": 1.5,
-        "2025": 2.0,
-        "2026_forecast": 2.4
+        "2023": 0.002,
+        "2024": 0.0028,
+        "2025": 0.0036,
+        "2026_forecast": 0.0036
+      },
+      "revenue_growth": {
+        "2023_to_2024": "+0.4 de variação relativa",
+        "2024_to_2025": "+0.285714 de variação relativa",
+        "2023_to_2025": "+0.8 de variação relativa"
+      },
+      "brazil_2023_milestone": {
+        "headline": "Performance Analytics Brazil estimated to close the reference period at USD 1220, approximately 1.65x budget and 1.74x prior-period revenue",
+        "actuals_2022_usd_millions": 0.0007,
+        "budget_2023_usd_millions": 0.00074,
+        "actuals_2023_usd_millions": 0.00122,
+        "growth_vs_2022": "+0.742857 de variação relativa",
+        "above_budget": "+0.648649 de variação relativa",
+        "quarterly_usd_millions": {
+          "Q1": {
+            "actuals_2022": 2e-05,
+            "budget_2023": 0.00022,
+            "actuals_2023": 0.00026
+          },
+          "Q2": {
+            "actuals_2022": 0.00016,
+            "budget_2023": 6e-05,
+            "actuals_2023": 0.00022
+          },
+          "Q3": {
+            "actuals_2022": 0.00018,
+            "budget_2023": 0.0003,
+            "actuals_2023": 0.00038
+          },
+          "Q4_preliminary": {
+            "actuals_2022": 0.00034,
+            "budget_2023": 0.00016,
+            "actuals_2023": 0.00036
+          }
+        },
+        "drivers": [
+          "Prior-period growth was in large part due to correct assignation of product",
+          "Reference-period performance was heavily steered by the partnership with the MS team"
+        ],
+        "source": "Internal financial reporting"
+      },
+      "scale_proof_points": {
+        "cliente_banana_product_baskets": {
+          "customers_modeled": "0.1012MM",
+          "sku_subgroups": 894,
+          "interactions": "3.812MM"
+        },
+        "cliente_manga_principality": {
+          "pf_associates": "0.092MM",
+          "look_alike_clusters": 8,
+          "development_duration": "42 weeks"
+        },
+        "insight_agent": {
+          "acquirers_pipeline": 30,
+          "clients_plus_pocs": "12 + 4",
+          "user_pay_projects": 6
+        }
       }
     },
     {
       "section": 3,
       "title": "What We Bring to the Market",
+      "objective": "Portfolio de capabilities, produtos e tipos de projetos, mostrando como Analytics complementa e potencializa as demais tracks.",
+      "source": "Guia Comercial de PA.htm",
       "client_types": [
         "Emissores",
         "Adquirentes",
         "Merchants"
-      ]
+      ],
+      "capabilities_demonstrated_in_cases": [
+        {
+          "capability": "Customer Segmentation & Look-Alike Modeling",
+          "example": "Cliente Manga Principalidade",
+          "methods": [
+            "UMAP",
+            "K-Means",
+            "cluster characterization"
+          ]
+        },
+        {
+          "capability": "Recommendation / Next Best Product",
+          "example": "Cliente Manga Principalidade",
+          "methods": [
+            "Matrix Factorization (ALS)",
+            "cross-sell ranking",
+            "upsell ranking"
+          ]
+        },
+        {
+          "capability": "Product Affinity & Basket Analytics",
+          "example": "Cliente Banana Cestas de Produtos",
+          "methods": [
+            "BM25",
+            "Matrix Factorization ALS",
+            "cosine similarity"
+          ]
+        },
+        {
+          "capability": "Customer Relationship / Principality Optimization",
+          "example": "Cliente Manga Principalidade",
+          "methods": [
+            "product affinity",
+            "expected principality uplift"
+          ]
+        },
+        {
+          "capability": "Market Share & Share of Wallet Analytics",
+          "example": "Insight Agent",
+          "methods": [
+            "Market Share",
+            "Share of Wallet"
+          ]
+        },
+        {
+          "capability": "AI-powered Insight Generation",
+          "example": "Insight Agent",
+          "methods": [
+            "local LLMs",
+            "multi-agent architecture",
+            "NLP",
+            "ML quality scoring"
+          ]
+        },
+        {
+          "capability": "Automated Reporting",
+          "example": "Lights-off Fraud Reporting"
+        }
+      ],
+      "other_tracks": []
     },
     {
       "section": 4,
       "title": "Analytics in Action: From Data to Impact",
+      "objective": "Principais cases evidenciando problema de negócio, insight gerado e impacto para o cliente.",
       "cases": [
         {
-          "case_name": "Cliente A | Exemplo"
+          "case_name": "Cliente Banana | Product Baskets",
+          "client": "Cliente Banana",
+          "business_problem": "Aumentar transversalidade entre Cliente Banana, Cliente Maçã e Cliente Pera nos testes da Mesa de Performance: identificar cestas de SKUs estratégicos, clientes com maior propensão a cada cesta e produtos de alto valor que motivam a visita.",
+          "data_challenges": [
+            "Apenas compras registradas, sem preferência declarada",
+            "Itens onipresentes de baixo valor (sacola, pão) dominavam o sinal",
+            "Mesmo produto com nomes diferentes entre BUs"
+          ],
+          "analytics_solution": {
+            "lookback": "24 meses de compras (CPF x SKU)",
+            "steps": [
+              "BM25 para ponderar relevância dos produtos",
+              "Matrix Factorization ALS para vetores de clientes e produtos",
+              "Similaridade de cosseno produto x produto (cestas) e cliente x cesta (público-alvo)",
+              "Cestas temáticas com clientes-alvo"
+            ],
+            "baskets": [
+              "Café + chocolate",
+              "Churrasco",
+              "Destilados"
+            ],
+            "model_scale": {
+              "customers_modeled": "0.1012MM",
+              "sku_subgroups": 894,
+              "interactions": "3.812MM",
+              "target_customers_mechanic_b": 549
+            }
+          },
+          "business_results": {
+            "headline": "1.1875x conversion vs. second-best campaign (Destilados, record at Cliente Banana)",
+            "conversion_by_mechanic": {
+              "Destilados (cesta)": "1.52%",
+              "Churrasco (cesta)": "1.28%",
+              "Ganhe e Use I": "1.28%",
+              "Membership": "1.2%",
+              "Café + chocolate (cesta)": "1.12%",
+              "Raspou, Ganhou": "0.56%",
+              "Presente Surpreenda": "0.16%"
+            },
+            "incremental_revenue_cafe": "R$ 218",
+            "cafe_revenue_growth_non_primary_bu": "+0.245 de variação relativa"
+          },
+          "executive_message": "Collaborative filtering turned 24 months of purchases into thematic offer baskets, delivering 1.1875x conversion vs. the second-best campaign and R$ 218 incremental revenue in the Café basket."
         },
         {
-          "case_name": "Cliente B | Exemplo"
+          "case_name": "Cliente Manga | Principality Recommendation Engine",
+          "client": "Cliente Manga",
+          "business_problem": "Evoluir a recomendação de produtos para considerar, além de afinidade e conversão, o impacto esperado de cada recomendação no indicador de principalidade.",
+          "analytics_solution": {
+            "modules": [
+              "Look-alike segmentation with differentiated customer profiles",
+              "Matrix Factorization (cross-sell e upsell em paralelo)",
+              "Camada de incremento de principalidade (ΔP) para repriorização"
+            ],
+            "population": "0.092MM PF associates",
+            "segmentation_quality": {
+              "umap_trustworthiness": "97.6%",
+              "silhouette": 0.76,
+              "calinski_harabasz": 815094,
+              "davies_bouldin": 0.296,
+              "same_cluster_after_3_months": "88.28%",
+              "same_cluster_after_6_months": "82.08%"
+            },
+            "clusters": [
+              "Segmento A",
+              "Segmento B",
+              "Segmento C",
+              "Segmento D",
+              "Segmento E",
+              "Segmento F",
+              "Segmento G",
+              "Segmento H"
+            ]
+          },
+          "business_results": {
+            "headline": "+4 p.p. theoretical incremental principality gain vs. control (short recommendation list, backtest)",
+            "associates_recommended": "0.094MM",
+            "associates_analyzed": "0.046MM",
+            "top3": {
+              "group_1_share": "28.8%",
+              "incremental_gain": "+4 p.p."
+            },
+            "top5": {
+              "group_1_share": "40.8%",
+              "group_1_increase_vs_top3": "+0.416667 de variação relativa",
+              "incremental_gain": "+3.2 p.p."
+            },
+            "by_subsegment": {
+              "PF I": "+4.8 p.p.",
+              "PF II": "+4 p.p.",
+              "PF III": "+4.8 p.p.",
+              "PF IV+": "+3.2 p.p."
+            },
+            "best_cluster": "Segmento A: +8.8 p.p.",
+            "principality_points_top3": "3.336 pts with principality layer vs. 2.112 pts pure MF"
+          },
+          "operationalization": {
+            "status": "Productized in Cliente Manga environment",
+            "cadence": [
+              "Semestral retraining (~10h)",
+              "Monthly pipeline (~90 min)",
+              "Daily recommendation adjustment"
+            ],
+            "assets": [
+              "GitLab code",
+              "Scheduled jobs",
+              "MLflow metrics",
+              "Technical documentation"
+            ]
+          },
+          "future_vision": "Unified engine combining affinity, conversion, principality and profitability, extendable to PJ.",
+          "executive_message": "A productized engine combining look-alike segmentation, product affinity and principality impact showed +4 p.p. theoretical principality gain for associates who adopted the short recommendation list."
+        },
+        {
+          "case_name": "Lights-off Fraud Reporting",
+          "client_type": "",
+          "business_problem": "",
+          "analytics_solution": "",
+          "business_results": {
+            "headline": ""
+          }
+        },
+        {
+          "case_name": "Insight Agent | AI-powered Market Share & Share of Wallet Insights",
+          "business_problem": {
+            "context": "Produto automatizado de Market Share e Share of Wallet para adquirentes, com requisitos de privacidade Mastercard.",
+            "bottleneck": "Geração de insights manual, limitando escala para os 30 adquirentes do pipeline.",
+            "constraint": "Dados restritos ao ambiente Mastercard, inviabilizando APIs externas de IA."
+          },
+          "analytics_solution": {
+            "innovation_1": "Circuito multiagêntico com IA local em GPU: geradores -> julgadores -> corretores -> insights validados",
+            "local_models": [
+              "Modelo local A",
+              "Modelo local B"
+            ],
+            "guardrails": [
+              "Regex",
+              "BERT"
+            ],
+            "innovation_2": {
+              "description": "Score de qualidade do insight com ML",
+              "algorithm": "Random Forest",
+              "nlp_features": 164,
+              "mae": 0.09216,
+              "out_of_time_mae": 0.07832
+            }
+          },
+          "business_results": {
+            "clients": [
+              "Cliente Uva",
+              "Cliente Abacaxi",
+              "Cliente Laranja",
+              "Cliente Melancia",
+              "Cliente Kiwi",
+              "Cliente Morango"
+            ],
+            "pocs": [
+              "Cliente Pêssego",
+              "Cliente Ameixa"
+            ],
+            "pipeline": {
+              "acquirers": 30,
+              "active_relationships": 8,
+              "to_conquer": 22,
+              "note": "sem crescer o time"
+            },
+            "user_pay_projects": {
+              "total": 6,
+              "composition": "2 adquirentes + 4 merchants",
+              "cliente_laranja": "R$ 480 em 4 anos"
+            },
+            "privacy": "IA executada localmente, mantendo o processamento dos dados no ambiente Mastercard"
+          },
+          "executive_message": "A local multi-agent AI circuit generates, judges, corrects and validates insights at scale, enabling a 30-acquirer pipeline without growing the team and keeping data processing within the local environment."
         }
       ]
     },
     {
       "section": 5,
-      "title": "Scaling Our Impact Through Data, AI & Innovation"
+      "title": "Scaling Our Impact Through Data, AI & Innovation",
+      "objective": "Como estamos evoluindo a proposta de valor por meio de AI, automação, novas metodologias e soluções escaláveis.",
+      "innovation_examples": [
+        {
+          "example": "Insight Agent",
+          "innovation": "Multi-agent local AI + ML quality scoring",
+          "scale_indicator": "30 acquirers in pipeline, 22 to conquer without growing the team",
+          "quality_indicators": [
+            "164 NLP features",
+            "MAE 0.09216",
+            "Out-of-time MAE 0.07832"
+          ]
+        },
+        {
+          "example": "Cliente Manga Principality",
+          "innovation": "Productized recommendation engine with semestral/monthly/daily jobs",
+          "scale_indicator": "0.092MM PF associates"
+        },
+        {
+          "example": "Cliente Banana Product Baskets",
+          "innovation": "Latent-space recommendation (BM25 + ALS + cosine similarity)",
+          "scale_indicator": "3.812MM interactions, 0.1012MM customers"
+        },
+        {
+          "example": "Lights-off Fraud Reporting",
+          "innovation": "Automated reporting"
+        }
+      ]
     },
     {
       "section": 6,
-      "title": "Practice"
+      "title": "Practice",
+      "objective": "Pilares da prática, entregas relevantes e evoluções.",
+      "placeholder": "Rascunho: substituir pelos materiais da Nat",
+      "pillars": [
+        "Pessoas & formação",
+        "Método & qualidade",
+        "Ferramentas & aceleradores",
+        "Comunidade & conhecimento"
+      ],
+      "deliveries": [
+        "Playbook de modelagem",
+        "Biblioteca de código reutilizável",
+        "Trilha de formação em IA",
+        "Governança de modelos",
+        "Guilda mensal"
+      ],
+      "evolutions": [
+        {
+          "version": "v1.0",
+          "year": "2023",
+          "text": "playbook de modelagem"
+        },
+        {
+          "version": "v2.0",
+          "year": "2024",
+          "text": "biblioteca de features"
+        },
+        {
+          "version": "v3.0",
+          "year": "2025",
+          "text": "MLOps + monitoramento"
+        },
+        {
+          "version": "v4.0",
+          "year": "2026",
+          "text": "agentes + avaliação de LLMs"
+        }
+      ]
     },
     {
       "section": 7,
-      "title": "The Future of Analytics"
+      "title": "The Future of Analytics",
+      "objective": "Onde queremos estar: mais conectados às decisões estratégicas dos clientes, mais integrados às demais tracks e com soluções cada vez mais escaláveis e diferenciadas."
     }
   ],
   "headline_numbers_for_slides": [
     {
-      "number": "1.5x",
-      "meaning": "Exemplo de número-manchete",
+      "number": "$2000 -> $3600",
+      "meaning": "Performance Analytics revenue across reference periods (1.8x)",
       "section": 2
     },
     {
-      "number": "+3 p.p.",
-      "meaning": "Exemplo de ganho em pontos percentuais",
+      "number": "$3600",
+      "meaning": "Revenue forecast for the following period",
+      "section": 2
+    },
+    {
+      "number": "1.742857x",
+      "meaning": "PA Brazil revenue vs. prior period",
+      "section": 2
+    },
+    {
+      "number": "1.648649x",
+      "meaning": "PA Brazil revenue vs. budget",
+      "section": 2
+    },
+    {
+      "number": "1.1875x",
+      "meaning": "Cliente Banana conversion vs. second-best campaign",
       "section": 4
+    },
+    {
+      "number": "R$ 218",
+      "meaning": "Incremental revenue from Café basket",
+      "section": 4
+    },
+    {
+      "number": "1.245x",
+      "meaning": "Café revenue in non-primary BU vs. baseline",
+      "section": 4
+    },
+    {
+      "number": "3.812MM",
+      "meaning": "Interactions modeled at Cliente Banana",
+      "section": 4
+    },
+    {
+      "number": "+4 p.p.",
+      "meaning": "Cliente Manga theoretical principality gain for the short recommendation list",
+      "section": 4
+    },
+    {
+      "number": "0.092MM",
+      "meaning": "Cliente Manga PF associates covered",
+      "section": 4
+    },
+    {
+      "number": "30",
+      "meaning": "Acquirers in Insight Agent pipeline",
+      "section": 5
+    },
+    {
+      "number": "12 + 4",
+      "meaning": "Insight Agent clients + PoCs",
+      "section": 5
+    },
+    {
+      "number": "R$ 480",
+      "meaning": "Cliente Laranja user-pay over 4 years",
+      "section": 5
     }
-  ]
+  ],
+  "presentation_design_guidance": {
+    "section_2": "Use revenue evolution across reference periods as the dominant visual; use the Brazil milestone (1.742857x prior-period revenue, 1.648649x budget) as a callout and complement with a few scale proof points.",
+    "section_3": "Use a capability map (not a project list), organized by client type (Emissores, Adquirentes, Merchants), linking each capability to a case.",
+    "section_4": "One case card per case with Problem, Analytics, Impact and a single headline number.",
+    "section_5": "Show progression: manual analysis -> advanced analytics -> productized engines -> AI-powered scalable assets."
+  }
 }
 </script>
 <!--

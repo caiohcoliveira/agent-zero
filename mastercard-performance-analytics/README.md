@@ -63,8 +63,7 @@ src/
   90-player.js           render, transições, loop, controles, teclado
   99-tail.html
 data/
-  presentation.json        dados reais do vídeo (fora do Git: o repositório é público)
-  presentation.sample.json exemplo público com a mesma estrutura
+  presentation.json        dados do vídeo (números mascarados), embutidos no HTML pelo build
 build.sh                 junta tudo num HTML único e injeta o JSON de dados no topo
 ```
 
@@ -111,12 +110,15 @@ Depois de editar algo em `src/`, rode `./build.sh`.
 
 Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no bloco `<script type="application/json" id="pa-data">`.
 
-- **No HTML pronto:** abra o arquivo num editor de texto, mude o valor no bloco `pa-data` e salve.
-- **No projeto:**
-  1. edite `data/presentation.json`;
-  2. rode `./build.sh`, que gera dois arquivos:
-     - `performance-analytics.html`, com os dados de exemplo (`data/presentation.sample.json`). É a versão que vai para o Git.
-     - `dist/performance-analytics.html`, com os dados reais. Fica só na máquina local.
-- **Formatação:** é automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita um campo `display` para fixar o texto exato de tela.
-- **Campos faltando:** se um campo faltar, a cena mostra "—" em vez de quebrar.
-- **Sigilo:** `data/presentation.json`, `dist/` e `musica/` estão no `.gitignore`. O repositório é público, então dados internos e arquivos de música não entram nele.
+- **No HTML pronto:** abra o arquivo num editor de texto, mude o valor no bloco `pa-data` e salve. É assim que os números mascarados podem ser trocados pelos originais.
+- **No projeto:** a fonte é `data/presentation.json`. Rode `./build.sh` para gerar o HTML com ele.
+- **Repositório público:**
+  - troque pelos números originais só na cópia local do HTML;
+  - edições feitas direto no HTML não voltam para o `data/presentation.json`. Para carregar uma mudança adiante, atualize o JSON.
+- **Formatação:** é automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita `display` para fixar o texto exato de tela.
+- **Campos faltando:** a cena mostra "—" ou a versão sem número, em vez de quebrar.
+- **Para completar depois:**
+  - `other_tracks`, na seção 3;
+  - os campos vazios do case Lights-off, na seção 4;
+  - a Prática, na seção 6, que hoje é um rascunho a substituir pelos materiais da Nat.
+- **Música:** as faixas entram embutidas no HTML. Os MP3 avulsos (`musica/`) ficam fora do Git.

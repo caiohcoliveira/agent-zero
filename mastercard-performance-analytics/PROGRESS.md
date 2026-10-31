@@ -41,11 +41,12 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   **Aguardando validação do usuário (estrutura e músicas).**
 - [x] **S1b. Dados (v3.2):**
   - bloco JSON `pa-data` no topo do HTML, lido por `src/01-data.js` (acessos seguros e formatação pt-BR);
-  - `data/presentation.json` local e fora do Git; exemplo público em `data/presentation.sample.json`;
-  - `build.sh` gera a versão pública e a `dist/` com os dados reais;
-  - storyline v3.2 aponta os campos do JSON de cada estação.
+  - `data/presentation.json` no Git, com os números mascarados.
+- [x] **S1c. Respostas (v3.3):**
+  - duração por play: abertura ~15s, 2:00, ~2:30, ~1:00;
+  - padrões assumidos e campos para completar no JSON (Prática, Lights-off, `other_tracks`).
 
-  **Aguardando respostas** (lista "O que preciso de vocês" no `STORYLINE.md`).
+  Ver "Decisões desta rodada (v3.3)" no `STORYLINE.md`. **Sem perguntas em aberto.**
 - [ ] **S2. Config v3:**
   - cenas, tempos e textos;
   - números lidos do bloco de dados (`src/01-data.js`);
@@ -82,7 +83,7 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
 ## Como retomar numa nova sessão
 
 1. Faça checkout da branch `claude/mastercard-analytics-video-4cof1t`.
-2. Leia este arquivo e o `STORYLINE.md` (v3).
+2. Leia este arquivo e o `STORYLINE.md` (v3.3).
 3. Continue a partir do primeiro item não marcado. Os parâmetros ficam em `src/01-config.js`.
-4. Rode `./build.sh` e faça a verificação: o render da duração inteira deve sair sem exceções. Os dados reais (`data/presentation.json`) não estão no Git: peça o JSON ao usuário se ele não estiver na máquina.
+4. Rode `./build.sh` e faça a verificação: o render da duração inteira deve sair sem exceções. Os MP3 das músicas não estão no Git (`musica/`): se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado.
 5. Faça commit e push, e marque o item aqui.

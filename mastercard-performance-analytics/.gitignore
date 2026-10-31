@@ -1,4 +1,3 @@
-# O repositório é público: dados reais e arquivos de música ficam só na máquina local.
-data/presentation.json
-dist/
+# Arquivos de música avulsos ficam fora do Git: a licença da Pixabay não permite
+# redistribuir a faixa solta. Elas entram embutidas no HTML, como parte do vídeo.
 musica/
