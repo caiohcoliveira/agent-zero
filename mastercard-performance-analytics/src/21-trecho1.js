@@ -143,8 +143,8 @@
       if (fc) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, bx, by, bw, bh, 6); ctx.strokeStyle = C.yellow; ctx.lineWidth = 4; ctx.stroke(); ctx.restore();
         hatch(ctx, () => rr(ctx, bx, by, bw, bh, 6), bx, by, bw, bh, { color: C.yellow, alpha: .35, gap: 14 }); }
       else { brush(ctx, bx, by, bw, bh, i === rows.length - 2 ? C.orange : mix(C.red, C.orange, i / 3), 80 + i, 1); inkRect(ctx, bx, by, bw, bh, 4, 4, i); }
-      text(ctx, FMT.usdMM(v), bx + bw / 2, by - 30, { size: o.small ? 22 : 34, weight: 900, color: o.small ? INK : '#FFF', align: 'center' });
-      text(ctx, yr(k), bx + bw / 2, y + h + 34, { size: o.small ? 17 : 26, weight: 800, mono: true, color: fc ? (o.small ? '#B07A00' : C.yellow) : (o.small ? '#4A4038' : '#E9DDCC'), align: 'center' });
+      text(ctx, FMT.usdMM(v), bx + bw / 2, by - (o.small ? 20 : 30), { size: o.small ? 15 : 34, weight: 900, color: o.small ? INK : '#FFF', align: 'center' });
+      text(ctx, o.small ? k.replace(/_forecast/i, '*') : yr(k), bx + bw / 2, y + h + (o.small ? 24 : 34), { size: o.small ? 16 : 26, weight: 800, mono: true, color: fc ? (o.small ? '#B07A00' : C.yellow) : (o.small ? '#4A4038' : '#E9DDCC'), align: 'center' });
       if (i && growth[i - 1] && !fc && !o.small) { const gp = P(t, T_BAR[i] + .3, .4); if (gp > 0) pill(ctx, bx - gap / 2 + bw / 2, by - 90, FMT.rel(growth[i - 1]) + ' no ano', { size: 22, fill: C.yellow, weight: 900, alpha: gp, scale: E.outBack(gp), rot: -.04 }); }
     });
     line(ctx, x - 20, y + h, x + w + 20, y + h, o.small ? INK : '#FFF', 4);

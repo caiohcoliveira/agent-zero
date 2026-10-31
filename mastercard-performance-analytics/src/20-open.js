@@ -5,27 +5,22 @@
 /* ---------- pré-show (loop de espera) ---------- */
 STOPSCN.preshow = {
   draw(ctx, tl) {
-    bgDark(ctx, tl, { centerA: .85, center: '#2E2016' });
-    collage(ctx, tl * .6, { seed: 17, n: 7, theme: 'dark', alpha: .7 });
     const br = BT.breath, ctxTitle = (DATA.presentation_context || {});
-    // grafites respirando ao redor
-    [['star', 300, 250, 90, C.yellow], ['arrow', 1600, 300, 120, C.orange], ['spiral', 1660, 820, 90, C.red], ['crown', 260, 820, 100, C.orange], ['zigzag', 960, 960, 160, C.yellow]]
-      .forEach(([k, x, y, s, c], i) => scribble(ctx, k, x, y, s, c, 400 + i, 1, { alpha: .5 + .3 * Math.sin(tl * 1.1 + i), glow: true, rot: Math.sin(tl * .4 + i) * .1 }));
-    intersection(ctx, W / 2, 285, 92, 120, { hot: .25 + .25 * br });
+    platform(ctx, tl, { sign: 'PLATAFORMA 1', people: true });
+    ctx.save(); ctx.fillStyle = 'rgba(10,7,5,.35)'; ctx.fillRect(0, 230, W, 560); ctx.restore();
+    intersection(ctx, W / 2, 330, 80, 104, { hot: .25 + .25 * br });
     paintTitle(ctx, 'PERFORMANCE ANALYTICS', W / 2, 520, { size: 104, bg: C.orange, seed: 7, p: 1 });
-    text(ctx, (ctxTitle.organization || 'Mastercard Advisors').toUpperCase() + '  ·  ' + TX.line, W / 2, 625, { size: 24, weight: 800, mono: true, color: '#F3E6D6', align: 'center', ls: 4 });
+    text(ctx, (ctxTitle.organization || 'Mastercard Advisors').toUpperCase() + '  ·  ' + TX.line, W / 2, 618, { size: 24, weight: 800, mono: true, color: '#F3E6D6', align: 'center', ls: 4 });
     const tt = tl % 16, ph = [TX.line, TX.stop.preshow, TX.line].map(s => s.padEnd(27, ' '));
-    FLAP.board(ctx, W / 2, 790, ph, [-100, .4, 8.4], tt, { tw: 46, th: 66, hiFrom: [0, 0, 0] });
-    glow(ctx, W / 2, 285, 300, C.orange, .25 + .2 * br);
+    FLAP.board(ctx, W / 2, 730, ph, [-100, .4, 8.4], tt, { tw: 42, th: 60, hiFrom: [0, 0, 0] });
     hint(ctx, tl, '→  para começar');
-    scanlines(ctx, .05);
   }
 };
 
 /* ---------- abertura (10s, trilha sintetizada a 120 BPM): plataforma → trem chega → portas abrem → bilhete → mapa ---------- */
 (() => {
   const id = 'open', T_ARR = .9, T_STOP = 4.3, T_DOOR = 4.5, T_TIX = 5.0, T_PUNCH = 6.0, T_DIVE = 7.0, T_MAP = 7.6;
-  const L = 1500, S = 1.18, TY = 900 - 400 * S, DOOR = L * .5, PLAT = TX.line.padEnd(27, ' ');
+  const L = 1500, S = 1.18, TY = 930 - 408 * S, DOOR = L * .5, PLAT = TX.line.padEnd(27, ' ');
   cue(id, .3, 'type', { n: 22, gap: .03 }); cue(id, T_ARR, 'whoosh', { dur: 3.2, v: .35 }); cue(id, T_STOP - .2, 'heart', {});
   cue(id, T_DOOR, 'impact', { size: .8 }); cue(id, T_DOOR + .05, 'chime', { f: 987.8, up: -4 }); cue(id, T_TIX, 'pop', { p: 1, v: .2 }); cue(id, T_PUNCH, 'click', { v: 1 });
   cue(id, T_DIVE, 'whoosh', { dur: 1.2, v: .4 }); cue(id, T_MAP + .4, 'shimmer', { dur: 2 });

@@ -164,30 +164,92 @@ function overlayPlay(ctx, T, s) {
   TRAIN_PASS.draw(ctx, T);
 }
 
-/* ---------- plataforma das paradas ---------- */
-function platform(ctx, tl, o = {}) {
-  ctx.fillStyle = '#17120F'; ctx.fillRect(0, 0, W, H);
-  // azulejos de metrô (tijolinho) pintados à mão
-  const r = rng(o.seed || 5), tw = 120, th = 58;
-  for (let row = 0; row * th < 860; row++) for (let c = -1; c * tw < W + tw; c++) {
-    const x = c * tw + (row % 2 ? tw / 2 : 0), y = row * th + 40, v = r();
-    rr(ctx, x + 3, y + 3, tw - 6, th - 6, 6); ctx.fillStyle = v < .08 ? '#3A2A1E' : v < .16 ? '#2B2420' : '#231D19'; ctx.fill();
+/* ---------- plataforma das paradas: estação viva ----------
+   Teto com luminárias e cones de luz, parede de azulejos pintados, fosso dos trilhos e a
+   plataforma. Eventos em paralelo, em ciclos próprios (tudo função do tempo da parada):
+   luminária que pisca, ratinho nos trilhos, goteira, pombo bicando, passageiro passando,
+   farol de um trem que cruza a estação (com vento nos cartazes), relógio e painel de LED. */
+const PLAT = { wall: 830, pit: 950, PY: 518 };
+/** vento do trem que passa (0–1) — os cartazes balançam */
+function platformWind(tl) { const c = (tl + 9) % 29; return c < 3.2 ? Math.sin(c / 3.2 * Math.PI) : 0; }
+const TILES = makeCanvas(W, PLAT.wall, (g, w, h) => {
+  g.fillStyle = '#1C1612'; g.fillRect(0, 0, w, h);
+  const r = rng(5), tw = 96, th = 48;
+  for (let row = 0; row * th < h; row++) for (let c = -1; c * tw < w + tw; c++) {
+    const x = c * tw + (row % 2 ? tw / 2 : 0), y = row * th, v = r(), base = v < .06 ? '#4A3424' : v < .14 ? '#3A2E26' : v < .5 ? '#2F2620' : '#2A221D';
+    const gr = g.createLinearGradient(x, y, x + tw * .4, y + th); gr.addColorStop(0, mix(base, '#FFE6C8', .1)); gr.addColorStop(1, mix(base, '#000000', .25));
+    rr(g, x + 3, y + 3, tw - 6, th - 6, 7); g.fillStyle = gr; g.fill();
+    g.fillStyle = 'rgba(255,240,220,.08)'; rr(g, x + 7, y + 6, tw * .5, 5, 3); g.fill();
   }
-  ctx.save(); ctx.globalAlpha = .18; ctx.drawImage(SHADE, 0, 0, W, 900); ctx.restore();
-  // faixa de neon que respira
-  const br = BT.breath == null ? .5 : BT.breath;
-  ctx.save(); ctx.shadowColor = C.orange; ctx.shadowBlur = 30 + 20 * br; line(ctx, 60, 70, W - 60, 70, rgba('#FFB070', .75 + .25 * br), 6); ctx.restore();
+  // faixa Mastercard na parede
+  [[C.red, 236], [C.orange, 252], [C.yellow, 268]].forEach(([c, y]) => { g.fillStyle = mix(c, '#000000', .35); g.fillRect(0, y, w, 16); });
+  // manchas de umidade
+  const r2 = rng(9); for (let k = 0; k < 14; k++) { const x = r2() * w, y = 300 + r2() * 480, rad = 40 + r2() * 120, gr = g.createRadialGradient(x, y, 4, x, y, rad); gr.addColorStop(0, 'rgba(10,6,4,.35)'); gr.addColorStop(1, 'rgba(10,6,4,0)'); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
+});
+function platform(ctx, tl, o = {}) {
+  const br = BT.breath == null ? .5 : BT.breath, WALL = PLAT.wall, PIT = PLAT.pit;
+  ctx.fillStyle = '#0E0B09'; ctx.fillRect(-W, -H, W * 3, H * 3);
+  ctx.drawImage(TILES, 0, 0);
+  // teto abobadado
+  const cg = ctx.createLinearGradient(0, 0, 0, 120); cg.addColorStop(0, '#0B0908'); cg.addColorStop(1, '#2A211B'); ctx.fillStyle = cg; ctx.fillRect(0, 0, W, 110);
+  line(ctx, 0, 110, W, 110, INK, 6);
+  // luminárias: a 3ª pisca de tempos em tempos
+  const LAMPS = [200, 620, 1040, 1460, 1840];
+  LAMPS.forEach((x, k) => {
+    let on = .85 + .15 * br; if (k === 2) { const c = tl % 11; if (c < 1.1) on = hash(Math.floor(tl * 16)) > .45 ? 1 : .08; }
+    if (k === 4) { const c = (tl + 5) % 23; if (c < .6) on = hash(Math.floor(tl * 20) + 7) > .5 ? 1 : .1; }
+    rr(ctx, x - 90, 78, 180, 22, 8); ctx.fillStyle = '#2E2620'; ctx.fill(); inkRect(ctx, x - 90, 78, 180, 22, 8, 3, k);
+    rr(ctx, x - 80, 92, 160, 10, 5); ctx.fillStyle = mix('#3A3028', '#FFF1D6', on); ctx.fill();
+    if (on > .3) { glow(ctx, x, 100, 160, '#FFD9A0', .35 * on); lightCone(ctx, x, 100, 160, 620, 860, '#FFD9A0', .5 * on); }
+  });
   // placa esmaltada com o nome da parada
   if (o.sign) { const sw = measure(ctx, o.sign, 34, 900, false, 4) + 180;
-    paper(ctx, W / 2 - sw / 2, 104, sw, 76, { r: 14, fill: '#F3EBDD', shadow: 8, shadowColor: '#000', lw: 4 });
-    intersection(ctx, W / 2 - sw / 2 + 62, 142, 20, 24);
-    text(ctx, o.sign, W / 2 + 34, 143, { size: 34, weight: 900, color: INK, align: 'center', ls: 4 }); }
-  // chão da plataforma com a faixa amarela de segurança
-  const fy = 900; ctx.fillStyle = '#0F0C0A'; ctx.fillRect(0, fy, W, H - fy);
-  ctx.fillStyle = C.yellow; for (let x = 0; x < W; x += 60) { ctx.save(); ctx.translate(x, fy + 16); ctx.transform(1, 0, -.5, 1, 0, 0); ctx.fillRect(0, 0, 36, 22); ctx.restore(); }
-  line(ctx, 0, fy, W, fy, INK, 6);
+    paper(ctx, W / 2 - sw / 2, 120, sw, 60, { r: 12, fill: '#F3EBDD', shadow: 7, shadowColor: '#000', lw: 4 });
+    intersection(ctx, W / 2 - sw / 2 + 60, 150, 17, 21);
+    text(ctx, o.sign, W / 2 + 34, 151, { size: 30, weight: 900, color: INK, align: 'center', ls: 4 }); }
+  // painel de LED rolando e relógio de estação
+  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   MANTENHA-SE ATRÁS DA FAIXA AMARELA   ', lx = 40, lw = 330;
+    rr(ctx, lx, 120, lw, 52, 8); ctx.fillStyle = '#080605'; ctx.fill(); inkRect(ctx, lx, 120, lw, 52, 8, 3, 3);
+    ctx.save(); ctx.beginPath(); ctx.rect(lx + 8, 124, lw - 16, 44); ctx.clip(); ctx.font = font(22, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 90) % mw;
+    ctx.shadowColor = C.orange; ctx.shadowBlur = 8; ctx.fillStyle = C.orange; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 8 - off, 147); ctx.restore();
+    ctx.fillStyle = 'rgba(0,0,0,.4)'; for (let k = 0; k < 9; k++) ctx.fillRect(lx + 6, 124 + k * 5, lw - 12, 1.5);
+    const cx = W - 52, cy = 150; circle(ctx, cx + 4, cy + 5, 44, 'rgba(0,0,0,.6)'); vball(ctx, cx, cy, 44, '#F3EBDD', { rim: false, lw: 4 });
+    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; line(ctx, cx + Math.cos(a) * 34, cy + Math.sin(a) * 34, cx + Math.cos(a) * 39, cy + Math.sin(a) * 39, INK, 3); }
+    const sec = tl % 60, mn = 37 + tl / 60; [[mn / 60 * TAU, 30, 4, INK], [((9 + mn / 60) / 12) * TAU, 20, 6, INK], [sec / 60 * TAU, 34, 2, C.red]].forEach(([a, l, w, c]) => line(ctx, cx, cy, cx + Math.sin(a) * l, cy - Math.cos(a) * l, c, w));
+    circle(ctx, cx, cy, 4, C.red); }
+  // rodapé, fosso dos trilhos e trilhos
+  ctx.fillStyle = '#120E0C'; ctx.fillRect(0, WALL, W, PIT - WALL); line(ctx, 0, WALL, W, WALL, INK, 5);
+  for (let x = -40; x < W + 40; x += 70) { ctx.fillStyle = '#2A1F18'; ctx.beginPath(); ctx.moveTo(x, 900); ctx.lineTo(x + 46, 900); ctx.lineTo(x + 56, 940); ctx.lineTo(x - 8, 940); ctx.closePath(); ctx.fill(); }
+  [886, 926].forEach((y, k) => { line(ctx, 0, y, W, y, '#5A5048', 9); line(ctx, 0, y - 3, W, y - 3, rgba('#FFE2BC', .45 + .2 * br), 2); });
+  // poça da goteira
+  ctx.save(); ctx.globalAlpha = .55; ctx.beginPath(); ctx.ellipse(1480, 912, 90, 12, 0, 0, TAU); ctx.fillStyle = '#2A3440'; ctx.fill(); ctx.restore();
+  // plataforma: faixa tátil amarela e piso com reflexo das luminárias
+  ctx.fillStyle = '#17120F'; ctx.fillRect(0, PIT, W, H - PIT + 200);
+  ctx.fillStyle = C.yellow; for (let x = 0; x < W; x += 60) { ctx.save(); ctx.translate(x, PIT + 12); ctx.transform(1, 0, -.5, 1, 0, 0); ctx.fillRect(0, 0, 36, 20); ctx.restore(); }
+  line(ctx, 0, PIT, W, PIT, INK, 6);
+  LAMPS.forEach(x => { const g = ctx.createRadialGradient(x, PIT + 80, 4, x, PIT + 80, 170); g.addColorStop(0, 'rgba(255,214,160,.16)'); g.addColorStop(1, 'rgba(255,214,160,0)'); ctx.fillStyle = g; ctx.fillRect(x - 170, PIT + 30, 340, 120); });
   // grafites que respiram nas paredes
-  (o.doodles || []).forEach((d, i) => scribble(ctx, d[0], d[1], d[2], d[3], d[4] || C.orange, 300 + i, 1, { rot: d[5] || 0, alpha: .55 + .2 * Math.sin(tl * 1.3 + i), glow: true }));
+  (o.doodles || []).forEach((d, i) => scribble(ctx, d[0], d[1], d[2], d[3], d[4] || C.orange, 300 + i, 1, { rot: d[5] || 0, alpha: .5 + .2 * Math.sin(tl * 1.3 + i), glow: true }));
+  platformLife(ctx, tl, o);
+}
+/** os eventos da estação (desenhados por cima da parede, atrás dos cartazes só o que é de fundo) */
+function platformLife(ctx, tl, o = {}) {
+  const PIT = PLAT.pit;
+  // goteira: a gota cai do teto e abre um anel na poça
+  { const c = tl % 5.3, fall = .9; if (c < fall) { const y = lerp(112, 905, (c / fall) ** 2); ctx.fillStyle = 'rgba(170,210,240,.85)'; ctx.beginPath(); ctx.ellipse(1480, y, 4, 7, 0, 0, TAU); ctx.fill(); }
+    else if (c < fall + .8) { const k = (c - fall) / .8; ctx.save(); ctx.globalAlpha = 1 - k; ctx.strokeStyle = 'rgba(190,220,250,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(1480, 910, 10 + 70 * k, 2 + 8 * k, 0, 0, TAU); ctx.stroke(); ctx.restore(); } }
+  // ratinho atravessando os trilhos (com uma parada para farejar)
+  { const c = (tl + 4) % 17, d = 3.6; if (c < d) { let u = c / d; const stop = u > .42 && u < .58; u = u < .42 ? u : u > .58 ? u - .16 : .42; const x = lerp(-80, W + 80, u / .84);
+      PEOPLE.mouse(ctx, x, 924, .9, 1, stop ? 0 : tl * 30); } }
+  // pombo na plataforma: bica, anda um pouco, bica de novo
+  { const c = tl % 13, walk = c > 8 && c < 10, x = 250 + (c > 10 ? 70 : walk ? (c - 8) * 35 : 0), peck = walk ? 0 : Math.max(0, Math.sin(tl * 6)) ** 3;
+    PEOPLE.pigeon(ctx, x, PIT + 105, 1, 1, peck); }
+  // farol de trem cruzando a estação (luz varre a parede da esquerda para a direita)
+  { const c = (tl + 9) % 29; if (c < 3.2) { const u = c / 3.2, x = lerp(-600, W + 600, u); ctx.save(); ctx.globalCompositeOperation = 'screen';
+      const g = ctx.createRadialGradient(x, 560, 20, x, 560, 700); g.addColorStop(0, 'rgba(255,236,200,.35)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, PIT); ctx.restore();
+      for (let k = 0; k < 14; k++) { const yy = 130 + hash(k * 7) * 760, xx = ((x + hash(k * 3) * 900) % (W + 200)) - 100; line(ctx, xx, yy, xx + 160, yy, 'rgba(255,240,220,.18)', 2); } } }
+  // passageiro passando em primeiro plano (silhueta desfocada)
+  { const c = (tl + 2) % 23, d = 7; if (c < d && o.people !== false) { const u = c / d, x = lerp(W + 120, -120, u); ctx.save(); ctx.globalAlpha = .9; PEOPLE.draw(ctx, x, H + 10, .62, PEOPLE.walk(tl * 5.5), { dir: -1, sil: true, t: tl }); ctx.restore(); } }
 }
 /** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
 const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz
@@ -292,7 +354,7 @@ function popupKey(n, k, ui, ctl) {
  *  Clique num cartaz → zoom · clique numa miniatura → popup · clique fora → volta · → segue (cartazes e embarque) */
 function recapScene(o) {
   const N = o.posters, px = i => 360 + i * 600;
-  const viewOf = k => { if (!k) return { x: W / 2, y: H / 2, s: 1 }; const L = slideRects(N[k - 1]), avail = L.top - 80, s = avail / 650; return { x: px(k - 1), y: 560 - ((40 + avail / 2) - H / 2) / s, s }; };
+  const viewOf = k => { if (!k) return { x: W / 2, y: H / 2, s: 1 }; const L = slideRects(N[k - 1]), avail = L.top - 80, s = avail / 650; return { x: px(k - 1), y: PLAT.PY - ((40 + avail / 2) - H / 2) / s, s }; };
   const curN = item => (item ? N[item - 1] : null);
   return {
     draw(ctx, tl, item, prevItem, p, ui) {
@@ -302,7 +364,8 @@ function recapScene(o) {
       ctx.fillStyle = '#17120F'; ctx.fillRect(0, 0, W, H);
       ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
       platform(ctx, tl, { sign: o.sign, doodles: o.doodles });
-      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), 560 - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] }); if (hov) glow(ctx, px(i), 560, 380, C.orange, .18); });
+      const wind = platformWind(tl);
+      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), PLAT.PY - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] + wind * .025 * Math.sin(tl * 9 + i * 2) }); if (hov) glow(ctx, px(i), PLAT.PY, 380, C.orange, .18); });
       ctx.restore();
       if (o.from != null && tl < 1.4) { ctx.save(); ctx.globalAlpha = 1 - E.inOutCubic(tl / 1.4); const z = 1 + tl * .25; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); }
       const sa = item ? (prevItem ? 1 : e) : (prevItem ? 1 - e : 0), sn = curN(item) || curN(prevItem);
@@ -315,7 +378,7 @@ function recapScene(o) {
     hit(x, y, ui) {
       const item = window.__state ? __state.item : 0, n = curN(item);
       if (n && (ui.pop != null)) return popupHit(n, x, y, ui);
-      if (!item) { for (let i = 0; i < N.length; i++) if (Math.abs(x - px(i)) < 250 && Math.abs(y - 560) < 320) return { poster: i }; return null; }
+      if (!item) { for (let i = 0; i < N.length; i++) if (Math.abs(x - px(i)) < 250 && Math.abs(y - PLAT.PY) < 320) return { poster: i }; return null; }
       const L = slideRects(n); for (const r of L.rects) if (x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h + 30) return { thumb: r.i };
       return { back: true };
     },
