@@ -2,7 +2,7 @@
 
 **Sessão:** até 20 min, sendo ~5:45 de vídeo em 4 plays e 11 min de fala das apresentadoras, em 4 paradas
 **Vídeo:** HTML único offline, 1920×1080, em **modo apresentação**: trechos de vídeo e paradas em loop, controlados pelo teclado ou pelo passador de slides
-**Status:** **proposta em validação**. As cenas da v3 ainda não foram implementadas; o HTML já carrega o bloco de dados. O vídeo atual ainda é a v2, cujo roteiro está no histórico (commit `20e1d96`).
+**Status:** **implementado** no `performance-analytics.html` (v3.3). Os números vêm do JSON de dados; os pontos que dependem de material (Practice, Lights-off, demais tracks) entram pelo JSON quando chegarem.
 
 Marcadores usados no texto:
 - **[v2]** reaproveita uma cena da v2, com ajustes;

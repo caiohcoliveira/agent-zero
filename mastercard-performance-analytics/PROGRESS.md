@@ -56,32 +56,19 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   - pré-show, paradas em loop com itens, embarque e setas ignoradas durante o vídeo;
   - teclas 1–7, P, Home/End e barra com estações e paradas;
   - cenas antigas da v2 movidas para `src/legacy/` (referência; fora do build).
-- [ ] **S4. Componentes:**
-  - letreiro de estação;
-  - mapa e mini-mapa;
-  - plataforma com cartazes;
-  - régua do caso;
-  - comprovante de impacto.
-- [ ] **S5. Trilha:**
-  - faixas escolhidas: berrydeep, kulakovka e twisterium (Pixabay);
-  - análise feita (andamento, compassos, seções, volume);
-  - MP3 fora do Git;
-  - aguardando as respostas sobre duração e encaixe (ver "Trilha" no `STORYLINE.md`);
-  - depois: sincronia por compasso, SFX de metrô e silêncio nas paradas.
-- [ ] **S6. Abertura + Parada 0:** mapa navegável, com o pré-show opcional.
-- [ ] **S7. Trecho 1:** estações 01–03 + Parada 1 (3 cartazes).
-- [ ] **S8. Trecho 2:**
-  - estação 04 (casos 1–3);
-  - estação 05;
-  - estação 06 (placeholders até os materiais da Nat);
-  - Parada 2 (3 cartazes).
-- [ ] **S9. Trecho 3:** estação 07, clímax, split-flap e encerramento em loop.
-- [ ] **S10. QA completo + README:** inclui loops sem emenda e navegação com passador.
+- [x] **S4. Camada de batida + estilo + componentes** (`src/09-fx.js`, `src/10-ui.js`):
+  - câmera, cores, RGB, linhas de foco e quadros invertidos guiados pela música;
+  - traço de tinta fervendo, respingos, grafites e pinceladas;
+  - split-flap, mapa, mini-mapa, letreiro de estação, plataforma e cartazes, régua e comprovante.
+- [x] **S5. Abertura + Parada 0 + trecho 1** (`src/20-open.js`, `src/21-trecho1.js`): estações 01–03 e Parada 1.
+- [x] **S6. Trecho 2** (`src/22-cases.js`, `src/23-scale.js`): 4 cases, estações 05 e 06 e Parada 2.
+- [x] **S7. Trecho 3** (`src/24-final.js`): estação 07, clímax, letreiro final e encerramento.
+- [ ] **S8. QA completo + README:** varredura de render, navegação com passador, loops; README e roteiro atualizados.
 
 ## Como retomar numa nova sessão
 
 1. Faça checkout da branch `claude/mastercard-analytics-video-4cof1t`.
-2. Leia este arquivo e o `STORYLINE.md` (v3.3).
+2. Leia este arquivo, o `README.md` (arquitetura v3) e o `STORYLINE.md` (v3.3).
 3. Continue a partir do primeiro item não marcado. Os parâmetros ficam em `src/01-config.js`.
 4. Rode `./build.sh` e faça a verificação: o render da duração inteira deve sair sem exceções. Os MP3 das músicas não estão no Git (`musica/`): se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado.
 5. Faça commit e push, e marque o item aqui.

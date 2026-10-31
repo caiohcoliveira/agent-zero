@@ -1,110 +1,43 @@
-# Performance Analytics — "A Interseção" (v2)
+# Performance Analytics — "A Linha" (v3)
 
-Vídeo animado executivo de 4 minutos sobre a track de Performance Analytics, com visual retrô-moderno de colagem na identidade Mastercard e camada futurista nos trechos de modelos.
+Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há paradas em loop, para as apresentadoras falarem. O visual é retrô-moderno, de colagem, com traço de tinta no espírito de Arcane. A câmera, as cores e os elementos reagem às batidas das músicas.
 
-- **Arquivo final:** [`performance-analytics.html`](performance-analytics.html) — um único HTML, 1920×1080, 100% offline, sem dependências.
-- **Roteiro e storyboard (v2):** [`STORYLINE.md`](STORYLINE.md).
+- **Arquivo final:** [`performance-analytics.html`](performance-analytics.html), um único HTML 1920×1080, 100% offline, com dados e músicas embutidos.
+- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v3.3).
 - **Checkpoint de retomada:** [`PROGRESS.md`](PROGRESS.md).
 
-## Como assistir
+## Como apresentar
 
-1. Abra `performance-analytics.html` no Chrome ou no Edge (duplo clique).
-2. Clique em **Assistir**. O áudio só pode começar depois de um clique, por regra do navegador.
-3. Tecle **F** para tela cheia.
+1. Abra `performance-analytics.html` no Chrome ou no Edge e tecle **F** para tela cheia.
+2. A tela começa no **pré-show**, um loop de espera. A primeira tecla libera o áudio, por regra do navegador.
+3. Com → (ou o passador de slides) a sessão anda assim:
 
-| Tecla | Ação |
-|---|---|
-| Espaço | play / pause |
-| R | reiniciar |
-| ← / → | voltar / avançar 5 s |
-| F | tela cheia |
-| M | trilha e efeitos on/off |
-| V | narração on/off |
-| C | legendas da narração on/off |
+| Momento | O que acontece | Duração |
+|---|---|---|
+| Pré-show | loop de espera | até a primeira tecla |
+| Play 1 · abertura | os 5 desafios → o mapa da linha (trilha sintetizada) | 0:15 |
+| **Parada 0** · roteiro | o mapa em loop; cada → destaca uma estação | fala |
+| Play 2 · estações 01–03 | "Vintage Film Funk" | 1:59 |
+| **Parada 1** · retomada | plataforma com os cartazes 01, 02 e 03 | fala |
+| Play 3 · estações 04–06 | "Technology" (a partir de 0:20) | 2:29 |
+| **Parada 2** · retomada | cartazes 04, 05 e 06 | fala |
+| Play 4 · 07, clímax e letreiro | "Epic Piano" (a partir de 0:07) | 1:07 |
+| **Encerramento** | letreiro "Performance Analytics" vivo; → mostra o cartaz 07 | fala |
 
-A barra de progresso aceita clique e arraste. Ao passar o mouse, ela mostra o nome da cena.
+São ~5:50 de vídeo no total.
 
-**Gravar em MP4:** basta gravar a tela em tela cheia (OBS, Xbox Game Bar ou QuickTime) com o áudio do sistema. Como tudo é desenhado em função do tempo, cada execução é idêntica.
+| Tecla | Na parada | Durante o vídeo |
+|---|---|---|
+| → · PageDown · espaço · Enter · clique | próximo cartaz; no último, embarca no próximo play | só espaço/Enter: pausa |
+| ← · PageUp | cartaz anterior | — (setas não pulam o vídeo) |
+| P | — | pausa/retoma (emergência) |
+| 1 a 7 | vai para a estação | vai para a estação |
+| Home ou R / End | volta ao pré-show / vai ao encerramento | idem |
+| F · M · V · C | tela cheia · som · narração · legendas | idem |
 
-## Narração
+A barra de progresso mostra as estações (traços) e as paradas (losangos). Ela aceita clique e arraste, para quem opera. Os controles somem sozinhos durante as paradas e o vídeo e voltam ao mover o mouse.
 
-- A narração vem **desligada por padrão**. Para ligar, use o botão **Voz** ou a tecla **V** (ou `CONFIG.audio.voice = true`).
-- Ela usa a **Web Speech API** do navegador e prefere uma voz feminina pt-BR.
-- A qualidade depende das vozes instaladas no sistema:
-  - **Windows / Edge:** "Francisca" e "Thalita" (naturais, exigem internet); "Maria" funciona offline.
-  - **macOS:** "Luciana".
-- O nome da voz em uso aparece na barra de controles.
-- Cada frase dispara no seu próprio cue (`CONFIG.narration`), então a sincronia é feita frase a frase.
-- Termos em inglês recebem grafia fonética (`CONFIG.phonetics`) para soar natural.
-
-**Para usar uma locução gravada:**
-1. Desligue a voz (`CONFIG.audio.voice = false`).
-2. Use os tempos de `CONFIG.narration` como guia de edição.
-3. Embuta o áudio no próprio HTML como `data:` URI.
-
-## Arquitetura
-
-```
-src/
-  00-head.html           HTML + CSS (palco 1920×1080, overlay inicial, controles)
-  01-config.js           ★ CONFIG: cores, tempos das cenas, textos, narração, áudio, motion
-  01-data.js             ★ DADOS: lê o bloco JSON "pa-data" do topo do HTML, acessos seguros e formatação pt-BR
-  02-core.js             easing, interpolação, RNG com seed, cores, primitivas, câmera, fundos, granulação
-  03-collage.js          ★ linguagem retrô-moderna: papel, contornos, sombras chapadas, meio-tom, fita,
-                         stickers, tiras de fórmula, recortes; camada futurista (grid neon, sol, scanlines, holo)
-  03-components.js       ícones vetoriais, agentes (personagens), cards, carimbo ✓, chips, dashboard
-  04-viz.js              visualizações de modelos: gaussiana, regressão, classificação, árvore,
-                         ensemble, clusters, anomalia, embeddings, recomendação, agentes,
-                         pipeline, crédito, forecast, IA, gradiente descendente, atenção (transformer)
-  05-audio.js            trilha e SFX sintetizados (Web Audio) + sistema de cues
-  06-voice.js            narração (speechSynthesis) e legendas
-  10…17-*.js             as 10 cenas: hook (5 desafios), problema, hub, ALS, embeddings,
-                         lights-off, insights em escala, possibilidades (∞), clímax, split-flap
-  90-player.js           render, transições, loop, controles, teclado
-  99-tail.html
-data/
-  presentation.json        dados do vídeo (números mascarados), embutidos no HTML pelo build
-build.sh                 junta tudo num HTML único e injeta o JSON de dados no topo
-```
-
-Depois de editar algo em `src/`, rode `./build.sh`.
-
-**Decisões principais:**
-
-- **Canvas 2D com render puro em função do tempo.** Cada cena é uma função `draw(ctx, t)` sem estado. Por isso o seek e a pausa são perfeitos, a barra de progresso funciona em qualquer ponto e não há acúmulo de erro. A aleatoriedade usa seed, então o resultado é sempre igual.
-- **Timeline central.** As cenas têm `dur`, e os inícios são calculados em sequência. Narração, cues de som e tremores de câmera usam o tempo local de cada cena, então mudar a duração de uma cena desloca tudo o que vem depois.
-- **Áudio amarrado à timeline.** Um scheduler com lookahead agenda, a cada semicolcheia (120 BPM), as notas e os SFX que caem na janela dos próximos ~160 ms. No pause ou seek, os buses são recriados e as notas pendentes são descartadas.
-- **Performance.** Brilhos usam gradientes radiais em vez de `shadowBlur`, e a granulação é uma textura pré-renderizada. O render custa ~1 ms por frame.
-
-## Estratégia de animação
-
-- **Visual retrô-moderno de colagem:**
-  - papel recortado com contorno de tinta, sombras chapadas, meio-tom, fita e stickers;
-  - fórmulas reais coladas como easter eggs técnicos (cosseno, gradiente descendente, ALS, atenção, Gini, uplift, Bellman…).
-- **Camada futurista nos trechos de modelos:** grid neon em perspectiva, sol listrado, scanlines e painéis holográficos.
-
-- **Entrar rápido e assentar.** Os elementos entram com `outExpo` ou `outBack`, com um leve overshoot.
-- **Câmera virtual.** Faz zoom, pan e rotação, com tremor nos impactos. A intensidade é controlada por `CONFIG.motion`.
-- **Textura stop motion.** Os snaps de câmera da cena 8 são quantizados "em dois" (15 fps), sobre o resto do filme a 60 fps.
-- **Ritmo claro e escuro.** As cenas alternam entre fundo claro e escuro. A virada mais forte é o apagão literal no caso lights-off.
-- **Fios narrativos:**
-  - as 4 perguntas da cena 2 viram os chips de capítulo, que ganham ✓;
-  - os Agentes reaparecem nos casos 01 e 04, no clímax e no final;
-  - o ponto laranja abre e fecha o filme.
-- **Semântica de cor:** vermelho = negócio / alerta, amarelo = dados, laranja = resposta.
-
-## Parâmetros úteis (`src/01-config.js`)
-
-| Parâmetro | Efeito |
-|---|---|
-| `scenes[].dur` | duração de cada cena (o total é recalculado) |
-| `colors` | paleta |
-| `text` | todos os textos-chave; `*palavra*` = destaque laranja |
-| `narration` | frases e tempos da narração |
-| `motion.intensity`, `motion.shake`, `motion.onTwos`, `motion.grain` | energia do movimento |
-| `audio.music`, `audio.sfx`, `audio.voice` (padrão: desligada), volumes, `voiceRate` | áudio |
-| `caseDone` | momento do carimbo ✓ de cada caso (sincroniza os chips) |
-| `captions` | legendas completas ligadas por padrão |
+O modo `CONFIG.mode = 'reel'` roda tudo direto, sem paradas, para mandar por e-mail.
 
 ## Dados do vídeo
 
@@ -114,11 +47,78 @@ Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no 
 - **No projeto:** a fonte é `data/presentation.json`. Rode `./build.sh` para gerar o HTML com ele.
 - **Repositório público:**
   - troque pelos números originais só na cópia local do HTML;
-  - edições feitas direto no HTML não voltam para o `data/presentation.json`. Para carregar uma mudança adiante, atualize o JSON.
-- **Formatação:** é automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita `display` para fixar o texto exato de tela.
-- **Campos faltando:** a cena mostra "—" ou a versão sem número, em vez de quebrar.
+  - edições feitas direto no HTML não voltam para o `data/presentation.json`. Para levar uma mudança adiante, atualize o JSON.
+- **Formatação:** automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita `display` para fixar o texto exato de tela.
+- **Campo faltando:** a cena mostra "—" ou a versão sem número, em vez de quebrar.
 - **Para completar depois:**
-  - `other_tracks`, na seção 3;
-  - os campos vazios do case Lights-off, na seção 4;
-  - a Prática, na seção 6, que hoje é um rascunho a substituir pelos materiais da Nat.
-- **Música:** as faixas entram embutidas no HTML. Os MP3 avulsos (`musica/`) ficam fora do Git.
+  - `other_tracks` (seção 3): nomes das demais tracks no faixa da estação 03;
+  - campos vazios do case Lights-off (seção 4): `business_problem`, `business_results.headline`, `client_type`;
+  - Practice (seção 6): `pillars`, `deliveries`, `evolutions`. Hoje é um rascunho; apague `placeholder` para tirar a etiqueta "rascunho".
+
+## Música e batidas
+
+- **Faixas (Pixabay):** berrydeep "Vintage Film Funk", kulakovka "Technology" e twisterium "Epic Piano Background".
+  - Entram embutidas no HTML, recodificadas a 128 kbps, como parte do vídeo.
+  - Os MP3 avulsos ficam em `musica/`, fora do Git, porque a licença não permite redistribuir a faixa solta.
+- **Sincronia:** `tools/music.py` analisa as faixas e gera `src/07-beats.js`, com batidas, compassos, envelopes de grave e caixa, picos e mudanças de seção.
+  - As cenas marcam os eventos nos compassos: `grid(id).bars`.
+  - O estado da música no quadro fica em `BT`: `beat`, `down`, `kick`, `snare`, `level`, `hit` e `drop`.
+- **O que reage à música** (`src/09-fx.js`):
+  - **câmera:** soco de zoom nos tempos fortes, balanço no compasso e tranco nos picos;
+  - **cores:** calor no 1º tempo, separação RGB nas caixas e picos, linhas de foco e quadros invertidos (*impact frames*) nas viradas de seção;
+  - **elementos:** pulsam com o grave, e o traço de tinta "ferve" mais forte nas caixas.
+- **Intensidade:** `CONFIG.motion.beat` (0 desliga).
+- **Paradas:** ficam em silêncio. A abertura usa a trilha sintetizada a 120 BPM. Se uma faixa faltar no HTML, o play correspondente usa um groove sintetizado de reserva.
+
+## Arquitetura
+
+```
+src/
+  00-head.html     HTML + CSS, bloco de dados (pa-data) e blocos de música
+  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, paradas, textos, narração, áudio
+  01-data.js       ★ DADOS: lê o JSON, acessos seguros (SEC, CASE, HEADLINES) e formatação pt-BR (FMT)
+  02-core.js       easing, cores, primitivas, texto, câmera, fundos, granulação
+  03-collage.js    papel, contornos, meio-tom, fita, stickers, fórmulas; camada futurista (grid, sol, holo)
+  03-components.js ícones, agentes, cards, carimbo ✓, dashboard
+  04-viz.js        visualizações de modelos (gaussiana, regressão, classificação, clusters, embeddings…)
+  05-audio.js      trilha sintetizada da abertura + SFX + sistema de cues
+  06-voice.js      narração (speechSynthesis) e legendas
+  07-beats.js      gerado por tools/music.py: batidas e envelopes das faixas
+  08-music.js      toca as faixas em sincronia e expõe BEAT/BT
+  09-fx.js         câmera e pós-processamento guiados pela música; traço de tinta, respingos, grafites, pinceladas
+  10-ui.js         split-flap, mapa do metrô, mini-mapa, letreiro de estação, plataforma, cartazes, régua e comprovante
+  20-open.js       pré-show, abertura e Parada 0
+  21-trecho1.js    estações 01, 02, 03 e Parada 1
+  22-cases.js      estação 04: Banana, Manga, Lights-off, Insight Agent
+  23-scale.js      estações 05 e 06 e Parada 2
+  24-final.js      estação 07, clímax, letreiro final e encerramento
+  90-player.js     modo apresentação: plays, paradas em loop, navegação, controles
+  99-tail.html
+  legacy/          cenas da v2 (só referência; fora do build)
+data/presentation.json
+tools/build.py     monta o HTML (python3; ffmpeg para as músicas)
+tools/music.py     analisa as músicas (requer librosa)
+build.sh           atalho para tools/build.py
+```
+
+- **Para montar:** depois de editar `src/` ou `data/`, rode `./build.sh`.
+  - Sem a pasta `musica/`, o build reaproveita as músicas que já estão no HTML.
+  - Ao trocar uma faixa, rode `tools/music.py` antes, e ajuste os `dur` das cenas em `src/01-config.js` aos novos compassos.
+
+**Decisões principais:**
+- **Render puro em função do tempo.** Cada cena é `draw(ctx, t)` sem estado, e a música vira dados (`BT`) também em função do tempo. Por isso o seek é exato e o resultado é sempre igual.
+- **Paradas com relógio próprio.** O loop usa o tempo desde a entrada na parada, e a transição entre cartazes é uma câmera que viaja na plataforma, sem corte.
+- **Leveza:** brilhos com gradiente radial e granulação pré-renderizada. A separação RGB só roda nos quadros em que a música pede.
+
+## Parâmetros úteis (`src/01-config.js`)
+
+| Parâmetro | Efeito |
+|---|---|
+| `mode` | `'show'` (paradas em loop) ou `'reel'` (direto) |
+| `plays[].from` | de onde cada faixa começa |
+| `scenes[].dur` | duração de cada cena; casada com os compassos da faixa |
+| `stops[].items` | quantos passos o → percorre em cada parada |
+| `text` | todos os textos fixos (estações, desafios, rótulos) |
+| `motion.beat`, `motion.intensity`, `motion.grain` | quanto a música mexe nos visuais, energia, granulação |
+| `audio.tracks.*.gain`, `audio.trackVolume` | volume das faixas (já equalizadas) |
+| `audio.voice`, `captions` | narração e legendas (desligadas por padrão) |
