@@ -116,14 +116,14 @@ function ticket(ctx, x, y, s, o = {}) {
 }
 
 /* ---------- legendas de tela (sem narrador, cada cena se explica sozinha) ----------
-   SCENES[id].caps = [[t0, t1, 'texto com *destaque*', 'ETIQUETA'], …] em tempo local da cena */
+   SCENES[id].caps = [[t0, t1, 'texto com *destaque*', 'ETIQUETA', { top }], …] em tempo local da cena */
 function captionStrip(ctx, s, t) {
   const caps = (SCENES[s.id] && SCENES[s.id].caps) || [];
-  caps.forEach(([t0, t1, str, kick]) => {
+  caps.forEach(([t0, t1, str, kick, opt]) => {
     const a = Math.min(P(t, t0, .35), 1 - P(t, t1 - .35, .35)); if (a <= 0) return;
     let size = 34; const plain = str.replace(/\*/g, ''), kw = kick ? measure(ctx, kick, 18, 800, true, 3) + 44 : 0;
     let tw = measure(ctx, plain, size, 800); const maxW = 1680 - kw; if (tw > maxW) { size *= maxW / tw; tw = maxW; }
-    const w = kw + tw + 72, h = 78, x = W / 2 - w / 2, y = H - 122 + (1 - E.outCubic(a)) * 24;
+    const w = kw + tw + 72, h = 78, x = W / 2 - w / 2, y = (opt && opt.top ? 118 : H - 122) + (1 - E.outCubic(a)) * 24 * (opt && opt.top ? -1 : 1);
     ctx.save(); ctx.globalAlpha *= a;
     paper(ctx, x, y, w, h, { r: 12, fill: 'rgba(18,14,11,.93)', outline: '#000', shadow: 7, shadowColor: 'rgba(0,0,0,.6)', lw: 3 });
     if (kick) { rr(ctx, x + 18, y + 20, kw - 8, 38, 6); ctx.fillStyle = C.orange; ctx.fill(); text(ctx, kick, x + 18 + (kw - 8) / 2, y + 40, { size: 18, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 3 }); }

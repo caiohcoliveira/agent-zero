@@ -53,6 +53,11 @@ const FUTURE_ART = {
 
   SCENES[id] = {
     themeAt: () => 'dark', fx: { invert: false },
+    peaks: [[T_KEY - .1, T_KEY + 1.6, .7]],
+    caps: [[1, T_SIGN[0] - .2, 'Última estação: *onde queremos estar*', 'O FUTURO'],
+      [T_SIGN[0] + .3, T_SIGN[1] - .3, '*Mais perto das decisões* estratégicas dos clientes: um lugar na mesa', 'DIREÇÃO 1'],
+      [T_SIGN[1] + .3, T_SIGN[2] - .3, '*Mais integrados* às demais tracks: analytics conectando as soluções', 'DIREÇÃO 2'],
+      [T_SIGN[2] + .3, T_ROW, '*Mais escaláveis e diferenciados*: soluções que se replicam e se destacam', 'DIREÇÃO 3']],
     draw(ctx, t) {
       const rise = E.outCubic(P(t, 0, 8)), row = E.inOutCubic(P(t, T_ROW, 1.4));
       bgDark(ctx, t, { centerA: .9, center: '#2B1408' });
@@ -70,7 +75,7 @@ const FUTURE_ART = {
         const x = lerp(cx, rx, row), y = lerp(cy, ry, row), s = lerp(ap, .68, row) * (1 + .01 * BT.beat);
         if (gone < 1 || row > 0) sign(ctx, x, y, s, k, t, clamp(p * 1.4));
       });
-      const kp = P(t, T_KEY, .6); if (kp > 0) paintTitle(ctx, TX.futureKey, W / 2, 930, { size: 60, bg: C.red, seed: 51, p: kp });
+      const kp = P(t, T_KEY, .6); if (kp > 0) paintTitle(ctx, TX.futureKey, W / 2, 880, { size: 64, bg: C.red, seed: 51, p: kp });
       scanlines(ctx, .05);
     }
   };
@@ -91,6 +96,8 @@ const FUTURE_ART = {
   for (let k = 0; k < N; k++) cue(id, cutAt(k), 'hit', { size: .35 + k * .05 }); cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
 
   SCENES[id] = {
+    peaks: [[0, 12]],
+    caps: [[.3, T_KEY - .2, 'Tudo o que vimos se apoia em *ciência de dados*: da estatística aos agentes de IA', 'NOSSA BASE', { top: true }]],
     themeAt: t => t < T_KEY ? (Math.floor(t / 1.2) % 2 ? 'light' : 'dark') : 'dark',
     draw(ctx, t) {
       let k = -1; for (let i = 0; i < N; i++) if (t >= cutAt(i)) k = i;
@@ -136,10 +143,13 @@ const CLOSE = (() => {
     [[380, 300, 140, C.red], [1540, 330, 160, C.yellow]].forEach(([x, y, r, c], i) => splat(ctx, x, y, r, c, 300 + i, E.outBack(P(t, T_CHORD + i * .06, .35)), .8));
     const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, header: 'PRÓXIMA PARADA', headerCol: C.red, glowA: gA });
     if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x, b.y - 40, b.w, b.h + 40, 18); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
-    text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 960, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
+    text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 860, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
     scanlines(ctx, .06);
   }
-  SCENES[id] = { themeAt: () => 'dark', fx: { chroma: .7 }, draw(ctx, t) { draw(ctx, t); } };
+  SCENES[id] = { themeAt: () => 'dark', fx: { chroma: .7 }, draw(ctx, t) { draw(ctx, t); },
+    peaks: [[T_CHORD - .1, T_CHORD + 1.8]],
+    caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*', 'PRÓXIMA PARADA'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*', 'PRÓXIMA PARADA'],
+      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*', 'PRÓXIMA PARADA'], [T_CHORD + .4, 26.4, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
   return { draw, T_CHORD };
 })();
 
