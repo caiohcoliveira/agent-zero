@@ -115,7 +115,8 @@ const CONFIG = {
     circleA: 'Negócio', circleB: 'Dados',
     chain: ['Dados', 'Decisões', 'Impacto', 'Valor'],
     engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Implementação', 'construir'], ['Mensuração', 'provar']],
-    tagline: 'Da pergunta de negócio ao *valor medido*.',
+    question: 'Quem pode resolver esse problema?',
+    tagline: 'Esse é o nosso *papel estratégico*.',
     caseSteps: ['PROBLEMA', 'DADOS', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'],
     agents: {
       gen: [{ role: 'analista', name: 'Analista' }, { role: 'business', name: 'Business' }, { role: 'clevel', name: 'C-Level' }],
@@ -123,14 +124,22 @@ const CONFIG = {
     },
     progression: ['Análise manual', 'Analytics avançado', 'Motores produtizados', 'Ativos de IA escaláveis'],
     perimeter: 'AMBIENTE MASTERCARD', never: 'o dado nunca sai',
-    waves: {
-      issuer: ['Fraud', 'Credit Risk', 'Authorization', 'AML', 'Collections'],
-      acquirer: ['Fraud', 'Merchant Risk', 'Authorization Optimization', 'Smart Routing', 'Chargeback'],
-      analytics: ['embeddings', 'anomaly detection', 'spend forecasting', 'customer similarity', 'merchant similarity',
-        'product affinity', 'share of wallet', 'incrementality', 'attribution', 'assortment optimization'],
-      frontier: ['causal ML', 'uplift modeling', 'reinforcement learning', 'graph fraud', 'graph embeddings',
-        'deep recommenders', 'dynamic pricing', 'real-time personalization', 'multi-objective optimization']
+    // estação 03: casos de machine learning que bancos e fintechs usam (nome em pt · técnica em inglês)
+    ml: {
+      pred: [['Prevenção a fraude', 'gradient boosting · graph ML'], ['Score de risco de crédito', 'logistic regression · XGBoost'], ['Propensão a churn', 'survival analysis'],
+        ['Propensão de compra', 'collaborative filtering'], ['Lifetime value do cliente', 'BG/NBD · regression'], ['Previsão de gastos e demanda', 'time series forecasting'],
+        ['Risco de inadimplência', 'roll rates · Markov chains'], ['Lavagem de dinheiro (AML)', 'anomaly detection'], ['Aprovação de transações', 'real-time classification'], ['Previsão de chargeback', 'classification · NLP']],
+      presc: [['Próxima melhor oferta', 'recommender systems'], ['Limite de crédito ótimo', 'constrained optimization'], ['Preço e taxas (MDR)', 'price elasticity'],
+        ['Régua de cobrança', 'uplift modeling'], ['Retenção com o incentivo certo', 'causal ML'], ['Alocação de campanhas e verba', 'multi-objective optimization'],
+        ['Roteamento de transações', 'reinforcement learning'], ['Cashback e benefícios', 'causal inference'], ['Personalização em tempo real', 'contextual bandits'], ['Equilíbrio aprovação × fraude', 'threshold optimization']],
+      frontier: 'Na fronteira: *graph neural networks, causal ML, reinforcement learning* e agentes de LLM'
     },
+    // nomes das capabilities (JSON em inglês) → tela em pt; técnicas ficam em inglês
+    capPT: { 'Customer Segmentation & Look-Alike Modeling': 'Segmentação de clientes e look-alike', 'Recommendation / Next Best Product': 'Recomendação do próximo produto',
+      'Product Affinity & Basket Analytics': 'Afinidade de produtos e cestas', 'Customer Relationship / Principality Optimization': 'Relacionamento e principalidade',
+      'Market Share & Share of Wallet Analytics': 'Market share e share of wallet', 'AI-powered Insight Generation': 'Insights gerados por IA', 'Automated Reporting': 'Relatórios automatizados' },
+    methodPT: { 'cluster characterization': 'caracterização dos clusters', 'cross-sell ranking': 'ranking de cross-sell', 'upsell ranking': 'ranking de upsell', 'cosine similarity': 'cosine similarity',
+      'product affinity': 'afinidade de produto', 'expected principality uplift': 'ganho esperado de principalidade', 'local LLMs': 'LLMs locais', 'multi-agent architecture': 'arquitetura multiagente', 'ML quality scoring': 'score de qualidade com ML' },
     future: [
       { title: 'Mais perto das decisões', sub: 'estratégicas dos clientes', icon: 'chair' },
       { title: 'Mais integrados', sub: 'às demais tracks', icon: 'link' },
