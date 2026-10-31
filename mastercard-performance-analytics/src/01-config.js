@@ -31,7 +31,8 @@ const CONFIG = {
     shake: 1.0,            // tremor de câmera nos impactos
     onTwos: true,          // snaps "em dois" (textura stop motion)
     grain: 0.06,           // granulação de filme (0 desliga)
-    beat: 1.0              // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
+    beat: 1.0,             // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
+    beatBase: 0.15         // fora dos clímax a batida fica contida nesse nível (os picos de cada cena ficam em SCENES[id].peaks)
   },
 
   audio: {
@@ -90,17 +91,16 @@ const CONFIG = {
 
   // ---------------------------------------------------------------- TEXTOS-CHAVE
   text: {
-    hookKicker: 'O NOSSO DESAFIO HOJE',
-    hook: ['Eficiência operacional', 'Automação e escala', 'Ciência de dados', 'Inteligência artificial', 'Gerar valor'],
     line: 'LINHA PERFORMANCE ANALYTICS',
+    // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
-      { n: '01', short: 'STRATEGIC CAPABILITY', teaser: 'o papel de analytics na consultoria' },
-      { n: '02', short: 'EVOLUTION & IMPACT',   teaser: 'como a track cresceu e o que entregou' },
-      { n: '03', short: 'WHAT WE BRING',        teaser: 'capabilities para emissores, adquirentes e merchants' },
-      { n: '04', short: 'ANALYTICS IN ACTION',  teaser: 'cases, do problema ao impacto' },
-      { n: '05', short: 'SCALING OUR IMPACT',   teaser: 'dados, IA e inovação em escala' },
-      { n: '06', short: 'PRACTICE',             teaser: 'pilares, entregas e evoluções' },
-      { n: '07', short: 'FUTURE OF ANALYTICS',  teaser: 'onde queremos estar' }
+      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor' },
+      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil' },
+      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam' },
+      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido' },
+      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis' },
+      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar' },
+      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar' }
     ],
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
@@ -108,7 +108,7 @@ const CONFIG = {
     chain: ['Dados', 'Decisões', 'Impacto', 'Valor'],
     engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Implementação', 'construir'], ['Mensuração', 'provar']],
     tagline: 'Da pergunta de negócio ao *valor medido*.',
-    caseSteps: ['PROBLEMA', 'SOLUÇÃO ANALÍTICA', 'INSIGHT / DECISÃO', 'IMPACTO'],
+    caseSteps: ['PROBLEMA', 'DADOS', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'],
     agents: {
       gen: [{ role: 'analista', name: 'Analista' }, { role: 'business', name: 'Business' }, { role: 'clevel', name: 'C-Level' }],
       judges: 'Julgadores', fixers: 'Corretores', done: 'Insight validado'
@@ -137,8 +137,7 @@ const CONFIG = {
   // ---------------------------------------------------------------- NARRAÇÃO (opcional, desligada por padrão)
   // at = segundos desde o início da cena · também serve de roteiro para quem apresenta
   narration: [
-    { scene: 'open', at: 1.2, text: 'Hoje, o nosso desafio tem cinco nomes.' },
-    { scene: 'open', at: 11.0, text: 'E, acima de tudo: gerar valor.' },
+    { scene: 'open', at: 1.0, text: 'Bem-vindos à linha Performance Analytics.' },
     { scene: 's01', at: 1.0, text: 'Próxima estação: analytics como capacidade estratégica da consultoria.' },
     { scene: 's01', at: 8.0, text: 'Todo projeto começa com uma pergunta de negócio.' },
     { scene: 's01', at: 22.0, text: 'Transformamos dados em decisões, decisões em impacto… e impacto em valor.' },
@@ -146,7 +145,8 @@ const CONFIG = {
     { scene: 's02', at: 22.5, text: 'E o Brasil fechou acima do período anterior e acima do budget.' },
     { scene: 's03', at: 1.0, text: 'Próxima estação: o que levamos ao mercado.' },
     { scene: 's03', at: 10.0, text: 'Para emissores, adquirentes e merchants, cada capability já tem um case para mostrar.' },
-    { scene: 's04', at: 1.0, text: 'Próxima estação: analytics em ação. Do problema ao impacto.' },
+    { scene: 's04', at: 1.0, text: 'Próxima estação: analytics em ação. Agora, os cases de impacto.' },
+    { scene: 'banana', at: 1.0, text: 'Case um: cestas de produtos para o Cliente Banana.' },
     { scene: 'manga', at: 1.0, text: 'Recomendar olhando também a principalidade.' },
     { scene: 'lightsoff', at: 1.0, text: 'O report de fraude para o board, agora lights-off.' },
     { scene: 'insight', at: 1.0, text: 'Insights em escala, com IA local: o dado nunca sai da Mastercard.' },

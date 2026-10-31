@@ -49,10 +49,10 @@ STOPSCN.preshow = {
       // kicker
       const kp = E.outBack(P(t, T_KICK, .4));
       if (kp > 0) { ctx.save(); ctx.globalAlpha *= 1 - go; ctx.translate(W / 2, lerp(H / 2 - 120, 210, P(t, T_DROP - .3, .5, E.inOutCubic))); ctx.rotate(-.03); ctx.scale(kp, kp);
-        const kw = measure(ctx, TX.hookKicker, 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
-        text(ctx, TX.hookKicker, 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
+        const kw = measure(ctx, TX.hookKicker || '', 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
+        text(ctx, TX.hookKicker || '', 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
       // as 5 tiras batem no tempo
-      TX.hook.forEach((s, i) => {
+      (TX.hook || []).forEach((s, i) => {
         const p = P(t, SL[i], .28), big = i === 4; if (p <= 0) return;
         const y0 = 330 + i * 112 + (big ? 22 : 0), size = big ? 104 : 74, w = measure(ctx, s, size, 900) + 120, rot = [-.02, .015, -.012, .02, -.025][i];
         const sl = E.outBack(p), x = W / 2 + (1 - E.outExpo(p)) * (i % 2 ? 900 : -900);
@@ -87,7 +87,7 @@ STOPSCN.stop0 = (() => {
   function infoCard(ctx, k, a, tl) {
     if (a <= 0) return;
     const n = MAP.node(k), isStop = typeof k === 'string', st = isStop ? null : TX.stations[k - 1];
-    const title = isStop ? TX.stop.label : (SEC(k).title || st.short), sub = isStop ? TX.stop.talkStop : st.teaser;
+    const title = isStop ? TX.stop.label : st.title, sub = isStop ? TX.stop.talkStop : st.teaser;
     const w = Math.max(measure(ctx, title, 30, 900), measure(ctx, sub, 22, 600)) + 80, h = 120;
     const x = clamp(n.x - w / 2, 40, W - w - 40), y = n.y + (n.y > 700 ? -h - 70 : n.y < 450 ? 70 : 64);
     ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 30); ctx.rotate(Math.sin(tl * .8) * .01 - .01);

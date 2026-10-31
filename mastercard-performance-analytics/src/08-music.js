@@ -95,14 +95,26 @@ const BEAT = (() => {
       beat: full ? Math.exp(-sb * 7) : 0, down: full ? Math.exp(-sd * 4) : 0, phase: sb / per, bar: sd / (per * 4), i: bi, di: db,
       hit: 0, drop: Math.abs(x - 4.5) < 2.5 && x >= 4.5 ? Math.exp(-(x - 4.5) * 2.2) : 0, bpm: CONFIG.bpm, on: full };
   }
-  const QUIET = { kick: 0, snare: 0, low: 0, level: 0, beat: 0, down: 0, phase: 0, bar: 0, i: 0, di: 0, hit: 0, drop: 0, bpm: 0, on: false };
+  const QUIET = { kick: 0, snare: 0, low: 0, level: 0, beat: 0, down: 0, phase: 0, bar: 0, i: 0, di: 0, hit: 0, drop: 0, bpm: 0, on: false, I: 0 };
+  /** intensidade da batida no instante T: base contida e picos nos clímax (SCENES[id].peaks = [[t0, t1], …] em tempo local) */
+  function intensity(sc, t) {
+    const base = CONFIG.motion.beatBase == null ? .15 : CONFIG.motion.beatBase, pk = (SCENES[sc.id] && SCENES[sc.id].peaks) || [];
+    let I = 0; pk.forEach(([a, b, amt = 1]) => { I = Math.max(I, amt * Math.min(clamp((t - a) / .35 + 1), clamp((b - t) / .6))); });
+    return base + (1 - base) * I;
+  }
+  /** aplica a intensidade: os ataques (soco, cor, RGB, inversão) só aparecem inteiros nos picos; o nível segue respirando */
+  function shape(r, I) {
+    ['kick', 'snare', 'beat', 'down', 'hit', 'drop'].forEach(k => { r[k] *= I; });
+    r.low *= .35 + .65 * I; r.level *= .35 + .65 * I; r.I = I; return r;
+  }
   return {
     /** estado da música no instante T da linha do tempo */
     at(T) {
-      const sc = sceneAt(T), p = CONFIG.playById[sc.play];
-      if (!p || !p.track) return synth(T - (p ? p.start : 0));
-      return fromTrack(p.track, p.from + (T - p.start));
+      const sc = sceneAt(T), p = CONFIG.playById[sc.play], I = intensity(sc, T - sc.start);
+      if (!p || !p.track) return shape(synth(T - (p ? p.start : 0)), I);
+      return shape(fromTrack(p.track, p.from + (T - p.start)), I);
     },
+    intensity,
     /** paradas: sem música, só uma respiração lenta para os loops */
     idle(tl) { return { ...QUIET, breath: .5 + .5 * Math.sin(tl * TAU / 4) }; },
     quiet: QUIET

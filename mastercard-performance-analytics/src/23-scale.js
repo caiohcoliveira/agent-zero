@@ -95,7 +95,7 @@ function ptScale(s) {
       const pp = P(t, T_PED - .25, .25, E.inQuad); if (pp > 0) { const y = lerp(-300, yb - colH - 60, pp);
         ctx.save(); ctx.translate(cx, y); ctx.beginPath(); ctx.moveTo(-430, 30); ctx.lineTo(0, -110); ctx.lineTo(430, 30); ctx.closePath(); ctx.fillStyle = '#F3EBDD'; ctx.fill(); ink(ctx, () => { ctx.beginPath(); ctx.moveTo(-430, 30); ctx.lineTo(0, -110); ctx.lineTo(430, 30); ctx.closePath(); }, 4, 7);
         rr(ctx, -450, 30, 900, 44, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -450, 30, 900, 44, 4, 4, 9);
-        retroText(ctx, (S().title || 'PRACTICE').toUpperCase(), 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
+        retroText(ctx, 'A PRÁTICA', 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
       // entregas carimbadas
       (S().deliveries || []).slice(0, 5).forEach((d, i) => { const p = E.outBack(P(t, T_DEL + i * .45, .35)); if (p <= 0) return;
         const x = 1230 + (i % 2) * 330, y = 250 + Math.floor(i / 2) * 150 + (i % 2) * 40;

@@ -657,7 +657,8 @@ const CONFIG = {
     shake: 1.0,            // tremor de câmera nos impactos
     onTwos: true,          // snaps "em dois" (textura stop motion)
     grain: 0.06,           // granulação de filme (0 desliga)
-    beat: 1.0              // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
+    beat: 1.0,             // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
+    beatBase: 0.15         // fora dos clímax a batida fica contida nesse nível (os picos de cada cena ficam em SCENES[id].peaks)
   },
 
   audio: {
@@ -716,17 +717,16 @@ const CONFIG = {
 
   // ---------------------------------------------------------------- TEXTOS-CHAVE
   text: {
-    hookKicker: 'O NOSSO DESAFIO HOJE',
-    hook: ['Eficiência operacional', 'Automação e escala', 'Ciência de dados', 'Inteligência artificial', 'Gerar valor'],
     line: 'LINHA PERFORMANCE ANALYTICS',
+    // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
-      { n: '01', short: 'STRATEGIC CAPABILITY', teaser: 'o papel de analytics na consultoria' },
-      { n: '02', short: 'EVOLUTION & IMPACT',   teaser: 'como a track cresceu e o que entregou' },
-      { n: '03', short: 'WHAT WE BRING',        teaser: 'capabilities para emissores, adquirentes e merchants' },
-      { n: '04', short: 'ANALYTICS IN ACTION',  teaser: 'cases, do problema ao impacto' },
-      { n: '05', short: 'SCALING OUR IMPACT',   teaser: 'dados, IA e inovação em escala' },
-      { n: '06', short: 'PRACTICE',             teaser: 'pilares, entregas e evoluções' },
-      { n: '07', short: 'FUTURE OF ANALYTICS',  teaser: 'onde queremos estar' }
+      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor' },
+      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil' },
+      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam' },
+      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido' },
+      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis' },
+      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar' },
+      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar' }
     ],
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
@@ -734,7 +734,7 @@ const CONFIG = {
     chain: ['Dados', 'Decisões', 'Impacto', 'Valor'],
     engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Implementação', 'construir'], ['Mensuração', 'provar']],
     tagline: 'Da pergunta de negócio ao *valor medido*.',
-    caseSteps: ['PROBLEMA', 'SOLUÇÃO ANALÍTICA', 'INSIGHT / DECISÃO', 'IMPACTO'],
+    caseSteps: ['PROBLEMA', 'DADOS', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'],
     agents: {
       gen: [{ role: 'analista', name: 'Analista' }, { role: 'business', name: 'Business' }, { role: 'clevel', name: 'C-Level' }],
       judges: 'Julgadores', fixers: 'Corretores', done: 'Insight validado'
@@ -763,8 +763,7 @@ const CONFIG = {
   // ---------------------------------------------------------------- NARRAÇÃO (opcional, desligada por padrão)
   // at = segundos desde o início da cena · também serve de roteiro para quem apresenta
   narration: [
-    { scene: 'open', at: 1.2, text: 'Hoje, o nosso desafio tem cinco nomes.' },
-    { scene: 'open', at: 11.0, text: 'E, acima de tudo: gerar valor.' },
+    { scene: 'open', at: 1.0, text: 'Bem-vindos à linha Performance Analytics.' },
     { scene: 's01', at: 1.0, text: 'Próxima estação: analytics como capacidade estratégica da consultoria.' },
     { scene: 's01', at: 8.0, text: 'Todo projeto começa com uma pergunta de negócio.' },
     { scene: 's01', at: 22.0, text: 'Transformamos dados em decisões, decisões em impacto… e impacto em valor.' },
@@ -772,7 +771,8 @@ const CONFIG = {
     { scene: 's02', at: 22.5, text: 'E o Brasil fechou acima do período anterior e acima do budget.' },
     { scene: 's03', at: 1.0, text: 'Próxima estação: o que levamos ao mercado.' },
     { scene: 's03', at: 10.0, text: 'Para emissores, adquirentes e merchants, cada capability já tem um case para mostrar.' },
-    { scene: 's04', at: 1.0, text: 'Próxima estação: analytics em ação. Do problema ao impacto.' },
+    { scene: 's04', at: 1.0, text: 'Próxima estação: analytics em ação. Agora, os cases de impacto.' },
+    { scene: 'banana', at: 1.0, text: 'Case um: cestas de produtos para o Cliente Banana.' },
     { scene: 'manga', at: 1.0, text: 'Recomendar olhando também a principalidade.' },
     { scene: 'lightsoff', at: 1.0, text: 'O report de fraude para o board, agora lights-off.' },
     { scene: 'insight', at: 1.0, text: 'Insights em escala, com IA local: o dado nunca sai da Mastercard.' },
@@ -2069,14 +2069,26 @@ const BEAT = (() => {
       beat: full ? Math.exp(-sb * 7) : 0, down: full ? Math.exp(-sd * 4) : 0, phase: sb / per, bar: sd / (per * 4), i: bi, di: db,
       hit: 0, drop: Math.abs(x - 4.5) < 2.5 && x >= 4.5 ? Math.exp(-(x - 4.5) * 2.2) : 0, bpm: CONFIG.bpm, on: full };
   }
-  const QUIET = { kick: 0, snare: 0, low: 0, level: 0, beat: 0, down: 0, phase: 0, bar: 0, i: 0, di: 0, hit: 0, drop: 0, bpm: 0, on: false };
+  const QUIET = { kick: 0, snare: 0, low: 0, level: 0, beat: 0, down: 0, phase: 0, bar: 0, i: 0, di: 0, hit: 0, drop: 0, bpm: 0, on: false, I: 0 };
+  /** intensidade da batida no instante T: base contida e picos nos clímax (SCENES[id].peaks = [[t0, t1], …] em tempo local) */
+  function intensity(sc, t) {
+    const base = CONFIG.motion.beatBase == null ? .15 : CONFIG.motion.beatBase, pk = (SCENES[sc.id] && SCENES[sc.id].peaks) || [];
+    let I = 0; pk.forEach(([a, b, amt = 1]) => { I = Math.max(I, amt * Math.min(clamp((t - a) / .35 + 1), clamp((b - t) / .6))); });
+    return base + (1 - base) * I;
+  }
+  /** aplica a intensidade: os ataques (soco, cor, RGB, inversão) só aparecem inteiros nos picos; o nível segue respirando */
+  function shape(r, I) {
+    ['kick', 'snare', 'beat', 'down', 'hit', 'drop'].forEach(k => { r[k] *= I; });
+    r.low *= .35 + .65 * I; r.level *= .35 + .65 * I; r.I = I; return r;
+  }
   return {
     /** estado da música no instante T da linha do tempo */
     at(T) {
-      const sc = sceneAt(T), p = CONFIG.playById[sc.play];
-      if (!p || !p.track) return synth(T - (p ? p.start : 0));
-      return fromTrack(p.track, p.from + (T - p.start));
+      const sc = sceneAt(T), p = CONFIG.playById[sc.play], I = intensity(sc, T - sc.start);
+      if (!p || !p.track) return shape(synth(T - (p ? p.start : 0)), I);
+      return shape(fromTrack(p.track, p.from + (T - p.start)), I);
     },
+    intensity,
     /** paradas: sem música, só uma respiração lenta para os loops */
     idle(tl) { return { ...QUIET, breath: .5 + .5 * Math.sin(tl * TAU / 4) }; },
     quiet: QUIET
@@ -2401,12 +2413,12 @@ function miniMap(ctx, T, a = 1) {
 function stationBoard(ctx, T) {
   for (let k = 1; k <= 7; k++) {
     const Ts = CONFIG.stationStart[k]; if (Ts == null || T < Ts || T > Ts + 4) continue;
-    const t = T - Ts, st = TX.stations[k - 1], ph = [`${st.n} ${st.short}`];
+    const t = T - Ts - .35, st = TX.stations[k - 1], ph = [`${st.n} ${st.short}`]; if (t < 0) continue;
     const din = E.outBack(P(t, 0, .5)), dout = E.inCubic(P(t, 3.3, .6));
     const y = lerp(-120, 118, din) - 200 * dout, s = lerp(1, .5, dout);
     ctx.save(); ctx.globalAlpha *= 1 - dout; ctx.translate(W / 2, y); ctx.scale(s, s);
     FLAP.board(ctx, 0, 0, ph, [.15], t, { tw: 40, th: 58, hiFrom: [3], header: `ESTAÇÃO ${st.n}`, headerCol: C.red });
-    const title = (SEC(k).title || st.short), pa = P(t, .9, .4);
+    const title = st.title, pa = P(t, .9, .4);
     if (pa > 0) { ctx.save(); ctx.globalAlpha *= pa; ctx.translate(0, 70 + (1 - E.outBack(pa)) * 20); ctx.rotate(-.01);
       const tw = measure(ctx, title, 26, 800) + 60; paper(ctx, -tw / 2, -22, tw, 44, { torn: true, seed: 40 + k, fill: PAPER, shadow: 5, shadowColor: '#000', lw: 2.5 });
       text(ctx, title, 0, 1, { size: 26, weight: 800, color: INK, align: 'center' }); ctx.restore(); }
@@ -2421,8 +2433,11 @@ CONFIG.scenes.forEach(s => {
 
 /** sobreposição dos trechos: mini-mapa (depois da abertura) + letreiro de estação */
 function overlayPlay(ctx, T, s) {
-  if (s.play > 1) miniMap(ctx, T, P(T, CONFIG.playById[2].start, .6) * (SCENES[s.id] && SCENES[s.id].hideMap ? .0 : 1));
+  const t = T - s.start;
+  if (s.play > 1) { miniMap(ctx, T, P(T, CONFIG.playById[2].start, .6) * (SCENES[s.id] && SCENES[s.id].hideMap ? .0 : 1)); nextStationLED(ctx, T); }
+  captionStrip(ctx, s, t);
   stationBoard(ctx, T);
+  TRAIN_PASS.draw(ctx, T);
 }
 
 /* ---------- plataforma das paradas ---------- */
@@ -2460,7 +2475,7 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
   retroText(ctx, st.n, -w / 2 + 54, -h / 2 + 63, { size: 46, weight: 900, color: '#FFF', depth: 3, lw: 3 });
   text(ctx, st.short, -w / 2 + 120, -h / 2 + 63, { size: Math.min(26, (w - 170) / st.short.length * 1.7), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
   ctx.save(); ctx.translate(0, 40); ctx.beginPath(); ctx.rect(-w / 2 + 20, -h / 2 + 70, w - 40, h - 120); ctx.clip();
-  if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, SEC(n).title || st.short, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
+  if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, st.title, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
   ctx.restore(); ctx.restore();
 }
 /** parada de retomada: plataforma + 3 cartazes; item 0 = visão geral, item k = zoom no cartaz k */
@@ -2482,16 +2497,17 @@ function hint(ctx, tl, label, item) {
 }
 
 /* ---------- cases: régua, comprovante ---------- */
-/** régua Problema → Solução → Insight → Impacto; step = etapa atual (0–3), p = progresso da etapa */
+/** régua das etapas do case (canto superior direito); step = etapa atual, p = progresso da etapa */
 function caseRuler(ctx, step, p, o = {}) {
-  const labels = TX.caseSteps, x0 = o.x == null ? W / 2 - 560 : o.x, w = o.w || 1120, y = o.y || 1010, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
+  const labels = TX.caseSteps, x0 = o.x == null ? W - 700 : o.x, w = o.w || 600, y = o.y || 58, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
   if (A <= 0) return;
   ctx.save(); ctx.globalAlpha *= A;
   line(ctx, x0, y, x0 + w, y, 'rgba(255,255,255,.25)', 6); line(ctx, x0, y, x0 + dx * clamp(step + p, 0, labels.length - 1), y, C.orange, 6);
   labels.forEach((l, i) => { const x = x0 + i * dx, done = i < step, cur = i === Math.floor(step);
-    circle(ctx, x, y, cur ? 15 + 3 * BT.beat : 11, done ? C.yellow : cur ? C.orange : '#3A322B', INK, 3);
+    circle(ctx, x, y, cur ? 15 : 11, done ? C.yellow : cur ? C.orange : '#3A322B', INK, 3);
     if (done) icon(ctx, 'check', x, y, 16, INK, 6);
-    text(ctx, l, x, y - 30, { size: cur ? 18 : 15, weight: 800, mono: true, color: cur ? '#FFF' : '#BFB3A3', align: 'center', ls: 2 }); });
+    const lw = measure(ctx, l, cur ? 17 : 14, 800, true, 1) + 16; rr(ctx, x - lw / 2, y + 20, lw, 28, 6); ctx.fillStyle = cur ? C.orange : 'rgba(14,11,9,.7)'; ctx.fill();
+    text(ctx, l, x, y + 35, { size: cur ? 17 : 14, weight: 800, mono: true, color: cur ? '#FFF' : '#D8CCBC', align: 'center', ls: 1 }); });
   ctx.restore();
 }
 /** comprovante de maquininha: linhas impressas de cima para baixo + número-manchete e carimbo ✓ */
@@ -2510,6 +2526,162 @@ function receipt(ctx, x, y, o) {
   if (o.headline) { const hy = 96 + lines.length * lh; line(ctx, -w / 2 + 20, hy, w / 2 - 20, hy, INK, 2, [6, 6]);
     retroText(ctx, o.headline, 0, hy + 62, { size: o.hlSize || 64, weight: 900, color: C.orange, align: 'center', depth: 4, lw: 3 });
     if (o.hlLabel) text(ctx, o.hlLabel, 0, hy + 116, { size: 16, weight: 700, mono: true, color: '#3A332C', align: 'center' }); }
+  ctx.restore();
+}
+
+/* ===== 11-station.js ===== */
+/* ============================================================================
+   11. KIT DA ESTAÇÃO — o vagão da Linha Performance Analytics, o trem que
+   passa entre as estações, o painel "próxima estação", o bilhete de embarque,
+   as legendas de tela (o vídeo roda sem narrador) e os cartões de conexão
+   ========================================================================== */
+
+/** vagão visto de lado. (x, y) = canto superior esquerdo; base de 1000 × 400 em escala s.
+ *  o: len (comprimento base), open (0–1 abre as portas), lit (luz interna), seed, label */
+function trainCar(ctx, x, y, s, o = {}) {
+  const L = o.len || 1000, open = clamp(o.open || 0), lit = o.lit == null ? 1 : o.lit, R = rng(o.seed || 3);
+  const doors = o.doors || [L * .25, L * .75], DW = 150, WY = 60, WH = 116;
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  // sombra chapada, truques e rodas
+  rr(ctx, 16, 20, L, 360, 46); ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fill();
+  [[L * .08, L * .3], [L * .62, L * .3]].forEach(([bx, bw]) => { rr(ctx, bx, 340, bw, 34, 10); ctx.fillStyle = '#211A15'; ctx.fill(); });
+  [L * .14, L * .32, L * .68, L * .86].forEach(wx => { circle(ctx, wx, 378, 30, '#1A1512', INK, 5); circle(ctx, wx, 378, 9, '#6E665C'); });
+  // corpo: teto, faixa Mastercard, saia
+  ctx.save(); rr(ctx, 0, 0, L, 360, 46); ctx.clip();
+  ctx.fillStyle = '#F3EBDD'; ctx.fillRect(0, 0, L, 360);
+  ctx.fillStyle = '#DCD1C1'; ctx.fillRect(0, 0, L, 30);
+  [[C.red, 232], [C.orange, 250], [C.yellow, 268]].forEach(([c, yy]) => { ctx.fillStyle = c; ctx.fillRect(0, yy, L, 18); });
+  ctx.fillStyle = '#2A221C'; ctx.fillRect(0, 300, L, 60);
+  hatch(ctx, () => rr(ctx, 0, 0, L, 300, 0), L * .78, 0, L * .22, 300, { alpha: .14, gap: 12 });
+  // janelas com a luz quente do vagão e passageiros
+  const slots = [], edges = [30, ...doors.flatMap(d => [d - DW / 2 - 22, d + DW / 2 + 22]), L - 30];
+  for (let k = 0; k < edges.length; k += 2) { const a = edges[k], b = edges[k + 1], n = Math.max(0, Math.floor((b - a + 24) / 146)), w0 = n ? (b - a - (n - 1) * 24) / n : 0;
+    for (let j = 0; j < n; j++) slots.push(a + j * (w0 + 24), w0); }
+  for (let k = 0; k < slots.length; k += 2) {
+    const wx = slots[k], ww = slots[k + 1];
+    rr(ctx, wx, WY, ww, WH, 18); const g = ctx.createLinearGradient(0, WY, 0, WY + WH);
+    g.addColorStop(0, mix('#3A2A1E', '#FFE2B0', lit)); g.addColorStop(1, mix('#2A1E15', '#FF9C45', lit)); ctx.fillStyle = g; ctx.fill();
+    const heads = Math.floor(R() * 3);
+    for (let h = 0; h < heads; h++) { const hx = wx + ww * (.25 + .5 * R()), hy = WY + WH - 30;
+      ctx.fillStyle = 'rgba(40,24,14,.72)'; ctx.beginPath(); ctx.arc(hx, hy - 16, 15, 0, TAU); ctx.fill(); rr(ctx, hx - 26, hy, 52, 40, 18); ctx.fill(); }
+    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.moveTo(wx + 14, WY + 8); ctx.lineTo(wx + 40, WY + 8); ctx.lineTo(wx + 14, WY + 60); ctx.fill();
+    inkRect(ctx, wx, WY, ww, WH, 18, 5, k + 1);
+  }
+  // portas: duas folhas que deslizam; atrás, o interior aceso
+  doors.forEach((d, i) => {
+    const dx = d - DW / 2, gap = open * 66;
+    rr(ctx, dx, 44, DW, 256, 8); ctx.fillStyle = mix('#2A1E15', '#FFC27A', lit * (.4 + .6 * open)); ctx.fill();
+    if (open > 0) glow(ctx, d, 170, 140 * open, '#FFD9A0', .5 * open * lit);
+    [[-1, dx - gap], [1, d + gap]].forEach(([sd, lx]) => {
+      rr(ctx, lx, 44, DW / 2, 256, 6); ctx.fillStyle = '#E9DFCF'; ctx.fill();
+      rr(ctx, lx + 14, 64, DW / 2 - 28, 104, 10); ctx.fillStyle = mix('#3A2A1E', '#FFD49A', lit); ctx.fill();
+      inkRect(ctx, lx, 44, DW / 2, 256, 6, 4, 20 + i * 2 + (sd > 0));
+    });
+    rr(ctx, d - 58, 12, 116, 26, 5); ctx.fillStyle = '#120E0B'; ctx.fill();
+    text(ctx, o.label || 'ANALYTICS', d, 26, { size: 15, weight: 900, mono: true, color: C.orange, align: 'center', ls: 2 });
+  });
+  // logo no costado
+  const lx = o.logoX == null ? L * .5 : o.logoX;
+  intersection(ctx, lx - 140, 206, 11, 13);
+  text(ctx, 'PERFORMANCE ANALYTICS', lx - 120, 207, { size: 17, weight: 900, color: INK, ls: 2 });
+  ctx.restore();
+  inkRect(ctx, 0, 0, L, 360, 46, 6, o.seed || 3);
+  ctx.restore();
+}
+
+/* ---------- o trem passa na frente da câmera na chegada de cada estação (esconde o corte) ---------- */
+const TRAIN_PASS = (() => {
+  const S = 3.2, LEN = 1000, HALF = .5, list = [];
+  const stopAt = T => CONFIG.mode !== 'reel' && CONFIG.stops.some(st => st.after && Math.abs(st.T - T) < 1e-3);
+  for (let k = 1; k <= 7; k++) { const Ts = CONFIG.stationStart[k]; if (Ts == null) continue; list.push({ Ts, fromStop: stopAt(Ts) }); }
+  list.forEach(p => { const sc = sceneAt(p.Ts + .01); cue(sc.id, Math.max(0, p.Ts - .35 - sc.start), 'whoosh', { dur: .9, v: .38 }); });
+  return {
+    list,
+    draw(ctx, T) {
+      list.forEach(p => {
+        const u = (T - (p.Ts - HALF)) / (2 * HALF); if (u <= 0 || u >= 1 || (p.fromStop && u < .5)) return;
+        const span = W + LEN * S + 80, x = W + 40 - span * u, y = -40;
+        ctx.save(); ctx.globalAlpha = .28; trainCar(ctx, x + 70, y, S, { len: LEN, seed: 5, lit: .9 }); ctx.restore();
+        trainCar(ctx, x, y, S, { len: LEN, seed: 5, lit: .9 });
+        // rastros de velocidade
+        const r = rng(Math.floor(p.Ts * 10)); ctx.save(); ctx.globalAlpha = .5;
+        for (let k = 0; k < 18; k++) { const ly = r() * H, lx = x + r() * LEN * S, lw = 200 + r() * 600; line(ctx, lx, ly, lx + lw, ly, k % 3 ? 'rgba(255,240,220,.5)' : rgba(C.orange, .6), 2 + r() * 5); }
+        ctx.restore();
+      });
+    }
+  };
+})();
+
+/** painel de LED do vagão: "próxima estação" nos últimos segundos de cada estação */
+function nextStationLED(ctx, T) {
+  let nk = 0, Tn = 0;
+  for (let k = 1; k <= 7; k++) { const Ts = CONFIG.stationStart[k]; if (Ts != null && Ts > T) { nk = k; Tn = Ts; break; } }
+  const stop = CONFIG.mode !== 'reel' ? CONFIG.stops.find(st => st.after && st.T > T && (!nk || st.T <= Tn)) : null;
+  const target = stop ? stop.T : Tn; if (!target || target - T > 4.5) return;
+  const a = clamp((4.5 - (target - T)) / .3) * clamp((target - T - .1) / .3); if (a <= 0) return;
+  const label = stop ? `PRÓXIMA PARADA  ›  ${stop.id === 'end' ? 'ENCERRAMENTO' : 'CONVERSA COM AS APRESENTADORAS'}` : `PRÓXIMA ESTAÇÃO  ›  ${TX.stations[nk - 1].n} ${TX.stations[nk - 1].short}`;
+  const w = measure(ctx, label, 20, 800, true, 3) + 64, x = 562, y = 62, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;
+  ctx.save(); ctx.globalAlpha *= a;
+  rr(ctx, x, y - 26, w, 52, 10); ctx.fillStyle = '#0A0807'; ctx.fill(); ctx.strokeStyle = '#3A2A1E'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.save(); ctx.shadowColor = C.orange; ctx.shadowBlur = 10; text(ctx, label, x + 32, y + 1, { size: 20, weight: 800, mono: true, color: C.orange, ls: 3, alpha: blink }); ctx.restore();
+  ctx.fillStyle = 'rgba(0,0,0,.35)'; for (let k = 0; k < 9; k++) ctx.fillRect(x + 6, y - 22 + k * 5.4, w - 12, 1.6);
+  ctx.restore();
+}
+
+/** bilhete de embarque perfurado */
+function ticket(ctx, x, y, s, o = {}) {
+  const p = clamp(o.punch || 0);
+  ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || -.05); ctx.scale(s, s);
+  paper(ctx, -330, -120, 660, 240, { r: 16, fill: '#F6EEDF', shadow: 12, shadowColor: '#000', lw: 4, halftone: .06 });
+  rr(ctx, -330, -120, 150, 240, 16); ctx.fillStyle = C.orange; ctx.fill(); inkRect(ctx, -330, -120, 150, 240, 16, 4, 8);
+  intersection(ctx, -255, -40, 30, 38);
+  text(ctx, 'BILHETE', -255, 50, { size: 22, weight: 900, mono: true, color: '#FFF', align: 'center', ls: 3 });
+  ctx.save(); ctx.setLineDash([8, 8]); line(ctx, -170, -110, -170, 110, INK, 3); ctx.restore();
+  text(ctx, 'LINHA PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
+  text(ctx, 'DE  dados', -140, -22, { size: 30, weight: 800, mono: true, color: '#4A4038' });
+  text(ctx, 'PARA  valor', -140, 22, { size: 30, weight: 800, mono: true, color: C.red });
+  text(ctx, '7 estações · 2 baldeações', -140, 72, { size: 20, weight: 700, mono: true, color: '#6A6056' });
+  if (p > 0) { ctx.save(); ctx.translate(210, 10); ctx.rotate(-.22); ctx.scale(lerp(1.8, 1, E.outBack(p)), lerp(1.8, 1, E.outBack(p))); ctx.globalAlpha *= clamp(p * 2);
+    rr(ctx, -95, -40, 190, 80, 10); ctx.strokeStyle = C.red; ctx.lineWidth = 6; ctx.stroke();
+    text(ctx, 'EMBARQUE', 0, -8, { size: 28, weight: 900, mono: true, color: C.red, align: 'center', ls: 3 }); text(ctx, '✓ validado', 0, 22, { size: 18, weight: 800, mono: true, color: C.red, align: 'center' }); ctx.restore(); }
+  ctx.restore();
+}
+
+/* ---------- legendas de tela (sem narrador, cada cena se explica sozinha) ----------
+   SCENES[id].caps = [[t0, t1, 'texto com *destaque*', 'ETIQUETA'], …] em tempo local da cena */
+function captionStrip(ctx, s, t) {
+  const caps = (SCENES[s.id] && SCENES[s.id].caps) || [];
+  caps.forEach(([t0, t1, str, kick]) => {
+    const a = Math.min(P(t, t0, .35), 1 - P(t, t1 - .35, .35)); if (a <= 0) return;
+    let size = 34; const plain = str.replace(/\*/g, ''), kw = kick ? measure(ctx, kick, 18, 800, true, 3) + 44 : 0;
+    let tw = measure(ctx, plain, size, 800); const maxW = 1680 - kw; if (tw > maxW) { size *= maxW / tw; tw = maxW; }
+    const w = kw + tw + 72, h = 78, x = W / 2 - w / 2, y = H - 122 + (1 - E.outCubic(a)) * 24;
+    ctx.save(); ctx.globalAlpha *= a;
+    paper(ctx, x, y, w, h, { r: 12, fill: 'rgba(18,14,11,.93)', outline: '#000', shadow: 7, shadowColor: 'rgba(0,0,0,.6)', lw: 3 });
+    if (kick) { rr(ctx, x + 18, y + 20, kw - 8, 38, 6); ctx.fillStyle = C.orange; ctx.fill(); text(ctx, kick, x + 18 + (kw - 8) / 2, y + 40, { size: 18, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 3 }); }
+    rich(ctx, str, x + 36 + kw, y + h / 2 + 1, { size, weight: 800, color: '#FFF', accent: C.yellow, align: 'left', ls: 0 });
+    ctx.restore();
+  });
+}
+
+/** cartão de conexão em tela cheia: etiqueta + frase grande (com *destaque*) + linha de apoio */
+function bridgeCard(ctx, a, kicker, str, o = {}) {
+  if (a <= 0) return; a = clamp(a);
+  ctx.save(); ctx.globalAlpha *= a;
+  ctx.fillStyle = o.bg || '#120E0B'; ctx.fillRect(0, 0, W, H);
+  // a linha do metrô atravessando o cartão
+  const ly = H / 2 + 210, run = (o.t || 0) * 120;
+  line(ctx, 0, ly, W, ly, INK, 30); line(ctx, 0, ly, W, ly, o.lineCol || C.orange, 16);
+  for (let k = -1; k < 8; k++) { const x = ((k * 300 - run) % (W + 300) + W + 300) % (W + 300) - 150; circle(ctx, x, ly, 18, '#FFF8EE', INK, 5); }
+  glow(ctx, W / 2, H / 2 - 20, 700, C.orange, .18);
+  const e = E.outExpo(clamp(a * 1.4)), size = o.size || 100;
+  if (kicker) { const kw = measure(ctx, kicker, 26, 800, true, 6) + 70; ctx.save(); ctx.translate(W / 2, H / 2 - 150); ctx.rotate(-.02);
+    paper(ctx, -kw / 2, -28, kw, 56, { r: 6, fill: C.red, shadow: 6, shadowColor: '#000', lw: 3 }); text(ctx, kicker, 0, 2, { size: 26, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
+  ctx.save(); ctx.translate(W / 2, H / 2 - 20); ctx.scale(lerp(1.25, 1, e), lerp(1.25, 1, e));
+  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; brush(ctx, -pw / 2, -size * .62, pw, size * 1.24, '#2A1E15', o.seed || 9, E.outCubic(clamp(a * 1.6)));
+  rich(ctx, str, 0, 0, { size, weight: 900, color: '#FFF', accent: C.orange, retro: true, depth: 6, lw: 5 });
+  ctx.restore();
+  if (o.sub) text(ctx, o.sub, W / 2, H / 2 + 100, { size: 34, weight: 700, color: '#E9DDCC', align: 'center', alpha: clamp(a * 2 - .8) });
   ctx.restore();
 }
 
@@ -2565,10 +2737,10 @@ STOPSCN.preshow = {
       // kicker
       const kp = E.outBack(P(t, T_KICK, .4));
       if (kp > 0) { ctx.save(); ctx.globalAlpha *= 1 - go; ctx.translate(W / 2, lerp(H / 2 - 120, 210, P(t, T_DROP - .3, .5, E.inOutCubic))); ctx.rotate(-.03); ctx.scale(kp, kp);
-        const kw = measure(ctx, TX.hookKicker, 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
-        text(ctx, TX.hookKicker, 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
+        const kw = measure(ctx, TX.hookKicker || '', 30, 800, true, 6) + 70; paper(ctx, -kw / 2, -30, kw, 60, { r: 6, fill: C.red, shadow: 7, shadowColor: '#000', lw: 3 });
+        text(ctx, TX.hookKicker || '', 0, 2, { size: 30, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
       // as 5 tiras batem no tempo
-      TX.hook.forEach((s, i) => {
+      (TX.hook || []).forEach((s, i) => {
         const p = P(t, SL[i], .28), big = i === 4; if (p <= 0) return;
         const y0 = 330 + i * 112 + (big ? 22 : 0), size = big ? 104 : 74, w = measure(ctx, s, size, 900) + 120, rot = [-.02, .015, -.012, .02, -.025][i];
         const sl = E.outBack(p), x = W / 2 + (1 - E.outExpo(p)) * (i % 2 ? 900 : -900);
@@ -2603,7 +2775,7 @@ STOPSCN.stop0 = (() => {
   function infoCard(ctx, k, a, tl) {
     if (a <= 0) return;
     const n = MAP.node(k), isStop = typeof k === 'string', st = isStop ? null : TX.stations[k - 1];
-    const title = isStop ? TX.stop.label : (SEC(k).title || st.short), sub = isStop ? TX.stop.talkStop : st.teaser;
+    const title = isStop ? TX.stop.label : st.title, sub = isStop ? TX.stop.talkStop : st.teaser;
     const w = Math.max(measure(ctx, title, 30, 900), measure(ctx, sub, 22, 600)) + 80, h = 120;
     const x = clamp(n.x - w / 2, 40, W - w - 40), y = n.y + (n.y > 700 ? -h - 70 : n.y < 450 ? 70 : 64);
     ctx.save(); ctx.globalAlpha *= a; ctx.translate(x + w / 2, y + h / 2 + (1 - E.outBack(a)) * 30); ctx.rotate(Math.sin(tl * .8) * .01 - .01);
@@ -3411,7 +3583,7 @@ function ptScale(s) {
       const pp = P(t, T_PED - .25, .25, E.inQuad); if (pp > 0) { const y = lerp(-300, yb - colH - 60, pp);
         ctx.save(); ctx.translate(cx, y); ctx.beginPath(); ctx.moveTo(-430, 30); ctx.lineTo(0, -110); ctx.lineTo(430, 30); ctx.closePath(); ctx.fillStyle = '#F3EBDD'; ctx.fill(); ink(ctx, () => { ctx.beginPath(); ctx.moveTo(-430, 30); ctx.lineTo(0, -110); ctx.lineTo(430, 30); ctx.closePath(); }, 4, 7);
         rr(ctx, -450, 30, 900, 44, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -450, 30, 900, 44, 4, 4, 9);
-        retroText(ctx, (S().title || 'PRACTICE').toUpperCase(), 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
+        retroText(ctx, 'A PRÁTICA', 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
       // entregas carimbadas
       (S().deliveries || []).slice(0, 5).forEach((d, i) => { const p = E.outBack(P(t, T_DEL + i * .45, .35)); if (p <= 0) return;
         const x = 1230 + (i % 2) * 330, y = 250 + Math.floor(i / 2) * 150 + (i % 2) * 40;

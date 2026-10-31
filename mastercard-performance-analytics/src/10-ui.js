@@ -137,12 +137,12 @@ function miniMap(ctx, T, a = 1) {
 function stationBoard(ctx, T) {
   for (let k = 1; k <= 7; k++) {
     const Ts = CONFIG.stationStart[k]; if (Ts == null || T < Ts || T > Ts + 4) continue;
-    const t = T - Ts, st = TX.stations[k - 1], ph = [`${st.n} ${st.short}`];
+    const t = T - Ts - .35, st = TX.stations[k - 1], ph = [`${st.n} ${st.short}`]; if (t < 0) continue;
     const din = E.outBack(P(t, 0, .5)), dout = E.inCubic(P(t, 3.3, .6));
     const y = lerp(-120, 118, din) - 200 * dout, s = lerp(1, .5, dout);
     ctx.save(); ctx.globalAlpha *= 1 - dout; ctx.translate(W / 2, y); ctx.scale(s, s);
     FLAP.board(ctx, 0, 0, ph, [.15], t, { tw: 40, th: 58, hiFrom: [3], header: `ESTAÇÃO ${st.n}`, headerCol: C.red });
-    const title = (SEC(k).title || st.short), pa = P(t, .9, .4);
+    const title = st.title, pa = P(t, .9, .4);
     if (pa > 0) { ctx.save(); ctx.globalAlpha *= pa; ctx.translate(0, 70 + (1 - E.outBack(pa)) * 20); ctx.rotate(-.01);
       const tw = measure(ctx, title, 26, 800) + 60; paper(ctx, -tw / 2, -22, tw, 44, { torn: true, seed: 40 + k, fill: PAPER, shadow: 5, shadowColor: '#000', lw: 2.5 });
       text(ctx, title, 0, 1, { size: 26, weight: 800, color: INK, align: 'center' }); ctx.restore(); }
@@ -157,8 +157,11 @@ CONFIG.scenes.forEach(s => {
 
 /** sobreposição dos trechos: mini-mapa (depois da abertura) + letreiro de estação */
 function overlayPlay(ctx, T, s) {
-  if (s.play > 1) miniMap(ctx, T, P(T, CONFIG.playById[2].start, .6) * (SCENES[s.id] && SCENES[s.id].hideMap ? .0 : 1));
+  const t = T - s.start;
+  if (s.play > 1) { miniMap(ctx, T, P(T, CONFIG.playById[2].start, .6) * (SCENES[s.id] && SCENES[s.id].hideMap ? .0 : 1)); nextStationLED(ctx, T); }
+  captionStrip(ctx, s, t);
   stationBoard(ctx, T);
+  TRAIN_PASS.draw(ctx, T);
 }
 
 /* ---------- plataforma das paradas ---------- */
@@ -196,7 +199,7 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
   retroText(ctx, st.n, -w / 2 + 54, -h / 2 + 63, { size: 46, weight: 900, color: '#FFF', depth: 3, lw: 3 });
   text(ctx, st.short, -w / 2 + 120, -h / 2 + 63, { size: Math.min(26, (w - 170) / st.short.length * 1.7), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
   ctx.save(); ctx.translate(0, 40); ctx.beginPath(); ctx.rect(-w / 2 + 20, -h / 2 + 70, w - 40, h - 120); ctx.clip();
-  if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, SEC(n).title || st.short, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
+  if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, st.title, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
   ctx.restore(); ctx.restore();
 }
 /** parada de retomada: plataforma + 3 cartazes; item 0 = visão geral, item k = zoom no cartaz k */
@@ -218,16 +221,17 @@ function hint(ctx, tl, label, item) {
 }
 
 /* ---------- cases: régua, comprovante ---------- */
-/** régua Problema → Solução → Insight → Impacto; step = etapa atual (0–3), p = progresso da etapa */
+/** régua das etapas do case (canto superior direito); step = etapa atual, p = progresso da etapa */
 function caseRuler(ctx, step, p, o = {}) {
-  const labels = TX.caseSteps, x0 = o.x == null ? W / 2 - 560 : o.x, w = o.w || 1120, y = o.y || 1010, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
+  const labels = TX.caseSteps, x0 = o.x == null ? W - 700 : o.x, w = o.w || 600, y = o.y || 58, dx = w / (labels.length - 1), A = o.alpha == null ? 1 : o.alpha;
   if (A <= 0) return;
   ctx.save(); ctx.globalAlpha *= A;
   line(ctx, x0, y, x0 + w, y, 'rgba(255,255,255,.25)', 6); line(ctx, x0, y, x0 + dx * clamp(step + p, 0, labels.length - 1), y, C.orange, 6);
   labels.forEach((l, i) => { const x = x0 + i * dx, done = i < step, cur = i === Math.floor(step);
-    circle(ctx, x, y, cur ? 15 + 3 * BT.beat : 11, done ? C.yellow : cur ? C.orange : '#3A322B', INK, 3);
+    circle(ctx, x, y, cur ? 15 : 11, done ? C.yellow : cur ? C.orange : '#3A322B', INK, 3);
     if (done) icon(ctx, 'check', x, y, 16, INK, 6);
-    text(ctx, l, x, y - 30, { size: cur ? 18 : 15, weight: 800, mono: true, color: cur ? '#FFF' : '#BFB3A3', align: 'center', ls: 2 }); });
+    const lw = measure(ctx, l, cur ? 17 : 14, 800, true, 1) + 16; rr(ctx, x - lw / 2, y + 20, lw, 28, 6); ctx.fillStyle = cur ? C.orange : 'rgba(14,11,9,.7)'; ctx.fill();
+    text(ctx, l, x, y + 35, { size: cur ? 17 : 14, weight: 800, mono: true, color: cur ? '#FFF' : '#D8CCBC', align: 'center', ls: 1 }); });
   ctx.restore();
 }
 /** comprovante de maquininha: linhas impressas de cima para baixo + número-manchete e carimbo ✓ */
