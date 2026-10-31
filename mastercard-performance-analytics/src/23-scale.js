@@ -132,9 +132,5 @@ function ptScale(s) {
 })();
 
 /* ---------- Parada 2: retomada do trecho 2 ---------- */
-STOPSCN.stop2 = {
-  draw(ctx, tl, item, prevItem, p) {
-    recapStop(ctx, tl, item, prevItem, p, { posters: [4, 5, 6], sign: 'PARADA 2 · BALDEAÇÃO', from: CONFIG.sceneById.s06.end,
-      doodles: [['bang', 120, 300, 70, C.yellow], ['star', 1800, 280, 80, C.orange], ['heart', 1810, 820, 70, C.red], ['zigzag', 120, 820, 90, C.orange]] });
-  }
-};
+STOPSCN.stop2 = recapScene({ posters: [4, 5, 6], sign: 'PARADA 2 · BALDEAÇÃO', from: CONFIG.sceneById.s06.end,
+  doodles: [['bang', 120, 300, 70, C.yellow], ['star', 1800, 280, 80, C.orange], ['heart', 1810, 820, 70, C.red], ['zigzag', 120, 820, 90, C.orange]] });

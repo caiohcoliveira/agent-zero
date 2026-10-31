@@ -154,12 +154,29 @@ const CLOSE = (() => {
 })();
 
 STOPSCN.end = {
-  draw(ctx, tl, item, prevItem, p) {
+  draw(ctx, tl, item, prevItem, p, ui) {
+    ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
     BT = { ...BT, level: .25 + .2 * BT.breath };
     CLOSE.draw(ctx, 40 + tl, { breath: BT.breath });
-    const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0;
+    const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0, L = slideRects(7), ph = L.top - 90, pw = ph * .78;
     if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H);
-      poster(ctx, W / 2, H / 2 + (1 - show) * 700, 760, 900, 7, tl, { rot: -.01 }); ctx.restore(); }
+      poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
+    if (item === 1) slidePopup(ctx, 7, ui);
+    if (!item) text(ctx, 'clique no letreiro para rever a estação 07', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .4 + .2 * Math.sin(tl * 2.4) });
     hint(ctx, tl, item === 0 ? '→' : '←');
-  }
+  },
+  hit(x, y, ui) {
+    if (!__state.item) return { poster: 0 };
+    if (ui.pop != null) return popupHit(7, x, y, ui);
+    for (const r of slideRects(7).rects) if (x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h + 30) return { thumb: r.i };
+    return { back: true };
+  },
+  click(tg, ui, ctl) {
+    if (tg && tg.pop) return popupAct(7, tg, ui, ctl);
+    if (tg && tg.poster != null) { ctl.setItem(1); return true; }
+    if (tg && tg.thumb != null) { ctl.popup(tg.thumb); return true; }
+    if (tg && tg.back) { ctl.setItem(0); return true; }
+    return true;
+  },
+  key(k, ui, ctl) { if (__state.item && popupKey(7, k, ui, ctl)) return true; if (k === 'Escape' && __state.item) { ctl.setItem(0); return true; } return false; }
 };

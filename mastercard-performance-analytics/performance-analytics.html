@@ -2495,18 +2495,133 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
   if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, st.title, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
   ctx.restore(); ctx.restore();
 }
-/** parada de retomada: plataforma + 3 cartazes; item 0 = visão geral, item k = zoom no cartaz k */
-function recapStop(ctx, tl, item, prevItem, p, o) {
-  const views = [{ x: W / 2, y: H / 2, s: 1 }, ...o.posters.map((n, i) => ({ x: 360 + i * 600, y: 540, s: 1.52 }))];
-  const e = E.inOutCubic(p), a = views[Math.min(prevItem, views.length - 1)], b = views[Math.min(item, views.length - 1)];
-  const vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e) * (1 + .006 * Math.sin(tl * .7));
-  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
-  platform(ctx, tl, { sign: o.sign, doodles: o.doodles });
-  o.posters.forEach((n, i) => poster(ctx, 360 + i * 600, 560, 500, 640, n, tl, { rot: [-.02, .012, -.01][i] }));
+/* ---------- slides montados: miniaturas e popup das paradas ----------
+   Cada estação lista os momentos em que a cena está "montada" (cena, tempo local, título).
+   A miniatura é renderizada sob demanda (uma por quadro) e guardada; o popup renderiza em tela cheia. */
+const SLIDES = {
+  1: [['s01', 10.6, 'As perguntas de negócio'], ['s01', 13.8, 'Negócio × Dados'], ['s01', 24.3, 'Nossos serviços'], ['s01', 31.2, 'O caminho do valor']],
+  2: [['s02', 16.9, 'Faturamento da track'], ['s02', 27.6, 'O marco do Brasil'], ['s02', 31.8, 'Conclusão']],
+  3: [['s03', 18.8, 'Projetos por tipo de cliente'], ['s03', 34.8, 'ML para bancos e fintechs']],
+  4: [['banana', 16.8, 'Banana · os dados'], ['banana', 34.4, 'Banana · como fizemos'], ['banana', 52.4, 'Banana · impacto'],
+    ['manga', 30.6, 'Manga · embeddings'], ['manga', 43.6, 'Manga · camada ΔP'], ['manga', 52.6, 'Manga · impacto'],
+    ['lightsoff', 16.8, 'Lights-off · o trabalho manual'], ['lightsoff', 43.6, 'Lights-off · luzes apagadas'],
+    ['insight', 34.8, 'Agentes · o circuito'], ['insight', 47.6, 'Agentes · milhares de páginas'], ['insight', 61.6, 'Agentes · impacto']],
+  5: [['s05', 12.8, 'Do manual à IA escalável']],
+  6: [['s06', 15.3, 'Pilares, entregas e evoluções']],
+  7: [['s07', 27.6, 'As 3 direções'], ['climax', 11.6, 'Nossa especialidade']]
+};
+const SLIDE = (() => {
+  const cache = {}, queue = [], big = { key: null, cv: null }, scratch = makeCanvas(W, H, () => {});
+  const key = sl => sl[0] + '@' + sl[1];
+  const render = (c, sl) => { c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over'; PLAYER.slideAt(c, CONFIG.sceneById[sl[0]].start + sl[1]); };
+  return {
+    thumb(sl) { const k = key(sl); if (cache[k]) return cache[k]; if (!queue.includes(k)) queue.push(k); return null; },
+    /** renderiza uma miniatura pendente por quadro */
+    pump() { const k = queue.shift(); if (!k) return; const i = k.lastIndexOf('@'); render(scratch.getContext('2d'), [k.slice(0, i), +k.slice(i + 1)]); cache[k] = makeCanvas(480, 270, g => g.drawImage(scratch, 0, 0, 480, 270)); },
+    full(sl) { const k = key(sl); if (big.key !== k) { big.cv = big.cv || makeCanvas(W, H, () => {}); render(big.cv.getContext('2d'), sl); big.key = k; } return big.cv; }
+  };
+})();
+/** posições das miniaturas da estação n (faixa de baixo; 2 fileiras se forem muitas) */
+function slideRects(n) {
+  const list = SLIDES[n] || [], k = list.length, rows = k > 5 ? 2 : 1, per = Math.ceil(k / rows), th = rows > 1 ? 128 : 160, tw = th * 16 / 9, gap = 26, lab = 34;
+  const top = H - 22 - rows * (th + lab + 10);
+  return { top, rects: list.map((sl, i) => { const r = Math.floor(i / per), c = i % per, cnt = Math.min(per, k - r * per), x0 = W / 2 - (cnt * tw + (cnt - 1) * gap) / 2;
+    return { x: x0 + c * (tw + gap), y: top + r * (th + lab + 10), w: tw, h: th, sl, i }; }) };
+}
+function slideStrip(ctx, n, a, ui) {
+  if (a <= 0 || !SLIDES[n]) return; const L = slideRects(n);
+  ctx.save(); ctx.globalAlpha *= a;
+  const g = ctx.createLinearGradient(0, L.top - 90, 0, L.top + 10); g.addColorStop(0, 'rgba(12,9,7,0)'); g.addColorStop(1, 'rgba(12,9,7,.92)'); ctx.fillStyle = g; ctx.fillRect(0, L.top - 90, W, H - L.top + 90);
+  text(ctx, `CENAS DA ESTAÇÃO ${TX.stations[n - 1].n}  ·  clique para abrir`, W / 2, L.top - 28, { size: 20, weight: 800, mono: true, color: C.yellow, align: 'center', ls: 3 });
+  L.rects.forEach(r => { const th = SLIDE.thumb(r.sl), hov = ui && ui.hover && ui.hover.thumb === r.i;
+    ctx.save(); if (hov) { ctx.translate(r.x + r.w / 2, r.y + r.h / 2); ctx.scale(1.06, 1.06); ctx.translate(-r.x - r.w / 2, -r.y - r.h / 2); }
+    rr(ctx, r.x - 4, r.y - 4, r.w + 8, r.h + 8, 8); ctx.fillStyle = hov ? C.orange : '#F3EBDD'; ctx.fill();
+    if (th) ctx.drawImage(th, r.x, r.y, r.w, r.h); else { ctx.fillStyle = '#2A221C'; ctx.fillRect(r.x, r.y, r.w, r.h); text(ctx, '…', r.x + r.w / 2, r.y + r.h / 2, { size: 30, weight: 900, color: '#8A8378', align: 'center' }); }
+    text(ctx, r.sl[2], r.x + r.w / 2, r.y + r.h + 20, { size: 17, weight: 800, color: hov ? C.yellow : '#F3E6D6', align: 'center' });
+    ctx.restore(); });
   ctx.restore();
-  // entrada: o último quadro do trecho se dissolve na plataforma
-  if (o.from != null && tl < 1.4) { ctx.save(); ctx.globalAlpha = 1 - E.inOutCubic(tl / 1.4); const z = 1 + tl * .25; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); }
-  hint(ctx, tl, item === views.length - 1 ? TX.stop.go : '→', item);
+}
+const POP = { x: W / 2 - 790, y: 130, w: 1580, h: 889 };
+/** popup com o slide montado: fundo escuro, título, fechar e setas */
+function slidePopup(ctx, n, ui) {
+  const open = ui.pop != null, idx = open ? ui.pop : ui.prevPop, a = open ? E.outCubic(ui.popP) : 1 - E.outCubic(ui.popP); if (idx == null || a <= 0 || !SLIDES[n] || !SLIDES[n][idx]) return;
+  const list = SLIDES[n], sl = list[idx];
+  ctx.save(); ctx.globalAlpha *= a; ctx.fillStyle = 'rgba(8,6,5,.86)'; ctx.fillRect(0, 0, W, H);
+  ctx.translate(W / 2, H / 2); const s = lerp(.92, 1, a); ctx.scale(s, s); ctx.translate(-W / 2, -H / 2);
+  paper(ctx, POP.x - 12, POP.y - 12, POP.w + 24, POP.h + 24, { r: 14, fill: '#F3EBDD', shadow: 14, shadowColor: '#000', lw: 4 });
+  ctx.drawImage(SLIDE.full(sl), POP.x, POP.y, POP.w, POP.h);
+  pill(ctx, POP.x + 130, POP.y - 52, `ESTAÇÃO ${TX.stations[n - 1].n}`, { size: 20, fill: C.red, color: '#FFF', weight: 900 });
+  text(ctx, sl[2], POP.x + 250, POP.y - 52, { size: 30, weight: 900, color: '#FFF' });
+  if (list.length > 1) text(ctx, `${idx + 1} / ${list.length}`, POP.x + POP.w - 110, POP.y - 52, { size: 22, weight: 800, mono: true, color: '#BFB3A3', align: 'right' });
+  const hv = k => ui.hover && ui.hover.pop === k;
+  circle(ctx, POP.x + POP.w - 30, POP.y - 52, 30, hv('close') ? C.orange : C.red, INK, 3); text(ctx, '✕', POP.x + POP.w - 30, POP.y - 50, { size: 30, weight: 900, color: '#FFF', align: 'center' });
+  if (idx > 0) { circle(ctx, 44, H / 2, 34, hv('prev') ? C.orange : 'rgba(243,235,221,.9)', INK, 3); text(ctx, '‹', 42, H / 2 - 4, { size: 52, weight: 900, color: INK, align: 'center' }); }
+  if (idx < list.length - 1) { circle(ctx, W - 44, H / 2, 34, hv('next') ? C.orange : 'rgba(243,235,221,.9)', INK, 3); text(ctx, '›', W - 42, H / 2 - 4, { size: 52, weight: 900, color: INK, align: 'center' }); }
+  text(ctx, 'Esc ou ✕ fecha  ·  ← → trocam de cena', W / 2, H - 26, { size: 18, weight: 700, mono: true, color: '#BFB3A3', align: 'center' });
+  ctx.restore();
+}
+function popupHit(n, x, y, ui) {
+  const list = SLIDES[n] || [];
+  if (Math.hypot(x - (POP.x + POP.w - 30), y - (POP.y - 52)) < 40) return { pop: 'close' };
+  if (ui.pop > 0 && Math.hypot(x - 44, y - H / 2) < 46) return { pop: 'prev' };
+  if (ui.pop < list.length - 1 && Math.hypot(x - (W - 44), y - H / 2) < 46) return { pop: 'next' };
+  if (x > POP.x && x < POP.x + POP.w && y > POP.y && y < POP.y + POP.h) return { pop: 'inside' };
+  return { pop: 'close' };
+}
+function popupAct(n, tg, ui, ctl) {
+  const list = SLIDES[n] || [];
+  if (tg.pop === 'close') ctl.popup(null); else if (tg.pop === 'prev') ctl.popup(Math.max(0, ui.pop - 1)); else if (tg.pop === 'next') ctl.popup(Math.min(list.length - 1, ui.pop + 1));
+  return true;
+}
+function popupKey(n, k, ui, ctl) {
+  if (ui.pop == null) return false; const list = SLIDES[n] || [];
+  if (k === 'Escape') ctl.popup(null);
+  else if (k === 'ArrowRight' || k === 'PageDown') { if (ui.pop < list.length - 1) ctl.popup(ui.pop + 1); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { if (ui.pop > 0) ctl.popup(ui.pop - 1); }
+  else return k !== 'f' && k !== 'F' && k !== 'm' && k !== 'M';
+  return true;
+}
+/** parada de retomada: plataforma + cartazes. item 0 = visão geral; item k = zoom no cartaz k com as cenas embaixo.
+ *  Clique num cartaz → zoom · clique numa miniatura → popup · clique fora → volta · → segue (cartazes e embarque) */
+function recapScene(o) {
+  const N = o.posters, px = i => 360 + i * 600;
+  const viewOf = k => { if (!k) return { x: W / 2, y: H / 2, s: 1 }; const L = slideRects(N[k - 1]), avail = L.top - 80, s = avail / 650; return { x: px(k - 1), y: 560 - ((40 + avail / 2) - H / 2) / s, s }; };
+  const curN = item => (item ? N[item - 1] : null);
+  return {
+    draw(ctx, tl, item, prevItem, p, ui) {
+      ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
+      const e = E.inOutCubic(p), a = viewOf(Math.min(prevItem, N.length)), b = viewOf(Math.min(item, N.length));
+      const vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e) * (1 + .004 * Math.sin(tl * .7));
+      ctx.fillStyle = '#17120F'; ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
+      platform(ctx, tl, { sign: o.sign, doodles: o.doodles });
+      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), 560 - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] }); if (hov) glow(ctx, px(i), 560, 380, C.orange, .18); });
+      ctx.restore();
+      if (o.from != null && tl < 1.4) { ctx.save(); ctx.globalAlpha = 1 - E.inOutCubic(tl / 1.4); const z = 1 + tl * .25; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); }
+      const sa = item ? (prevItem ? 1 : e) : (prevItem ? 1 - e : 0), sn = curN(item) || curN(prevItem);
+      if (sn) slideStrip(ctx, sn, sa * (item ? 1 : 1), ui);
+      SLIDE.pump();
+      if (!item) text(ctx, 'clique num cartaz para abrir a estação', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .5 + .2 * Math.sin(tl * 2.4) });
+      if (item && sn) slidePopup(ctx, sn, ui);
+      hint(ctx, tl, item === N.length ? TX.stop.go : '→', item);
+    },
+    hit(x, y, ui) {
+      const item = window.__state ? __state.item : 0, n = curN(item);
+      if (n && (ui.pop != null)) return popupHit(n, x, y, ui);
+      if (!item) { for (let i = 0; i < N.length; i++) if (Math.abs(x - px(i)) < 250 && Math.abs(y - 560) < 320) return { poster: i }; return null; }
+      const L = slideRects(n); for (const r of L.rects) if (x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h + 30) return { thumb: r.i };
+      return { back: true };
+    },
+    click(tg, ui, ctl) {
+      const item = __state.item, n = curN(item);
+      if (tg && tg.pop) return popupAct(n, tg, ui, ctl);
+      if (tg && tg.poster != null) { ctl.setItem(tg.poster + 1); return true; }
+      if (tg && tg.thumb != null) { ctl.popup(tg.thumb); return true; }
+      if (tg && tg.back) { ctl.setItem(0); return true; }
+      return true;
+    },
+    key(k, ui, ctl) { const item = __state.item, n = curN(item); if (n && popupKey(n, k, ui, ctl)) return true; if (k === 'Escape' && item) { ctl.setItem(0); return true; } return false; }
+  };
 }
 /** dica discreta para quem apresenta (canto inferior direito) */
 function hint(ctx, tl, label, item) {
@@ -3171,12 +3286,8 @@ STOPSCN.stop0 = (() => {
 })();
 
 /* ---------- Parada 1: retomada do trecho 1 ---------- */
-STOPSCN.stop1 = {
-  draw(ctx, tl, item, prevItem, p) {
-    recapStop(ctx, tl, item, prevItem, p, { posters: [1, 2, 3], sign: 'PARADA 1 · BALDEAÇÃO', from: CONFIG.sceneById.s03.end,
-      doodles: [['star', 120, 300, 70, C.yellow], ['arrow', 1800, 280, 90, C.orange], ['crown', 1810, 820, 80, C.yellow], ['spiral', 110, 820, 70, C.red]] });
-  }
-};
+STOPSCN.stop1 = recapScene({ posters: [1, 2, 3], sign: 'PARADA 1 · BALDEAÇÃO', from: CONFIG.sceneById.s03.end,
+  doodles: [['star', 120, 300, 70, C.yellow], ['arrow', 1800, 280, 90, C.orange], ['crown', 1810, 820, 80, C.yellow], ['spiral', 110, 820, 70, C.red]] });
 
 /* ===== 22-cases.js ===== */
 /* ============================================================================
@@ -3960,12 +4071,8 @@ function ptScale(s) {
 })();
 
 /* ---------- Parada 2: retomada do trecho 2 ---------- */
-STOPSCN.stop2 = {
-  draw(ctx, tl, item, prevItem, p) {
-    recapStop(ctx, tl, item, prevItem, p, { posters: [4, 5, 6], sign: 'PARADA 2 · BALDEAÇÃO', from: CONFIG.sceneById.s06.end,
-      doodles: [['bang', 120, 300, 70, C.yellow], ['star', 1800, 280, 80, C.orange], ['heart', 1810, 820, 70, C.red], ['zigzag', 120, 820, 90, C.orange]] });
-  }
-};
+STOPSCN.stop2 = recapScene({ posters: [4, 5, 6], sign: 'PARADA 2 · BALDEAÇÃO', from: CONFIG.sceneById.s06.end,
+  doodles: [['bang', 120, 300, 70, C.yellow], ['star', 1800, 280, 80, C.orange], ['heart', 1810, 820, 70, C.red], ['zigzag', 120, 820, 90, C.orange]] });
 
 /* ===== 24-final.js ===== */
 /* ============================================================================
@@ -4124,14 +4231,31 @@ const CLOSE = (() => {
 })();
 
 STOPSCN.end = {
-  draw(ctx, tl, item, prevItem, p) {
+  draw(ctx, tl, item, prevItem, p, ui) {
+    ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
     BT = { ...BT, level: .25 + .2 * BT.breath };
     CLOSE.draw(ctx, 40 + tl, { breath: BT.breath });
-    const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0;
+    const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0, L = slideRects(7), ph = L.top - 90, pw = ph * .78;
     if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H);
-      poster(ctx, W / 2, H / 2 + (1 - show) * 700, 760, 900, 7, tl, { rot: -.01 }); ctx.restore(); }
+      poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
+    if (item === 1) slidePopup(ctx, 7, ui);
+    if (!item) text(ctx, 'clique no letreiro para rever a estação 07', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .4 + .2 * Math.sin(tl * 2.4) });
     hint(ctx, tl, item === 0 ? '→' : '←');
-  }
+  },
+  hit(x, y, ui) {
+    if (!__state.item) return { poster: 0 };
+    if (ui.pop != null) return popupHit(7, x, y, ui);
+    for (const r of slideRects(7).rects) if (x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h + 30) return { thumb: r.i };
+    return { back: true };
+  },
+  click(tg, ui, ctl) {
+    if (tg && tg.pop) return popupAct(7, tg, ui, ctl);
+    if (tg && tg.poster != null) { ctl.setItem(1); return true; }
+    if (tg && tg.thumb != null) { ctl.popup(tg.thumb); return true; }
+    if (tg && tg.back) { ctl.setItem(0); return true; }
+    return true;
+  },
+  key(k, ui, ctl) { if (__state.item && popupKey(7, k, ui, ctl)) return true; if (k === 'Escape' && __state.item) { ctl.setItem(0); return true; } return false; }
 };
 
 /* ===== 90-player.js ===== */
@@ -4173,6 +4297,8 @@ const PLAYER = (() => {
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
   function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
+  /** slide "montado" para as paradas: o quadro do trecho sem batida, com a legenda daquele momento */
+  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
 
   function renderPlay(T) {
     T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
@@ -4236,7 +4362,7 @@ const PLAYER = (() => {
     st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
     syncUI(); poke();
   }
-  function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); poke(); }
+  function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); UI.pop = UI.prevPop = null; poke(); }
   function next() {
     if (st.mode !== 'stop') return;
     const s = STOPS[st.stop];
@@ -4305,7 +4431,8 @@ const PLAYER = (() => {
   });
   cv.addEventListener('pointermove', e => {
     const impl = stopImpl(); if (!impl || !impl.hit) { if (UI.hover != null) UI.hover = null; cv.style.cursor = ''; return; }
-    const [x, y] = stagePt(e); UI.hover = impl.hit(x, y, UI); cv.style.cursor = UI.hover != null ? 'pointer' : '';
+    const [x, y] = stagePt(e), h = UI.hover = impl.hit(x, y, UI);
+    cv.style.cursor = h == null || h.back || h.pop === 'inside' ? '' : 'pointer';
   });
   window.addEventListener('keydown', e => {
     const k = e.key, impl = stopImpl();
@@ -4340,7 +4467,7 @@ const PLAYER = (() => {
   window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1, ui) => { const keep = { ...UI }; if (ui) Object.assign(UI, { selAt: -1e9, popAt: -1e9 }, ui); renderStop(id, tl, item, prevItem, p); Object.assign(UI, keep); };
   window.__ui = UI; window.__ctl = CTL;
   window.__seek = seek; window.__state = st; window.__next = next; window.__prev = prev; window.__gotoStop = gotoStop; window.__jump = jumpStation;
-  return { play, pause, seek, frameAt, next, prev };
+  return { play, pause, seek, frameAt, slideAt, next, prev };
 })();
 </script>
 </body>

@@ -36,6 +36,8 @@ const PLAYER = (() => {
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
   function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
+  /** slide "montado" para as paradas: o quadro do trecho sem batida, com a legenda daquele momento */
+  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
 
   function renderPlay(T) {
     T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
@@ -99,7 +101,7 @@ const PLAYER = (() => {
     st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
     syncUI(); poke();
   }
-  function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); poke(); }
+  function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); UI.pop = UI.prevPop = null; poke(); }
   function next() {
     if (st.mode !== 'stop') return;
     const s = STOPS[st.stop];
@@ -168,7 +170,8 @@ const PLAYER = (() => {
   });
   cv.addEventListener('pointermove', e => {
     const impl = stopImpl(); if (!impl || !impl.hit) { if (UI.hover != null) UI.hover = null; cv.style.cursor = ''; return; }
-    const [x, y] = stagePt(e); UI.hover = impl.hit(x, y, UI); cv.style.cursor = UI.hover != null ? 'pointer' : '';
+    const [x, y] = stagePt(e), h = UI.hover = impl.hit(x, y, UI);
+    cv.style.cursor = h == null || h.back || h.pop === 'inside' ? '' : 'pointer';
   });
   window.addEventListener('keydown', e => {
     const k = e.key, impl = stopImpl();
@@ -203,5 +206,5 @@ const PLAYER = (() => {
   window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1, ui) => { const keep = { ...UI }; if (ui) Object.assign(UI, { selAt: -1e9, popAt: -1e9 }, ui); renderStop(id, tl, item, prevItem, p); Object.assign(UI, keep); };
   window.__ui = UI; window.__ctl = CTL;
   window.__seek = seek; window.__state = st; window.__next = next; window.__prev = prev; window.__gotoStop = gotoStop; window.__jump = jumpStation;
-  return { play, pause, seek, frameAt, next, prev };
+  return { play, pause, seek, frameAt, slideAt, next, prev };
 })();

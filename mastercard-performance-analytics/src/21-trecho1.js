@@ -342,9 +342,5 @@
 })();
 
 /* ---------- Parada 1: retomada do trecho 1 ---------- */
-STOPSCN.stop1 = {
-  draw(ctx, tl, item, prevItem, p) {
-    recapStop(ctx, tl, item, prevItem, p, { posters: [1, 2, 3], sign: 'PARADA 1 · BALDEAÇÃO', from: CONFIG.sceneById.s03.end,
-      doodles: [['star', 120, 300, 70, C.yellow], ['arrow', 1800, 280, 90, C.orange], ['crown', 1810, 820, 80, C.yellow], ['spiral', 110, 820, 70, C.red]] });
-  }
-};
+STOPSCN.stop1 = recapScene({ posters: [1, 2, 3], sign: 'PARADA 1 · BALDEAÇÃO', from: CONFIG.sceneById.s03.end,
+  doodles: [['star', 120, 300, 70, C.yellow], ['arrow', 1800, 280, 90, C.orange], ['crown', 1810, 820, 80, C.yellow], ['spiral', 110, 820, 70, C.red]] });
