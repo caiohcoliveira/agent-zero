@@ -57,9 +57,11 @@ Arquivo de retomada. Cada etapa concluída é commitada e enviada para a branch 
   - régua do caso;
   - comprovante de impacto.
 - [ ] **S5. Trilha:**
-  - temas A e B (faixa escolhida ou tema original);
-  - SFX de metrô;
-  - silêncio nas paradas.
+  - faixas escolhidas: berrydeep, kulakovka e twisterium (Pixabay);
+  - análise feita (andamento, compassos, seções, volume);
+  - MP3 fora do Git;
+  - aguardando as respostas sobre duração e encaixe (ver "Trilha" no `STORYLINE.md`);
+  - depois: sincronia por compasso, SFX de metrô e silêncio nas paradas.
 - [ ] **S6. Abertura + Parada 0:** mapa navegável, com o pré-show opcional.
 - [ ] **S7. Trecho 1:** estações 01–03 + Parada 1 (3 cartazes).
 - [ ] **S8. Trecho 2:**

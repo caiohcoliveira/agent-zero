@@ -359,27 +359,64 @@ O trilho passa da última estação e segue para um horizonte neon, com sol synt
 
 ---
 
-## Trilha (para validar)
+## Trilha (escolhida)
 
-| Trecho | Clima | Recomendação | Alternativas |
-|---|---|---|---|
-| **1** · estações 01–03 | partida, papel e colagem | Banda Black Rio — "Maria Fumaça" (1977) | Tim Maia — "Descobridor dos Sete Mares" (1983) · Kraftwerk — "Trans-Europe Express" (1977) · Daft Punk — "Harder, Better, Faster, Stronger" (2001) |
-| **2** · estações 04–06 | cases, IA e neon | Giorgio Moroder — "Chase" (1978) | M83 — "Midnight City" (2011) · Daft Punk — "The Grid" / "Derezzed" (TRON: Legacy, 2010) · Kraftwerk — "Numbers" (1981) · Marcos Valle — "Estrelar" (1983) |
-| **3** · final curto | chegada ao futuro | Lulu Santos — "Tempos Modernos" (1982) | reprise do tema A · assinatura sonora da Mastercard no último quadro (se a Marca liberar) |
+As faixas foram escolhidas por vocês na Pixabay. A licença da Pixabay libera uso e edição sem crédito obrigatório. Os arquivos MP3 **não** entram no repositório, que é público.
 
-**Lógica da recomendação:**
-- O vídeo vai do papel ao neon, e a trilha acompanha: groove brasileiro retrô no trecho 1, sintetizador retrô-futurista no trecho 2.
-- As duas faixas recomendadas são instrumentais, então não competem com o texto na tela.
+| Trecho | Faixa | Duração | Andamento | Tom |
+|---|---|---|---|---|
+| 1 · estações 01–03 | berrydeep — "Vintage Film Funk" | 1:59 | ~144 BPM (compasso de 1,66 s) | Lá maior |
+| 2 · estações 04–06 | kulakovka — "Technology" | 2:49 | ~108 BPM (compasso de 2,22 s) | Fá# menor |
+| 3 · final | twisterium — "Epic Piano Background" | 1:15 | ~99 BPM (compasso de 2,42 s) | Ré maior |
 
-**Antes de escolher:**
-- **Licença:** música comercial num evento corporativo envolve dois direitos.
-  - Execução pública: ECAD, geralmente resolvido pelo local ou pela organização do evento.
-  - Sincronização: a faixa fica "colada" às imagens do vídeo, o que exige licença da editora e da gravadora.
+**Estrutura de energia de cada faixa:**
+- **Vintage Film Funk:**
+  - intro, de 0:00 a 0:11;
+  - groove, de 0:11 a 0:55;
+  - respiro, de 0:55 a 1:12;
+  - groove forte, de 1:12 a 1:47;
+  - fade até 1:59.
+- **Technology:**
+  - intro suave, de 0:00 a 0:38;
+  - construção, de 0:38 a 0:56;
+  - parte principal, de 0:56 a 2:27;
+  - saída, de 2:27 a 2:49.
+- **Epic Piano Background:**
+  - piano suave, de 0:00 a 0:08;
+  - crescendo, de 0:08 a 0:40;
+  - parte mais cheia, de 0:40 a 1:02;
+  - último acorde e decaimento, de 1:03 a 1:15.
 
-  Vale validar com Jurídico e Marca da Mastercard.
-- **Alternativa sem licença:** um tema original sintetizado (como a trilha atual) no espírito da referência escolhida, sem copiar melodia.
-- **Sincronia:** se a escolha for uma faixa real, vocês passam o arquivo e eu sincronizo os cortes ao BPM e às partes da música. A duração do trecho acompanha a edição.
-- **Fallback:** a trilha sintetizada continua no HTML, para o caso de o arquivo não estar disponível.
+**Volume:** as faixas estão masterizadas em −10, −12 e −10 LUFS e serão equalizadas entre si.
+
+**Encaixe proposto (se o vídeo seguir a música):**
+- **Trecho 1:**
+  - intro → chegada e letreiro da 01;
+  - groove → estações 01 e 02;
+  - respiro → placar da 02;
+  - groove forte → estação 03 com as ondas, e o ∞ no último tempo forte;
+  - fade → Parada 1.
+- **Trecho 2:**
+  - intro suave → abertura da 04 e problema do caso 1;
+  - construção → miolo do ALS;
+  - parte principal → casos 2 e 3 e estação 05 (GPU, neon);
+  - saída → estação 06, chegando à Parada 2.
+- **Trecho 3:**
+  - piano e crescendo → estação 07;
+  - parte mais cheia → clímax;
+  - último acorde → "PERFORMANCE ANALYTICS";
+  - decaimento → encerramento.
+
+**Em aberto (perguntas feitas ao usuário):**
+1. **Duração:** as faixas somam ~6:03, contra 8:30 de trechos planejados. Opções:
+   - o vídeo segue a música e fica com ~6:35 (recomendado);
+   - as faixas são esticadas até 9:00;
+   - meio-termo, com ~7:45.
+2. **Abertura:** fica com o som sintetizado atual ou com o começo do funk?
+3. **Clímax:** pode seguir o ritmo do piano, ficando mais épico e menos frenético?
+4. **Efeitos sonoros por cima das faixas:** manter só o essencial, mais baixo?
+5. **Paradas e encerramento:** silêncio total ou ambiência baixa?
+6. **Repositório:** o HTML com música embutida pode ir para o repositório público, ou fica só uma versão local?
 
 ---
 
