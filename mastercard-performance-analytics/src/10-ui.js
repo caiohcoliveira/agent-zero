@@ -117,7 +117,7 @@ function metroMap(ctx, t, o = {}) {
 /** mini-mapa no canto durante os trechos: 7 estações + 2 baldeações, trem andando */
 function miniMap(ctx, T, a = 1) {
   if (a <= 0) return;
-  const seq = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7], x0 = 64, x1 = 520, y = 62, dx = (x1 - x0) / (seq.length - 1);
+  const seq = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7], x0 = W - 520, x1 = W - 98, y = 58, dx = (x1 - x0) / (seq.length - 1);   // v7: canto superior direito (o título fica à esquerda)
   const k = stationAt(T), s = sceneAt(T);
   // posição do trem: índice da estação atual + progresso na estação
   const order = seq.indexOf(k), ks = CONFIG.stationStart[k] || 0, ke = k < 7 ? (CONFIG.stationStart[k + 1] || CONFIG.duration) : CONFIG.duration;
@@ -129,7 +129,9 @@ function miniMap(ctx, T, a = 1) {
     if (typeof n === 'string') { circle(ctx, x - 5, y, 9, C.red, INK, 2); circle(ctx, x + 5, y, 9, C.yellow, INK, 2); }
     else { const cur = n === k; circle(ctx, x, y, cur ? 13 : 9, cur ? C.yellow : '#FFF8EE', INK, 2.5); if (cur) text(ctx, TX.stations[n - 1].n, x, y + 1, { size: 12, weight: 900, color: INK, align: 'center' }); } });
   const tx = x0 + pos * dx; glow(ctx, tx, y, 40, C.orange, .55 + .3 * BT.beat); circle(ctx, tx, y, 7 + 2 * BT.beat, C.orange, '#FFF', 2);
-  if (k) text(ctx, TX.stations[k - 1].short, x1 + 48, y + 1, { size: 15, weight: 800, mono: true, color: '#FFF', ls: 2, alpha: .9 });
+  if (k) { const lb = `${TX.stations[k - 1].n} · ${TX.stations[k - 1].short}`, lw = measure(ctx, lb, 17, 800, true, 2) + 30;
+    rr(ctx, x1 + 34 - lw, y + 36, lw, 32, 16); ctx.fillStyle = 'rgba(14,11,9,.7)'; ctx.fill();
+    text(ctx, lb, x1 + 34 - lw / 2, y + 53, { size: 17, weight: 800, mono: true, color: '#FFF', ls: 2, align: 'center', alpha: .92 }); }
   ctx.restore();
 }
 
@@ -269,21 +271,26 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
    A miniatura é renderizada sob demanda (uma por quadro) e guardada; o popup renderiza em tela cheia. */
 // [cena, instante montado (miniatura), título, início do loop, fim do loop] — o popup roda a animação em loop nesse trecho
 const SLIDES = {
-  1: [['s01', 10.6, 'As perguntas de negócio', .8, 11.6], ['s01', 13.8, 'Negócio × Dados', 11.6, 15.8], ['s01', 24.3, 'Nossos serviços', 15.6, 24.6], ['s01', 31.2, 'O caminho do valor', 24.8, 32.2]],
-  2: [['s02', 16.9, 'Faturamento da track', .6, 20.8], ['s02', 27.6, 'O marco do Brasil', 21, 28.2], ['s02', 31.8, 'Conclusão', 28.2, 32.4]],
-  3: [['s03', 18.8, 'Projetos por tipo de cliente', 2.2, 21.2], ['s03', 34.8, 'ML para bancos e fintechs', 21.6, 35.4]],
-  4: [['banana', 16.8, 'Banana · os dados', 8.9, 17.6], ['banana', 31.8, 'Banana · matriz esparsa e ALS', 22.2, 32.4], ['banana', 34.8, 'Banana · cosseno', 32.4, 35.4], ['banana', 52.4, 'Banana · solução e impacto', 35.6, 53.1],
-    ['manga', 34.6, 'Manga · clusters e embeddings 3D', 22.2, 35.3], ['manga', 43.6, 'Manga · camada ΔP', 35.6, 44.2], ['manga', 52.6, 'Manga · impacto', 44.4, 53.1],
-    ['lightsoff', 16.8, 'Fraude · o trabalho manual', 2.6, 17.4], ['lightsoff', 42, 'Fraude · automação, luz apagada e neon', 26.4, 44.2],
-    ['insight', 34.8, 'Agentes · o circuito', 22.2, 35.4], ['insight', 47.6, 'Agentes · milhares de páginas', 35.6, 48.6], ['insight', 61.6, 'Agentes · impacto', 48.9, 62.1]],
-  5: [['s05', 12.8, 'Do manual à IA escalável', .3, 13.2]],
-  6: [['s06', 15.3, 'Pilares e entregas', .3, 15.6]],
-  7: [['s07', 27.6, 'Onde queremos estar', .5, 28.6], ['climax', 11.6, 'Analytics & Advanced Analytics', 0, 11.9]]
+  1: [['s01', 11.6, 'As perguntas de negócio', 3.9, 12.2], ['s01', 35.0, 'A ponte: os 4 serviços', 19.8, 35.6], ['s01', 46.0, 'Do diagnóstico à mensuração', 35.8, 46.9]],
+  2: [['s02', 19.5, 'Faturamento da track', 3.9, 20.2], ['s02', 29.5, 'Brasil: anterior e orçamento', 20.6, 30.3], ['s02', 38.0, 'Brasil por trimestre', 30.8, 43.4]],
+  3: [['s03', 15.0, 'Onde aplicamos', 3.8, 15.2], ['s03', 25.0, 'O que entregamos', 16.1, 25.2], ['s03', 33.5, 'Junto com as outras tracks', 26.1, 33.4],
+    ['s03', 43.5, 'Modelos preditivos', 34.5, 43.4], ['s03', 51.5, 'Modelos prescritivos', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
+  4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 34.0, 'Cestas · como fizemos', 24.5, 35.4], ['banana', 59.0, 'Cestas · solução e resultado', 35.6, 59.8],
+    ['manga', 34.5, 'Principalidade · como fizemos', 24.5, 35.4], ['manga', 45.5, 'Principalidade · reordenação', 35.6, 46.6], ['manga', 58.5, 'Principalidade · resultado', 46.8, 59.8],
+    ['lightsoff', 11, 'Relatórios · antes', 2.4, 11.9], ['lightsoff', 32, 'Relatórios · como fizemos', 20.4, 33.2], ['lightsoff', 48, 'Relatórios · luz apagada e resultado', 33.3, 49.9],
+    ['insight', 35, 'Agentes · avaliar e corrigir', 24.4, 36.3], ['insight', 59, 'Agentes · escala', 48.9, 60.3], ['insight', 67, 'Agentes · situação', 60.4, 68.8]],
+  5: [['s05', 19.5, 'A mesma equipe, mais alcance', 3.8, 19.8]],
+  6: [['s06', 24.0, 'Pilares e contribuições', 3.8, 24.3]],
+  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Reuso e eficiência', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 18.5, 'Disciplinas · Analytics & Advanced Analytics', 0, 19.1]]
 };
+/** telas extras das paradas (lupa) que não são cenas do filme: SLIDES com nome '@tela' */
+const SLIDE_SCREENS = {};
 const SLIDE = (() => {
   const cache = {}, queue = [], big = { key: null, cv: null }, scratch = makeCanvas(W, H, () => {});
   const key = sl => sl[0] + '@' + sl[1];
-  const render = (c, sl) => { c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over'; PLAYER.slideAt(c, CONFIG.sceneById[sl[0]].start + sl[1]); };
+  const render = (c, sl) => { c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+    if (sl[0][0] === '@') { HUD.begin(); try { (SLIDE_SCREENS[sl[0].slice(1)] || (g => { bgDark(g, 0); }))(c, sl[1]); } finally { HUD.flush(c); } return; }
+    PLAYER.slideAt(c, CONFIG.sceneById[sl[0]].start + sl[1]); };
   return {
     thumb(sl) { const k = key(sl); if (cache[k]) return cache[k]; if (!queue.includes(k)) queue.push(k); return null; },
     /** renderiza uma miniatura pendente por quadro */
@@ -374,10 +381,20 @@ function recapScene(o) {
       N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), PLAT.PY - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] + wind * .025 * Math.sin(tl * 9 + i * 2) }); if (hov) glow(ctx, px(i), PLAT.PY, 380, C.orange, .18); });
       ctx.restore();
       if (o.from != null && tl < 1.4) { ctx.save(); ctx.globalAlpha = 1 - E.inOutCubic(tl / 1.4); const z = 1 + tl * .25; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); }
-      const sa = item ? (prevItem ? 1 : e) : (prevItem ? 1 - e : 0), sn = curN(item) || curN(prevItem);
-      if (sn) slideStrip(ctx, sn, sa * (item ? 1 : 1), ui);
+    },
+    /** interface por cima da pintura: chamada, passagem, miniaturas, popup e dicas */
+    ui(ctx, tl, item, prevItem, p, ui) {
+      ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
+      const e = E.inOutCubic(p), sa = item ? (prevItem ? 1 : e) : (prevItem ? 1 - e : 0), sn = curN(item) || curN(prevItem);
+      const ov = (item ? (prevItem ? 0 : 1 - e) : (prevItem ? e : 1)) * clamp((tl - .9) / .6);
+      if (o.call && ov > 0) { ctx.save(); ctx.globalAlpha *= ov; const w = measure(ctx, o.call, 34, 900, true, 3) + 90;
+        rr(ctx, W / 2 - w / 2, 22, w, 74, 12); ctx.fillStyle = '#0A0807'; ctx.fill(); ctx.strokeStyle = '#3A2A1E'; ctx.lineWidth = 3; ctx.stroke();
+        ctx.shadowColor = C.orange; ctx.shadowBlur = 12; text(ctx, o.call, W / 2, 60, { size: 34, weight: 900, mono: true, color: C.orange, align: 'center', ls: 3 }); ctx.restore(); }
+      if (o.banner && ov > 0) { ctx.save(); ctx.globalAlpha *= ov; ctx.fillStyle = 'rgba(12,9,7,.86)'; ctx.fillRect(0, H - 150, W, 76); line(ctx, 0, H - 150, W, H - 150, C.orange, 4);
+        para(ctx, o.banner, W / 2, H - 134, 1700, { size: 34, weight: 800, color: '#FFF', accent: C.yellow, align: 'center' }); ctx.restore(); }
+      if (sn) slideStrip(ctx, sn, sa, ui);
       SLIDE.pump();
-      if (!item) text(ctx, 'clique num cartaz para abrir a estação', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .5 + .2 * Math.sin(tl * 2.4) });
+      if (!item) text(ctx, 'clique num cartaz para abrir a estação', W / 2, H - 36, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: (.5 + .2 * Math.sin(tl * 2.4)) * clamp((tl - .9) / .6) });
       if (item && sn) slidePopup(ctx, sn, ui);
       hint(ctx, tl, item === N.length ? TX.stop.go : '→', item);
     },

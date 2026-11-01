@@ -30,6 +30,18 @@ const PEOPLE = (() => {
     return { hx: sw * 9, hy: -102 + 12 * b, lean: .1 * sw, tilt: -.2 * sw, a: [[2.7 + .3 * w, .45 + .3 * b], [2.55 - .3 * w, .55]], l: [[.25 * sw, .3 + .5 * b], [-.2 * sw, .3 + .35 * b]] };
   }
   function reach(k) { const p = JSON.parse(JSON.stringify(POSE.stand)); p.a[0] = [lerp(.22, 1.75, k), lerp(.15, 0, k)]; p.lean = .06 * k; return p; }
+  /** segura algo na frente do peito (o bilhete); k = 0 braço solto → 1 segurando */
+  function hold(k, base) { const p = JSON.parse(JSON.stringify(base || POSE.stand)); p.a[0] = [lerp(p.a[0][0], .5, k), lerp(p.a[0][1], 1.75, k)]; return p; }
+  /** acena com o braço da frente */
+  function wave(t, k = 1, base) { const p = JSON.parse(JSON.stringify(base || POSE.stand)); p.a[0] = [lerp(p.a[0][0], 2.75, k), lerp(p.a[0][1], .45 + .38 * Math.sin(t * 9), k)]; p.tilt += .05 * k; return p; }
+  /** aponta para a frente e para cima */
+  function point(k, base) { const p = JSON.parse(JSON.stringify(base || POSE.stand)); p.a[0] = [lerp(p.a[0][0], 2.05, k), lerp(p.a[0][1], -.05, k)]; p.lean += .03 * k; return p; }
+  /** posição da mão (i = 0 braço da frente · 1 de trás) no mesmo espaço de draw(x, y, s, P, { dir }) */
+  function hand(x, y, s, P, o = {}, i = 0) {
+    const dir = o.dir || 1, side = i === 0 ? 1 : -1, N = [P.hx + Math.sin(P.lean) * L.torso, P.hy - Math.cos(P.lean) * L.torso];
+    const sh = [N[0] + side * 30, N[1] + 14], [a, k] = P.a[i], el = dn(sh[0], sh[1], a, L.ua), hd = dn(el[0], el[1], a + k, L.fa);
+    return [x + hd[0] * s * dir, y + hd[1] * s];
+  }
 
   const COL = { skin: '#F7CBA6', skinDk: '#E3A27C', hair: '#F7D45C', hairDk: '#D8A433', top: '#E2462C', topDk: '#B8321E', stripe: C.yellow, pants: '#2E3A66', pantsDk: '#222B4E', shoe: '#FFFFFF', sole: C.orange, phones: C.orange };
   /** desenha a personagem (vista 3/4, olhando para +x). o: { dir, t, phones: 'neck'|'on', mood: 'tired'|'happy'|'calm', dark, swing, sil } */
@@ -121,5 +133,5 @@ const PEOPLE = (() => {
     const hx = 22 + peck * 8, hy = -38 + peck * 26; circle(ctx, hx, hy, 10, '#6A7F80', INK, 2.5); circle(ctx, hx + 3, hy - 2, 1.8, '#F7A93B'); line(ctx, hx + 9, hy + 1, hx + 16, hy + 3, '#E0B070', 3);
     ctx.restore();
   }
-  return { POSE, mixPose, typing, walk, dance, reach, draw, mouse, pigeon };
+  return { POSE, mixPose, typing, walk, dance, reach, hold, wave, point, hand, draw, mouse, pigeon };
 })();

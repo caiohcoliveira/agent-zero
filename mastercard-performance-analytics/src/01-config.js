@@ -9,6 +9,7 @@
    ========================================================================== */
 const W = 1920, H = 1080;
 
+const C_RED = '#EB001B', C_ORANGE = '#FF5F00', C_YELLOW = '#F79E1B';
 const CONFIG = {
   fps: 30,                 // referência visual (render usa rAF; "on twos" = fps/2)
   bpm: 120,                // trilha sintetizada da abertura: 1 compasso = 2s
@@ -41,7 +42,7 @@ const CONFIG = {
     voice: false,          // narração do navegador: DESLIGADA por padrão (botão "Voz" / tecla V)
     musicVolume: 0.42, sfxVolume: 0.5,
     trackVolume: 1.0,      // volume geral das faixas (funk, technology, piano)
-    tracks: { funk: { gain: .63 }, tech: { gain: .79 }, piano: { gain: .62 } },  // equaliza o loudness (~−14 LUFS)
+    tracks: { funk: { gain: .91 }, tech: { gain: .94 }, piano: { gain: .87 } },  // versões animadas (tools/remix.py): ~1–3 dB acima da v5.4, equilibradas entre si
     duckDuringVoice: 0.55,
     voiceRate: 1.07, voicePitch: 1.02,
     preferredVoices: ['Francisca', 'Thalita', 'Brenda', 'Giovanna', 'Leila', 'Manuela', 'Yara',
@@ -54,30 +55,31 @@ const CONFIG = {
   // ---------------------------------------------------------------- PLAYS (trechos de vídeo)
   // track = faixa embutida (src/07-beats.js) · from = de onde a faixa começa (s)
   plays: [
-    { id: 1, track: null },                    // abertura: trilha sintetizada
-    { id: 2, track: 'funk', from: 0 },         // "Vintage Film Funk" inteira (1:59)
-    { id: 3, track: 'tech', from: 0 },         // "Technology" remontada para os cases (tools/edit_tech.py, 4:24)
-    { id: 4, track: 'piano', from: 7.48 }      // "Epic Piano" a partir do primeiro impacto (1:07)
+    { id: 1, track: null },                    // embarque: trilha sintetizada (src/05-audio.js)
+    { id: 2, track: 'funk', from: 0 },         // "Vintage Film Funk" remontada (tools/edit_music.py, 2:34)
+    { id: 3, track: 'tech', from: 0 },         // "Technology" remontada para os cases (tools/edit_music.py, 5:04)
+    { id: 4, track: 'piano', from: 2.7 }       // "Epic Piano" do 2º compasso: o acorde final cai no letreiro (14,06 s)
   ],
 
   // ---------------------------------------------------------------- CENAS (ordem = ordem do filme)
   // dur casado com os compassos da faixa do play; station = estação da linha (1–7)
+  // v7: cada tela traz contexto, explicação, visual com rótulos e conclusão (sem narrador)
   scenes: [
-    { id: 'open',      play: 1, dur: 10,     theme: 'dark' },                   // plataforma → trem → embarque → mapa
-    { id: 's01',       play: 2, dur: 33.88,  station: 1, theme: 'light' },
-    { id: 's02',       play: 2, dur: 37.08,  station: 2, theme: 'dark' },
-    { id: 's03',       play: 2, dur: 48.524, station: 3, theme: 'dark' },   // ∞ em 36.96 (saída da música)
-    // estação 04: cada case tem parte calma (problema e dados) → construção (como fizemos) → drop (solução e impacto)
-    { id: 's04',       play: 3, dur: 8.889,  station: 4, theme: 'dark' },   // título da seção + "os cases de impacto"
-    { id: 'banana',    play: 3, dur: 53.333, station: 4, theme: 'dark' },   // drop em 35.56
-    { id: 'manga',     play: 3, dur: 53.333, station: 4, theme: 'dark' },   // drop em 35.56
-    { id: 'lightsoff', play: 3, dur: 53.334, station: 4, theme: 'light' },  // drop em 35.56 (o interruptor)
-    { id: 'insight',   play: 3, dur: 62.222, station: 4, theme: 'dark' },   // drop em 35.56 (milhares de páginas)
-    { id: 's05',       play: 3, dur: 13.337, station: 5, theme: 'dark' },
-    { id: 's06',       play: 3, dur: 19.93,  station: 6, theme: 'light' },  // saída suave da música
-    { id: 's07',       play: 4, dur: 28.8,   station: 7, theme: 'dark' },
-    { id: 'climax',    play: 4, dur: 12,     theme: 'dark' },
-    { id: 'close',     play: 4, dur: 26.378, theme: 'dark' }                // último acorde em 14.08
+    { id: 'open',      play: 1, dur: 20,     theme: 'dark' },                   // identidade → propósito → percurso
+    { id: 's01',       play: 2, dur: 46.98,  station: 1, theme: 'dark' },   // a ponte entre negócio e dados (frase A de 16 compassos)
+    { id: 's02',       play: 2, dur: 43.64,  station: 2, theme: 'dark' },   // a frase A de novo, até o break
+    { id: 's03',       play: 2, dur: 63.924, station: 3, theme: 'dark' },   // break → parte B → saída (síntese em 52,4)
+    // estação 04: cada case tem 27 compassos: calma 11 (problema, dados) → construção 5 (como fizemos) → cheia 11 (solução, resultado)
+    { id: 's04',       play: 3, dur: 11.111, station: 4, theme: 'dark' },   // analytics em ação: os 4 cases
+    { id: 'banana',    play: 3, dur: 60,     station: 4, theme: 'dark' },   // drop na solução: 35,56
+    { id: 'manga',     play: 3, dur: 60,     station: 4, theme: 'dark' },   // drop na reordenação: 35,56
+    { id: 'lightsoff', play: 3, dur: 60.001, station: 4, theme: 'light' },  // interruptor 33,33 · silêncio · drop 35,56
+    { id: 'insight',   play: 3, dur: 68.89,  station: 4, theme: 'dark' },   // construção longa; drop na escala: 48,89
+    { id: 's05',       play: 3, dur: 20.004, station: 5, theme: 'dark' },
+    { id: 's06',       play: 3, dur: 24.444, station: 6, theme: 'dark' },   // a faixa termina em 20 s; silêncio até a parada
+    { id: 's07',       play: 4, dur: 26.4,   station: 7, theme: 'dark' },   // 11 compassos de piano
+    { id: 'climax',    play: 4, dur: 19.2,   theme: 'dark' },                   // as 8 disciplinas, acumulando (8 compassos)
+    { id: 'close',     play: 4, dur: 26.378, theme: 'dark' }                // último acorde em 14,06
   ],
 
   // ---------------------------------------------------------------- PARADAS (loop + itens navegáveis)
@@ -95,22 +97,25 @@ const CONFIG = {
     line: 'LINHA PERFORMANCE ANALYTICS',
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
-      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'como transformamos dados em decisões, impacto e valor',
-        see: ['As perguntas de negócio que chegam até nós', 'Negócio × Dados: onde analytics entra', 'Diagnóstico → Estratégia → Implementação → Mensuração'] },
-      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'quanto a track cresceu e o marco do Brasil',
-        see: ['Evolução do faturamento da track, ano a ano', 'Brasil: acima do período anterior e do orçamento'] },
-      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'O que levamos ao mercado',                             teaser: 'projetos recentes e os modelos que bancos e fintechs usam',
-        see: ['Alguns de nossos últimos projetos, por tipo de cliente', 'Modelos preditivos e prescritivos que levamos a bancos e fintechs'] },
-      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do dado ao impacto',                teaser: '4 cases, do problema ao resultado medido',
-        see: ['Cliente Banana · cestas de produtos', 'Cliente Manga · motor de principalidade', 'Relatórios de fraude · automatizados, sem trabalho manual', 'Insight Agent · agentes de IA que escrevem insights'] },
-      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'Escalando o impacto com dados, IA e inovação',         teaser: 'do trabalho manual aos ativos de IA escaláveis',
-        see: ['A escada: manual → avançado → produtizado → IA escalável', 'IA local: o dado nunca sai da Mastercard'] },
-      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: pilares, entregas e evoluções',             teaser: 'como nos organizamos para entregar',
-        see: ['Os pilares da prática', 'Entregas e evoluções'] },
-      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'onde queremos estar',
-        see: ['Mais perto das decisões estratégicas', 'Mais integrados às demais tracks', 'Mais escaláveis e diferenciados'] }
+      { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'conectamos perguntas de negócio aos dados, do diagnóstico à mensuração',
+        see: ['Decisões difíceis começam com perguntas', 'A ponte entre negócio e dados', 'Diagnóstico, estratégia, implementação e mensuração'] },
+      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'o faturamento da track e o resultado do Brasil',
+        see: ['Faturamento anual da track, com base zero', 'Brasil: comparado ao período anterior e ao orçamento', 'Trimestres: anterior × orçamento × realizado'] },
+      { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'Onde aplicamos analytics',                             teaser: 'tipos de cliente, capabilities e modelos',
+        see: ['Emissores, adquirentes e varejo', 'Segmentação, recomendação e automação', 'Modelos que antecipam e modelos que recomendam'] },
+      { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do problema ao resultado',          teaser: '4 cases, do problema à solução e ao resultado',
+        see: ['Cestas de produtos · Cliente Banana', 'Principalidade · Cliente Manga', 'Relatórios de fraude automatizados', 'Agentes de IA para insights'] },
+      { n: '05', short: 'ESCALANDO O IMPACTO',      title: 'A mesma equipe, um alcance maior',                     teaser: 'automação, padronização e reutilização',
+        see: ['Equipe → ativo reutilizável → aplicações', 'O mesmo ativo serve a novos projetos'] },
+      { n: '06', short: 'A PRÁTICA',                title: 'A Prática: os pilares que sustentam a linha',          teaser: 'os pilares e o que cada um entrega',
+        see: ['Os pilares da prática', 'Uma contribuição por pilar'] },
+      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'para onde a linha segue',
+        see: ['Decisões estratégicas e integração', 'Reuso de ativos e eficiência', 'Projetos User-Pay com Advanced Analytics'] }
     ],
-    stopInfo: { p1: ['Parada 1 · conversa', 'retomamos as estações 01, 02 e 03'], p2: ['Parada 2 · conversa', 'retomamos as estações 04, 05 e 06'] },
+    // os 3 capítulos da viagem (mapa da abertura e da Conversa 0)
+    chapters: [['Onde atuamos', [1, 2, 3], C_RED], ['Cases e resultados', [4, 5, 6], C_ORANGE], ['O que vem pela frente', [7], C_YELLOW]],
+    mission: 'Transformamos dados em decisões e soluções de negócio.',
+    stopInfo: { p1: ['Conversa 1', 'perguntas sobre as estações 01, 02 e 03'], p2: ['Conversa 2', 'aplicações e aprofundamento dos cases'] },
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
     circleA: 'Negócio', circleB: 'Dados',
@@ -142,16 +147,16 @@ const CONFIG = {
     methodPT: { 'cluster characterization': 'caracterização dos clusters', 'cross-sell ranking': 'ranking de cross-sell', 'upsell ranking': 'ranking de upsell', 'cosine similarity': 'cosine similarity',
       'product affinity': 'afinidade de produto', 'expected principality uplift': 'ganho esperado de principalidade', 'local LLMs': 'LLMs locais', 'multi-agent architecture': 'arquitetura multiagente', 'ML quality scoring': 'score de qualidade com ML' },
     future: [
-      { title: 'Mais perto das decisões', sub: 'estratégicas dos clientes', icon: 'chair' },
-      { title: 'Mais integrados', sub: 'às demais tracks', icon: 'link' },
-      { title: 'Mais escaláveis', sub: 'e diferenciados', icon: 'grid' },
-      { title: 'Eficiência operacional', sub: 'automação de projetos', icon: 'robots' },
-      { title: 'Projetos User-Pay', sub: 'com Advanced Analytics', icon: 'userpay' }
+      { title: 'Apoiar decisões estratégicas', sub: 'dos clientes', icon: 'chair' },
+      { title: 'Combinar analytics', sub: 'com as demais tracks', icon: 'link' },
+      { title: 'Reutilizar ativos', sub: 'para ampliar o alcance', icon: 'grid' },
+      { title: 'Automatizar rotinas', sub: 'para ganhar eficiência', icon: 'robots' },
+      { title: 'Ampliar projetos User-Pay', sub: 'com Advanced Analytics', icon: 'userpay' }
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
     // clímax: as disciplinas por trás de tudo (não técnicas soltas)
     climaxWords: ['Estatística', 'Otimização & Pesquisa operacional', 'Modelos supervisionados', 'Modelos não supervisionados', 'NLP', 'Redes neurais', 'Deep learning', 'Inteligência artificial'],
-    climaxSub: ['setup de projetos de marketing e estratégia', 'modelos para tomada de decisão', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'processamento de linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
+    climaxSub: ['setup de projetos de marketing e estratégia', 'modelos para tomada de decisão', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'entendem a linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
     climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },

@@ -123,10 +123,63 @@ Ordem: primeiro a base que todas as cenas usam (pintura e luz), depois a persona
 
 **v5 concluída.** Próximo passo: revisão do usuário.
 
+## v7 — experimento: "cada tela se explica sozinha" (branch `claude/mastercard-analytics-video-experimento`)
+
+Base: roteiro criativo v7, com 4 escolhas da v5.4 mantidas:
+- fraude híbrida;
+- 8 disciplinas acumulando;
+- letreiro WELCOME TO…;
+- estação viva nas conversas.
+
+A v5.4 continua intacta em `claude/mastercard-analytics-video-4cof1t`.
+
+- [x] **E1. Base:**
+  - música remontada para 9:11 (`tools/edit_music.py`) e batidas reanalisadas;
+  - texto nítido depois da pintura (HUD) e roteiro de tela por cena (SAY);
+  - linha laranja (LINE), câmera com paralaxe, diagramas nomeados (`src/14-v7.js`);
+  - mini-mapa e painel de LED no canto direito.
+- [x] **E2. Play 1, Conversa 0 e estações 01–03:**
+  - embarque com a analista e o bilhete, missão e mapa com 3 capítulos;
+  - ponte dos 4 serviços;
+  - gráficos com eixo, unidade e base;
+  - capabilities, preditivos × prescritivos.
+- [x] **E3. Estação 04, os 4 cases, 05 e 06:**
+  - explicação por etapa e base da comparação;
+  - fraude híbrida;
+  - ciclo dos agentes;
+  - reuso;
+  - pilares-viaduto com `contribution`.
+- [x] **E4. Play 4 e conversas:**
+  - cidade conectada, disciplinas acumulando, letreiro da v5.4;
+  - cartazes legíveis com chamada e "A seguir…";
+  - lupa com cenas em loop e catálogo de 20 modelos.
+- [x] **E5. QA:**
+  - medidor de leitura (`tools/read_check.js`): 72 telas, 0 curtas;
+  - render de 0 a 551 s e de todas as conversas, sem exceções;
+  - testes de navegação e de clique;
+  - documentação reescrita para a v7.
+
+**v7 concluída.**
+
+### v7.1 — pedidos da revisão
+
+- [x] **Músicas mais animadas** (`tools/remix.py`):
+  - Technology com bateria, construções, drops com impacto, sidechain e graves;
+  - funk e piano com graves, impactos e risers;
+  - piano com percussão no clímax.
+- [x] **Embarque:** o bilhete grande "DE dados → PARA valor" carimbado volta, como na v5.4, no lugar da linha de trem.
+- [x] **QA e folhas de cenas:**
+  - varredura sem erros e medidor de leitura (0 curtas);
+  - folhas com as fotos de todas as cenas e conversas enviadas ao usuário.
+
+Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
+
 ## Como retomar numa nova sessão
 
-1. Faça checkout da branch `claude/mastercard-analytics-video-4cof1t`.
-2. Leia este arquivo, o `README.md` (arquitetura) e o `STORYLINE.md` (v4).
-3. Continue a partir do primeiro item não marcado. Os parâmetros ficam em `src/01-config.js`.
-4. Rode `./build.sh` e faça a verificação: o render da duração inteira deve sair sem exceções. Os MP3 das músicas não estão no Git (`musica/`): se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado. A faixa da estação 04 é `musica/tech-edit.mp3`, gerada por `tools/edit_tech.py` a partir de `musica/tech.mp3`.
+1. Faça checkout da branch: `claude/mastercard-analytics-video-experimento` (v7) ou `claude/mastercard-analytics-video-4cof1t` (v5.4).
+2. Leia este arquivo, o `README.md` (arquitetura e contrato de tela) e o `STORYLINE.md`.
+3. Continue a partir do primeiro item não marcado. Os parâmetros ficam em `src/01-config.js`; o kit de tela, em `src/14-v7.js`.
+4. Rode `./build.sh`, depois `node tools/read_check.js`, e verifique o render da duração inteira sem exceções.
+   - Os MP3 não estão no Git (`musica/`). Se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado.
+   - As remontagens saem de `tools/edit_music.py`.
 5. Faça commit e push, e marque o item aqui.

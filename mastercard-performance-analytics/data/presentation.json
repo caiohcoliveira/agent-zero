@@ -365,6 +365,7 @@
       "pillars": [
         {
           "pillar": "Cenoura",
+          "contribution": "Treinamentos, mesas-redondas e troca de conhecimento no time",
           "highlights": [
             "10 specific training sessions in collaboration with OC Training",
             "AI & AA Practice offered 10 different training sessions for all A&CS Team",
@@ -375,6 +376,7 @@
         },
         {
           "pillar": "Brócolis",
+          "contribution": "Newsletter, automações e kit de onboarding",
           "highlights": [
             "AI & AA Newsletter introduced in Brazil, with 6 editions since the reference period",
             "Newsletter built using Copilot and sent through an automated Power Automate process",
@@ -384,6 +386,7 @@
         },
         {
           "pillar": "Abobrinha",
+          "contribution": "Formação em IA e certificação Greenbelt",
           "highlights": [
             "AI Contributor Learning Program as the first step toward AI Greenbelt Certification",
             "AI Greenbelt Certification launched in the reference period",
@@ -392,6 +395,7 @@
         },
         {
           "pillar": "Beterraba",
+          "contribution": "Projetos de IA, eficiência e agentes internos",
           "highlights": [
             "Cliente Goiaba Agentic Commerce client project",
             "Cliente Caju AI for Cards client project",
@@ -403,6 +407,7 @@
         },
         {
           "pillar": "Couve",
+          "contribution": "Repositório com mais de 60 projetos padronizados",
           "highlights": [
             "More than 60 Performance Analytics projects mapped in a centralized repository",
             "10 structured dimensions",
