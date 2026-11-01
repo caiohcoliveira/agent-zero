@@ -207,5 +207,39 @@ const VIZ = (() => {
         if (u > 1.2) text(ctx, lb + (i + 1), xs(i), yy + 1, { size: u * 4, weight: 800, mono: true, color: INK, align: 'center' }); }); }
   };
 
+  /** pesquisa operacional: região viável, a reta do objetivo desliza até o vértice ótimo */
+  V.lp = (ctx, x, y, w, h, p, o = {}) => {
+    const u = U(w, h), fgc = fg(o), X = v => x + w * (.08 + .84 * v), Y = v => y + h * (.92 - .84 * v);
+    axes(ctx, x + w * .08, y + h * .08, w * .84, h * .84, o, 1);
+    const poly = [[0, 0], [0, .78], [.42, .7], [.74, .38], [.82, 0]], ap = E.outCubic(clamp(p * 2));
+    ctx.beginPath(); poly.forEach(([a, b], i) => i ? ctx.lineTo(X(a), Y(b)) : ctx.moveTo(X(a), Y(b))); ctx.closePath(); ctx.fillStyle = rgba(C.orange, .22 * ap); ctx.fill(); ctx.strokeStyle = rgba(C.orange, ap); ctx.lineWidth = Math.max(1.5, u * .7); ctx.stroke();
+    [[[0, .95], [1, .62]], [[.3, 1], [.95, .1]], [[.6, 1], [.9, 0]]].forEach(([[a, b], [c, d]], i) => { const lp = clamp(p * 2.5 - i * .25); line(ctx, X(a), Y(b), X(lerp(a, c, lp)), Y(lerp(b, d, lp)), rgba(fgc, .45), Math.max(1, u * .4), [u * 1.5, u * 1.5]); });
+    const k = E.inOutCubic(clamp(p * 1.4 - .3)), off = lerp(.15, 1.04, k);
+    line(ctx, X(off - .05) , Y(0), X(0), Y(off * 1.1), C.yellow, Math.max(2, u * .8), [u * 2, u * 1.2]);
+    if (k > .97) { glow(ctx, X(.74), Y(.38), u * 14, C.yellow, .9); circle(ctx, X(.74), Y(.38), u * 2.4, '#FFF', INK, 2); }
+    if (u > 1.2) text(ctx, 'ótimo', X(.74) + u * 4, Y(.38) - u * 4, { size: u * 4.5, weight: 800, color: C.yellow, alpha: k > .97 ? 1 : 0 });
+  };
+  /** rede neural: perceptron multicamadas com o sinal passando camada a camada */
+  V.mlp = (ctx, x, y, w, h, p, o = {}) => {
+    const u = U(w, h), t = o.t || 0, L = [4, 6, 6, 3], fgc = fg(o), pos = (l, i) => [x + w * (.1 + .8 * l / (L.length - 1)), y + h * (.5 + (i - (L[l] - 1) / 2) * .14)];
+    for (let l = 0; l < L.length - 1; l++) for (let i = 0; i < L[l]; i++) for (let j = 0; j < L[l + 1]; j++) { const a = clamp(p * 3 - l * .5), [x1, y1] = pos(l, i), [x2, y2] = pos(l + 1, j), wgt = hash(l * 97 + i * 13 + j);
+      line(ctx, x1, y1, lerp(x1, x2, a), lerp(y1, y2, a), rgba(wgt > .5 ? C.orange : fgc, .12 + .35 * wgt * a), Math.max(1, u * (.2 + .5 * wgt))); }
+    const wave = (t * .8) % 1 * (L.length - 1);
+    L.forEach((n, l) => { for (let i = 0; i < n; i++) { const [px, py] = pos(l, i), a = E.outBack(clamp(p * 3 - l * .4)); if (a <= 0) continue; const hot = Math.abs(wave - l) < .5;
+      if (hot) glow(ctx, px, py, u * 7, C.yellow, .5); vball(ctx, px, py, u * 3.2 * a, hot ? C.yellow : l === 0 ? C.red : l === L.length - 1 ? C.orange : '#F3EBDD', { lw: Math.max(1.5, u * .45), rim: false }); } });
+    if (u > 1.2) ['entrada', 'oculta', 'oculta', 'saída'].forEach((s, l) => text(ctx, s, pos(l, 0)[0], y + h * .95, { size: u * 3.6, weight: 800, mono: true, color: rgba(fgc, .8), align: 'center' }));
+  };
+  /** NLP: a frase vira tokens, os tokens viram vetores, e o modelo extrai o sentido */
+  V.nlp = (ctx, x, y, w, h, p, o = {}) => {
+    const u = U(w, h), fgc = fg(o), words = ['o', 'market', 'share', 'caiu', 'no', 'sul'], n = words.length, xs = i => x + w * (.1 + .8 * i / (n - 1));
+    words.forEach((wd, i) => { const a = E.outBack(clamp(p * 3 - i * .12)); if (a <= 0) return; const bw = u * (6 + wd.length * 2.6) * a, yy = y + h * .14;
+      rr(ctx, xs(i) - bw / 2, yy - u * 4, bw, u * 8, u * 2); ctx.fillStyle = '#F6EEDF'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1, u * .4); ctx.stroke();
+      if (u > 1.2) text(ctx, wd, xs(i), yy + 1, { size: u * 4.2, weight: 800, color: INK, align: 'center' });
+      const va = clamp(p * 2.4 - .6 - i * .08); if (va > 0) { line(ctx, xs(i), yy + u * 5, xs(i), y + h * .36, rgba(fgc, .5 * va), Math.max(1, u * .4)); arrowHead(ctx, xs(i), y + h * .36, Math.PI / 2, u * 2, rgba(fgc, va));
+        for (let d = 0; d < 6; d++) { const v = hash(i * 31 + d * 7), bh = u * 2.6; rr(ctx, xs(i) - u * 3, y + h * .4 + d * bh * 1.25, u * 6 * (.3 + .7 * v) * va, bh, u * .6); ctx.fillStyle = v > .5 ? C.orange : C.yellow; ctx.fill(); } } });
+    const sa = clamp(p * 2 - 1.1); if (sa > 0) { const cy = y + h * .86; [[1, 3], [2, 3], [3, 5]].forEach(([a, b], k) => { ctx.beginPath(); ctx.moveTo(xs(a), y + h * .74); ctx.quadraticCurveTo((xs(a) + xs(b)) / 2, cy, xs(b), y + h * .74); ctx.strokeStyle = rgba(C.yellow, sa); ctx.lineWidth = Math.max(1.5, u * .7); ctx.stroke(); });
+      if (u > 1.2) text(ctx, 'sentido: queda de share na região Sul', x + w / 2, y + h * .95, { size: u * 4.4, weight: 800, color: C.yellow, align: 'center', alpha: sa }); }
+  };
+
   return V;
 })();

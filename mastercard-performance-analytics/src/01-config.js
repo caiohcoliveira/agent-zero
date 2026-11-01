@@ -147,8 +147,10 @@ const CONFIG = {
       { title: 'Mais escaláveis', sub: 'e diferenciados', icon: 'grid' }
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
-    climaxWords: ['Estatística', 'Regressão', 'Classificação', 'Clusters', 'Embeddings', 'Otimização', 'Transformers', 'Agentes'],
-    climaxKey: 'Nossa especialidade é *analytics*.',
+    // clímax: as disciplinas por trás de tudo (não técnicas soltas)
+    climaxWords: ['Estatística', 'Otimização', 'Modelos supervisionados', 'Modelos não supervisionados', 'NLP', 'Redes neurais', 'Deep learning', 'Inteligência artificial'],
+    climaxSub: ['inferência, testes e incerteza', 'pesquisa operacional', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'processamento de linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
+    climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },
 

@@ -90,14 +90,14 @@ const FUTURE_ART = {
 /* ---------- clímax: 8 cortes no piano ---------- */
 (() => {
   const id = 'climax', G = grid(id), BE = G.beats, cutAt = k => BE[Math.min(k * 2, BE.length - 1)] || k * 1.2;
-  const VZ = ['gaussian', 'regression', 'classification', 'clusters', 'embeddings', 'gradient', 'transformer', 'agents'];
-  const FXS = ['N(μ, σ²)', 'ŷ = Xβ + ε', 'σ(wᵀx + b)', 'argmin Σ‖x − μₖ‖²', 'cos θ = a·b/‖a‖‖b‖', 'θ ← θ − η∇L(θ)', 'softmax(QKᵀ/√dₖ)V', 'gerar → julgar → corrigir'];
+  const VZ = ['gaussian', 'lp', 'classification', 'clusters', 'nlp', 'mlp', 'transformer', 'agents'];
+  const FXS = ['N(μ, σ²) · p < 0,05', 'max cᵀx  s.a.  Ax ≤ b', 'σ(wᵀx + b)', 'argmin Σ‖x − μₖ‖²', 'texto → tokens → vetores', 'h = σ(Wx + b)', 'softmax(QKᵀ/√dₖ)V', 'perceber → raciocinar → agir'];
   const N = TX.climaxWords.length, T_KEY = cutAt(N);
   for (let k = 0; k < N; k++) cue(id, cutAt(k), 'hit', { size: .35 + k * .05 }); cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
 
   SCENES[id] = {
     peaks: [[0, 12]],
-    caps: [[.3, T_KEY - .2, 'Tudo o que vimos se apoia em *ciência de dados*: da estatística aos agentes de IA', 'NOSSA BASE', { top: true }]],
+    caps: [[.3, T_KEY - .2, 'Por trás de tudo, *disciplinas*: da estatística à inteligência artificial', 'NOSSA BASE', { top: true }]],
     themeAt: t => t < T_KEY ? (Math.floor(t / 1.2) % 2 ? 'light' : 'dark') : 'dark',
     draw(ctx, t) {
       let k = -1; for (let i = 0; i < N; i++) if (t >= cutAt(i)) k = i;
@@ -108,7 +108,8 @@ const FUTURE_ART = {
         collage(ctx, t, { seed: 113, n: 8, theme: 'dark', alpha: .6 });
         [[460, 360, 160, C.red], [1460, 420, 190, C.orange], [960, 760, 140, C.yellow]].forEach(([x, y, r, c], i) => splat(ctx, x, y, r, c, 140 + i, E.outBack(P(t, T_KEY + i * .08, .35)), .8));
         ctx.save(); ctx.translate(W / 2, H / 2); const s = lerp(1.7, 1, E.outExpo(p)) * (1 + .03 * BT.beat); ctx.scale(s, s);
-        rich(ctx, TX.climaxKey, 0, 0, { size: 112, weight: 900, color: '#FFF', retro: true, depth: 7, lw: 5 }); ctx.restore();
+        const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); text(ctx, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
+        rich(ctx, k2 || '', 0, 30, { size: 96, weight: 900, color: '#FFF', retro: true, depth: 7, lw: 5 }); ctx.restore();
         return;
       }
       const lt = t - cutAt(k), dur = cutAt(k + 1) - cutAt(k), light = k % 2 === 1, p = clamp(lt / dur);
@@ -119,8 +120,9 @@ const FUTURE_ART = {
       VIZ[VZ[k]](ctx, vx, vy, vw, vh, E.outCubic(clamp(p * 1.3)), { t, theme: light ? 'light' : 'dark' });
       const ws = lerp(1.5, 1, E.outExpo(clamp(lt / .25)));
       ctx.save(); ctx.translate(130, 930); ctx.rotate(-.03); ctx.scale(ws, ws);
-      const w = measure(ctx, TX.climaxWords[k], 96, 900) + 80; brush(ctx, -40, -62, w, 124, [C.red, C.orange, C.yellow][k % 3], 190 + k, 1);
-      retroText(ctx, TX.climaxWords[k], 0, 0, { size: 96, weight: 900, color: k % 3 === 2 ? INK : '#FFF', depth: k % 3 === 2 ? 0 : 5, lw: k % 3 === 2 ? 0 : 4 }); ctx.restore();
+      const fs = Math.min(96, 1300 / Math.max(1, measure(ctx, TX.climaxWords[k], 96, 900)) * 96), w = measure(ctx, TX.climaxWords[k], fs, 900) + 80; brush(ctx, -40, -fs * .65, w, fs * 1.3, [C.red, C.orange, C.yellow][k % 3], 190 + k, 1);
+      retroText(ctx, TX.climaxWords[k], 0, 0, { size: fs, weight: 900, color: k % 3 === 2 ? INK : '#FFF', depth: k % 3 === 2 ? 0 : 5, lw: k % 3 === 2 ? 0 : 4 });
+      text(ctx, TX.climaxSub[k], 0, fs * .72 + 14, { size: 30, weight: 800, color: light ? INK : '#FFE9D6' }); ctx.restore();
       formula(ctx, FXS[k], 1560, 960, { size: 22, neon: !light, rot: .04, seed: 30 + k });
       text(ctx, `${String(k + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`, W - 80, 90, { size: 30, weight: 900, mono: true, color: light ? INK : '#FFF', align: 'right' });
       if (lt < .07) flash(ctx, 1 - lt / .07, '#FFF8EE');
