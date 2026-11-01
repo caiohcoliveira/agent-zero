@@ -88,7 +88,7 @@ function nextStationLED(ctx, T) {
   const target = stop ? stop.T : Tn; if (!target || target - T > 4.5) return;
   const a = clamp((4.5 - (target - T)) / .3) * clamp((target - T - .1) / .3); if (a <= 0) return;
   const label = stop ? `PRÓXIMA PARADA  ›  ${stop.id === 'end' ? 'ENCERRAMENTO' : 'CONVERSA COM AS APRESENTADORAS'}` : `PRÓXIMA ESTAÇÃO  ›  ${TX.stations[nk - 1].n} ${TX.stations[nk - 1].short}`;
-  const w = measure(ctx, label, 20, 800, true, 3) + 64, x = 562, y = 62, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;
+  const w = measure(ctx, label, 20, 800, true, 3) + 64, x = W - 64 - w, y = 214, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;   // v7: abaixo do mini-mapa
   ctx.save(); ctx.globalAlpha *= a;
   rr(ctx, x, y - 26, w, 52, 10); ctx.fillStyle = '#0A0807'; ctx.fill(); ctx.strokeStyle = '#3A2A1E'; ctx.lineWidth = 3; ctx.stroke();
   ctx.save(); ctx.shadowColor = C.orange; ctx.shadowBlur = 10; text(ctx, label, x + 32, y + 1, { size: 20, weight: 800, mono: true, color: C.orange, ls: 3, alpha: blink }); ctx.restore();

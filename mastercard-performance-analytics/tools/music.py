@@ -18,7 +18,7 @@ import librosa
 import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TRACKS = {'funk': 'musica/funk.mp3', 'tech': 'musica/tech-edit.mp3', 'piano': 'musica/piano.mp3'}
+TRACKS = {'funk': 'musica/funk-edit.mp3', 'tech': 'musica/tech-edit.mp3', 'piano': 'musica/piano.mp3'}  # funk e tech: remontagens (tools/edit_music.py)
 SR, FPS = 22050, 50
 HOP = SR // FPS  # 441 amostras = 20 ms
 

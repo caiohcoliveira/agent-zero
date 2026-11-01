@@ -35,12 +35,12 @@ const PLAYER = (() => {
   }
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
-  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
+  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; HUD.begin(); try { (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); } finally { HUD.flush(c); } [BT, NOW] = keep; }
   /** slide "montado" para as paradas: o quadro do trecho sem batida, com a legenda daquele momento */
-  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
+  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; HUD.begin(); try { c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); } finally { HUD.flush(c); } captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
 
   function renderPlay(T) {
-    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
+    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T; HUD.reset(); HUD.begin();
     const s = sceneAt(T), t = T - s.start, sh = shakeAt(T), fx = typeof FX !== 'undefined';
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.save(); ctx.translate(sh.x, sh.y); ctx.translate(W / 2, H / 2); ctx.rotate(sh.r);
@@ -50,6 +50,7 @@ const PLAYER = (() => {
     ctx.restore();
     if (fx) FX.post(ctx, T, s);
     PAINT.post(ctx);
+    HUD.flush(ctx);   // texto nítido por cima do acabamento pintado (src/14-v7.js)
     if (typeof overlayPlay === 'function') overlayPlay(ctx, T, s, themeOf(s, t));
     if (CONFIG.captions) caption(VOICE.caption(T));
     grain(ctx, T);
@@ -59,8 +60,11 @@ const PLAYER = (() => {
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     const impl = STOPSCN[id], now = performance.now();
     UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35); UI.popT = (now - UI.popAt) / 1000;
+    HUD.reset(); HUD.begin();
     if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
     if (!(impl && impl.noPaint)) PAINT.post(ctx);
+    HUD.flush(ctx);
+    if (impl && impl.ui) impl.ui(ctx, tl, item, prevItem, p, UI);   // interface da parada (cartões, miniaturas, popup) por cima, sem pintura
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }
     grain(ctx, tl * 30);
   }

@@ -117,7 +117,7 @@ function metroMap(ctx, t, o = {}) {
 /** mini-mapa no canto durante os trechos: 7 estações + 2 baldeações, trem andando */
 function miniMap(ctx, T, a = 1) {
   if (a <= 0) return;
-  const seq = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7], x0 = 64, x1 = 520, y = 62, dx = (x1 - x0) / (seq.length - 1);
+  const seq = [1, 2, 3, 'p1', 4, 5, 6, 'p2', 7], x0 = W - 520, x1 = W - 98, y = 58, dx = (x1 - x0) / (seq.length - 1);   // v7: canto superior direito (o título fica à esquerda)
   const k = stationAt(T), s = sceneAt(T);
   // posição do trem: índice da estação atual + progresso na estação
   const order = seq.indexOf(k), ks = CONFIG.stationStart[k] || 0, ke = k < 7 ? (CONFIG.stationStart[k + 1] || CONFIG.duration) : CONFIG.duration;
@@ -129,7 +129,9 @@ function miniMap(ctx, T, a = 1) {
     if (typeof n === 'string') { circle(ctx, x - 5, y, 9, C.red, INK, 2); circle(ctx, x + 5, y, 9, C.yellow, INK, 2); }
     else { const cur = n === k; circle(ctx, x, y, cur ? 13 : 9, cur ? C.yellow : '#FFF8EE', INK, 2.5); if (cur) text(ctx, TX.stations[n - 1].n, x, y + 1, { size: 12, weight: 900, color: INK, align: 'center' }); } });
   const tx = x0 + pos * dx; glow(ctx, tx, y, 40, C.orange, .55 + .3 * BT.beat); circle(ctx, tx, y, 7 + 2 * BT.beat, C.orange, '#FFF', 2);
-  if (k) text(ctx, TX.stations[k - 1].short, x1 + 48, y + 1, { size: 15, weight: 800, mono: true, color: '#FFF', ls: 2, alpha: .9 });
+  if (k) { const lb = `${TX.stations[k - 1].n} · ${TX.stations[k - 1].short}`, lw = measure(ctx, lb, 17, 800, true, 2) + 30;
+    rr(ctx, x1 + 34 - lw, y + 36, lw, 32, 16); ctx.fillStyle = 'rgba(14,11,9,.7)'; ctx.fill();
+    text(ctx, lb, x1 + 34 - lw / 2, y + 53, { size: 17, weight: 800, mono: true, color: '#FFF', ls: 2, align: 'center', alpha: .92 }); }
   ctx.restore();
 }
 
