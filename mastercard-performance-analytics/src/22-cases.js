@@ -172,7 +172,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     pos.forEach(([x, y], i) => { const p = E.outBack(P(t, T0 + .4 + i * .3, .4)); if (p <= 0) return; ctx.save(); ctx.translate(x, y); ctx.scale(p, p);
       vball(ctx, 0, 0, 74, STORES[i][1], { lw: 4 }); icon(ctx, 'store', 0, -6, 70, i === 1 ? '#FFF' : INK, 7);
       pill(ctx, 0, 98, STORES[i][0], { size: 20, fill: '#F6EEDF', weight: 900 }); ctx.restore(); });
-    text(ctx, '3 bandeiras · um só cliente', 1470, 860, { size: 24, weight: 800, mono: true, color: '#F3E6D6', align: 'center' });
+    text(ctx, '3 empresas (BUs) · um só grupo', 1470, 860, { size: 24, weight: 800, mono: true, color: '#F3E6D6', align: 'center' });
     ctx.restore();
   }
   /** matriz esparsa → ALS: U e Vᵀ se ajustam em turnos, o erro cai e R̂ = U·Vᵀ preenche os vazios */
@@ -223,7 +223,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     ctx.save(); ctx.globalAlpha *= p * (1 - out);
     holo(ctx, cx - 640, cy - 270, 1280, 520, { title: 'ESPAÇO DOS PRODUTOS (VETORES DE Vᵀ)', color: C.orange });
     PR.forEach((q, i) => { const tx = CEN[q.b][0] + q.ox * .5, ty = CEN[q.b][1] + q.oy * .6, x = cx + lerp(q.sx, tx, g) * 560, y = cy + lerp(q.sy * .7, ty, g) * 380;
-      const sh = t > T_TENSE ? (hash(Math.floor(t * 24) + i) - .5) * 6 : 0; vball(ctx, x + sh, y, 10, g > .5 ? col[q.b] : '#BFB3A3', { lw: 2, rim: false }); });
+      vball(ctx, x, y, 10, g > .5 ? col[q.b] : '#BFB3A3', { lw: 2, rim: false }); });
     CEN.forEach(([x, y], k) => { const la = P(t, T_COS + 1.4 + k * .25, .4); if (la <= 0) return; const px = cx + x * 560, py = cy + y * 380;
       ctx.save(); ctx.globalAlpha *= la; ctx.setLineDash([8, 8]); ctx.beginPath(); ctx.ellipse(px, py, 150, 110, 0, 0, TAU); ctx.strokeStyle = col[k]; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
       pill(ctx, px, py - 135, BASK[k][0], { size: 20, fill: col[k], color: k === 2 ? '#FFF' : INK, weight: 900, alpha: la }); });
@@ -239,7 +239,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
       const x = 480 + i * 480, y = 520 + Math.sin(t * 2 + i) * 4;
       ctx.save(); ctx.translate(x, y); ctx.scale(p, p); ctx.rotate([-.04, .03, -.02][i]);
       paper(ctx, -150, -120, 300, 260, { r: 18, fill: [C.yellow, C.orange, C.red][i], shadow: 10, shadowColor: '#000', lw: 4, halftone: .18 });
-      ctx.beginPath(); ctx.arc(0, -120, 70, Math.PI, 0); ctx.strokeStyle = INK; ctx.lineWidth = 8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, -120, 70, Math.PI, 0); ctx.strokeStyle = INK; ctx.lineWidth = 16; ctx.stroke(); ctx.strokeStyle = '#F6EEDF'; ctx.lineWidth = 8; ctx.stroke();
       ics.forEach((ic, j) => { vball(ctx, -55 + j * 110, -20, 48, '#FFF8EE', { lw: 3 }); icon(ctx, ic, -55 + j * 110, -20, 56, INK, 9); });
       text(ctx, name, 0, 84, { size: 30, weight: 900, color: i === 0 ? INK : '#FFF', align: 'center' });
       ctx.restore();
@@ -262,14 +262,14 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     CASEKIT.headline(ctx, t, T_IMP + .05, 1300, 420, HL, 'conversão vs. 2ª melhor campanha', { col: C.orange });
     const br = dget(CS(), 'business_results', {});
     receipt(ctx, 1460, 620, { w: 560, p: P(t, T_IMP + 1.2, 2.2), rot: .02, lines: [
-      ['receita incremental (Café)', FMT.auto(br.incremental_revenue_cafe)], ['Café em bandeira não principal', FMT.rel(br.cafe_revenue_growth_non_primary_bu)],
+      ['receita incremental (Café)', FMT.auto(br.incremental_revenue_cafe)], ['Café em BU não principal', FMT.rel(br.cafe_revenue_growth_non_primary_bu)],
       ['clientes modelados', FMT.mm(ms().customers_modeled)], ['interações', FMT.mm(ms().interactions)], ['subgrupos de produto', FMT.num(ms().sku_subgroups || 0, 0)]] });
   }
 
   SCENES[id] = {
     themeAt: () => 'dark',
     peaks: [[T_DROP - .15, T_DROP + 1.8], [T_IMP - .1, T_IMP + 1.4, .8]],
-    caps: [[T0 + .2, 5.4, 'O desafio: fazer o cliente de uma bandeira *comprar também nas outras*', 'PROBLEMA'],
+    caps: [[T0 + .2, 5.4, 'O desafio: fazer o cliente de uma das empresas do grupo (BUs) *comprar também nas outras*', 'PROBLEMA'],
       [5.6, PH[1] - .2, 'Para isso: achar *cestas de produtos estratégicos* e quem tem mais chance de comprá-las', 'PROBLEMA'],
       [PH[1] + .2, T_DC[0] - .2, `O que o cliente tinha: *${MONTHS} meses de compras*, por cliente (CPF) e produto (SKU)`, 'DADOS'],
       [T_DC[0] + .1, PH[2] - .2, 'Mas o dado era difícil: *só compras*, itens que dominam o sinal e nomes diferentes', 'DADOS'],
@@ -472,10 +472,10 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
 (() => {
   const id = 'lightsoff', bt = caseBars(id), CS = () => CASE('Lights-off'), G = grid(id);
   const T0 = 2.6, PH = [0, bt(4), bt(8), bt(16), bt(20)], T_STRAT = bt(8), T_PIPE = bt(10), T_UP = bt(13) + .9, T_WALK = T_UP + 1, T_REACH = T_WALK + 2.9, T_DROP = bt(16);
-  const T_PHONES = T_DROP + .7, T_DANCE = T_DROP + 1, T_STAMP = bt(18), T_IMP = bt(20), T_Q = bt(22), T_DIVE = bt(23);
-  const NODES = [['Dados', 'db'], ['Validação', 'check'], ['Processamento', 'gear'], ['Destaques', 'ai'], ['Relatório', 'doc'], ['Board', 'board']];
-  const CYCLE = ['Extrair os dados', 'Conferir', 'Copiar e colar', 'Escrever destaques', 'Revisar', 'Enviar ao board'];
-  const EGG = ['SQL · parquet', 'z = (x − μ)/σ', 'DAG ⟳ · idempotente', '? destaques', 'PDF · PPT', 'cron 0 7 * * 1'];
+  const T_IDEA = bt(7) + .6, T_PHONES = T_DROP + .7, T_DANCE = T_DROP + 1, T_STAMP = bt(18), T_IMP = bt(20), T_Q = bt(22), T_DIVE = bt(23);
+  const NODES = [['Dados', 'db'], ['Validação', 'check'], ['Processamento', 'gear'], ['Insights', 'ai'], ['Relatório', 'doc'], ['Board', 'board']];
+  const CYCLE = ['Extrair os dados', 'Conferir', 'Copiar e colar', 'Escrever insights', 'Revisar', 'Enviar ao board'];
+  const EGG = ['SQL · parquet', 'z = (x − μ)/σ', 'DAG ⟳ · idempotente', '? insights', 'PDF · PPT', 'cron 0 7 * * 1'];
   const LABELS = ['PROBLEMA', 'TRABALHO MANUAL', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'];
   const FLOOR = 880, GS = 1.6, LIFT = -34, SEAT = 470, SW_X = 1790, STAND = 1660, nx = i => 470 + i * 190, NY = 330;
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, T0 - .6, 'whoosh', { dur: .6, v: .3 });
@@ -488,14 +488,14 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   /** onde está e o que faz a analista em cada instante */
   function girlAt(t) {
     const P_ = PEOPLE, tired = t < T_DROP;
-    if (t < T_UP) return { x: SEAT, y: LIFT, pose: P_.typing(t), dir: 1, phones: 'neck', mood: 'tired' };
-    if (t < T_WALK) { const k = E.inOutCubic((t - T_UP) / (T_WALK - T_UP)); return { x: SEAT + 30 * k, y: LIFT * (1 - k), pose: P_.mixPose(P_.typing(t), P_.POSE.stand, k), dir: 1, phones: 'neck', mood: 'tired' }; }
+    if (t < T_UP) return { x: SEAT, y: LIFT, pose: P_.typing(t * (t > T_IDEA ? 1.4 : 1)), dir: 1, phones: 'neck', mood: t > T_IDEA ? 'happy' : 'tired' };
+    if (t < T_WALK) { const k = E.inOutCubic((t - T_UP) / (T_WALK - T_UP)); return { x: SEAT + 30 * k, y: LIFT * (1 - k), pose: P_.mixPose(P_.typing(t), P_.POSE.stand, k), dir: 1, phones: 'neck', mood: 'happy' }; }
     if (t < T_REACH) { const u = (t - T_WALK) / (T_REACH - T_WALK); return { x: lerp(SEAT + 30, STAND, E.inOutSine(u)), pose: P_.walk((t - T_WALK) * 17), dir: 1, phones: 'neck', mood: 'calm' }; }
     if (t < T_DROP + .4) return { x: STAND, pose: P_.reach(E.outCubic(clamp((t - T_REACH) / 1.2))), dir: 1, phones: 'neck', mood: 'calm' };
     const { ph, i } = beatAt(t), d = P_.dance(t, 1 - ph, i), on = t > T_PHONES ? 'on' : 'neck';
     if (t < T_DANCE) return { x: STAND, pose: P_.mixPose(P_.reach(1), P_.POSE.stand, (t - T_DROP - .4) / (T_DANCE - T_DROP - .4)), dir: -1, phones: on, mood: 'happy' };
     if (t < T_IMP) return { x: STAND - 40 * Math.sin((t - T_DANCE) * 1.3), pose: d, dir: -1, phones: 'on', mood: 'happy' };
-    const u = clamp((t - T_IMP) / 6.5); return { x: lerp(STAND, -260, u), pose: P_.mixPose(d, P_.walk((t - T_IMP) * 15), .5), dir: -1, phones: 'on', mood: 'happy', gone: u >= 1 };
+    const u = clamp((t - T_IMP) / 3.2); return { x: lerp(STAND, W + 300, u), pose: P_.mixPose(d, P_.walk((t - T_IMP) * 15), .5), dir: 1, phones: 'on', mood: 'happy', gone: u >= 1 };
   }
   function lightSwitch(ctx, x, y, s, on, o = {}) {
     ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
@@ -547,7 +547,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     glow(ctx, 760, 520, 160, '#BFD8FF', .22);
   }
   function bubble(ctx, t) {
-    const a = P(t, PH[1], .4) * (1 - P(t, PH[2] - .4, .4)); if (a <= 0) return;
+    const a = P(t, PH[1], .4) * (1 - P(t, T_IDEA - .3, .3)); if (a <= 0) return;
     const sp = t - PH[1], step = Math.floor(sp * (1 + sp * .12)) % CYCLE.length, cx = 520, cy = 300;
     ctx.save(); ctx.globalAlpha *= a;
     [[SEAT + 60, 418, 10], [SEAT + 74, 388, 15]].forEach(([x, y, r]) => vball(ctx, x, y, r, '#FFFDF8', { rim: false, lw: 3 }));
@@ -573,21 +573,57 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     if (t > T_DROP + .6) for (let k = 0; k < 6; k++) { const u = ((t - T_DROP) * .45 + k / 6) % 1; circle(ctx, lerp(nx(0), nx(5), u), NY, 8, C.yellow); }
     ctx.restore();
   }
+  /** a ideia: lâmpada acende sobre a cabeça dela */
+  function idea(ctx, t) {
+    const a = P(t, T_IDEA, .35) * (1 - P(t, PH[2] + .1, .4)); if (a <= 0) return;
+    const x = SEAT + 30, y = 360, s = E.outBack(P(t, T_IDEA, .45)) * (1 + .05 * Math.sin(t * 9));
+    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.scale(s, s);
+    glow(ctx, 0, 0, 170, '#FFE27A', .7);
+    for (let k = 0; k < 10; k++) { const ang = k / 10 * TAU + t; line(ctx, Math.cos(ang) * 64, Math.sin(ang) * 64, Math.cos(ang) * 92, Math.sin(ang) * 92, '#FFD23A', 6); }
+    vball(ctx, 0, -6, 46, '#FFE680', { lw: 4.5, rimCol: '#FFF6C0' }); rr(ctx, -20, 34, 40, 30, 6); ctx.fillStyle = '#8A8378'; ctx.fill(); inkRect(ctx, -20, 34, 40, 30, 6, 4, 3);
+    line(ctx, -16, 45, 16, 45, INK, 3); line(ctx, -16, 54, 16, 54, INK, 3); ctx.beginPath(); ctx.moveTo(-12, 10); ctx.lineTo(-4, -12); ctx.lineTo(4, 6); ctx.lineTo(12, -12); ctx.strokeStyle = '#E08A00'; ctx.lineWidth = 4; ctx.stroke();
+    ctx.restore();
+  }
+  /** feliz automatizando: faíscas e corações saindo do teclado */
+  function joy(ctx, t, g) {
+    if (t < T_PIPE - .3 || t > T_UP) return;
+    for (let k = 0; k < 6; k++) { const d = (t * .9 + k / 6) % 1, x = g.x + 90 + Math.sin(k * 2.1 + t) * 50, y = 640 - d * 220; ctx.save(); ctx.globalAlpha = (1 - d) * .9;
+      if (k % 2) scribble(ctx, 'heart', x, y, 34, C.red, 60 + k, 1, { glow: true }); else scribble(ctx, 'star', x, y, 30, C.yellow, 70 + k, 1, { glow: true }); ctx.restore(); }
+  }
+  /** luz apagada: a sala vira contornos de neon — tudo automatizado */
+  function neonRoom(ctx, t) {
+    const on = P(t, T_DROP + .1, .5); if (on <= 0) return;
+    const fl = t < T_DROP + .8 ? (hash(Math.floor(t * 20)) > .35 ? 1 : .2) : 1, a = on * fl * (1 - P(t, T_DIVE + .4, .6)), sy = FLOOR + LIFT - 60 * GS + 6;
+    ctx.save(); ctx.globalAlpha *= a; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    const neon = (col, w, fn) => { ctx.shadowColor = col; ctx.shadowBlur = 16; ctx.strokeStyle = col; ctx.lineWidth = w; fn(); ctx.stroke(); ctx.shadowBlur = 0; ctx.strokeStyle = '#FFF4E4'; ctx.lineWidth = w * .35; fn(); ctx.stroke(); };
+    neon(C.orange, 5, () => { ctx.beginPath(); ctx.rect(54, 234, 302, 342); ctx.moveTo(205, 234); ctx.lineTo(205, 576); ctx.moveTo(54, 405); ctx.lineTo(356, 405); });
+    neon(C.yellow, 5, () => { ctx.beginPath(); ctx.rect(560, 650, 470, 26); ctx.rect(575, 676, 18, FLOOR - 676); ctx.rect(1005, 676, 18, FLOOR - 676); });
+    neon('#FF5FA2', 5, () => { ctx.beginPath(); ctx.moveTo(820, 470); ctx.lineTo(905, 452); ctx.lineTo(905, 612); ctx.lineTo(820, 600); ctx.closePath(); ctx.moveTo(880, 612); ctx.lineTo(880, 650); });
+    neon(C.orange, 4, () => { ctx.beginPath(); ctx.rect(SEAT - 70, sy, 140, 18); ctx.rect(SEAT - 96, sy - 190, 22, 190); ctx.moveTo(SEAT - 6, sy + 18); ctx.lineTo(SEAT - 6, FLOOR - 10); });
+    neon(C.yellow, 5, () => { ctx.beginPath(); ctx.arc(1640, 300, 66, 0, TAU); });
+    neon(C.red, 4, () => { ctx.beginPath(); ctx.moveTo(0, 560); ctx.lineTo(W, 560); ctx.moveTo(0, FLOOR); ctx.lineTo(W, FLOOR); });
+    neon('#FF5FA2', 3, () => { ctx.beginPath(); for (let st = 0; st < 3; st++) ctx.rect(1076 + st * 110, FLOOR - 170, 100, 168); ctx.rect(931, 650 - 24 * 8 - 4, 94, 24 * 8 + 4); });
+    const sa = P(t, T_DROP + .5, .4) * (t < T_DROP + 1.2 ? (hash(Math.floor(t * 14) + 3) > .3 ? 1 : .3) : 1);
+    if (sa > 0) { ctx.globalAlpha = a * sa; ctx.save(); ctx.translate(1250, 500); ctx.rotate(-.03); ctx.shadowColor = '#FF5FA2'; ctx.shadowBlur = 24; ctx.font = font(46, 900); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.strokeStyle = '#FF5FA2'; ctx.lineWidth = 6; ctx.strokeText('TUDO AUTOMATIZADO', 0, 0); ctx.shadowBlur = 0; ctx.fillStyle = '#FFF0F6'; ctx.fillText('TUDO AUTOMATIZADO', 0, 0); ctx.restore(); }
+    ctx.restore();
+  }
   SCENES[id] = {
     themeAt: t => t < T_DROP ? 'light' : 'dark', fx: { invert: true },
     peaks: [[T_DROP - .15, T_DROP + 1.8], [T_DANCE, T_IMP, .35], [T_IMP - .1, T_IMP + 1.2, .7]],
     caps: [[T0 + .2, 5.6, 'Antes: cada relatório de fraude para o board era *montado à mão*', 'PROBLEMA'],
       [5.8, PH[1] - .2, 'Relatório após relatório, *a pilha só crescia* — e o relógio não parava', 'PROBLEMA'],
-      [PH[1] + .2, 13.2, 'Extrair, conferir, copiar, colar, escrever destaques, revisar… *tudo à mão*', 'TRABALHO MANUAL'],
-      [13.4, PH[2] - .2, 'O dia vira noite e o ciclo recomeça: *muito tempo* gasto em cada relatório', 'TRABALHO MANUAL'],
+      [PH[1] + .2, 13.2, 'Extrair, conferir, copiar, colar, escrever insights, revisar… *tudo à mão*', 'TRABALHO MANUAL'],
+      [13.4, T_IDEA - .2, 'O dia vira noite e o ciclo recomeça: *muito tempo* gasto em cada relatório', 'TRABALHO MANUAL'],
+      [T_IDEA, PH[2] - .2, 'Até que ela tem uma *ideia*…', 'A IDEIA'],
       [PH[2] + .2, T_PIPE - .2, 'Nossa estratégia: *automatizar de ponta a ponta* — para poder apagar as luzes', 'ESTRATÉGIA'],
-      [T_PIPE + .1, T_PIPE + 4.6, '1 · Os *dados* entram sozinhos e passam por *validação*', 'COMO FIZEMOS'],
-      [T_PIPE + 4.8, T_UP - .1, '2 · O *processamento* calcula os indicadores e monta os *destaques* e o *relatório*', 'COMO FIZEMOS'],
+      [T_PIPE + .1, T_PIPE + 4.6, '1 · Feliz, ela monta a automação: os *dados* entram sozinhos e passam por *validação*', 'COMO FIZEMOS'],
+      [T_PIPE + 4.8, T_UP - .1, '2 · O *processamento* calcula os indicadores e monta os *insights* e o *relatório*', 'COMO FIZEMOS'],
       [T_UP, T_DROP - .1, '3 · Com o pipeline pronto, ela levanta e vai até o interruptor…', 'COMO FIZEMOS'],
-      [T_DROP + .2, T_STAMP - .1, '*Lights-off*: ela apaga as luzes e o relatório roda sozinho', 'SOLUÇÃO'],
+      [T_DROP + .2, T_STAMP - .1, '*Lights-off*: ela apaga as luzes e tudo segue rodando sozinho, em neon', 'SOLUÇÃO'],
       [T_STAMP + .1, T_IMP - .2, 'Do dado ao board, *sem ninguém copiar e colar* — e ela sai dançando', 'SOLUÇÃO'],
       [T_IMP + .2, T_Q - .2, 'Resultado: relatórios para o board *sem trabalho manual* — o time volta a analisar', 'IMPACTO'],
-      [T_Q, 53.4, 'Mas quem escreve os *destaques* em escala? É o próximo case', 'E AGORA?']],
+      [T_Q, 53.4, 'Mas quem escreve os *insights* em escala? É o próximo case', 'E AGORA?']],
     draw(ctx, t) {
       const dark = P(t, T_DROP, .15), dive = E.inCubic(P(t, T_DIVE, 2.2)), sw = 1 - P(t, T_DROP - .05, .1), g = girlAt(t);
       ctx.save();
@@ -601,6 +637,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
       desk(ctx, t);
       // luz apagada: a sala escurece, sobra a luz da janela, do monitor e do neon
       if (dark > 0) { ctx.save(); ctx.globalAlpha = dark * .86; ctx.fillStyle = '#080A18'; ctx.fillRect(0, 0, W, H); ctx.restore(); glow(ctx, 200, 400, 300, '#5A6AA0', .25 * dark); }
+      neonRoom(ctx, t);
       pipeline(ctx, t, dark);
       bubble(ctx, t);
       const swA = P(t, T_STRAT + .3, .5) * (1 - P(t, T_IMP, .6)); if (swA > 0) { ctx.save(); ctx.globalAlpha *= swA; lightSwitch(ctx, SW_X, 600, .8, sw, { label: sw > .5 ? 'luz acesa · trabalho manual' : 'lights-off' }); ctx.restore(); }
@@ -611,8 +648,9 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
           paper(ctx, -300, -80, 600, 160, { torn: true, seed: 50 + i, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5 });
           pill(ctx, -200, -50, h, { size: 20, fill: c, color: '#FFF', weight: 900 }); icon(ctx, ic, 230, 10, 70, c, 9);
           text(ctx, twoLines(l), -40, 20, { size: 28, weight: 800, color: INK, align: 'center', lh: 1.1 }); ctx.restore(); });
-        if (t > T_Q) rich(ctx, 'Mas quem escreve os *destaques*?', W / 2, 470, { size: 56, weight: 900, color: '#FFF', retro: true, alpha: P(t, T_Q, .5) * (1 - dive) });
+        if (t > T_Q) rich(ctx, 'Mas quem escreve os *insights*?', W / 2, 470, { size: 56, weight: 900, color: '#FFF', retro: true, alpha: P(t, T_Q, .5) * (1 - dive) });
         ctx.restore(); }
+      joy(ctx, t, g); idea(ctx, t);
       if (!g.gone) { if (t < T_DROP) glow(ctx, g.x + 90, 560, 150, '#BFD8FF', .18 * (1 - dark));
         if (dark > 0) { glow(ctx, g.x, FLOOR - 240, 300, C.orange, .22 * dark); lightCone(ctx, g.x, 120, 80, 520, FLOOR - 120, '#FFB070', .5 * dark); }
         PEOPLE.draw(ctx, g.x, FLOOR + (g.y || 0), GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * .45 });
@@ -656,7 +694,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     ctx.save(); ctx.globalAlpha *= a;
     dashboard(ctx, 170, 300, 880, 560, { t: t - 3.4, seed: 4 });
     rr(ctx, 230, 760, 760, 80, 10); ctx.fillStyle = '#FFF8E8'; ctx.fill(); ctx.save(); ctx.setLineDash([10, 8]); ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
-    const typed = 'Destaques: o market share caiu no…'.slice(0, Math.floor(clamp((t - 4.5) / 4) * 22)); text(ctx, typed + (Math.floor(t * 3) % 2 ? '|' : ''), 260, 800, { size: 26, weight: 800, color: INK });
+    const typed = 'Insights: o market share caiu no…'.slice(0, Math.floor(clamp((t - 4.5) / 4) * 22)); text(ctx, typed + (Math.floor(t * 3) % 2 ? '|' : ''), 260, 800, { size: 26, weight: 800, color: INK });
     pill(ctx, 610, 300, 'escrito à mão, página a página', { size: 22, fill: C.red, color: '#FFF', weight: 900, rot: -.03 });
     text(ctx, `${N_ACQ} adquirentes esperando`, 1450, 300, { size: 28, weight: 900, color: '#FFF', align: 'center' });
     for (let k = 0; k < N_ACQ; k++) { const x = 1240 + (k % 6) * 84, y = 380 + Math.floor(k / 6) * 92, p = E.outBack(P(t, 4 + k * .05, .3)); if (p <= 0) continue;
@@ -707,9 +745,10 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     if (t > T_REJ && t < T_FIX + .4) { ctx.save(); ctx.globalAlpha *= 1 - P(t, T_FIX, .4); scribble(ctx, 'x', JX + 80, AY - 110, 90, C.red, 3, P(t, T_REJ, .3), { glow: true }); text(ctx, 'reprovado', JX + 80, AY - 170, { size: 22, weight: 900, mono: true, color: C.red, align: 'center' }); ctx.restore(); }
     const fp = E.outBack(P(t, T_FIX - .3, .4)); if (fp > 0) { agent(ctx, FX_, AY, 62 * fp, { role: 'embalador', t: t + 2, seed: 4, look: Math.sin(t * 3) }); text(ctx, TX.agents.fixers, FX_, AY + 94, { size: 22, weight: 800, color: '#FFF', align: 'center' }); }
     const sol = dget(CS(), 'analytics_solution.innovation_2', {}), sp = P(t, T_SC, .5);
-    if (sp > 0) { holo(ctx, 640, 700, 640, 120, { title: 'NOTA DE QUALIDADE DO INSIGHT', color: C.orange, alpha: sp });
-      text(ctx, `${sol.algorithm || 'Random Forest'} · ${sol.nlp_features || '—'} features de NLP · erro fora do tempo ${FMT.auto(sol.out_of_time_mae)}`, 960, 772, { size: 22, weight: 800, mono: true, color: '#FFE9D6', align: 'center', alpha: sp });
-      for (let k = 0; k < 10; k++) { rr(ctx, 1300 + k * 22, 740, 16, 50, 3); ctx.fillStyle = k < 8 ? C.yellow : rgba(C.orange, .4); ctx.fill(); } }
+    if (sp > 0) { ctx.save(); ctx.globalAlpha *= sp; holo(ctx, 560, 690, 800, 150, { title: 'NOTA DE QUALIDADE DO INSIGHT', color: C.orange });
+      text(ctx, `${sol.algorithm || 'Random Forest'} com ${sol.nlp_features || '—'} features de NLP dá uma nota a cada insight`, 960, 745, { size: 24, weight: 800, color: '#FFE9D6', align: 'center' });
+      const g = E.outCubic(P(t, T_SC + .4, 1.2)); rr(ctx, 620, 782, 520, 24, 12); ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fill(); rr(ctx, 620, 782, 520 * .82 * g, 24, 12); ctx.fillStyle = C.yellow; ctx.fill();
+      text(ctx, g > .95 ? 'aprovado ✓' : 'avaliando…', 1170, 794, { size: 22, weight: 900, color: g > .95 ? C.yellow : '#BFB3A3' }); ctx.restore(); }
     const ok = P(t, T_OK, .4); if (ok > 0) stamp(ctx, DX, AY - 20, TX.agents.done, ok, { theme: 'dark' });
     ctx.restore();
   }

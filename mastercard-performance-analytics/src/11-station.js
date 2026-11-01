@@ -50,8 +50,8 @@ function trainCar(ctx, x, y, s, o = {}) {
   });
   // logo no costado
   const lx = o.logoX == null ? L * .5 : o.logoX;
-  intersection(ctx, lx - 140, 206, 11, 13);
-  text(ctx, 'PERFORMANCE ANALYTICS', lx - 120, 207, { size: 17, weight: 900, color: INK, ls: 2 });
+  intersection(ctx, lx - 132, 206, 10, 12);
+  text(ctx, 'PERFORMANCE ANALYTICS', lx - 114, 207, { size: 14, weight: 900, color: INK, ls: 1 });
   ctx.restore();
   inkRect(ctx, 0, 0, L, 360, 46, 6, o.seed || 3);
   ctx.restore();

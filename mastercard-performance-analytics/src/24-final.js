@@ -4,16 +4,66 @@
 
 /* ---------- desenhos das 3 direções do futuro ---------- */
 const FUTURE_ART = {
-  // um lugar na mesa de decisão
+  // um lugar na mesa do board: sala com tela de resultados, mesa em perspectiva, conselheiros e o lugar de Analytics
   chair(ctx, s, t, p) {
     ctx.save(); ctx.scale(s, s);
-    ctx.beginPath(); ctx.ellipse(0, 40, 260, 80, 0, 0, TAU); ctx.fillStyle = '#5A3A22'; ctx.fill(); ink(ctx, () => { ctx.beginPath(); ctx.ellipse(0, 40, 260, 80, 0, 0, TAU); }, 5, 3);
-    for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + .2, x = Math.cos(a) * 300, y = 40 + Math.sin(a) * 110, me = k === 2, z = Math.sin(a) > 0;
-      if (!z && !me) { rr(ctx, x - 30, y - 70, 60, 70, 8); ctx.fillStyle = '#3A2A1E'; ctx.fill(); inkRect(ctx, x - 30, y - 70, 60, 70, 8, 3, k); } }
-    const ax = Math.cos(2 / 8 * TAU + .2) * 300, ay = 40 + Math.sin(2 / 8 * TAU + .2) * 110, a = E.outBack(p);
-    glow(ctx, ax, ay - 40, 160, C.orange, .6 * a + .2 * BT.level);
-    ctx.save(); ctx.translate(ax, ay); ctx.scale(a, a); rr(ctx, -40, -100, 80, 100, 10); ctx.fillStyle = C.orange; ctx.fill(); inkRect(ctx, -40, -100, 80, 100, 10, 4, 9);
-    pill(ctx, 0, -130, 'Analytics', { size: 22, fill: C.yellow, weight: 900, rot: -.05 }); ctx.restore();
+    ctx.fillStyle = '#3A2618'; ctx.fillRect(-440, -300, 880, 230); for (let k = -4; k <= 4; k++) line(ctx, k * 100, -300, k * 100, -70, 'rgba(0,0,0,.35)', 4);
+    ctx.fillStyle = '#24170F'; ctx.fillRect(-440, -70, 880, 320); line(ctx, -440, -70, 440, -70, INK, 5);
+    rr(ctx, -300, -150, 120, 60, 6); ctx.fillStyle = '#C9A060'; ctx.fill(); inkRect(ctx, -300, -150, 120, 60, 6, 3, 2); text(ctx, 'SALA DO\nBOARD', -240, -119, { size: 18, weight: 900, mono: true, color: INK, align: 'center', ls: 2, lh: 1.1 });
+    rr(ctx, -170, -244, 340, 150, 8); ctx.fillStyle = '#0E1420'; ctx.fill(); inkRect(ctx, -170, -244, 340, 150, 8, 4, 3); glow(ctx, 0, -170, 200, '#7FB0FF', .15);
+    for (let k = 0; k < 6; k++) { const bh = (24 + k * 16) * E.outCubic(clamp(p * 1.5 - k * .08)); rr(ctx, -140 + k * 48, -110 - bh, 30, bh, 3); ctx.fillStyle = k === 5 ? C.yellow : C.orange; ctx.fill(); }
+    line(ctx, -150, -115, 150, -115, '#BFD8FF', 2);
+    const bust = (x, y, sc, suit, hair, o = {}) => { ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc);
+      if (o.glow) { glow(ctx, 0, -10, 130, C.orange, .55); }
+      ctx.beginPath(); ctx.moveTo(-34, 50); ctx.quadraticCurveTo(-36, -2, 0, -6); ctx.quadraticCurveTo(36, -2, 34, 50); ctx.closePath(); ctx.fillStyle = suit; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(0, 16); ctx.lineTo(8, -4); ctx.fillStyle = '#F3EBDD'; ctx.fill();
+      vball(ctx, 0, -30, 24, '#F2C29B', { lw: 3.5, rim: false }); ctx.beginPath(); ctx.arc(0, -34, 25, Math.PI * 1.05, Math.PI * 1.95); ctx.lineTo(18, -30); ctx.quadraticCurveTo(0, -46, -20, -28); ctx.closePath(); ctx.fillStyle = hair; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
+      circle(ctx, 8, -30, 3, INK); circle(ctx, -6, -30, 3, INK); ctx.restore(); };
+    // conselheiros nas laterais e na cabeceira
+    bust(0, -64, .8, '#2C3352', '#4A3426');
+    [[-205, -16, .9, '#3A3A48', '#2A1E18'], [-262, 56, 1, '#2C3352', '#C9A060'], [-318, 128, 1.1, '#4A2E2E', '#1A1412'], [205, -16, .9, '#38404A', '#8A5A3A'], [262, 56, 1, '#2C3352', '#3A2A20']].forEach(b => bust(...b));
+    // Analytics ganha a cadeira
+    const a = E.outBack(clamp(p * 1.6 - .2)); if (a > 0) { ctx.save(); ctx.translate(318, 128); ctx.scale(a, a); bust(0, 0, 1.1, C.orange, C.yellow, { glow: true }); pill(ctx, 0, -100, 'Analytics', { size: 26, fill: C.yellow, weight: 900, rot: -.05 }); ctx.restore(); }
+    // mesa em perspectiva
+    ctx.beginPath(); ctx.moveTo(-150, -34); ctx.lineTo(150, -34); ctx.lineTo(300, 160); ctx.lineTo(-300, 160); ctx.closePath();
+    const g = ctx.createLinearGradient(0, -34, 0, 160); g.addColorStop(0, '#9A6440'); g.addColorStop(1, '#5A3420'); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.stroke();
+    ctx.fillStyle = '#3A2214'; ctx.beginPath(); ctx.moveTo(-300, 160); ctx.lineTo(300, 160); ctx.lineTo(300, 184); ctx.lineTo(-300, 184); ctx.closePath(); ctx.fill(); ctx.stroke();
+    [[-150, 20], [-90, 90], [120, 10], [70, 100]].forEach(([x, y], k) => { ctx.save(); ctx.translate(x, y); ctx.rotate((k - 1.5) * .2); paper(ctx, -24, -16, 48, 32, { r: 2, fill: '#FFFDF8', shadow: 2, lw: 2, volume: false }); ctx.restore(); });
+    ctx.restore();
+  },
+  // eficiência operacional: robozinhos automatizando as tarefas na esteira
+  robots(ctx, s, t, p) {
+    ctx.save(); ctx.scale(s, s);
+    for (let k = 0; k < 3; k++) { ctx.save(); ctx.translate(-300 + k * 300, -170); ctx.rotate(t * (k % 2 ? -.8 : .8)); icon(ctx, 'gear', 0, 0, 90, 'rgba(255,233,214,.18)', 10); ctx.restore(); }
+    pill(ctx, -300, -240, 'manual', { size: 22, fill: C.red, color: '#FFF', weight: 900 }); pill(ctx, 300, -240, 'automático', { size: 22, fill: C.yellow, weight: 900 });
+    rr(ctx, -420, 100, 840, 34, 17); ctx.fillStyle = '#3A3028'; ctx.fill(); inkRect(ctx, -420, 100, 840, 34, 17, 4, 3);
+    for (let k = 0; k < 15; k++) { const x = -420 + ((k * 60 + t * 90) % 840); circle(ctx, x, 117, 9, '#6A5E52', INK, 2); }
+    for (let k = 0; k < 8; k++) { const x = ((t * 90 + k * 110) % 880) - 440, done = x > 60;
+      ctx.save(); ctx.translate(x, 70); paper(ctx, -22, -28, 44, 56, { r: 4, fill: done ? '#F6EEDF' : '#FFD9CF', shadow: 3, lw: 2.5, volume: false });
+      if (done) icon(ctx, 'check', 0, 0, 30, '#D9890B', 8); else { line(ctx, -12, -10, 12, -10, '#8A8378', 3); line(ctx, -12, 0, 8, 0, '#8A8378', 3); line(ctx, -12, 10, 12, 10, '#8A8378', 3); } ctx.restore(); }
+    const n = Math.ceil(clamp(p * 1.3) * 3);
+    for (let k = 0; k < n; k++) { const x = -170 + k * 170, bob = Math.sin(t * 6 + k * 2) * 6, arm = Math.max(0, Math.sin(t * 6 + k * 2));
+      ctx.save(); ctx.translate(x, bob);
+      vlimb(ctx, -34, -30, -46, 20 + arm * 30, 14, '#9AA3AE'); vlimb(ctx, 34, -30, 46, 20 + arm * 30, 14, '#9AA3AE');
+      vslab(ctx, -36, -52, 72, 70, 16, '#B8C2CC', { lw: 3.5 }); circle(ctx, 0, -18, 10, C.orange, INK, 2.5);
+      line(ctx, 0, -110, 0, -134, INK, 4); circle(ctx, 0, -138, 8, C.red, INK, 2); glow(ctx, 0, -138, 26, C.red, .5 + .5 * Math.sin(t * 8 + k));
+      vball(ctx, 0, -82, 32, '#D2D9E0', { lw: 4 }); rr(ctx, -24, -92, 48, 20, 10); ctx.fillStyle = INK; ctx.fill();
+      const bl = Math.floor(t * 3 + k) % 7 === 0; circle(ctx, -10, -82, bl ? 1.5 : 5, C.yellow); circle(ctx, 10, -82, bl ? 1.5 : 5, C.yellow);
+      ctx.restore(); }
+    ctx.restore();
+  },
+  // projetos user-pay: os clientes usam o ativo de Advanced Analytics e pagam pelo uso
+  userpay(ctx, s, t, p) {
+    ctx.save(); ctx.scale(s, s);
+    const cl = [[-320, -160, 'bank', C.red], [0, -210, 'store', C.yellow], [320, -160, 'bank', '#F3EBDD'], [-330, 120, 'store', C.orange], [330, 120, 'card', C.red], [0, 175, 'store', '#F3EBDD']];
+    const n = Math.ceil(clamp(p * 1.4) * cl.length);
+    cl.slice(0, n).forEach(([x, y], k) => { ctx.save(); ctx.setLineDash([10, 10]); ctx.lineDashOffset = -t * 30; line(ctx, x, y, 0, -10, 'rgba(255,233,214,.35)', 3); ctx.restore();
+      const u = (t * .6 + k * .17) % 1; vball(ctx, lerp(x, 0, u), lerp(y, -10, u), 13, C.yellow, { lw: 2.5, rim: false }); });
+    glow(ctx, 0, -10, 220, C.orange, .45);
+    vslab(ctx, -120, -90, 240, 150, 40, C.orange, { lw: 4.5 }); icon(ctx, 'chart', 0, -16, 90, '#FFF', 9);
+    pill(ctx, 20, 100, 'Advanced Analytics', { size: 24, fill: '#F6EEDF', weight: 900 });
+    cl.slice(0, n).forEach(([x, y, ic, c], k) => { const a = E.outBack(clamp(p * 1.4 * cl.length - k)); ctx.save(); ctx.translate(x, y); ctx.scale(a, a); vball(ctx, 0, 0, 40, c, { lw: 4 }); icon(ctx, ic, 0, 0, 44, c === C.red ? '#FFF' : INK, 7); ctx.restore(); });
+    pill(ctx, 250, 30, 'pagamento por uso', { size: 22, fill: C.yellow, weight: 900, rot: -.03 });
     ctx.restore();
   },
   // as tracks se aproximam até as lentes se fundirem
@@ -36,16 +86,16 @@ const FUTURE_ART = {
 /* ---------- 07 · The Future of Analytics ---------- */
 (() => {
   const id = 's07', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
-  const T_SIGN = [bt(2), bt(5), bt(8)], T_ROW = bt(10) - .4, T_KEY = bt(10) + .4, ART = ['chair', 'merge', 'tiles'];
+  const T_SIGN = [bt(1), bt(3), bt(5), bt(7), bt(9)], T_ROW = bt(10) - .4, T_KEY = bt(10) + .4, ART = ['chair', 'merge', 'tiles', 'robots', 'userpay'], NS = T_SIGN.length;
   T_SIGN.forEach(t0 => { cue(id, t0, 'chime', { f: 784, up: 5 }); cue(id, t0, 'whoosh', { dur: .5, v: .25 }); }); cue(id, T_KEY, 'swell', { dur: 2 });
 
   function sign(ctx, x, y, s, k, t, p) {
-    const f = TX.future[k], w = 820, h = 640;
-    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.rotate([-.015, .01, -.01][k]);
+    const f = TX.future[k], w = 820, h = 640, light = k === 2;
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.rotate([-.015, .01, -.01, .012, -.01][k]);
     paper(ctx, -w / 2, -h / 2, w, h, { r: 22, fill: '#1B1511', shadow: 16, shadowColor: '#000', lw: 5, outline: '#000' });
-    rr(ctx, -w / 2 + 20, -h / 2 + 20, w - 40, 120, 14); ctx.fillStyle = [C.red, C.orange, C.yellow][k]; ctx.fill(); inkRect(ctx, -w / 2 + 20, -h / 2 + 20, w - 40, 120, 14, 4, k);
-    text(ctx, f.title, 0, -h / 2 + 62, { size: 44, weight: 900, color: k === 2 ? INK : '#FFF', align: 'center' });
-    text(ctx, f.sub, 0, -h / 2 + 108, { size: 28, weight: 700, color: k === 2 ? INK : '#FFE9D6', align: 'center' });
+    rr(ctx, -w / 2 + 20, -h / 2 + 20, w - 40, 120, 14); ctx.fillStyle = [C.red, C.orange, C.yellow, C.orange, C.red][k]; ctx.fill(); inkRect(ctx, -w / 2 + 20, -h / 2 + 20, w - 40, 120, 14, 4, k);
+    text(ctx, f.title, 0, -h / 2 + 62, { size: 44, weight: 900, color: light ? INK : '#FFF', align: 'center' });
+    text(ctx, f.sub, 0, -h / 2 + 108, { size: 28, weight: 700, color: light ? INK : '#FFE9D6', align: 'center' });
     ctx.save(); ctx.beginPath(); ctx.rect(-w / 2 + 20, -h / 2 + 150, w - 40, h - 170); ctx.clip(); ctx.translate(0, 90);
     FUTURE_ART[ART[k]](ctx, .95, t, p); ctx.restore();
     ctx.restore();
@@ -57,7 +107,9 @@ const FUTURE_ART = {
     caps: [[1, T_SIGN[0] - .2, 'Última estação: *onde queremos estar*', 'O FUTURO'],
       [T_SIGN[0] + .3, T_SIGN[1] - .3, '*Mais perto das decisões* estratégicas dos clientes: um lugar na mesa', 'DIREÇÃO 1'],
       [T_SIGN[1] + .3, T_SIGN[2] - .3, '*Mais integrados* às demais tracks: analytics conectando as soluções', 'DIREÇÃO 2'],
-      [T_SIGN[2] + .3, T_ROW, '*Mais escaláveis e diferenciados*: soluções que se replicam e se destacam', 'DIREÇÃO 3']],
+      [T_SIGN[2] + .3, T_SIGN[3] - .3, '*Mais escaláveis e diferenciados*: soluções que se replicam e se destacam', 'DIREÇÃO 3'],
+      [T_SIGN[3] + .3, T_SIGN[4] - .3, '*Eficiência operacional*: automação de projetos — robôs cuidando das tarefas repetitivas', 'DIREÇÃO 4'],
+      [T_SIGN[4] + .3, T_ROW, '*Projetos User-Pay* com Advanced Analytics: os clientes pagam pelo uso dos nossos ativos', 'DIREÇÃO 5']],
     draw(ctx, t) {
       const rise = E.outCubic(P(t, 0, 8)), row = E.inOutCubic(P(t, T_ROW, 1.4));
       bgDark(ctx, t, { centerA: .9, center: '#2B1408' });
@@ -67,12 +119,12 @@ const FUTURE_ART = {
       [[-1, C.red], [1, C.yellow]].forEach(([sd, c]) => { ctx.save(); ctx.shadowColor = c; ctx.shadowBlur = 16; line(ctx, W / 2 + sd * 40, hz, W / 2 + sd * 420, H, c, 8); ctx.restore(); });
       const u = (t * .12) % 1, ty = lerp(H - 40, hz + 10, u), tx = W / 2, ts = lerp(1, .2, u);
       glow(ctx, tx, ty, 90 * ts, C.orange, .7); circle(ctx, tx, ty, 26 * ts, C.orange); ctx.restore();
-      // as 3 placas: cada uma no centro por alguns compassos, depois em fila
+      // as 5 placas: cada uma no centro por alguns compassos, depois em fila
       T_SIGN.forEach((t0, k) => {
         const p = P(t, t0, .8), ap = E.outBack(P(t, t0, .5)); if (ap <= 0) return;
-        const next = k < 2 ? E.inOutCubic(P(t, T_SIGN[k + 1] - .5, .8)) : 0, gone = k < 2 ? next * (1 - row) : 0;
-        const cx = lerp(W / 2, -600, gone), cy = 560, rx = 340 + k * 620, ry = 520;
-        const x = lerp(cx, rx, row), y = lerp(cy, ry, row), s = lerp(ap, .68, row) * (1 + .01 * BT.beat);
+        const next = k < NS - 1 ? E.inOutCubic(P(t, T_SIGN[k + 1] - .5, .8)) : 0, gone = k < NS - 1 ? next * (1 - row) : 0;
+        const cx = lerp(W / 2, -600, gone), cy = 560, rx = 200 + k * 380, ry = 500;
+        const x = lerp(cx, rx, row), y = lerp(cy, ry, row), s = lerp(ap, .44, row) * (1 + .01 * BT.beat);
         if (gone < 1 || row > 0) sign(ctx, x, y, s, k, t, clamp(p * 1.4));
       });
       const kp = P(t, T_KEY, .6); if (kp > 0) paintTitle(ctx, TX.futureKey, W / 2, 880, { size: 64, bg: C.red, seed: 51, p: kp });
@@ -80,9 +132,9 @@ const FUTURE_ART = {
     }
   };
   POSTERS[7] = (ctx, w, h, tl) => {
-    TX.future.forEach((f, k) => { const y = -h / 2 + 100 + k * 150;
-      ctx.save(); ctx.translate(-w / 2 + 90, y + 10); FUTURE_ART[ART[k]](ctx, .16, tl, 1); ctx.restore();
-      text(ctx, f.title, -w / 2 + 170, y - 6, { size: 26, weight: 900, color: INK }); text(ctx, f.sub, -w / 2 + 170, y + 26, { size: 20, weight: 700, color: '#4A4038' }); });
+    TX.future.forEach((f, k) => { const y = -h / 2 + 76 + k * 92;
+      ctx.save(); ctx.translate(-w / 2 + 80, y + 4); ctx.beginPath(); ctx.rect(-62, -42, 124, 84); ctx.clip(); ctx.fillStyle = '#1B1511'; ctx.fillRect(-62, -42, 124, 84); FUTURE_ART[ART[k]](ctx, .15, tl, 1); ctx.restore();
+      text(ctx, f.title, -w / 2 + 160, y - 8, { size: 24, weight: 900, color: INK }); text(ctx, f.sub, -w / 2 + 160, y + 20, { size: 18, weight: 700, color: '#4A4038' }); });
     rich(ctx, 'É esse o *papel*', 0, h / 2 - 90, { size: 34, weight: 900, color: INK }); rich(ctx, 'que queremos ocupar.', 0, h / 2 - 50, { size: 34, weight: 900, color: INK });
   };
 })();
@@ -136,8 +188,7 @@ const CLOSE = (() => {
   T_F.forEach((t0, k) => { cue(id, t0, 'type', { n: 26, gap: .024 }); }); cue(id, T_CHORD, 'combo'); cue(id, T_CHORD, 'shimmer', { dur: 2.5 });
   /** quadro do letreiro; t = tempo desde o início do letreiro (as paradas usam t grande = letreiro pronto) */
   function draw(ctx, t, o = {}) {
-    bgDark(ctx, t, { centerA: .9, center: '#3A2416' });
-    collage(ctx, t, { seed: 131, n: 6, theme: 'dark', alpha: .7 });
+    if (o.bg !== false) { bgDark(ctx, t, { centerA: .9, center: '#3A2416' }); collage(ctx, t, { seed: 131, n: 6, theme: 'dark', alpha: .7 }); }
     const gA = t > T_CHORD ? E.outCubic(P(t, T_CHORD, .8)) : 0, br = o.breath == null ? 0 : o.breath;
     glow(ctx, W / 2, 300, 560, C.orange, .2 + .25 * gA + .15 * br + .15 * BT.level);
     const meet = E.inOutCubic(P(t, .2, 1.2));
@@ -159,7 +210,8 @@ STOPSCN.end = {
   draw(ctx, tl, item, prevItem, p, ui) {
     ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
     BT = { ...BT, level: .25 + .2 * BT.breath };
-    CLOSE.draw(ctx, 40 + tl, { breath: BT.breath });
+    platform(ctx, tl, { led: true, people: true }); ctx.save(); ctx.fillStyle = 'rgba(12,9,7,.55)'; ctx.fillRect(0, 0, W, H); ctx.restore();
+    CLOSE.draw(ctx, 40 + tl, { breath: BT.breath, bg: false });
     const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0, L = slideRects(7), ph = L.top - 90, pw = ph * .78;
     if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H);
       poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }

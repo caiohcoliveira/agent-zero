@@ -144,12 +144,14 @@ const CONFIG = {
     future: [
       { title: 'Mais perto das decisões', sub: 'estratégicas dos clientes', icon: 'chair' },
       { title: 'Mais integrados', sub: 'às demais tracks', icon: 'link' },
-      { title: 'Mais escaláveis', sub: 'e diferenciados', icon: 'grid' }
+      { title: 'Mais escaláveis', sub: 'e diferenciados', icon: 'grid' },
+      { title: 'Eficiência operacional', sub: 'automação de projetos', icon: 'robots' },
+      { title: 'Projetos User-Pay', sub: 'com Advanced Analytics', icon: 'userpay' }
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
     // clímax: as disciplinas por trás de tudo (não técnicas soltas)
-    climaxWords: ['Estatística', 'Otimização', 'Modelos supervisionados', 'Modelos não supervisionados', 'NLP', 'Redes neurais', 'Deep learning', 'Inteligência artificial'],
-    climaxSub: ['inferência, testes e incerteza', 'pesquisa operacional', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'processamento de linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
+    climaxWords: ['Estatística', 'Otimização & Pesquisa operacional', 'Modelos supervisionados', 'Modelos não supervisionados', 'NLP', 'Redes neurais', 'Deep learning', 'Inteligência artificial'],
+    climaxSub: ['setup de projetos de marketing e estratégia', 'modelos para tomada de decisão', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'processamento de linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
     climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },

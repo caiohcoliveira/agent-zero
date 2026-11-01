@@ -48,7 +48,7 @@ STOPSCN.preshow = {
         FLAP.board(ctx, W / 2, 290, [PLAT, PLAT], [.3, 99], t, { tw: 34, th: 50, hiFrom: [5, 5], header: 'PARTIDA', headerCol: C.red });
         // o trem chega da direita e freia com a porta no centro
         const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(W + 60, W / 2 - DOOR * S, arr), sway = (1 - arr) * Math.sin(t * 30) * 2;
-        if (t > T_ARR) trainCar(ctx, x, TY + sway, S, { len: L, doors: [L * .17, DOOR, L * .83], open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1 });
+        if (t > T_ARR) trainCar(ctx, x, TY + sway, S, { len: L, doors: [L * .17, DOOR, L * .83], logoX: 520, open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1 });
         if (t > T_ARR && arr < .97) { const r = rng(3); ctx.save(); ctx.globalAlpha = .45 * (1 - arr); for (let k = 0; k < 14; k++) { const ly = TY + r() * 420 * S, lx = x + r() * L * S; line(ctx, lx, ly, lx + 300 + r() * 400, ly, 'rgba(255,240,220,.6)', 3); } ctx.restore(); }
         ctx.restore();
         // bilhete validado
@@ -88,7 +88,9 @@ STOPSCN.stop0 = (() => {
     draw(ctx, tl, item, prevItem, p, ui) {
       ui = ui || { sel: null, prevSel: null, selP: 1, hover: null };
       const cam = camOf(ui), zoomed = ui.sel != null || ui.selP < 1;
-      bgDark(ctx, tl, { centerA: .9, center: '#33200F' });
+      // fundo: a estação continua viva atrás do mapa (luz piscando, ratinho, trem passando…)
+      platform(ctx, tl, { led: true, people: true });
+      ctx.save(); ctx.fillStyle = 'rgba(12,9,7,.66)'; ctx.fillRect(0, 0, W, H); ctx.restore();
       ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(cam.s, cam.s); ctx.translate(-cam.x, -cam.y);
       glow(ctx, 960, 590, 900, C.orange, .12 + .05 * BT.breath);
       metroMap(ctx, tl, { reveal: 1, hi: ui.sel != null ? ui.sel : ui.hover, train: 0 });

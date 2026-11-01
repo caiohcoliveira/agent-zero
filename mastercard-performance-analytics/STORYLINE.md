@@ -10,6 +10,29 @@
 
 ---
 
+## Ajustes da v5.2
+
+- **Trem:** o adesivo "Performance Analytics" saiu de cima da porta. Ele fica entre as portas, e elas abrem sem cobrir o adesivo.
+- **Mapa (Parada 0) e encerramento:** a estação viva continua rodando ao fundo, como nas paradas de baldeação.
+- **Cestas:**
+  - são 3 empresas do mesmo grupo (BUs), não bandeiras;
+  - os pontos do gráfico de dispersão não tremem mais;
+  - a alça da sacola ganhou contraste.
+- **Lights-off:**
+  - acende a lâmpada da ideia;
+  - ela monta a automação feliz, com corações e estrelas;
+  - quando apaga a luz, a sala vira neon com "TUDO AUTOMATIZADO";
+  - ela sai dançando pela direita.
+- **"Destaques" virou "Insights".**
+- **Insight Agent:** a caixa do Random Forest foi refeita. O texto cabe e a barra mostra a nota até "aprovado ✓".
+- **Estação 07:**
+  - o board foi redesenhado: sala, tela de resultados, mesa em perspectiva, conselheiros e a cadeira de Analytics;
+  - entraram "Eficiência operacional · automação de projetos", com robozinhos na esteira;
+  - entraram "Projetos User-Pay com Advanced Analytics", por último, fazendo o gancho para o clímax.
+- **Clímax:**
+  - Estatística ganhou "setup de projetos de marketing e estratégia";
+  - a palavra "Otimização" virou "Otimização & Pesquisa operacional", com o subtítulo "modelos para tomada de decisão".
+
 ## O que mudou da v4 para a v5
 
 **Visual.** A animação passou a ser híbrida 2D/3D com acabamento pintado, tendo Arcane como referência. Tudo continua num único HTML offline: o "3D" é feito com volume pintado, luz e profundidade, e não com um motor 3D.
