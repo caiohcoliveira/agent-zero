@@ -61,9 +61,9 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
   cue(id, T_MAP, 'whoosh', { dur: 1, v: .3 }); [0, 1, 2].forEach(i => cue(id, T_MAP + 1.6 + i * .35, 'pop', { p: 1 + i * .1, v: .2 }));
 
   const SCRIPT = SAY.reg(id, [
-    [1.0, 6.4, 'big', TX.mission.replace('dados', '*dados*').replace('decisões', '*decisões*'), { y: 432, size: 52, band: true, visual: true }],
-    [7.45, 14.1, 'title', 'Da *pergunta* ao *valor*'],
-    [7.6, 14.1, 'body', 'Combinamos conhecimento de *negócio*, *analytics* e *implementação* para orientar decisões.', { y: 250, visual: true }],
+    [.8, 6.6, 'big', TX.mission.replace('dados', '*dados*').replace('decisões', '*decisões*'), { y: 432, size: 52, band: true, visual: true }],
+    [6.4, 14.1, 'title', 'Da *pergunta* ao *valor*'],
+    [6.5, 14.1, 'body', 'Combinamos conhecimento de *negócio*, *analytics* e *implementação* para orientar decisões.', { y: 250, visual: true }],
     [14.6, 20.3, 'title', 'O percurso'],
     [14.7, 20.3, 'note', 'Uma viagem pelas capacidades da nossa área, em *três capítulos*.', { x: 480, y: 128, w: 1340, align: 'left', size: 34, weight: 800 }]
   ]);
@@ -86,7 +86,7 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     ctx.save();
     if (dive > 0) { const z = 1 + dive * 5; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -(TY0 + 170 * S)); ctx.translate(0, (TY0 + 170 * S - H / 2) * (1 - dive)); }
     platform(ctx, t, { sign: 'PLATAFORMA 1 · LINHA PERFORMANCE ANALYTICS', doodles: [['star', 140, 330, 70, C.yellow], ['arrow', 1790, 300, 90, C.orange]] });
-    FLAP.board(ctx, W / 2, 232, [BOARD], [.3], t, { tw: 50, th: 74, hiFrom: [0], header: 'PARTIDA', headerCol: C.red, glowA: P(t, 1.6, .6) });
+    const ba = 1 - P(t, T_DOOR, .4); if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 232 - 60 * P(t, T_DOOR, .4), [BOARD], [.3], t, { tw: 50, th: 74, hiFrom: [0], header: 'PARTIDA', headerCol: C.red, glowA: P(t, 1.6, .6) }); ctx.restore(); }
     // o trem chega da esquerda e freia com a porta no centro; o farol varre a plataforma
     const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(-L * S - 80, W / 2 - DOOR * S, arr), sway = (1 - arr) * Math.sin(t * 30) * 2;
     if (t > T_ARR) {

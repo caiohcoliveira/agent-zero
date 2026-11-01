@@ -12,7 +12,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
 (() => {
   const id = 's01', bt = barsOf(id);
   // compassos: bt(5) = 11,92 (entra a frase A) … bt(20) = 44,78
-  const T_Q = [4.3, 5.5, 6.7], T_REV = bt(5) + .2, T_CABLE = bt(5) + 1.1, T_SEG = [bt(9), bt(11), bt(13), bt(15)];
+  const T_Q = [4.3, 5.5, 6.7], T_REV = bt(5) + .2, T_CABLE = bt(5) + 1.1, T_SEG = [bt(9), bt(10) + 1.1, bt(12), bt(13) + 1.1];
   const T_CROSS0 = bt(14) - .3, T_CROSS1 = bt(16) + .7, T_RES = bt(16) - .1, T_CONC = bt(19) - .2, T_RUN = bt(20) - .6;
   const QS = TX.postits.slice(0, 3), SVC = TX.engagement.map(e => e[0]), SCOL = [C.red, C.orange, C.yellow, '#FFD9A8'];
   const DEF = ['entender o problema', 'definir o caminho', 'construir a solução', 'verificar o resultado'];
@@ -27,11 +27,11 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
 
   const SCRIPT = SAY.reg(id, [
     [3.9, 12.4, 'title', 'Decisões difíceis começam com *perguntas*', { visual: true }],
-    [12.6, 35.8, 'title', 'O papel da área'],
+    [12.6, 37.5, 'title', 'O papel da área'],
     [12.8, 20.4, 'body', 'Conectamos *perguntas de negócio* aos *dados* necessários para respondê-las.', { visual: true }],
-    [T_SEG[0] - .1, 35.8, 'list', SVC.map((s, i) => `*${s}*: ${DEF[i]}.`), { at: T_SEG.map(x => x - .1), label: 'OS 4 SERVIÇOS', cols: SCOL, visual: true }],
-    [35.9, 47, 'title', 'Do diagnóstico à mensuração'],
-    [T_RES + .2, 47, 'body', 'Atuamos do *diagnóstico* à *mensuração* para gerar *valor* para o cliente.', { visual: true }],
+    [T_SEG[0] - .1, 37.5, 'list', SVC.map((s, i) => `*${s}*: ${DEF[i]}.`), { at: T_SEG.map(x => x - .1), label: 'OS 4 SERVIÇOS', cols: SCOL, visual: true }],
+    [37.4, 47, 'title', 'Do diagnóstico à mensuração'],
+    [37.6, 47, 'body', 'Atuamos do *diagnóstico* à *mensuração* para gerar *valor* para o cliente.', { visual: true }],
     [T_CONC, 47.2, 'concl', 'Analytics é uma *capacidade estratégica* da consultoria.']
   ]);
   const dawnAt = t => E.inOutSine(P(t, T_CROSS0, 6.5));
@@ -288,7 +288,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
 (() => {
   const id = 's03';
   // música: break 0–15,4 · parte B 15,4–52,36 · saída 52,36 → síntese
-  const T_CLI = [4.4, 5.5, 6.6], T_CAP = 16.0, T_INT = 26.0, T_PRED = 34.4, T_PRESC = 44.2, T_SYN = 52.3;
+  const T_CLI = [4.4, 5.5, 6.6], T_CAP = 16.0, T_INT = 25.6, T_PRED = 34.4, T_PRESC = 44.2, T_SYN = 52.3;
   const ctype = SEC(3).client_types || ['Emissores', 'Adquirentes', 'Merchants'], nm = s => /merchant/i.test(s) ? 'Varejo' : s;
   const TYPES = [[nm(ctype[0] || 'Emissores'), 'bank', 'Principalidade', 'decidir qual produto oferecer', C.red], [nm(ctype[1] || 'Adquirentes'), 'card', 'Market share', 'decidir onde crescer', C.orange],
     [nm(ctype[2] || 'Varejo'), 'basket', 'Cestas de produtos', 'decidir o que promover', C.yellow]];
@@ -302,7 +302,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   const SCRIPT = SAY.reg(id, [
     [3.8, T_CAP - .9, 'title', 'Onde aplicamos *analytics*', { visual: true }],
     [T_CAP + .1, T_INT - .9, 'title', 'O que entregamos em cada projeto', { visual: true }],
-    [T_INT + .1, T_PRED - .9, 'title', 'Junto com as outras tracks'],
+    [T_INT + .1, T_PRED - .9, 'title', 'Com as outras tracks'],
     [T_INT + .3, T_PRED - .9, 'body', 'Combinamos analytics com as *demais tracks* para ampliar o *impacto* dos projetos.', { y: 250, visual: true }],
     [T_PRED + .1, T_PRESC - .9, 'title', 'Modelos *preditivos* antecipam resultados', { visual: true }],
     [T_PRESC + .1, T_SYN - .5, 'title', 'Modelos *prescritivos* ajudam a escolher ações', { visual: true }],
@@ -437,5 +437,45 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   };
 })();
 
-/* ---------- Conversa 1 (provisória: ver V7-4) ---------- */
-STOPSCN.stop1 = recapScene({ posters: [1, 2, 3], sign: 'PARADA 1 · CONVERSA', from: CONFIG.sceneById.s03.end });
+/* ---------- Conversa 1: o que já foi explicado, legível sem fala (cartazes 01, 02, 03 + lupa) ---------- */
+POSTERS[1] = (ctx, w, h, tl) => {
+  const SV = TX.engagement.map(e => e[0]), DEF = ['entender o problema', 'definir o caminho', 'construir a solução', 'verificar o resultado'], COL = [C.red, C.orange, C.yellow, '#FFD9A8'];
+  late(ctx, c => para(c, 'Conectamos *perguntas de negócio*, dados, implementação e mensuração.', 0, -246, 420, { size: 26, weight: 900, color: INK, accent: C.red, align: 'center', lh: 1.15 }));
+  SV.forEach((sv, i) => { const y = -90 + i * 86, on = Math.floor(tl / 2) % 4 === i; rr(ctx, -210, y - 36, 420, 72, 10); ctx.fillStyle = on ? COL[i] : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
+    late(ctx, c => { circle(c, -178, y, 16, COL[i], INK, 2.5); text(c, String(i + 1), -178, y + 1, { size: 18, weight: 900, color: i === 3 ? INK : '#FFF', align: 'center' });
+      text(c, sv, -150, y - 13, { size: 24, weight: 900, color: INK }); text(c, DEF[i], -150, y + 16, { size: 20, weight: 700, color: '#3A332C' }); }); });
+  late(ctx, c => text(c, 'Dados → Decisão → Ação → Resultado', 0, 262, { size: 20, weight: 900, mono: true, color: '#8A6A48', align: 'center' }));
+};
+POSTERS[2] = (ctx, w, h, tl) => {
+  const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9), BR = sec.brazil_2023_milestone || {};
+  const isF = k => /forecast/i.test(k);
+  line(ctx, -200, 30, 200, 30, INK, 3);
+  R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else vslab(ctx, x, 30 - hh, 70, hh, 12, mix(C.red, C.orange, i / 2), { lw: 2.5 });
+    late(ctx, c => { text(c, FMT.usdMM(+v), x + 35, 30 - hh - 18, { size: 17, weight: 900, color: INK, align: 'center' }); text(c, k.replace(/_?forecast/i, '') + (isF(k) ? '*' : ''), x + 35, 50, { size: 18, weight: 900, color: INK, align: 'center' }); }); });
+  const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, vp = BR.actuals_2022_usd_millions ? BR.actuals_2023_usd_millions / BR.actuals_2022_usd_millions : null, vb = BR.budget_2023_usd_millions ? BR.actuals_2023_usd_millions / BR.budget_2023_usd_millions : null;
+  late(ctx, c => { text(c, 'faturamento anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
+    if (mult) para(c, `De ${R[0][0]} a ${R[2][0]}: *${FMT.num(mult, 1)}×* o valor inicial`, 0, 84, 420, { size: 22, weight: 900, color: INK, accent: C.red, align: 'center' });
+    para(c, `Brasil (estimativa): *${vp ? FMT.mult(vp) : '—'}* o período anterior · *${vb ? FMT.mult(vb) : '—'}* o orçamento`, 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
+    text(c, 'Crescimento consistente, acima do planejado.', 0, 246, { size: 20, weight: 900, color: C.red, align: 'center' }); });
+};
+POSTERS[3] = (ctx, w, h, tl) => {
+  late(ctx, c => { [['PREDITIVOS', 'antecipam resultados', 'fraude · saída · gastos', C.orange, -150], ['PRESCRITIVOS', 'ajudam a escolher ações', 'oferta · campanhas · incentivos', C.red, 40]].forEach(([k, s1, s2, col, y]) => {
+      tag(c, 0, y - 60, k, { size: 22, fill: col, color: '#FFF' }); text(c, s1, 0, y - 6, { size: 28, weight: 900, color: INK, align: 'center' }); text(c, s2, 0, y + 34, { size: 21, weight: 700, color: '#3A332C', align: 'center' }); });
+    text(c, 'Emissores · Adquirentes · Varejo', 0, -238, { size: 22, weight: 900, color: '#8A6A48', align: 'center' });
+    para(c, 'A escolha do modelo depende do *problema* e da *decisão de negócio*.', 0, 160, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
+    text(c, 'lupa: catálogo com 20 modelos', 0, 252, { size: 18, weight: 800, mono: true, color: '#8A6A48', align: 'center' }); });
+};
+/** lupa da estação 03: o catálogo completo de modelos (preditivos × prescritivos) */
+SLIDE_SCREENS.catalog = (c, t) => {
+  bgDark(c, t, { centerA: .9, center: '#2A1A10' });
+  text(c, 'Modelos que levamos a *bancos e fintechs*'.replace(/\*/g, ''), LAY.x, 110, { size: 52, weight: 900, color: '#FFF' });
+  text(c, 'caso de uso em português · técnica em inglês', LAY.x, 168, { size: 26, weight: 700, color: '#E9DCC8' });
+  [['PREDITIVOS · antecipam o que vai acontecer', TX.ml.pred, C.orange, 96], ['PRESCRITIVOS · recomendam o que fazer', TX.ml.presc, C.red, 990]].forEach(([h, list, col, x]) => {
+    tag(c, x + 300, 236, h, { size: 26, fill: col, color: '#FFF' });
+    list.forEach(([uc, tech], i) => { const y = 300 + i * 74; rr(c, x, y, 834, 62, 10); c.fillStyle = i % 2 ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.11)'; c.fill();
+      text(c, uc, x + 20, y + 31, { size: 28, weight: 800, color: '#FFF' }); text(c, tech, x + 814, y + 31, { size: 22, weight: 700, mono: true, color: C.yellow, align: 'right' }); });
+  });
+  para(c, TX.ml.frontier, W / 2, 1050 - 40, 1700, { size: 26, weight: 700, color: '#E9DCC8', accent: C.yellow, align: 'center' });
+};
+STOPSCN.stop1 = recapScene({ posters: [1, 2, 3], sign: 'PARADA 1 · CONVERSA', from: CONFIG.sceneById.s03.end, call: 'ONDE ISSO ENCONTRA O SEU CLIENTE?',
+  banner: 'A seguir: *quatro cases*, do problema à solução e ao resultado.', doodles: [['star', 120, 250, 70, C.yellow], ['arrow', 1800, 230, 90, C.orange]] });

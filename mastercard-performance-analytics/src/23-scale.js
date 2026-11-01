@@ -1,157 +1,123 @@
 /* ============================================================================
-   23. TRECHO 2 (fim) — estação 05 (escada da escala), estação 06 (Practice)
-   e a Parada 2
+   23. ESTAÇÕES 05 e 06 + Conversa 2 (cartazes 04, 05, 06)
+   ----------------------------------------------------------------------------
+   05 · a mesma equipe, um alcance maior: Equipe → Motor produtizado → Ativo
+        reutilizável → Projetos (o mecanismo do reuso, sem métricas inventadas)
+   06 · os pilares viram a infraestrutura da viagem: a linha corre sobre eles;
+        cada pilar traz o nome e uma contribuição curta (campo "contribution" do JSON)
    ========================================================================== */
-/** indicadores de escala do JSON (em inglês) → texto de tela em pt-BR */
-function ptScale(s) {
-  return String(s || '').replace(/(\d+(?:\.\d+)?)MM/g, (_, n) => FMT.mm(n)).replace(/\binteractions\b/g, 'interações').replace(/\bcustomers\b/g, 'clientes')
-    .replace(/PF associates/g, 'associados PF').replace(/acquirers in pipeline/g, 'adquirentes no pipeline').replace(/to conquer without growing the team/g, 'a conquistar sem crescer o time');
-}
+const PILLARS = (SEC(6).pillars || []).slice(0, 6).map(p => typeof p === 'string' ? { name: p, items: [], contrib: '' }
+  : { name: p.pillar || p.name || '', items: p.highlights || p.items || [], contrib: p.contribution || (p.highlights || [])[0] || '' });
+const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito'];
 
-/* ---------- 05 · Scaling Our Impact Through Data, AI & Innovation ---------- */
+/* ---------- 05 · Escalando o impacto: a mesma equipe, mais alcance ---------- */
 (() => {
-  const id = 's05', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
-  const T_STEP = [.5, bt(1), bt(2), bt(3)], T_GLOW = bt(4), T_KEY = bt(4) + .7;
-  const EX = () => {
-    const ex = SEC(5).innovation_examples || [], f = re => ex.find(e => re.test(e.example || '')) || {};
-    return [[{ name: 'planilhas · retrabalho', ind: 'insights escritos à mão' }], [{ name: 'Cliente Banana', ind: ptScale(f(/Banana/).scale_indicator) }],
-      [{ name: 'Cliente Manga', ind: ptScale(f(/Manga/).scale_indicator) }, { name: 'Relatórios de fraude', ind: 'reporting automatizado' }], [{ name: 'Insight Agent', ind: ptScale(f(/Insight/).scale_indicator) }]];
-  };
-  T_STEP.forEach((t0, i) => { cue(id, t0, 'stab', { i }); cue(id, t0, 'pop', { p: .8 + i * .2, v: .2 }); });
-  cue(id, T_GLOW, 'shimmer', { dur: 2 }); cue(id, T_KEY, 'chime', { f: 1046, up: 7 });
-
+  const id = 's05', GYc = 600;
+  const N = { team: [270, GYc], motor: [700, GYc], asset: [1110, GYc] }, PROJ = [[1600, 300, 'bank'], [1680, 450, 'store'], [1720, 600, 'card'], [1680, 750, 'basket'], [1600, 900, 'chart']];
+  const T_TEAM = .6, T_MOTOR = 2.2, T_ASSET = 4.2, T_PROJ = 6.4, T_CONC = 12.4;
+  cue(id, T_MOTOR, 'pop', { p: 1, v: .2 }); cue(id, T_ASSET, 'impact', { size: .6 }); PROJ.forEach((_, i) => cue(id, T_PROJ + i * .55, 'ping', { f: 784 * Math.pow(2, i * 2 / 12) })); cue(id, T_CONC, 'chime', { f: 784, up: 7 });
+  const SCRIPT = SAY.reg(id, [
+    [3.8, 20.3, 'title', 'A mesma equipe, *um alcance maior*'],
+    [4.2, T_CONC + .2, 'body', '*Automação*, *padronização* e *reutilização* ampliam o alcance das entregas.', { x: LAY.x, y: 812, w: 860, visual: true }],
+    [T_CONC, 20.3, 'concl', 'Um *ativo reutilizável* permite aplicar capacidades em *novos projetos*.']
+  ]);
   SCENES[id] = {
-    themeAt: () => 'dark',
-    peaks: [[T_GLOW - .1, T_GLOW + 1.2, .6]],
-    caps: [[.8, T_GLOW - .2, 'Como escalamos: do trabalho manual a *ativos de IA* que rodam sozinhos', 'ESCALA'],
-      [T_GLOW + .1, 13.4, 'Cada degrau leva o mesmo time a *mais clientes* — com o dado protegido', 'ESCALA']],
+    themeAt: () => 'dark', script: SCRIPT, peaks: [[T_ASSET - .1, T_ASSET + .8, .5]],
     draw(ctx, t) {
-      bgDark(ctx, t, { centerA: .85, center: '#2A170C' });
-      const gl = P(t, T_GLOW, 1);
-      neonGrid(ctx, t, { horizon: 980, sun: 0, alpha: .3 + .5 * gl, speed: .5 + BT.level });
-      collage(ctx, t, { seed: 83, n: 5, theme: 'dark', alpha: .5 * (1 - gl) });
-      const ex = EX(), sw = 400, sh = 150, x0 = 170, y0 = 900;
-      TX.progression.forEach((label, i) => {
-        const p = E.outBack(P(t, T_STEP[i], .45)); if (p <= 0) return;
-        const x = x0 + i * (sw + 30), y = y0 - (i + 1) * sh, h = (i + 1) * sh, neon = i === 3 || gl > 0;
-        ctx.save(); ctx.translate(0, (1 - p) * 300);
-        if (i === 3) { holo(ctx, x, y, sw, h, { color: C.orange, corners: true }); glow(ctx, x + sw / 2, y + 40, 260, C.orange, .35 + .25 * BT.level); }
-        else { brush(ctx, x, y, sw, h, [C.red, C.orange, C.yellow][i], 120 + i, 1); inkRect(ctx, x, y, sw, h, 6, 4, i); if (gl > 0) { ctx.save(); ctx.globalAlpha *= gl * .8; ctx.shadowColor = C.orange; ctx.shadowBlur = 24; rr(ctx, x, y, sw, h, 6); ctx.strokeStyle = C.orange; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } }
-        const dark = i === 2 && !neon ? INK : '#FFF';
-        retroText(ctx, '0' + (i + 1), x + 30, y + 44, { size: 44, weight: 900, color: '#FFF', depth: 3, lw: 3 });
-        text(ctx, twoLines(label), x + sw / 2, y + 110, { size: 30, weight: 900, color: i === 2 ? INK : '#FFF', align: 'center', lh: 1.05 });
-        ex[i].forEach((e, j) => { const ey = y - 76 - j * 96, ea = P(t, T_STEP[i] + .5 + j * .3, .4); if (ea <= 0) return;
-          ctx.save(); ctx.globalAlpha *= ea; ctx.translate(x + sw / 2, ey); ctx.rotate([-.02, .02][j] || 0);
-          const ind = measure(ctx, e.ind, 18, 600) > 380 ? twoLines(e.ind) : e.ind, two = ind.includes('\n'), w = Math.min(420, Math.max(measure(ctx, e.name, 24, 900), ...ind.split('\n').map(l => measure(ctx, l, 18, 600))) + 50), hh = two ? 86 : 64;
-          paper(ctx, -w / 2, -hh / 2, w, hh, { r: 8, fill: '#F6EEDF', shadow: 6, shadowColor: '#000', lw: 2.5 });
-          text(ctx, e.name, 0, -hh / 2 + 22, { size: 24, weight: 900, color: INK, align: 'center' }); text(ctx, ind, 0, two ? 14 : 16, { size: 18, weight: 600, color: '#4A4038', align: 'center', lh: 1.1 }); ctx.restore(); });
-        ctx.restore();
-      });
-      // o trem sobe a escada pulando no tempo
-      const k = T_STEP.filter(t0 => t >= t0).length - 1;
-      if (k >= 0) { const hop = 1 - Math.pow(2 * clamp(BT.phase) - 1, 2), tx = x0 + k * (sw + 30) + 46, ty = y0 - (k + 1) * sh - 22 - hop * 30;
-        glow(ctx, tx, ty, 70, C.orange, .6); circle(ctx, tx, ty, 18, C.orange); inkCircle(ctx, tx, ty, 18, 4, 77); }
-      // IA local: escudo e GPU no último degrau
-      const sp = P(t, T_STEP[3] + .6, .5); if (sp > 0) { const sx = x0 + 3 * (sw + 30) + sw / 2, sy = y0 - 4 * sh + 300;
-        ctx.save(); ctx.globalAlpha *= sp; icon(ctx, 'shield', sx - 90, sy, 70, C.yellow, 7); neonText(ctx, TX.never, sx + 40, sy, { size: 26, weight: 800, align: 'center', glow: C.yellow });
-        formula(ctx, 'IA local · GPU · egress: 0 B', sx, sy + 70, { size: 16, neon: true }); ctx.restore(); }
-      const kp = P(t, T_KEY, .5); if (kp > 0) paintTitle(ctx, 'Do manual à IA escalável', 560, 190, { size: 64, bg: C.red, seed: 33, p: kp });
-      scanlines(ctx, .05 + .04 * gl);
+      bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
+      neonGrid(ctx, t, { horizon: 820, alpha: .35, speed: .6 });
+      // a equipe (fica na origem)
+      const tp = E.outBack(P(t, T_TEAM, .5));
+      if (tp > 0) { ctx.save(); ctx.translate(...N.team); ctx.scale(tp, tp); holo(ctx, -150, -120, 300, 240, { color: C.yellow, corners: false });
+        [-70, 0, 70].forEach((dx, k) => PEOPLE.draw(ctx, dx, 90, .42, PEOPLE.wave(t + k, k === 1 ? .6 : 0), { dir: k ? -1 : 1, t: t + k, phones: 'neck', mood: 'happy' })); ctx.restore(); }
+      // a linha: equipe → motor → ativo
+      const lp = E.inOutSine(P(t, T_TEAM + .4, T_ASSET - T_TEAM));
+      LINE.draw(ctx, [N.team, N.motor, N.asset], lp, { w: 20, head: lp < .99, glow: 12 });
+      const mp = E.outBack(P(t, T_MOTOR, .5));
+      if (mp > 0) { ctx.save(); ctx.translate(...N.motor); ctx.scale(mp, mp); vslab(ctx, -110, -90, 220, 180, 34, '#3A3640', { lw: 4 }); for (let k = 0; k < 2; k++) { ctx.save(); ctx.translate(-40 + k * 80, -10); ctx.rotate(t * (k ? -2 : 2)); icon(ctx, 'gear', 0, 0, 74, C.orange, 9); ctx.restore(); } ctx.restore(); }
+      const ap = E.outBack(P(t, T_ASSET, .6));
+      if (ap > 0) { glow(ctx, ...N.asset, 260, C.yellow, .45 * ap + .1 * BT.level); ctx.save(); ctx.translate(...N.asset); ctx.scale(ap, ap); ctx.rotate(Math.sin(t * .8) * .05);
+        holo(ctx, -110, -110, 220, 220, { color: C.yellow }); icon(ctx, 'grid', 0, 0, 120, C.yellow, 9); ctx.restore(); }
+      // projetos em contextos diferentes, ligados ao mesmo ativo
+      PROJ.forEach(([x, y, ic], i) => { const p = E.inOutSine(P(t, T_PROJ + i * .55, .7)); if (p <= 0) return;
+        LINE.draw(ctx, [N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], p, { w: 10, col: [C.red, C.orange, C.yellow, C.orange, C.red][i], head: p < .99, shadow: false });
+        if (p > .95) for (let k = 0; k < 2; k++) { const u = (t * .5 + k * .5 + i * .13) % 1, [px, py] = LINE.at([N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], u); circle(ctx, px, py, 6, '#FFE7B0'); }
+        const s = E.outBack(P(t, T_PROJ + i * .55 + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
+      // rótulos obrigatórios
+      const la = k => clamp(P(t, [T_TEAM, T_MOTOR, T_ASSET, T_PROJ + 1][k] + .3, .4));
+      hud(ctx, c => { c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;
+        [['Equipe', N.team, 0], ['Motor produtizado', N.motor, 1], ['Ativo reutilizável', N.asset, 2]].forEach(([l, [x, y], k]) => { c.globalAlpha = la(k); text(c, l, x, y + 160, { size: 32, weight: 900, color: k === 2 ? C.yellow : '#FFF', align: 'center' }); });
+        c.globalAlpha = la(3); text(c, 'Projetos', 1784, 600, { size: 32, weight: 900, color: '#FFF' }); text(c, 'contextos', 1784, 640, { size: 24, weight: 700, color: '#E9DCC8' }); text(c, 'diferentes', 1784, 670, { size: 24, weight: 700, color: '#E9DCC8' }); });
+      SAY.draw(ctx, t, SCRIPT, 'dark');
     }
-  };
-  POSTERS[5] = (ctx, w, h, tl) => {
-    TX.progression.forEach((l, i) => { const sw = (w - 60) / 4, x = -w / 2 + 20 + i * (sw + 7), hh = 60 + i * 50, y = 120 - hh, on = Math.floor(tl * 1.2) % 4 === i;
-      rr(ctx, x, y, sw, hh, 4); ctx.fillStyle = on ? C.orange : [C.red, '#E8822A', C.yellow, '#2A221C'][i]; ctx.fill(); inkRect(ctx, x, y, sw, hh, 4, 2.5, i);
-      text(ctx, twoLines(l), x + sw / 2, 160, { size: 14, weight: 900, color: INK, align: 'center', lh: 1.05 }); });
-    text(ctx, 'IA local', 0, 240, { size: 40, weight: 900, color: C.orange, align: 'center' });
-    text(ctx, TX.never, 0, 286, { size: 24, weight: 800, color: INK, align: 'center' });
   };
 })();
 
-/* ---------- 06 · A Prática ----------
-   Tudo vem do JSON (seção 6): "pillars" = [{ pillar, highlights: [...] }, …]. A cena se ajusta à
-   quantidade de pilares (até 6) e ao tamanho dos textos (a fonte diminui para caber no cartão).
-   Também aceita pilares como texto simples ("Pessoas", …). */
+/* ---------- 06 · A Prática: os pilares sustentam a linha ---------- */
 (() => {
-  const id = 's06', G = grid(id), B = G.bars, bt = k => (B[k] != null ? B[k] : B[B.length - 1] + (k - B.length + 1) * 2.22);
-  const PIL = (() => (SEC(6).pillars || []).slice(0, 6).map(p => typeof p === 'string' ? { name: p, items: [] } : { name: p.pillar || p.name || '', items: p.highlights || p.items || [] }))();
-  const N = Math.max(1, PIL.length), T_COL = PIL.map((_, i) => .3 + i * Math.min(1.6, 7.8 / N)), T_PED = bt(4), T_CARDS = bt(4) + 1.1, T_BOARD = 16.2;
-  const COLS = [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange];
-  const CAPS = [[1, T_PED - .2, `Os *${N} pilares* que sustentam a prática de analytics`, 'A PRÁTICA'], [T_PED + .2, T_BOARD - .3, 'Cada pilar e suas *principais entregas*', 'ENTREGAS'],
-    [T_BOARD, 20, 'Segunda parada: conversa sobre as estações *04, 05 e 06*', 'PARADA 2']];
-  T_COL.forEach((t0, i) => cue(id, t0, 'pop', { p: .7 + i * .1, v: .2 })); cue(id, T_PED, 'impact', { size: .8 });
-  PIL.forEach((_, i) => cue(id, T_CARDS + i * .25, 'hit', { size: .25 })); cue(id, T_BOARD, 'type', { n: 22, gap: .025 });
-  // layout dos cartões calculado uma vez (texto quebrado e fonte que cabe)
-  const CW = Math.min(360, (W - 120 - (N - 1) * 20) / N), CH = 600, PAD = 22;
-  let LAY = null;
-  const layout = ctx => {
-    if (LAY) return LAY;
-    LAY = PIL.map(p => { for (let fs = 22; fs >= 12; fs--) { const lines = p.items.map(it => wrapText(ctx, it, CW - PAD * 2 - 22, fs, 700)), h = lines.reduce((s, l) => s + l.length * fs * 1.22 + fs * .55, 0);
-      if (h <= CH - 130 || fs === 12) return { fs, lines }; } });
-    return LAY;
-  };
-
-  function column(ctx, x, yb, h, label, p, i, w) {
-    if (p <= 0) return; const hh = h * E.outBack(p);
-    ctx.save(); ctx.translate(x, yb);
-    rr(ctx, -w / 2 - 20, -24, w + 40, 24, 3); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -w / 2 - 20, -24, w + 40, 24, 3, 3, i);
-    rr(ctx, -w / 2, -24 - hh, w, hh, 2); ctx.fillStyle = '#F3EBDD'; ctx.fill();
-    hatch(ctx, () => rr(ctx, -w / 2, -24 - hh, w, hh, 2), -w / 2, -24 - hh, w * .35, hh, { alpha: .25, gap: 7, angle: 0 });
-    for (let k = 1; k < 5; k++) line(ctx, -w / 2 + k * w / 5, -30, -w / 2 + k * w / 5, -18 - hh, rgba(INK, .35), 2);
-    inkRect(ctx, -w / 2, -24 - hh, w, hh, 2, 3.5, i + 4);
-    rr(ctx, -w / 2 - 16, -48 - hh, w + 32, 28, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -w / 2 - 16, -48 - hh, w + 32, 28, 4, 3, i + 8);
-    ctx.save(); ctx.translate(0, -24 - hh / 2); ctx.rotate(-Math.PI / 2); const fs = Math.min(28, (hh - 30) / Math.max(1, measure(ctx, label, 28, 900)) * 28);
-    text(ctx, label, 0, 0, { size: fs, weight: 900, color: INK, align: 'center', alpha: clamp(p * 2 - .6) }); ctx.restore();
-    ctx.restore();
-  }
-  function card(ctx, k, x, y, p, L) {
-    if (p <= 0) return; const pl = PIL[k], col = COLS[k % COLS.length], s = E.outBack(p);
-    ctx.save(); ctx.translate(x + CW / 2, y + CH / 2 + (1 - s) * 80); ctx.scale(s, s); ctx.rotate([-.012, .01, -.008, .012, -.01, .008][k]);
-    paper(ctx, -CW / 2, -CH / 2, CW, CH, { torn: true, seed: 210 + k, fill: '#FFFDF8', shadow: 10, lw: 3.5, tape: [[.5, 0, .1]] });
-    rr(ctx, -CW / 2 + 14, -CH / 2 + 16, CW - 28, 62, 10); ctx.fillStyle = col; ctx.fill(); inkRect(ctx, -CW / 2 + 14, -CH / 2 + 16, CW - 28, 62, 10, 3, k);
-    const ns = Math.min(30, (CW - 60) / Math.max(1, measure(ctx, pl.name, 30, 900)) * 30);
-    text(ctx, pl.name, 0, -CH / 2 + 48, { size: ns, weight: 900, color: col === C.yellow ? INK : '#FFF', align: 'center' });
-    text(ctx, `${pl.items.length} ${pl.items.length === 1 ? 'entrega' : 'entregas'}`, 0, -CH / 2 + 100, { size: 16, weight: 800, mono: true, color: '#8A6A48', align: 'center', ls: 2 });
-    let yy = -CH / 2 + 132; const fs = L.fs;
-    L.lines.forEach((ls, j) => { const a = P(NOW, T_CARDS + k * .25 + .3 + j * .12, .3); circle(ctx, -CW / 2 + PAD + 6, yy + fs * .5, 5, col);
-      ls.forEach((l, q) => text(ctx, l, -CW / 2 + PAD + 20, yy + fs * .5 + q * fs * 1.22, { size: fs, weight: 700, color: INK, alpha: a }));
-      yy += ls.length * fs * 1.22 + fs * .55; });
-    ctx.restore();
-  }
-
+  const id = 's06', N = Math.max(1, PILLARS.length), GYp = 900, TOPY = 430, X = i => W / 2 + (i - (N - 1) / 2) * Math.min(350, 1700 / N);
+  const T_COL = PILLARS.map((_, i) => .5 + i * .45), T_LINE = 2.4, G1 = Math.ceil(N / 2) + (N > 4 ? 1 : 0), T_G1 = 5.6, T_G2 = 12.6, T_CONC = 19.4;
+  T_COL.forEach((t0, i) => cue(id, t0, 'impact', { size: .3 })); cue(id, T_LINE, 'whoosh', { dur: 1.6, v: .3 }); cue(id, T_G1, 'pop', { p: 1, v: .2 }); cue(id, T_G2, 'pop', { p: 1.1, v: .2 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
+  const SCRIPT = SAY.reg(id, [
+    [3.8, 24.6, 'title', `Os *${NUMW[N] || N} pilares* da prática`],
+    [4.0, T_G1 + 3, 'note', 'Capacidades complementares sustentam nossas entregas.', { x: LAY.x, y: 214, align: 'left', size: 30, weight: 800 }],
+    [T_CONC, 24.6, 'concl', 'A combinação dessas capacidades permite *executar os projetos*.']
+  ]);
+  SAY.reg(id, PILLARS.map((p, i) => [i < G1 ? T_G1 : T_G2, 24.4, 'body', p.name + ': ' + p.contrib]));
   SCENES[id] = {
-    themeAt: () => 'light', fx: { invert: false, chroma: .5 }, caps: CAPS,
+    themeAt: () => 'dark', script: SCRIPT, peaks: [[T_LINE - .1, T_LINE + 1, .4]],
     draw(ctx, t) {
-      bgLight(ctx, t); collage(ctx, t, { seed: 97, n: 6, theme: 'light', alpha: .7 });
-      // o templo: um pilar por coluna, depois o frontão "A PRÁTICA"
-      const tA = 1 - E.inCubic(P(t, T_CARDS - .2, .6)), cx = 960, yb = 900, colH = 430, gap = Math.min(220, 1300 / N), cw = Math.min(120, gap * .62);
-      if (tA > 0) { ctx.save(); ctx.globalAlpha *= tA;
-        PIL.forEach((pl, i) => column(ctx, cx + (i - (N - 1) / 2) * gap, yb, colH, pl.name, P(t, T_COL[i], .5), i, cw));
-        const pp = P(t, T_PED - .25, .25, E.inQuad), hw = (N - 1) * gap / 2 + cw + 60; if (pp > 0) { const y = lerp(-300, yb - colH - 60, pp);
-          ctx.save(); ctx.translate(cx, y); const tri = () => { ctx.beginPath(); ctx.moveTo(-hw, 30); ctx.lineTo(0, -110); ctx.lineTo(hw, 30); ctx.closePath(); }; tri(); ctx.fillStyle = '#F3EBDD'; ctx.fill(); ink(ctx, tri, 4, 7);
-          rr(ctx, -hw - 20, 30, hw * 2 + 40, 44, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -hw - 20, 30, hw * 2 + 40, 44, 4, 4, 9);
-          retroText(ctx, 'A PRÁTICA', 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
-        ctx.restore(); }
-      // os cartões: cada pilar com suas entregas (texto do JSON)
-      if (t > T_CARDS - .2) { const L = layout(ctx), x0 = W / 2 - (N * CW + (N - 1) * 20) / 2;
-        paintTitle(ctx, 'A PRÁTICA', W / 2, 225, { size: 58, bg: C.orange, seed: 44, p: P(t, T_CARDS - .2, .6), splat: false });
-        PIL.forEach((_, k) => card(ctx, k, x0 + k * (CW + 20), 300, P(t, T_CARDS + k * .25, .45), L[k])); }
-      // chegada à Parada 2
-      const bp = P(t, T_BOARD - .5, .6); if (bp > 0) { ctx.save(); ctx.globalAlpha *= bp; ctx.fillStyle = rgba('#120E0B', .75 * bp); ctx.fillRect(0, 0, W, H);
-        FLAP.board(ctx, W / 2, H / 2, ['PARADA 2 · BALDEAÇÃO'], [T_BOARD], t, { tw: 56, th: 82, hiFrom: [10], header: TX.stop.label, headerCol: C.orange }); ctx.restore(); }
-      scanlines(ctx, .03);
+      bgDark(ctx, t, { centerA: .9, center: '#2E1C10' });
+      skyline(ctx, t, { y: 960, h: 320, seed: 88, col: '#1A1216', lit: .4 });
+      const g = ctx.createLinearGradient(0, GYp, 0, H); g.addColorStop(0, '#2A1C14'); g.addColorStop(1, '#0E0907'); ctx.fillStyle = g; ctx.fillRect(0, GYp, W, H - GYp); line(ctx, 0, GYp, W, GYp, INK, 6);
+      // pilares (colunas de viaduto) sobem
+      PILLARS.forEach((p, i) => { const k = E.outBack(P(t, T_COL[i], .7)), x = X(i), h = (GYp - TOPY) * Math.min(1, k); if (k <= 0) return;
+        vslab(ctx, x - 52, GYp - h, 104, h, 26, mix('#5A4A40', [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i], .35), { lw: 4 });
+        hatch(ctx, () => rr(ctx, x - 52, GYp - h, 104, h, 0), x - 52, GYp - h, 104, h, { alpha: .18, gap: 12 });
+        vslab(ctx, x - 74, GYp - h - 26, 148, 26, 18, '#6A5A50', { lw: 3.5 });
+        pin(ctx, x, GYp - h / 2, c => { c.globalAlpha *= clamp(k); c.rotate(-Math.PI / 2); text(c, p.name.toUpperCase(), 0, 0, { size: 28, weight: 900, color: '#FFF', align: 'center', ls: 3 }); }); });
+      // a linha corre por cima dos pilares
+      const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
+      if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
+      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) * .12) % 1; LINE.head(ctx, lerp(-120, W + 120, u), TOPY - 40, 0, 18); }
+      // contribuições: dois grupos, cada descrição fica na tela até o fim
+      PILLARS.forEach((p, i) => { const t0 = i < G1 ? T_G1 : T_G2, a = P(t, t0 + (i % G1) * .25, .5); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
+        hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;
+          paper(c, -w / 2, -110, w, 220, { r: 14, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5 });
+          rr(c, -w / 2, -110, w, 50, 14); c.fillStyle = [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i]; c.fill();
+          text(c, p.name, 0, -84, { size: 28, weight: 900, color: i === 2 ? INK : '#FFF', align: 'center' });
+          para(c, p.contrib, -w / 2 + 18, -46, w - 36, { size: 26, weight: 800, color: INK, lh: 1.16 });
+          if (p.items.length) text(c, `${p.items.length} entregas`, w / 2 - 16, 90, { size: 20, weight: 800, mono: true, color: '#8A6A48', align: 'right' }); }); });
+      SAY.draw(ctx, t, SCRIPT, 'dark');
     }
-  };
-  POSTERS[6] = (ctx, w, h, tl) => {
-    text(ctx, 'Pilares da prática', 0, -h / 2 + 50, { size: 26, weight: 900, color: INK, align: 'center' });
-    const rowH = Math.min(84, (h - 130) / N);
-    PIL.forEach((pl, i) => { const y = -h / 2 + 110 + i * rowH, col = COLS[i % COLS.length], on = Math.floor(tl * .8) % N === i;
-      rr(ctx, -w / 2 + 30, y, w - 60, rowH - 12, 10); ctx.fillStyle = on ? col : '#F3EBDD'; ctx.fill(); inkRect(ctx, -w / 2 + 30, y, w - 60, rowH - 12, 10, 2.5, i);
-      text(ctx, pl.name, -w / 2 + 52, y + (rowH - 12) / 2, { size: 24, weight: 900, color: on && col !== C.yellow ? '#FFF' : INK });
-      pill(ctx, w / 2 - 110, y + (rowH - 12) / 2, `${pl.items.length} entregas`, { size: 15, fill: '#FFFDF8', weight: 900 }); });
   };
 })();
 
-/* ---------- Parada 2: retomada do trecho 2 ---------- */
-STOPSCN.stop2 = recapScene({ posters: [4, 5, 6], sign: 'PARADA 2 · BALDEAÇÃO', from: CONFIG.sceneById.s06.end,
-  doodles: [['bang', 120, 300, 70, C.yellow], ['star', 1800, 280, 80, C.orange], ['heart', 1810, 820, 70, C.red], ['zigzag', 120, 820, 90, C.orange]] });
+/* ---------- Conversa 2: as quatro provas, a escala e os pilares (cartazes 04, 05, 06) ---------- */
+POSTERS[4] = (ctx, w, h, tl) => {
+  const B = CASE('Cliente Banana'), M = CASE('Cliente Manga'), I = CASE('Insight Agent'), pl = dget(I, 'business_results.pipeline', {});
+  const lift = (String(dget(B, 'business_results.headline', '')).match(/([+-]?\d+(?:\.\d+)?)\s*relative/i) || [])[1];
+  const rows = [['Cestas', lift ? FMT.rel(+lift) : '—', 'conversão vs. 2ª melhor campanha', C.yellow], ['Principalidade', FMT.auto(dget(M, 'business_results.top3.incremental_gain', '+4 p.p.')), 'vs. controle · backtest', C.orange],
+    ['Relatórios', 'automáticos', 'do dado ao board', '#F3EBDD'], ['Agentes', `${pl.active_relationships || 0} + ${pl.to_conquer || 0}`, `ativos + oportunidades (${pl.acquirers || 30})`, C.red]];
+  rows.forEach(([n, big, sub, col], i) => { const x = (i % 2 - .5) * 220, y = -150 + Math.floor(i / 2) * 230;
+    rr(ctx, x - 104, y - 92, 208, 196, 12); ctx.fillStyle = '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke(); rr(ctx, x - 104, y - 92, 208, 40, 12); ctx.fillStyle = col; ctx.fill();
+    late(ctx, c => { text(c, n, x, y - 72, { size: 22, weight: 900, color: col === C.yellow || col === '#F3EBDD' ? INK : '#FFF', align: 'center' });
+      text(c, big, x, y - 6, { size: Math.min(40, 190 / Math.max(1, measure(c, big, 40, 900)) * 40), weight: 900, color: C.orange, align: 'center' });
+      para(c, sub, x, y + 34, 190, { size: 18, weight: 800, color: '#3A332C', align: 'center', lh: 1.1 }); }); });
+};
+POSTERS[5] = (ctx, w, h, tl) => {
+  late(ctx, c => { para(c, 'A mesma equipe, *um alcance maior*', 0, -240, 420, { size: 30, weight: 900, color: INK, accent: C.red, align: 'center' }); });
+  const pts = [[-170, -40], [-40, -40], [80, -40]]; LINE.draw(ctx, pts, 1, { w: 12, shadow: false });
+  [['Equipe', 'user'], ['Motor', 'gear'], ['Ativo', 'grid']].forEach(([l, ic], i) => { circle(ctx, pts[i][0], -40, 30, i === 2 ? C.yellow : '#FFF8EE', INK, 4); icon(ctx, ic, pts[i][0], -40, 34, INK, 6); late(ctx, c => text(c, l, pts[i][0], 10, { size: 20, weight: 900, color: INK, align: 'center' })); });
+  for (let k = 0; k < 4; k++) { const y = -130 + k * 60; line(ctx, 110, -40, 180, y, C.orange, 5); circle(ctx, 190, y, 16, '#F6EEDF', INK, 3); }
+  late(ctx, c => { text(c, 'projetos', 190, 120, { size: 20, weight: 900, color: INK, align: 'center' });
+    para(c, 'Automação, padronização e reutilização ampliam o alcance das entregas.', 0, 150, 420, { size: 22, weight: 800, color: '#3A332C', align: 'center' }); });
+};
+POSTERS[6] = (ctx, w, h, tl) => {
+  const hi = Math.floor(tl / 2.5) % Math.max(1, PILLARS.length);
+  PILLARS.forEach((p, i) => { const y = -220 + i * 96, on = i === hi; rr(ctx, -210, y - 40, 420, 84, 10); ctx.fillStyle = on ? C.orange : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
+    late(ctx, c => { text(c, p.name, -190, y - 14, { size: 22, weight: 900, color: on ? '#FFF' : INK }); text(c, p.items.length ? `${p.items.length} entregas` : '', 190, y - 14, { size: 16, weight: 800, mono: true, color: on ? '#FFF' : '#8A6A48', align: 'right' });
+      text(c, p.contrib.length > 46 ? p.contrib.slice(0, 44) + '…' : p.contrib, -190, y + 16, { size: 17, weight: 700, color: on ? '#FFF' : '#3A332C' }); }); });
+};
+STOPSCN.stop2 = recapScene({ posters: [4, 5, 6], sign: 'PARADA 2 · CONVERSA', from: CONFIG.sceneById.s06.end, call: 'QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?',
+  doodles: [['crown', 1840, 240, 80, C.yellow], ['spiral', 80, 260, 70, C.orange]] });
