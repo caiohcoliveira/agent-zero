@@ -249,7 +249,7 @@ function platformLife(ctx, tl, o = {}) {
       const g = ctx.createRadialGradient(x, 560, 20, x, 560, 700); g.addColorStop(0, 'rgba(255,236,200,.35)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, PIT); ctx.restore();
       for (let k = 0; k < 14; k++) { const yy = 130 + hash(k * 7) * 760, xx = ((x + hash(k * 3) * 900) % (W + 200)) - 100; line(ctx, xx, yy, xx + 160, yy, 'rgba(255,240,220,.18)', 2); } } }
   // passageiro passando em primeiro plano (silhueta desfocada)
-  { const c = (tl + 2) % 23, d = 7; if (c < d && o.people !== false) { const u = c / d, x = lerp(W + 120, -120, u); ctx.save(); ctx.globalAlpha = .9; PEOPLE.draw(ctx, x, H + 10, .62, PEOPLE.walk(tl * 5.5), { dir: -1, sil: true, t: tl }); ctx.restore(); } }
+  { const c = (tl + 2) % 23, d = 7; if (c < d && o.people !== false) { const u = c / d, x = lerp(W + 120, -120, u); ctx.save(); ctx.globalAlpha = .9; PEOPLE.draw(ctx, x, H + 10, .95, PEOPLE.walk(tl * 13), { dir: -1, sil: true, t: tl }); ctx.restore(); } }
 }
 /** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
 const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz

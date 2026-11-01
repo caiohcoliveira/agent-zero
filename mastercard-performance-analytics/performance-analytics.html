@@ -2584,7 +2584,7 @@ function platformLife(ctx, tl, o = {}) {
       const g = ctx.createRadialGradient(x, 560, 20, x, 560, 700); g.addColorStop(0, 'rgba(255,236,200,.35)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, PIT); ctx.restore();
       for (let k = 0; k < 14; k++) { const yy = 130 + hash(k * 7) * 760, xx = ((x + hash(k * 3) * 900) % (W + 200)) - 100; line(ctx, xx, yy, xx + 160, yy, 'rgba(255,240,220,.18)', 2); } } }
   // passageiro passando em primeiro plano (silhueta desfocada)
-  { const c = (tl + 2) % 23, d = 7; if (c < d && o.people !== false) { const u = c / d, x = lerp(W + 120, -120, u); ctx.save(); ctx.globalAlpha = .9; PEOPLE.draw(ctx, x, H + 10, .62, PEOPLE.walk(tl * 5.5), { dir: -1, sil: true, t: tl }); ctx.restore(); } }
+  { const c = (tl + 2) % 23, d = 7; if (c < d && o.people !== false) { const u = c / d, x = lerp(W + 120, -120, u); ctx.save(); ctx.globalAlpha = .9; PEOPLE.draw(ctx, x, H + 10, .95, PEOPLE.walk(tl * 13), { dir: -1, sil: true, t: tl }); ctx.restore(); } }
 }
 /** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
 const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz
@@ -3042,99 +3042,104 @@ function lightCone(ctx, x, y, w0, w1, len, col, a) {
 
 /* ===== 13-people.js ===== */
 /* ============================================================================
-   13. PERSONAGENS 2.5D — rig simples (quadril, tronco, cabeça, braços, pernas)
-   com volume pintado, contorno de tinta e luz de recorte. Poses são números
+   13. PERSONAGENS — estilo desenho animado: cabeça grande, corpo baixinho, contorno
+   grosso, olhos grandes e sombra chapada. Rig simples (quadril, tronco, cabeça, braços, pernas). Poses são números
    (ângulos), então dá para misturar uma pose na outra (mixPose).
    ----------------------------------------------------------------------------
-   Coordenadas: origem nos pés, no chão; altura ~380 em escala 1; olhando para +x.
+   Coordenadas: origem nos pés, no chão; altura ~300 em escala 1; vista 3/4 olhando para +x.
    a: braços [perto, longe] = [ângulo do ombro a partir de "para baixo", dobra do cotovelo]
    l: pernas [perto, longe] = [ângulo do quadril, dobra do joelho]
    ========================================================================== */
 const PEOPLE = (() => {
-  const L = { thigh: 84, shin: 82, torso: 120, ua: 62, fa: 58, head: 37 };
+  // proporções de desenho animado: cabeça grande, corpo baixinho, braços e pernas finos, tênis grandes
+  const L = { thigh: 46, shin: 46, torso: 82, ua: 40, fa: 36, R: 62 };
   const dn = (x, y, a, l) => [x + Math.sin(a) * l, y + Math.cos(a) * l];
   const POSE = {
-    stand: { hx: 0, hy: -166, lean: .02, tilt: 0, a: [[.14, .3], [.06, .22]], l: [[.03, 0], [-.03, 0]] },
-    sit: { hx: 0, hy: -116, lean: .16, tilt: .1, a: [[1.0, 1.0], [.92, 1.08]], l: [[1.5, 1.5], [1.42, 1.42]] }
+    stand: { hx: 0, hy: -102, lean: 0, tilt: 0, a: [[.22, .15], [.14, .15]], l: [[.02, 0], [-.02, 0]] },
+    sit: { hx: 0, hy: -60, lean: .04, tilt: .06, a: [[1.28, .42], [1.18, .52]], l: [[1.57, 1.57], [1.52, 1.52]] }
   };
   const num = (a, b, k) => typeof a === 'number' ? lerp(a, b, k) : a.map((v, i) => num(v, b[i], k));
   /** mistura duas poses (k = 0 → p, 1 → q) */
   function mixPose(p, q, k) { const o = {}; for (const key in p) o[key] = num(p[key], q[key], clamp(k)); return o; }
-  function typing(t) { const p = JSON.parse(JSON.stringify(POSE.sit)); p.a[0][1] += .14 * Math.sin(t * 19); p.a[1][1] += .14 * Math.sin(t * 17 + 1.3); p.tilt += .03 * Math.sin(t * 2); return p; }
+  function typing(t) { const p = JSON.parse(JSON.stringify(POSE.sit)); p.a[0][1] += .2 * Math.sin(t * 19); p.a[1][1] += .2 * Math.sin(t * 17 + 1.3); p.tilt += .04 * Math.sin(t * 2.2); return p; }
+  /** passinho rápido e curto (como o andar apressado dos desenhos): tronco firme, pernas miúdas, quique leve */
   function walk(ph) {
     const s = Math.sin(ph), c = Math.cos(ph);
-    return { hx: 0, hy: -162 + 6 * Math.abs(c), lean: .07, tilt: 0, a: [[-.5 * s, .4], [.5 * s, .4]], l: [[.45 * s, Math.max(0, c) * .9], [-.45 * s, Math.max(0, -c) * .9]] };
+    return { hx: 0, hy: -102 - 5 * Math.abs(s), lean: .06, tilt: .05 * Math.sin(ph * 2), a: [[.55 + .18 * s, 1.05], [.5 - .18 * s, 1.05]], l: [[.36 * s, Math.max(0, c) * .95], [-.36 * s, Math.max(0, -c) * .95]] };
   }
-  /** dança no tempo da música: quique no tempo, troca de lado a cada batida, braços para o alto */
+  /** dança no tempo da música: desce no tempo, troca de lado a cada batida, braços para o alto */
   function dance(t, beat, bi) {
     const sw = bi % 2 ? 1 : -1, b = Math.pow(clamp(beat), 1.6), w = Math.sin(t * 6.5);
-    return { hx: sw * 10, hy: -158 + 16 * b, lean: .12 * sw, tilt: -.2 * sw, a: [[2.55 + .3 * w, .55 + .3 * b], [2.35 - .3 * w, .7]], l: [[.28 * sw, .25 + .5 * b], [-.22 * sw, .3 + .3 * b]] };
+    return { hx: sw * 9, hy: -102 + 12 * b, lean: .1 * sw, tilt: -.2 * sw, a: [[2.7 + .3 * w, .45 + .3 * b], [2.55 - .3 * w, .55]], l: [[.25 * sw, .3 + .5 * b], [-.2 * sw, .3 + .35 * b]] };
   }
-  function reach(k) { const p = JSON.parse(JSON.stringify(POSE.stand)); p.a[0] = [lerp(.14, 1.75, k), lerp(.3, .05, k)]; p.lean = .08 * k; return p; }
+  function reach(k) { const p = JSON.parse(JSON.stringify(POSE.stand)); p.a[0] = [lerp(.22, 1.75, k), lerp(.15, 0, k)]; p.lean = .06 * k; return p; }
 
-  const COL = { skin: '#F1C29C', hair: '#F6CF62', hairDk: '#C68B2C', top: '#E2462C', pants: '#2C3352', shoe: '#17161E', phones: C.orange };
-  /** desenha a personagem. o: { dir, t, phones: 'neck'|'on'|'off', mood: 'tired'|'happy'|'calm', dark (0–1), swing, sil (silhueta) } */
+  const COL = { skin: '#F7CBA6', skinDk: '#E3A27C', hair: '#F7D45C', hairDk: '#D8A433', top: '#E2462C', topDk: '#B8321E', stripe: C.yellow, pants: '#2E3A66', pantsDk: '#222B4E', shoe: '#FFFFFF', sole: C.orange, phones: C.orange };
+  /** desenha a personagem (vista 3/4, olhando para +x). o: { dir, t, phones: 'neck'|'on', mood: 'tired'|'happy'|'calm', dark, swing, sil } */
   function draw(ctx, x, y, s, P, o = {}) {
-    const dir = o.dir || 1, dark = o.dark || 0, t = o.t || 0;
-    const tint = c => o.sil ? (o.silCol || '#120D0B') : (dark > 0 ? mix(c, '#0D1024', dark * .62) : c);
+    const dir = o.dir || 1, dark = o.dark || 0, t = o.t || 0, sil = !!o.sil, R = L.R;
+    const tint = c => sil ? (o.silCol || '#120D0B') : (dark > 0 ? mix(c, '#0D1024', dark * .62) : c), OUT = sil ? tint('#000') : INK;
+    const seg = (x1, y1, x2, y2, w, c) => { ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.strokeStyle = OUT; ctx.lineWidth = w + 7; ctx.stroke(); ctx.strokeStyle = tint(c); ctx.lineWidth = w; ctx.stroke(); };
+    const blob = (pathFn, c, lw = 4) => { pathFn(); ctx.fillStyle = tint(c); ctx.fill(); if (lw > 0) { ctx.strokeStyle = OUT; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.stroke(); } };
     ctx.save(); ctx.translate(x, y); ctx.scale(s * dir, s);
-    // sombra no chão
-    ctx.save(); ctx.globalAlpha *= .35; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(P.hx * .5, 4, 90, 14, 0, 0, TAU); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.globalAlpha *= .3; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(P.hx * .5, 3, 70, 11, 0, 0, TAU); ctx.fill(); ctx.restore();
     const H0 = [P.hx, P.hy], N = [P.hx + Math.sin(P.lean) * L.torso, P.hy - Math.cos(P.lean) * L.torso];
-    const sh = side => [N[0] + side * 4, N[1] + 14], hip = side => [H0[0] + side * 6, H0[1]];
-    const leg = (i, side) => { const [hx, hy] = hip(side), [a, k] = P.l[i], kn = dn(hx, hy, a, L.thigh), ft = dn(kn[0], kn[1], a - k, L.shin);
-      vlimb(ctx, hx, hy, kn[0], kn[1], 38, tint(COL.pants), { ink: !o.sil }); vlimb(ctx, kn[0], kn[1], ft[0], ft[1], 25, tint(COL.pants), { ink: !o.sil });
-      ctx.save(); ctx.translate(ft[0], ft[1]); ctx.rotate(-(a - k) * .3); ctx.beginPath(); ctx.ellipse(14, -4, 26, 12, 0, 0, TAU); ctx.fillStyle = tint(COL.shoe); ctx.fill(); if (!o.sil) { ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke(); } ctx.restore(); };
-    const arm = (i, side) => { const [sx, sy] = sh(side), [a, k] = P.a[i], el = dn(sx, sy, a, L.ua), hd = dn(el[0], el[1], a + k, L.fa);
-      vlimb(ctx, sx, sy, el[0], el[1], 25, tint(COL.top), { ink: !o.sil }); vlimb(ctx, el[0], el[1], hd[0], hd[1], 17, tint(COL.skin), { ink: !o.sil });
-      if (o.sil) circle(ctx, hd[0], hd[1], 12, tint(COL.skin)); else vball(ctx, hd[0], hd[1], 12, tint(COL.skin), { rim: false, lw: 2.5 }); };
-    // braço e perna de trás (mais escuros)
-    ctx.save(); ctx.globalAlpha *= o.sil ? 1 : .92; leg(1, -1); arm(1, -1); ctx.restore();
-    // tronco (blusa) com volume
-    const px = Math.cos(P.lean), py = Math.sin(P.lean);
-    const Wm = [lerp(N[0], H0[0], .62), lerp(N[1], H0[1], .62)];
-    // pescoço
-    vlimb(ctx, N[0], N[1] + 6, N[0] + Math.sin(P.lean) * 22, N[1] - Math.cos(P.lean) * 22, 16, tint(COL.skin), { ink: !o.sil });
-    ctx.beginPath(); ctx.moveTo(N[0] - 30 * px, N[1] - 30 * py + 10); ctx.quadraticCurveTo(N[0], N[1] - 4, N[0] + 30 * px, N[1] + 30 * py + 10);
-    ctx.quadraticCurveTo(Wm[0] + 26 * px, Wm[1] + 20 * py, Wm[0] + 22 * px, Wm[1] + 22 * py); ctx.quadraticCurveTo(H0[0] + 34 * px, H0[1] + 34 * py - 14, H0[0] + 32 * px, H0[1] + 32 * py);
-    ctx.quadraticCurveTo(H0[0], H0[1] + 12, H0[0] - 32 * px, H0[1] - 32 * py); ctx.quadraticCurveTo(H0[0] - 34 * px, H0[1] - 34 * py - 14, Wm[0] - 22 * px, Wm[1] - 22 * py);
-    ctx.quadraticCurveTo(Wm[0] - 26 * px, Wm[1] - 20 * py, N[0] - 30 * px, N[1] - 30 * py + 10); ctx.closePath();
-    if (o.sil) { ctx.fillStyle = tint(COL.top); ctx.fill(); }
-    else { const g = ctx.createLinearGradient(N[0] - 40, N[1], H0[0] + 40, H0[1]); g.addColorStop(0, mix(tint(COL.top), LIGHT.hi, .25)); g.addColorStop(1, mix(tint(COL.top), LIGHT.lo, .35)); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(N[0] + 4, N[1] + 6); ctx.lineTo(N[0] + 16 * px + 10, N[1] + 40); ctx.lineTo(N[0] + 2, N[1] + 70); ctx.strokeStyle = rgba(INK, .6); ctx.lineWidth = 3; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(N[0] + 4, N[1] + 6); ctx.lineTo(N[0] + 12, N[1] + 28); ctx.lineTo(N[0] + 22, N[1] + 10); ctx.closePath(); ctx.fillStyle = tint('#F6EEDF'); ctx.fill();
-      line(ctx, H0[0] - 28 * px, H0[1] - 28 * py - 10, H0[0] + 28 * px, H0[1] + 28 * py - 10, tint('#1E1A2A'), 7); }
+    const leg = (i, side) => { const hip = [H0[0] + side * 13, H0[1] - 4], [a, k] = P.l[i], kn = dn(hip[0], hip[1], a, L.thigh), ft = dn(kn[0], kn[1], a - k, L.shin);
+      seg(hip[0], hip[1], kn[0], kn[1], 19, side > 0 ? COL.pants : COL.pantsDk); seg(kn[0], kn[1], ft[0], ft[1], 16, side > 0 ? COL.pants : COL.pantsDk);
+      ctx.save(); ctx.translate(ft[0], ft[1]); ctx.rotate(-(a - k) * .25);
+      blob(() => { ctx.beginPath(); ctx.ellipse(12, 2, 27, 15, 0, 0, TAU); }, COL.shoe); if (!sil) { ctx.beginPath(); ctx.ellipse(12, 10, 26, 6, 0, 0, Math.PI); ctx.fillStyle = tint(COL.sole); ctx.fill(); line(ctx, 2, -6, 14, -8, rgba(INK, .5), 2.5); }
+      ctx.restore(); };
+    const arm = (i, side) => { const sh = [N[0] + side * 30, N[1] + 14], [a, k] = P.a[i], el = dn(sh[0], sh[1], a, L.ua), hd = dn(el[0], el[1], a + k, L.fa);
+      seg(sh[0], sh[1], el[0], el[1], 15, side > 0 ? COL.top : COL.topDk); seg(el[0], el[1], hd[0], hd[1], 11, side > 0 ? COL.skin : COL.skinDk);
+      blob(() => { ctx.beginPath(); ctx.arc(hd[0], hd[1], 11, 0, TAU); }, side > 0 ? COL.skin : COL.skinDk, 3.5); };
+    leg(1, -1); arm(1, -1);
+    // tronco: blusa vermelha com gola branca e faixa amarela, sombra chapada do lado de trás
+    const px = Math.cos(P.lean), py = Math.sin(P.lean), sx = (k, w) => [lerp(N[0], H0[0], k) + w * px, lerp(N[1], H0[1], k) + w * py];
+    const torso = () => { ctx.beginPath(); const p1 = sx(0, -32), p2 = sx(0, 32), p3 = sx(1.08, 38), p4 = sx(1.08, -38); ctx.moveTo(p1[0], p1[1] + 6); ctx.quadraticCurveTo(N[0], N[1] - 4, p2[0], p2[1] + 6); ctx.quadraticCurveTo(p2[0] + 8, (p2[1] + p3[1]) / 2, p3[0], p3[1]); ctx.quadraticCurveTo(H0[0], H0[1] + 16, p4[0], p4[1]); ctx.quadraticCurveTo(p1[0] - 8, (p1[1] + p4[1]) / 2, p1[0], p1[1] + 6); ctx.closePath(); };
+    blob(torso, COL.top, 4.5);
+    if (!sil) { ctx.save(); torso(); ctx.clip(); const d = sx(0, -36); ctx.fillStyle = tint(COL.topDk); ctx.beginPath(); ctx.ellipse(d[0] - 6, (N[1] + H0[1]) / 2, 22, 70, 0, 0, TAU); ctx.fill();
+      const st = sx(.72, 0); ctx.fillStyle = tint(COL.stripe); ctx.save(); ctx.translate(st[0], st[1]); ctx.rotate(P.lean); ctx.fillRect(-50, -6, 100, 12); ctx.restore(); ctx.restore(); torso(); ctx.strokeStyle = OUT; ctx.lineWidth = 4.5; ctx.stroke();
+      blob(() => { ctx.beginPath(); ctx.moveTo(N[0] - 16, N[1] + 4); ctx.lineTo(N[0] + 2, N[1] + 26); ctx.lineTo(N[0] + 20, N[1] + 4); ctx.lineTo(N[0] + 2, N[1] + 12); ctx.closePath(); }, '#FFFFFF', 3); }
     leg(0, 1);
-    // cabeça: rabo de cavalo atrás, rosto, franja, fones
-    const hr = L.head, hc = [N[0] + Math.sin(P.lean + P.tilt) * (hr + 14), N[1] - Math.cos(P.lean + P.tilt) * (hr + 14)];
-    ctx.save(); ctx.translate(hc[0], hc[1]); ctx.rotate(P.tilt + P.lean);
-    if (o.phones === 'neck') { ctx.save(); ctx.translate(0, hr + 12); ctx.beginPath(); ctx.arc(0, -6, hr * .8, .2, Math.PI - .2); ctx.strokeStyle = INK; ctx.lineWidth = 7; ctx.stroke(); vball(ctx, hr * .62, 4, 11, tint(COL.phones), { rim: false, lw: 2.5 }); ctx.restore(); }
-    const sw = o.swing == null ? Math.sin(t * 3) * .25 : o.swing;
-    ctx.save(); ctx.translate(-hr * .78, -hr * .35); ctx.rotate(.5 + sw); ctx.beginPath(); ctx.ellipse(-8, 30, 17, 44, -.2, 0, TAU);
-    if (o.sil) { ctx.fillStyle = tint(COL.hair); ctx.fill(); } else { const g = ctx.createLinearGradient(0, -10, 0, 80); g.addColorStop(0, tint(COL.hair)); g.addColorStop(1, tint(COL.hairDk)); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.stroke(); }
-    ctx.restore();
-    if (o.sil) circle(ctx, 0, 0, hr, tint(COL.skin)); else vball(ctx, 0, 0, hr, tint(COL.skin), { lw: 4, rimCol: dark > .5 ? '#FF9A4A' : LIGHT.rim });
-    if (!o.sil) {
-      // rosto (olhando para +x)
-      const mood = o.mood || 'calm';
-      if (mood === 'happy') { ctx.beginPath(); ctx.arc(hr * .42, -hr * .06, 6, Math.PI * 1.1, Math.PI * 1.9); ctx.strokeStyle = INK; ctx.lineWidth = 3.5; ctx.stroke(); }
-      else { ctx.beginPath(); ctx.ellipse(hr * .46, -hr * .04, 7, mood === 'tired' ? 3.5 : 9, 0, 0, TAU); ctx.fillStyle = '#FFF8EE'; ctx.fill();
-        ctx.beginPath(); ctx.ellipse(hr * .52, -hr * .03, 4.5, mood === 'tired' ? 3 : 6.5, 0, 0, TAU); ctx.fillStyle = '#3A6E8A'; ctx.fill(); circle(ctx, hr * .53, -hr * .03, 2.4, INK); if (mood !== 'tired') circle(ctx, hr * .56, -hr * .1, 1.6, '#FFF');
-        line(ctx, hr * .28, -hr * (mood === 'tired' ? .1 : .3), hr * .66, -hr * (mood === 'tired' ? .08 : .28), INK, 3.5); line(ctx, hr * .62, -hr * .28, hr * .74, -hr * .36, INK, 2.5);
-        if (mood === 'tired') line(ctx, hr * .3, -hr * .18, hr * .6, -hr * .14, INK, 3); }
-      line(ctx, hr * .26, -hr * .32, hr * .62, -hr * (mood === 'tired' ? .24 : .36), tint(COL.hairDk), 4);
-      ctx.beginPath(); ctx.moveTo(hr * .92, -hr * .02); ctx.lineTo(hr * 1.04, hr * .2); ctx.lineTo(hr * .9, hr * .22); ctx.strokeStyle = rgba(INK, .7); ctx.lineWidth = 2.5; ctx.stroke();
-      if (mood === 'happy') { ctx.beginPath(); ctx.arc(hr * .62, hr * .36, 9, .2, Math.PI - .4); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke(); }
-      else line(ctx, hr * .5, hr * .46, hr * .74, hr * (mood === 'tired' ? .5 : .44), INK, 3);
-      circle(ctx, hr * .5, hr * .22, 7, 'rgba(235,90,80,.28)');
+    // cabeça
+    const ang = P.lean + P.tilt, hc = [N[0] + Math.sin(ang) * (R * .86), N[1] - Math.cos(ang) * (R * .86)];
+    ctx.save(); ctx.translate(hc[0], hc[1]); ctx.rotate(ang);
+    if (o.phones === 'neck') { ctx.beginPath(); ctx.ellipse(-4, R * .95, R * .5, R * .2, 0, .1, Math.PI - .1); ctx.strokeStyle = OUT; ctx.lineWidth = 9; ctx.stroke(); ctx.strokeStyle = tint(COL.phones); ctx.lineWidth = 4; ctx.stroke(); blob(() => { ctx.beginPath(); ctx.ellipse(-R * .52, R * .98, 13, 16, .3, 0, TAU); }, COL.phones, 3.5); }
+    // rabo de cavalo atrás, com elástico laranja
+    const sw = o.swing == null ? Math.sin(t * 4) * .25 : o.swing;
+    ctx.save(); ctx.translate(-R * .82, -R * .42); ctx.rotate(.55 + sw);
+    blob(() => { ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-34, 30, -12, 86); ctx.quadraticCurveTo(-2, 70, 6, 92); ctx.quadraticCurveTo(26, 44, 0, 0); ctx.closePath(); }, COL.hair, 4);
+    if (!sil) line(ctx, -4, 20, -8, 70, tint(COL.hairDk), 3);
+    blob(() => { ctx.beginPath(); ctx.ellipse(0, 4, 13, 9, 0, 0, TAU); }, COL.phones, 3); ctx.restore();
+    // rosto com sombra chapada
+    const face = () => { ctx.beginPath(); ctx.ellipse(0, 0, R * 1.04, R, 0, 0, TAU); };
+    blob(face, sil ? COL.skin : COL.skinDk, 0);
+    if (!sil) { ctx.save(); face(); ctx.clip(); ctx.beginPath(); ctx.ellipse(R * .14, -R * .06, R * .96, R * .94, 0, 0, TAU); ctx.fillStyle = tint(COL.skin); ctx.fill(); ctx.restore(); }
+    face(); ctx.strokeStyle = OUT; ctx.lineWidth = 4.5; ctx.stroke();
+    blob(() => { ctx.beginPath(); ctx.ellipse(-R * .7, R * .14, 12, 16, 0, 0, TAU); }, COL.skinDk, 3.5);
+    if (!sil) {
+      const mood = o.mood || 'calm', eyes = [[R * .4, R * .06, R * .22, R * .29], [-R * .08, R * .06, R * .17, R * .27]];
+      eyes.forEach(([ex, ey, rx, ry], k) => {
+        if (mood === 'happy') { ctx.beginPath(); ctx.ellipse(ex, ey + ry * .2, rx * .8, ry * .55, 0, Math.PI * 1.1, Math.PI * 1.9); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.stroke(); return; }
+        blob(() => { ctx.beginPath(); ctx.ellipse(ex, ey, rx, ry, 0, 0, TAU); }, '#FFFFFF', 3);
+        const pxp = ex + rx * .32, pyp = ey + ry * .12; circle(ctx, pxp, pyp, rx * .42, tint('#3D7FA8')); circle(ctx, pxp, pyp, rx * .24, INK); circle(ctx, pxp + rx * .14, pyp - ry * .16, rx * .12, '#FFFFFF');
+        if (mood === 'tired') { ctx.save(); ctx.beginPath(); ctx.ellipse(ex, ey, rx + 1, ry + 1, 0, 0, TAU); ctx.clip(); ctx.fillStyle = tint(COL.skin); ctx.fillRect(ex - rx - 2, ey - ry - 2, rx * 2 + 4, ry * .95); ctx.restore(); line(ctx, ex - rx, ey - ry * .1, ex + rx, ey - ry * .1, INK, 3.5); }
+        line(ctx, ex + rx * .6, ey - ry * .8, ex + rx * 1.05, ey - ry * 1.05, INK, 3); line(ctx, ex + rx * .2, ey - ry * .98, ex + rx * .45, ey - ry * 1.28, INK, 3);
+        ctx.beginPath(); ctx.arc(ex, ey - ry * 1.25, rx * .9, Math.PI * 1.15, Math.PI * 1.85); ctx.strokeStyle = tint(COL.hairDk); ctx.lineWidth = 4; ctx.stroke(); });
+      ctx.beginPath(); ctx.moveTo(R * .72, R * .2); ctx.quadraticCurveTo(R * .86, R * .36, R * .7, R * .42); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
+      if (mood === 'happy') blob(() => { ctx.beginPath(); ctx.moveTo(R * .12, R * .56); ctx.quadraticCurveTo(R * .4, R * .9, R * .66, R * .54); ctx.closePath(); }, '#8A1E1E', 3);
+      else if (mood === 'tired') { ctx.beginPath(); ctx.moveTo(R * .18, R * .66); ctx.quadraticCurveTo(R * .3, R * .6, R * .4, R * .66); ctx.quadraticCurveTo(R * .5, R * .72, R * .6, R * .64); ctx.strokeStyle = INK; ctx.lineWidth = 3.5; ctx.stroke(); }
+      else { ctx.beginPath(); ctx.arc(R * .4, R * .5, R * .2, .3, Math.PI - .5); ctx.strokeStyle = INK; ctx.lineWidth = 3.5; ctx.stroke(); }
+      circle(ctx, R * .66, R * .44, R * .12, 'rgba(240,110,100,.35)'); circle(ctx, -R * .2, R * .44, R * .1, 'rgba(240,110,100,.3)');
     }
-    // cabelo: calota + franja, com mechas
-    ctx.beginPath(); ctx.arc(0, 0, hr + 3, Math.PI * .92, Math.PI * 2.08); ctx.quadraticCurveTo(hr * .6, -hr * .2, hr * .1, -hr * .35); ctx.quadraticCurveTo(-hr * .3, -hr * .1, -hr * .9, hr * .25); ctx.closePath();
-    if (o.sil) { ctx.fillStyle = tint(COL.hair); ctx.fill(); }
-    else { const g = ctx.createLinearGradient(-hr, -hr, hr, hr * .4); g.addColorStop(0, mix(tint(COL.hair), LIGHT.hi, .35)); g.addColorStop(1, tint(COL.hairDk)); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.stroke();
-      ctx.strokeStyle = rgba(tint(COL.hairDk), .7); ctx.lineWidth = 2; for (let k = 0; k < 5; k++) { ctx.beginPath(); ctx.moveTo(-hr * .7 + k * 12, -hr * .85 + k * 2); ctx.quadraticCurveTo(-hr * .3 + k * 10, -hr * .4, -hr * .5 + k * 14, hr * .05); ctx.stroke(); } }
-    if (o.phones === 'on') { ctx.beginPath(); ctx.arc(-hr * .05, -hr * .05, hr + 8, Math.PI * 1.08, Math.PI * 1.98); ctx.strokeStyle = INK; ctx.lineWidth = 9; ctx.stroke(); ctx.strokeStyle = tint(COL.phones); ctx.lineWidth = 4; ctx.stroke();
-      if (o.sil) circle(ctx, -hr * .08, hr * .05, hr * .44, tint(COL.phones)); else { vball(ctx, -hr * .08, hr * .05, hr * .44, tint(COL.phones), { lw: 3.5 }); circle(ctx, -hr * .08, hr * .05, hr * .22, tint('#3A2A1E')); } }
+    // cabelo: calota com franja em pontas
+    const hair = () => { ctx.beginPath(); ctx.moveTo(-R * 1.05, R * .3); ctx.bezierCurveTo(-R * 1.25, -R * .9, R * .5, -R * 1.45, R * 1.02, -R * .32);
+      ctx.lineTo(R * .78, -R * .18); ctx.lineTo(R * .7, R * .02); ctx.lineTo(R * .48, -R * .26); ctx.lineTo(R * .3, -R * .02); ctx.lineTo(R * .12, -R * .34); ctx.lineTo(-R * .1, -R * .1); ctx.lineTo(-R * .3, -R * .42);
+      ctx.quadraticCurveTo(-R * .62, -R * .2, -R * .7, R * .3); ctx.closePath(); };
+    blob(hair, COL.hair, 4.5);
+    if (!sil) { ctx.save(); hair(); ctx.clip(); ctx.fillStyle = tint(COL.hairDk); ctx.beginPath(); ctx.ellipse(-R * .9, R * .1, R * .4, R * .9, .2, 0, TAU); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.beginPath(); ctx.ellipse(R * .1, -R * .78, R * .38, R * .1, -.25, 0, TAU); ctx.fill(); ctx.restore(); hair(); ctx.strokeStyle = OUT; ctx.lineWidth = 4.5; ctx.stroke(); }
+    if (o.phones === 'on') { ctx.beginPath(); ctx.ellipse(-R * .1, -R * .1, R * .95, R * 1.1, .15, Math.PI * 1.02, Math.PI * 1.93); ctx.strokeStyle = OUT; ctx.lineWidth = 11; ctx.stroke(); ctx.strokeStyle = tint(COL.phones); ctx.lineWidth = 5; ctx.stroke();
+      blob(() => { ctx.beginPath(); ctx.ellipse(-R * .7, R * .12, 22, 27, 0, 0, TAU); }, COL.phones, 4); if (!sil) circle(ctx, -R * .7, R * .12, 11, tint('#3A2A1E')); }
     ctx.restore();
     arm(0, 1);
     ctx.restore();
@@ -4109,7 +4114,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   const CYCLE = ['Extrair os dados', 'Conferir', 'Copiar e colar', 'Escrever destaques', 'Revisar', 'Enviar ao board'];
   const EGG = ['SQL · parquet', 'z = (x − μ)/σ', 'DAG ⟳ · idempotente', '? destaques', 'PDF · PPT', 'cron 0 7 * * 1'];
   const LABELS = ['PROBLEMA', 'TRABALHO MANUAL', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'];
-  const FLOOR = 880, GS = 1.22, SEAT = 470, SW_X = 1790, STAND = 1660, nx = i => 470 + i * 190, NY = 330;
+  const FLOOR = 880, GS = 1.6, LIFT = -34, SEAT = 470, SW_X = 1790, STAND = 1660, nx = i => 470 + i * 190, NY = 330;
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, T0 - .6, 'whoosh', { dur: .6, v: .3 });
   for (let k = 0; k < 14; k++) cue(id, T0 + .5 + k * 1.05, 'type', { n: 6, gap: .05 });
   cue(id, T_STRAT, 'chime', { f: 784, up: 7 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.6, 'pop', { p: .8 + i * .1, v: .18 }));
@@ -4120,14 +4125,14 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   /** onde está e o que faz a analista em cada instante */
   function girlAt(t) {
     const P_ = PEOPLE, tired = t < T_DROP;
-    if (t < T_UP) return { x: SEAT, pose: P_.typing(t), dir: 1, phones: 'neck', mood: 'tired' };
-    if (t < T_WALK) return { x: SEAT, pose: P_.mixPose(P_.typing(t), P_.POSE.stand, E.inOutCubic((t - T_UP) / (T_WALK - T_UP))), dir: 1, phones: 'neck', mood: 'tired' };
-    if (t < T_REACH) { const u = (t - T_WALK) / (T_REACH - T_WALK); return { x: lerp(SEAT, STAND, E.inOutSine(u)), pose: P_.walk((t - T_WALK) * 8.5), dir: 1, phones: 'neck', mood: 'calm' }; }
+    if (t < T_UP) return { x: SEAT, y: LIFT, pose: P_.typing(t), dir: 1, phones: 'neck', mood: 'tired' };
+    if (t < T_WALK) { const k = E.inOutCubic((t - T_UP) / (T_WALK - T_UP)); return { x: SEAT + 30 * k, y: LIFT * (1 - k), pose: P_.mixPose(P_.typing(t), P_.POSE.stand, k), dir: 1, phones: 'neck', mood: 'tired' }; }
+    if (t < T_REACH) { const u = (t - T_WALK) / (T_REACH - T_WALK); return { x: lerp(SEAT + 30, STAND, E.inOutSine(u)), pose: P_.walk((t - T_WALK) * 17), dir: 1, phones: 'neck', mood: 'calm' }; }
     if (t < T_DROP + .4) return { x: STAND, pose: P_.reach(E.outCubic(clamp((t - T_REACH) / 1.2))), dir: 1, phones: 'neck', mood: 'calm' };
     const { ph, i } = beatAt(t), d = P_.dance(t, 1 - ph, i), on = t > T_PHONES ? 'on' : 'neck';
     if (t < T_DANCE) return { x: STAND, pose: P_.mixPose(P_.reach(1), P_.POSE.stand, (t - T_DROP - .4) / (T_DANCE - T_DROP - .4)), dir: -1, phones: on, mood: 'happy' };
     if (t < T_IMP) return { x: STAND - 40 * Math.sin((t - T_DANCE) * 1.3), pose: d, dir: -1, phones: 'on', mood: 'happy' };
-    const u = clamp((t - T_IMP) / 6.5); return { x: lerp(STAND, -260, u), pose: P_.mixPose(d, P_.walk((t - T_IMP) * 7), .5), dir: -1, phones: 'on', mood: 'happy', gone: u >= 1 };
+    const u = clamp((t - T_IMP) / 6.5); return { x: lerp(STAND, -260, u), pose: P_.mixPose(d, P_.walk((t - T_IMP) * 15), .5), dir: -1, phones: 'on', mood: 'happy', gone: u >= 1 };
   }
   function lightSwitch(ctx, x, y, s, on, o = {}) {
     ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
@@ -4161,8 +4166,8 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   function desk(ctx, t) {
     const n = Math.floor(clamp((t - T0) / (PH[2] - T0 - 1)) * 24);
     // cadeira
-    vslab(ctx, SEAT - 66, FLOOR - 160, 130, 18, 30, '#3A2A22', { lw: 3 }); line(ctx, SEAT - 10, FLOOR - 140, SEAT - 10, FLOOR - 10, '#2A1E18', 10); line(ctx, SEAT - 60, FLOOR - 8, SEAT + 50, FLOOR - 8, '#2A1E18', 8);
-    vslab(ctx, SEAT - 92, FLOOR - 330, 22, 180, 14, '#3A2A22', { lw: 3 });
+    const sy = FLOOR + LIFT - 60 * GS + 6; vslab(ctx, SEAT - 70, sy, 140, 18, 30, '#3A2A22', { lw: 3 }); line(ctx, SEAT - 6, sy + 18, SEAT - 6, FLOOR - 10, '#2A1E18', 10); line(ctx, SEAT - 60, FLOOR - 8, SEAT + 50, FLOOR - 8, '#2A1E18', 8);
+    vslab(ctx, SEAT - 96, sy - 190, 22, 190, 14, '#3A2A22', { lw: 3 });
     // mesa
     vslab(ctx, 560, 650, 470, 26, 46, '#8A5634', { lw: 4 }); [575, 1005].forEach(lx => vslab(ctx, lx, 676, 18, FLOOR - 676, 10, '#6A4026', { lw: 3 }));
     // pilha de relatórios na mesa
@@ -4182,7 +4187,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     const a = P(t, PH[1], .4) * (1 - P(t, PH[2] - .4, .4)); if (a <= 0) return;
     const sp = t - PH[1], step = Math.floor(sp * (1 + sp * .12)) % CYCLE.length, cx = 520, cy = 300;
     ctx.save(); ctx.globalAlpha *= a;
-    [[SEAT + 40, 470, 10], [SEAT + 60, 430, 16]].forEach(([x, y, r]) => vball(ctx, x, y, r, '#FFFDF8', { rim: false, lw: 3 }));
+    [[SEAT + 60, 418, 10], [SEAT + 74, 388, 15]].forEach(([x, y, r]) => vball(ctx, x, y, r, '#FFFDF8', { rim: false, lw: 3 }));
     ctx.beginPath(); for (let k = 0; k < 9; k++) { const ang = k / 9 * TAU, rx = 230 + 14 * Math.sin(k * 2.3), ry = 70 + 10 * Math.cos(k * 1.7); ctx.arc(cx + Math.cos(ang) * rx * .8, cy + Math.sin(ang) * ry * .8, 52, 0, TAU); }
     ctx.fillStyle = '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
     ctx.beginPath(); ctx.ellipse(cx, cy, 230, 76, 0, 0, TAU); ctx.fillStyle = '#FFFDF8'; ctx.fill();
@@ -4247,8 +4252,8 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
         ctx.restore(); }
       if (!g.gone) { if (t < T_DROP) glow(ctx, g.x + 90, 560, 150, '#BFD8FF', .18 * (1 - dark));
         if (dark > 0) { glow(ctx, g.x, FLOOR - 240, 300, C.orange, .22 * dark); lightCone(ctx, g.x, 120, 80, 520, FLOOR - 120, '#FFB070', .5 * dark); }
-        PEOPLE.draw(ctx, g.x, FLOOR, GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * .45 });
-        if (t > PH[1] && t < T_UP) [[-60, -400], [40, -420]].forEach(([dx, dy], k) => { const d = (t * 1.5 + k * .5) % 1; vball(ctx, g.x + dx * .8, FLOOR + dy * GS * .9 + d * 50, 8 * (1 - d) + 2, '#9FD3F0', { rim: false, lw: 2 }); });
+        PEOPLE.draw(ctx, g.x, FLOOR + (g.y || 0), GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * .45 });
+        if (t > PH[1] && t < T_UP) [[-70, 470], [70, 450]].forEach(([dx, yy], k) => { const d = (t * 1.5 + k * .5) % 1; vball(ctx, g.x + dx, yy + d * 50, 8 * (1 - d) + 2, '#9FD3F0', { rim: false, lw: 2 }); });
         if (t > T_DANCE) for (let k = 0; k < 3; k++) { const d = (t * .8 + k / 3) % 1; ctx.save(); ctx.globalAlpha = (1 - d) * dark; text(ctx, k % 2 ? '♪' : '♫', g.x + (k - 1) * 60 + Math.sin(t * 3 + k) * 20, FLOOR - 480 - d * 160, { size: 46, weight: 900, color: C.yellow, align: 'center' }); ctx.restore(); } }
       if (dark > 0 && dark < 1) flash(ctx, 1 - dark, '#000000');
       ctx.restore();

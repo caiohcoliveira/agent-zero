@@ -477,7 +477,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   const CYCLE = ['Extrair os dados', 'Conferir', 'Copiar e colar', 'Escrever destaques', 'Revisar', 'Enviar ao board'];
   const EGG = ['SQL · parquet', 'z = (x − μ)/σ', 'DAG ⟳ · idempotente', '? destaques', 'PDF · PPT', 'cron 0 7 * * 1'];
   const LABELS = ['PROBLEMA', 'TRABALHO MANUAL', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'];
-  const FLOOR = 880, GS = 1.22, SEAT = 470, SW_X = 1790, STAND = 1660, nx = i => 470 + i * 190, NY = 330;
+  const FLOOR = 880, GS = 1.6, LIFT = -34, SEAT = 470, SW_X = 1790, STAND = 1660, nx = i => 470 + i * 190, NY = 330;
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, T0 - .6, 'whoosh', { dur: .6, v: .3 });
   for (let k = 0; k < 14; k++) cue(id, T0 + .5 + k * 1.05, 'type', { n: 6, gap: .05 });
   cue(id, T_STRAT, 'chime', { f: 784, up: 7 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.6, 'pop', { p: .8 + i * .1, v: .18 }));
@@ -488,14 +488,14 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   /** onde está e o que faz a analista em cada instante */
   function girlAt(t) {
     const P_ = PEOPLE, tired = t < T_DROP;
-    if (t < T_UP) return { x: SEAT, pose: P_.typing(t), dir: 1, phones: 'neck', mood: 'tired' };
-    if (t < T_WALK) return { x: SEAT, pose: P_.mixPose(P_.typing(t), P_.POSE.stand, E.inOutCubic((t - T_UP) / (T_WALK - T_UP))), dir: 1, phones: 'neck', mood: 'tired' };
-    if (t < T_REACH) { const u = (t - T_WALK) / (T_REACH - T_WALK); return { x: lerp(SEAT, STAND, E.inOutSine(u)), pose: P_.walk((t - T_WALK) * 8.5), dir: 1, phones: 'neck', mood: 'calm' }; }
+    if (t < T_UP) return { x: SEAT, y: LIFT, pose: P_.typing(t), dir: 1, phones: 'neck', mood: 'tired' };
+    if (t < T_WALK) { const k = E.inOutCubic((t - T_UP) / (T_WALK - T_UP)); return { x: SEAT + 30 * k, y: LIFT * (1 - k), pose: P_.mixPose(P_.typing(t), P_.POSE.stand, k), dir: 1, phones: 'neck', mood: 'tired' }; }
+    if (t < T_REACH) { const u = (t - T_WALK) / (T_REACH - T_WALK); return { x: lerp(SEAT + 30, STAND, E.inOutSine(u)), pose: P_.walk((t - T_WALK) * 17), dir: 1, phones: 'neck', mood: 'calm' }; }
     if (t < T_DROP + .4) return { x: STAND, pose: P_.reach(E.outCubic(clamp((t - T_REACH) / 1.2))), dir: 1, phones: 'neck', mood: 'calm' };
     const { ph, i } = beatAt(t), d = P_.dance(t, 1 - ph, i), on = t > T_PHONES ? 'on' : 'neck';
     if (t < T_DANCE) return { x: STAND, pose: P_.mixPose(P_.reach(1), P_.POSE.stand, (t - T_DROP - .4) / (T_DANCE - T_DROP - .4)), dir: -1, phones: on, mood: 'happy' };
     if (t < T_IMP) return { x: STAND - 40 * Math.sin((t - T_DANCE) * 1.3), pose: d, dir: -1, phones: 'on', mood: 'happy' };
-    const u = clamp((t - T_IMP) / 6.5); return { x: lerp(STAND, -260, u), pose: P_.mixPose(d, P_.walk((t - T_IMP) * 7), .5), dir: -1, phones: 'on', mood: 'happy', gone: u >= 1 };
+    const u = clamp((t - T_IMP) / 6.5); return { x: lerp(STAND, -260, u), pose: P_.mixPose(d, P_.walk((t - T_IMP) * 15), .5), dir: -1, phones: 'on', mood: 'happy', gone: u >= 1 };
   }
   function lightSwitch(ctx, x, y, s, on, o = {}) {
     ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
@@ -529,8 +529,8 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   function desk(ctx, t) {
     const n = Math.floor(clamp((t - T0) / (PH[2] - T0 - 1)) * 24);
     // cadeira
-    vslab(ctx, SEAT - 66, FLOOR - 160, 130, 18, 30, '#3A2A22', { lw: 3 }); line(ctx, SEAT - 10, FLOOR - 140, SEAT - 10, FLOOR - 10, '#2A1E18', 10); line(ctx, SEAT - 60, FLOOR - 8, SEAT + 50, FLOOR - 8, '#2A1E18', 8);
-    vslab(ctx, SEAT - 92, FLOOR - 330, 22, 180, 14, '#3A2A22', { lw: 3 });
+    const sy = FLOOR + LIFT - 60 * GS + 6; vslab(ctx, SEAT - 70, sy, 140, 18, 30, '#3A2A22', { lw: 3 }); line(ctx, SEAT - 6, sy + 18, SEAT - 6, FLOOR - 10, '#2A1E18', 10); line(ctx, SEAT - 60, FLOOR - 8, SEAT + 50, FLOOR - 8, '#2A1E18', 8);
+    vslab(ctx, SEAT - 96, sy - 190, 22, 190, 14, '#3A2A22', { lw: 3 });
     // mesa
     vslab(ctx, 560, 650, 470, 26, 46, '#8A5634', { lw: 4 }); [575, 1005].forEach(lx => vslab(ctx, lx, 676, 18, FLOOR - 676, 10, '#6A4026', { lw: 3 }));
     // pilha de relatórios na mesa
@@ -550,7 +550,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     const a = P(t, PH[1], .4) * (1 - P(t, PH[2] - .4, .4)); if (a <= 0) return;
     const sp = t - PH[1], step = Math.floor(sp * (1 + sp * .12)) % CYCLE.length, cx = 520, cy = 300;
     ctx.save(); ctx.globalAlpha *= a;
-    [[SEAT + 40, 470, 10], [SEAT + 60, 430, 16]].forEach(([x, y, r]) => vball(ctx, x, y, r, '#FFFDF8', { rim: false, lw: 3 }));
+    [[SEAT + 60, 418, 10], [SEAT + 74, 388, 15]].forEach(([x, y, r]) => vball(ctx, x, y, r, '#FFFDF8', { rim: false, lw: 3 }));
     ctx.beginPath(); for (let k = 0; k < 9; k++) { const ang = k / 9 * TAU, rx = 230 + 14 * Math.sin(k * 2.3), ry = 70 + 10 * Math.cos(k * 1.7); ctx.arc(cx + Math.cos(ang) * rx * .8, cy + Math.sin(ang) * ry * .8, 52, 0, TAU); }
     ctx.fillStyle = '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
     ctx.beginPath(); ctx.ellipse(cx, cy, 230, 76, 0, 0, TAU); ctx.fillStyle = '#FFFDF8'; ctx.fill();
@@ -615,8 +615,8 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
         ctx.restore(); }
       if (!g.gone) { if (t < T_DROP) glow(ctx, g.x + 90, 560, 150, '#BFD8FF', .18 * (1 - dark));
         if (dark > 0) { glow(ctx, g.x, FLOOR - 240, 300, C.orange, .22 * dark); lightCone(ctx, g.x, 120, 80, 520, FLOOR - 120, '#FFB070', .5 * dark); }
-        PEOPLE.draw(ctx, g.x, FLOOR, GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * .45 });
-        if (t > PH[1] && t < T_UP) [[-60, -400], [40, -420]].forEach(([dx, dy], k) => { const d = (t * 1.5 + k * .5) % 1; vball(ctx, g.x + dx * .8, FLOOR + dy * GS * .9 + d * 50, 8 * (1 - d) + 2, '#9FD3F0', { rim: false, lw: 2 }); });
+        PEOPLE.draw(ctx, g.x, FLOOR + (g.y || 0), GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * .45 });
+        if (t > PH[1] && t < T_UP) [[-70, 470], [70, 450]].forEach(([dx, yy], k) => { const d = (t * 1.5 + k * .5) % 1; vball(ctx, g.x + dx, yy + d * 50, 8 * (1 - d) + 2, '#9FD3F0', { rim: false, lw: 2 }); });
         if (t > T_DANCE) for (let k = 0; k < 3; k++) { const d = (t * .8 + k / 3) % 1; ctx.save(); ctx.globalAlpha = (1 - d) * dark; text(ctx, k % 2 ? '♪' : '♫', g.x + (k - 1) * 60 + Math.sin(t * 3 + k) * 20, FLOOR - 480 - d * 160, { size: 46, weight: 900, color: C.yellow, align: 'center' }); ctx.restore(); } }
       if (dark > 0 && dark < 1) flash(ctx, 1 - dark, '#000000');
       ctx.restore();
