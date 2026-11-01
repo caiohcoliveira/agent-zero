@@ -229,7 +229,7 @@
   const T_CAP = bt(1), T_HEAD = 4.3, T_TIX = bt(6), T_TRK = bt(9), T_WAVE = bt(10), T_INF = bt(17), T_FLAP = bt(17) + 1.6;
   const COLS = ['Emissores', 'Adquirentes', 'Varejo'], COL_X = [400, 960, 1520];
   const CASE_OF = ex => /Manga/i.test(ex) ? 'Cliente Manga' : /Banana/i.test(ex) ? 'Cliente Banana' : /Insight/i.test(ex) ? 'Insight Agent' : /Lights/i.test(ex) ? 'Lights-off' : ex;
-  const TICK = [['Cliente Banana', 'BANANA', C.yellow], ['Cliente Manga', 'MANGA', C.orange], ['Lights-off', 'LIGHTS-OFF', '#F3EBDD'], ['Insight Agent', 'INSIGHT AGENT', C.red]];
+  const TICK = [['Cliente Banana', 'BANANA', C.yellow], ['Cliente Manga', 'MANGA', C.orange], ['Lights-off', 'RELATÓRIO DE FRAUDE', '#F3EBDD'], ['Insight Agent', 'INSIGHT AGENT', C.red]];
   const colOf = cname => { const c = CASE(cname === 'Lights-off' ? 'Lights-off' : cname); const ct = (c.client_type || '').toLowerCase();
     if (ct) { const j = COLS.findIndex(x => x.toLowerCase().startsWith(ct.slice(0, 4))); if (j >= 0) return j; if (/merch|varej/.test(ct)) return 2; }
     return { 'Cliente Manga': 0, 'Insight Agent': 1, 'Cliente Banana': 2 }[cname] ?? -1; };

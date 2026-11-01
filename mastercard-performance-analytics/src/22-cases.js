@@ -112,7 +112,7 @@ const headlineFor = re => { const h = (DATA.headline_numbers_for_slides || []).f
 /** compassos de 2,22 s da faixa remontada (grade da cena, com reserva) */
 const caseBars = id => { const G = grid(id); return k => (G.bars[k] != null ? G.bars[k] : k * 2.2222); };
 const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['Cliente Manga', 'motor de principalidade', C.orange, 'EMISSORES'],
-  ['Lights-off', 'relatórios de fraude automáticos', '#F3EBDD', 'RELATÓRIOS'], ['Insight Agent', 'agentes de IA para insights', C.red, 'ADQUIRENTES']];
+  ['Relatórios de fraude', 'automatizados, do dado ao board', '#F3EBDD', 'RELATÓRIOS'], ['Insight Agent', 'agentes de IA para insights', C.red, 'ADQUIRENTES']];
 
 /* ---------- abertura da 04: título da seção + "agora, os cases de impacto" ---------- */
 (() => {
@@ -470,9 +470,9 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
    o pipeline é montado na parede; ela levanta, vai até o interruptor, apaga a luz no drop
    e sai dançando de fones no ritmo da música. */
 (() => {
-  const id = 'lightsoff', bt = caseBars(id), CS = () => CASE('Lights-off'), G = grid(id);
-  const T0 = 2.6, PH = [0, bt(4), bt(8), bt(16), bt(20)], T_STRAT = bt(8), T_PIPE = bt(10), T_UP = bt(13) + .9, T_WALK = T_UP + 1, T_REACH = T_WALK + 2.9, T_DROP = bt(16);
-  const T_IDEA = bt(7) + .6, T_PHONES = T_DROP + .7, T_DANCE = T_DROP + 1, T_STAMP = bt(18), T_IMP = bt(20), T_Q = bt(22), T_DIVE = bt(23);
+  const id = 'lightsoff', bt = caseBars(id), CS = () => CASE('Lights-off'), G = grid(id);  // o JSON ainda chama o case de "Lights-off Fraud Reporting"
+  const T0 = 2.6, PH = [0, bt(4), bt(8), bt(16), bt(20)], T_IDEA = bt(7) + .6, T_STRAT = T_IDEA + .6, T_PIPE = T_IDEA + 1.1, T_UP = bt(12) + .6, T_WALK = T_UP + 1, T_OFF = bt(15), T_REACH = T_OFF - 1.3, T_DROP = bt(16);
+  const T_PHONES = T_DROP + .7, T_DANCE = T_DROP + 1, T_STAMP = bt(18), T_IMP = bt(20), T_Q = bt(22), T_DIVE = bt(23);
   const NODES = [['Dados', 'db'], ['Validação', 'check'], ['Processamento', 'gear'], ['Insights', 'ai'], ['Relatório', 'doc'], ['Board', 'board']];
   const CYCLE = ['Extrair os dados', 'Conferir', 'Copiar e colar', 'Escrever insights', 'Revisar', 'Enviar ao board'];
   const EGG = ['SQL · parquet', 'z = (x − μ)/σ', 'DAG ⟳ · idempotente', '? insights', 'PDF · PPT', 'cron 0 7 * * 1'];
@@ -481,7 +481,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, T0 - .6, 'whoosh', { dur: .6, v: .3 });
   for (let k = 0; k < 14; k++) cue(id, T0 + .5 + k * 1.05, 'type', { n: 6, gap: .05 });
   cue(id, T_STRAT, 'chime', { f: 784, up: 7 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.6, 'pop', { p: .8 + i * .1, v: .18 }));
-  cue(id, T_REACH, 'riser', { dur: T_DROP - T_REACH, v: .25 }); cue(id, T_DROP, 'click', { v: 1 }); cue(id, T_DROP + .05, 'impact', { size: 1.1 });
+  cue(id, T_OFF, 'click', { v: 1 }); cue(id, T_OFF + .5, 'heart', {}); cue(id, T_OFF + 1.3, 'heart', {}); cue(id, T_OFF + .2, 'riser', { dur: T_DROP - T_OFF - .2, v: .3 }); cue(id, T_DROP, 'impact', { size: 1.3 }); cue(id, T_DROP + .02, 'shimmer', { dur: 2 });
   NODES.forEach((_, i) => cue(id, T_DROP + .6 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_STAMP, 'ding'); cue(id, T_IMP, 'impact', { size: .8 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
 
   const beatAt = t => { const b = G.beats; let i = 0; while (i + 1 < b.length && b[i + 1] <= t) i++; const per = (b[i + 1] || b[i] + .555) - b[i]; return { ph: clamp((t - b[i]) / per), i }; };
@@ -560,7 +560,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   }
   function pipeline(ctx, t, dark) {
     if (t < T_PIPE - .2) return;
-    const out = P(t, T_DIVE + 1.2, .5); ctx.save(); ctx.globalAlpha *= 1 - out;
+    const out = P(t, T_DIVE + 1.2, .5), hush = t > T_OFF && t < T_DROP ? .07 : 1; ctx.save(); ctx.globalAlpha *= (1 - out) * hush;
     const la = P(t, T_PIPE - .2, .5); text(ctx, 'PIPELINE AUTOMÁTICO', nx(0) - 80, NY - 110, { size: 18, weight: 900, mono: true, color: dark > .5 ? C.orange : '#6A4A30', ls: 3, alpha: la });
     NODES.forEach(([nm, ic], i) => { const p = E.outBack(P(t, T_PIPE + i * 1.6, .4)); if (p <= 0) return; const x = nx(i), hot = i === 3 && t > T_IMP;
       if (i) { const lp = P(t, T_PIPE + (i - .4) * 1.6, .5); if (dark > 0) { ctx.save(); ctx.shadowColor = C.orange; ctx.shadowBlur = 12 * dark; line(ctx, nx(i - 1) + 62, NY, lerp(nx(i - 1) + 62, x - 62, lp), NY, C.orange, 5); ctx.restore(); } else line(ctx, nx(i - 1) + 62, NY, lerp(nx(i - 1) + 62, x - 62, lp), NY, INK, 5); }
@@ -570,7 +570,13 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
       if (hot) { glow(ctx, x, NY, 150, C.yellow, .5); neonText(ctx, '?', x + 52, NY - 76, { size: 64, weight: 900, glow: C.yellow }); }
       if (dark > .5) neonText(ctx, nm, x, NY + 90, { size: 22, weight: 800, align: 'center' }); else text(ctx, nm, x, NY + 90, { size: 22, weight: 900, color: INK, align: 'center' });
       if (dark > .5) formula(ctx, EGG[i], x, NY + 136, { size: 14, neon: true, alpha: P(t, T_DROP + .6 + i * .3, .4) * (1 - P(t, T_IMP - .3, .3)), rot: (i % 2 ? .03 : -.03) }); });
-    if (t > T_DROP + .6) for (let k = 0; k < 6; k++) { const u = ((t - T_DROP) * .45 + k / 6) % 1; circle(ctx, lerp(nx(0), nx(5), u), NY, 8, C.yellow); }
+    // depois do drop: o dado corre o pipeline sozinho, execução após execução; cada volta solta um relatório no board
+    if (t > T_DROP) { const rt = t - T_DROP, sp = .55 + Math.min(1.6, rt * .12);
+      for (let k = 0; k < 10; k++) { const ph = rt * sp + k / 10, u = ph % 1, x = lerp(nx(0), nx(5), u), hot = Math.abs((x - nx(3)) / 190) < .5;
+        glow(ctx, x, NY, 30, hot ? C.yellow : C.orange, .7); vball(ctx, x, NY, 8, hot ? C.yellow : '#FFD8A8', { rim: false, lw: 2 }); }
+      for (let k = 0; k < 5; k++) { const d = (rt * sp * 2 + k / 5) % 1; ctx.save(); ctx.globalAlpha *= 1 - d; ctx.translate(nx(5) + 40 + d * 140, NY - 40 - d * 120); ctx.rotate(d * 2); paper(ctx, -16, -20, 32, 40, { r: 3, fill: '#FFF6E8', shadow: 2, lw: 2, volume: false }); icon(ctx, 'check', 0, 0, 22, C.orange, 6); ctx.restore(); }
+      const runs = Math.floor(rt * 7.3 * (1 + rt * .08)); ctx.save(); ctx.translate(nx(5), NY - 110); holo(ctx, -110, -26, 220, 52, { color: C.yellow, corners: false });
+      neonText(ctx, `execuções: ${String(runs).padStart(4, '0')}`, 0, 1, { size: 22, weight: 800, mono: true, align: 'center', glow: C.yellow }); ctx.restore(); }
     ctx.restore();
   }
   /** a ideia: lâmpada acende sobre a cabeça dela */
@@ -592,8 +598,8 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
   }
   /** luz apagada: a sala vira contornos de neon — tudo automatizado */
   function neonRoom(ctx, t) {
-    const on = P(t, T_DROP + .1, .5); if (on <= 0) return;
-    const fl = t < T_DROP + .8 ? (hash(Math.floor(t * 20)) > .35 ? 1 : .2) : 1, a = on * fl * (1 - P(t, T_DIVE + .4, .6)), sy = FLOOR + LIFT - 60 * GS + 6;
+    const on = P(t, T_DROP, .25); if (on <= 0) return;
+    const fl = t < T_DROP + .7 ? (hash(Math.floor(t * 24)) > .3 ? 1 : .35) : 1, a = on * fl * (1 - P(t, T_DIVE + .4, .6)), sy = FLOOR + LIFT - 60 * GS + 6;
     ctx.save(); ctx.globalAlpha *= a; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     const neon = (col, w, fn) => { ctx.shadowColor = col; ctx.shadowBlur = 16; ctx.strokeStyle = col; ctx.lineWidth = w; fn(); ctx.stroke(); ctx.shadowBlur = 0; ctx.strokeStyle = '#FFF4E4'; ctx.lineWidth = w * .35; fn(); ctx.stroke(); };
     neon(C.orange, 5, () => { ctx.beginPath(); ctx.rect(54, 234, 302, 342); ctx.moveTo(205, 234); ctx.lineTo(205, 576); ctx.moveTo(54, 405); ctx.lineTo(356, 405); });
@@ -605,27 +611,40 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     neon('#FF5FA2', 3, () => { ctx.beginPath(); for (let st = 0; st < 3; st++) ctx.rect(1076 + st * 110, FLOOR - 170, 100, 168); ctx.rect(931, 650 - 24 * 8 - 4, 94, 24 * 8 + 4); });
     const sa = P(t, T_DROP + .5, .4) * (t < T_DROP + 1.2 ? (hash(Math.floor(t * 14) + 3) > .3 ? 1 : .3) : 1);
     if (sa > 0) { ctx.globalAlpha = a * sa; ctx.save(); ctx.translate(1250, 500); ctx.rotate(-.03); ctx.shadowColor = '#FF5FA2'; ctx.shadowBlur = 24; ctx.font = font(46, 900); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.strokeStyle = '#FF5FA2'; ctx.lineWidth = 6; ctx.strokeText('TUDO AUTOMATIZADO', 0, 0); ctx.shadowBlur = 0; ctx.fillStyle = '#FFF0F6'; ctx.fillText('TUDO AUTOMATIZADO', 0, 0); ctx.restore(); }
+      ctx.strokeStyle = '#FF5FA2'; ctx.lineWidth = 6; ctx.strokeText('LIGHTS OFF RPA', 0, 0); ctx.shadowBlur = 0; ctx.fillStyle = '#FFF0F6'; ctx.fillText('LIGHTS OFF RPA', 0, 0); ctx.restore(); }
+    ctx.restore();
+  }
+  /** a explosão do drop: clarão, ondas de choque a partir do interruptor e faíscas de neon */
+  function boom(ctx, t) {
+    const k = t - T_DROP; if (k < 0 || k > 2) return;
+    if (k < .25) flash(ctx, (1 - k / .25) * .85, '#FFE2C0');
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    [[0, C.orange], [.12, '#FF5FA2'], [.24, C.yellow]].forEach(([d, c]) => { const q = k - d; if (q < 0) return; const r = q * 1500, a = Math.max(0, 1 - q / 1.4);
+      ctx.beginPath(); ctx.arc(SW_X - 40, 600, r, 0, TAU); ctx.strokeStyle = rgba(c, .8 * a); ctx.lineWidth = 26 * a + 4; ctx.shadowColor = c; ctx.shadowBlur = 30; ctx.stroke(); });
+    ctx.shadowBlur = 0;
+    for (let s = 0; s < 70; s++) { const ang = hash(s * 3.1) * TAU, sp = 500 + hash(s * 7.7) * 1300, d = sp * k * (1 - k * .25), x = SW_X - 40 + Math.cos(ang) * d, y = 600 + Math.sin(ang) * d + k * k * 160, a = Math.max(0, 1 - k / 1.6);
+      const c = [C.orange, C.yellow, '#FF5FA2', '#FFF4E4'][s % 4]; line(ctx, x, y, x - Math.cos(ang) * 40 * a, y - Math.sin(ang) * 40 * a, rgba(c, a), 4); circle(ctx, x, y, 4 * a + 1, rgba(c, a)); }
     ctx.restore();
   }
   SCENES[id] = {
-    themeAt: t => t < T_DROP ? 'light' : 'dark', fx: { invert: true },
-    peaks: [[T_DROP - .15, T_DROP + 1.8], [T_DANCE, T_IMP, .35], [T_IMP - .1, T_IMP + 1.2, .7]],
+    themeAt: t => t < T_OFF ? 'light' : 'dark', fx: { invert: true },
+    peaks: [[T_DROP - .1, T_DROP + 2.4], [T_DANCE, T_IMP, .35], [T_IMP - .1, T_IMP + 1.2, .7]],
     caps: [[T0 + .2, 5.6, 'Antes: cada relatório de fraude para o board era *montado à mão*', 'PROBLEMA'],
       [5.8, PH[1] - .2, 'Relatório após relatório, *a pilha só crescia* — e o relógio não parava', 'PROBLEMA'],
       [PH[1] + .2, 13.2, 'Extrair, conferir, copiar, colar, escrever insights, revisar… *tudo à mão*', 'TRABALHO MANUAL'],
       [13.4, T_IDEA - .2, 'O dia vira noite e o ciclo recomeça: *muito tempo* gasto em cada relatório', 'TRABALHO MANUAL'],
-      [T_IDEA, PH[2] - .2, 'Até que ela tem uma *ideia*…', 'A IDEIA'],
-      [PH[2] + .2, T_PIPE - .2, 'Nossa estratégia: *automatizar de ponta a ponta* — para poder apagar as luzes', 'ESTRATÉGIA'],
-      [T_PIPE + .1, T_PIPE + 4.6, '1 · Feliz, ela monta a automação: os *dados* entram sozinhos e passam por *validação*', 'COMO FIZEMOS'],
-      [T_PIPE + 4.8, T_UP - .1, '2 · O *processamento* calcula os indicadores e monta os *insights* e o *relatório*', 'COMO FIZEMOS'],
-      [T_UP, T_DROP - .1, '3 · Com o pipeline pronto, ela levanta e vai até o interruptor…', 'COMO FIZEMOS'],
-      [T_DROP + .2, T_STAMP - .1, '*Lights-off*: ela apaga as luzes e tudo segue rodando sozinho, em neon', 'SOLUÇÃO'],
+      [T_IDEA, T_IDEA + 1.5, 'Até que ela tem uma *ideia*…', 'A IDEIA'],
+      [T_IDEA + 1.6, T_IDEA + 6, 'Nossa estratégia: *automatizar de ponta a ponta* — e ela já começa a construir', 'ESTRATÉGIA'],
+      [T_IDEA + 6.1, T_IDEA + 10.6, '1 · Feliz, ela monta a automação: os *dados* entram sozinhos e passam por *validação*', 'COMO FIZEMOS'],
+      [T_IDEA + 10.7, T_UP - .1, '2 · O *processamento* calcula os indicadores e monta os *insights* e o *relatório*', 'COMO FIZEMOS'],
+      [T_UP, T_OFF - .1, '3 · Com a automação pronta, ela levanta e vai até o interruptor…', 'COMO FIZEMOS'],
+      [T_OFF + .1, T_DROP - .05, '…e apaga a luz.', 'LUZES APAGADAS'],
+      [T_DROP + .2, T_STAMP - .1, '*Lights Off RPA*: tudo acende e o dado corre o pipeline sozinho, execução após execução', 'SOLUÇÃO'],
       [T_STAMP + .1, T_IMP - .2, 'Do dado ao board, *sem ninguém copiar e colar* — e ela sai dançando', 'SOLUÇÃO'],
       [T_IMP + .2, T_Q - .2, 'Resultado: relatórios para o board *sem trabalho manual* — o time volta a analisar', 'IMPACTO'],
       [T_Q, 53.4, 'Mas quem escreve os *insights* em escala? É o próximo case', 'E AGORA?']],
     draw(ctx, t) {
-      const dark = P(t, T_DROP, .15), dive = E.inCubic(P(t, T_DIVE, 2.2)), sw = 1 - P(t, T_DROP - .05, .1), g = girlAt(t);
+      const dark = P(t, T_OFF, .12), lit = P(t, T_DROP, .25), dive = E.inCubic(P(t, T_DIVE, 2.2)), sw = 1 - P(t, T_OFF - .05, .1), g = girlAt(t);
       ctx.save();
       if (dive > 0) { const n = nx(3); ctx.translate(n, NY); ctx.scale(1 + dive * 14, 1 + dive * 14); ctx.translate(-n, -NY); }
       // sala: parede, lambri e piso de madeira
@@ -636,11 +655,11 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
       atmos(ctx, t, { alpha: .6 * (1 - dark), from: 120, bokeh: 2, dust: 26 });
       desk(ctx, t);
       // luz apagada: a sala escurece, sobra a luz da janela, do monitor e do neon
-      if (dark > 0) { ctx.save(); ctx.globalAlpha = dark * .86; ctx.fillStyle = '#080A18'; ctx.fillRect(0, 0, W, H); ctx.restore(); glow(ctx, 200, 400, 300, '#5A6AA0', .25 * dark); }
+      if (dark > 0) { ctx.save(); ctx.globalAlpha = dark * (.97 - .11 * lit); ctx.fillStyle = '#05060E'; ctx.fillRect(0, 0, W, H); ctx.restore(); glow(ctx, 200, 400, 300, '#5A6AA0', .12 * dark + .13 * lit); }
       neonRoom(ctx, t);
-      pipeline(ctx, t, dark);
+      pipeline(ctx, t, lit);
       bubble(ctx, t);
-      const swA = P(t, T_STRAT + .3, .5) * (1 - P(t, T_IMP, .6)); if (swA > 0) { ctx.save(); ctx.globalAlpha *= swA; lightSwitch(ctx, SW_X, 600, .8, sw, { label: sw > .5 ? 'luz acesa · trabalho manual' : 'lights-off' }); ctx.restore(); }
+      const swA = P(t, T_STRAT + .3, .5) * (1 - P(t, T_IMP, .6)); if (swA > 0) { ctx.save(); ctx.globalAlpha *= swA; lightSwitch(ctx, SW_X, 600, .8, sw, { label: sw > .5 ? 'luz acesa · trabalho manual' : 'luz apagada' }); ctx.restore(); }
       const sb = P(t, T_STAMP, .4); if (sb > 0) stamp(ctx, 1000, 560, dget(CS(), 'business_results.headline', '') || 'Relatório automatizado', sb * (1 - P(t, T_IMP - .3, .3)), { theme: 'dark' });
       const ip = P(t, T_IMP, .5) * (1 - P(t, T_DIVE, .5)); if (ip > 0) { ctx.save(); ctx.globalAlpha *= ip;
         [['ANTES', 'montado à mão, relatório por relatório', C.red, 'doc'], ['DEPOIS', 'gerado sozinho, no formato do board', C.orange, 'check']].forEach(([h, l, c, ic], i) => {
@@ -652,16 +671,16 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
         ctx.restore(); }
       joy(ctx, t, g); idea(ctx, t);
       if (!g.gone) { if (t < T_DROP) glow(ctx, g.x + 90, 560, 150, '#BFD8FF', .18 * (1 - dark));
-        if (dark > 0) { glow(ctx, g.x, FLOOR - 240, 300, C.orange, .22 * dark); lightCone(ctx, g.x, 120, 80, 520, FLOOR - 120, '#FFB070', .5 * dark); }
-        PEOPLE.draw(ctx, g.x, FLOOR + (g.y || 0), GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * .45 });
+        if (lit > 0) { glow(ctx, g.x, FLOOR - 240, 300, C.orange, .22 * lit); lightCone(ctx, g.x, 120, 80, 520, FLOOR - 120, '#FFB070', .5 * lit); }
+        PEOPLE.draw(ctx, g.x, FLOOR + (g.y || 0), GS, g.pose, { dir: g.dir, t, phones: g.phones, mood: g.mood, dark: dark * (.9 - .45 * lit) });
         if (t > PH[1] && t < T_UP) [[-70, 470], [70, 450]].forEach(([dx, yy], k) => { const d = (t * 1.5 + k * .5) % 1; vball(ctx, g.x + dx, yy + d * 50, 8 * (1 - d) + 2, '#9FD3F0', { rim: false, lw: 2 }); });
         if (t > T_DANCE) for (let k = 0; k < 3; k++) { const d = (t * .8 + k / 3) % 1; ctx.save(); ctx.globalAlpha = (1 - d) * dark; text(ctx, k % 2 ? '♪' : '♫', g.x + (k - 1) * 60 + Math.sin(t * 3 + k) * 20, FLOOR - 480 - d * 160, { size: 46, weight: 900, color: C.yellow, align: 'center' }); ctx.restore(); } }
-      if (dark > 0 && dark < 1) flash(ctx, 1 - dark, '#000000');
+      boom(ctx, t);
       ctx.restore();
       if (dive > .6) flash(ctx, (dive - .6) / .4, C.orange);
-      CASEKIT.header(ctx, t, 'CASE 3 DE 4 · RELATÓRIOS', 'Lights-off · relatórios de fraude', { at: T0 - .2, seed: 11, out: T_DIVE, bg: t < T_DROP ? C.red : C.orange });
+      CASEKIT.header(ctx, t, 'CASE 3 DE 4 · RELATÓRIOS', 'Relatórios de fraude', { at: T0 - .2, seed: 11, out: T_DIVE, bg: t < T_DROP ? C.red : C.orange });
       CASEKIT.ruler(ctx, t, PH, LABELS, P(t, T0 - .2, .4) * (1 - dive));
-      CASEKIT.interstitial(ctx, t, 3, '*Lights-off*', 'relatórios de fraude automáticos', '#F3EBDD');
+      CASEKIT.interstitial(ctx, t, 3, '*Relatórios de fraude*', 'automatizados, do dado ao board', '#F3EBDD');
       if (dark > 0) scanlines(ctx, .05 * dark);
     }
   };
@@ -823,7 +842,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
 /* cartaz da estação 04: os 4 cases com o número-manchete de cada um */
 POSTERS[4] = (ctx, w, h, tl) => {
   const items = [['Cliente Banana', headlineFor(/Banana conversion/i) || '—', 'conversão vs. 2ª melhor', C.yellow], ['Cliente Manga', headlineFor(/principality gain/i) || '—', 'principalidade', C.orange],
-    ['Lights-off', '✓', 'relatórios sem trabalho manual', '#F3EBDD'], ['Insight Agent', headlineFor(/Acquirers in Insight Agent pipeline/i) || '—', 'adquirentes · agentes de IA', C.red]];
+    ['Relatórios de fraude', '✓', 'sem trabalho manual', '#F3EBDD'], ['Insight Agent', headlineFor(/Acquirers in Insight Agent pipeline/i) || '—', 'adquirentes · agentes de IA', C.red]];
   items.forEach(([n, v, l, col], i) => { const x = (i % 2 ? 1 : -1) * w / 4, y = -h / 2 + 130 + Math.floor(i / 2) * 230, s = 1 + .05 * Math.sin(tl * 2 + i);
     paper(ctx, x - 110, y - 95, 220, 200, { r: 12, fill: col, shadow: 6, lw: 3 });
     text(ctx, n, x, y - 62, { size: 18, weight: 900, color: col === C.red ? '#FFF' : INK, align: 'center' });

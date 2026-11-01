@@ -10,6 +10,18 @@
 
 ---
 
+## Ajustes da v5.4
+
+- **Relatórios de fraude:** o nome do projeto deixou de ter "Lights-off". O case agora se chama apenas "Relatórios de fraude".
+- **Da ideia à construção:** a automação começa a ser montada logo depois da lâmpada da ideia; antes, ela ficava cerca de 6 s só digitando.
+- **Suspense:** ela apaga a luz cerca de 2 s antes do drop e a sala fica no escuro, com batidas de coração e a subida da música.
+- **O drop:**
+  - clarão, ondas de choque a partir do interruptor e faíscas;
+  - os neons acendem em cascata, com a placa **"LIGHTS OFF RPA"**;
+  - o dado corre o pipeline sozinho, cada vez mais rápido, soltando relatórios no board;
+  - um contador de "execuções" sobe.
+- **Paradas:** a cena aberta no popup roda em loop no trecho daquela etapa, para ajudar a explicar o funcionamento.
+
 ## Ajustes da v5.2
 
 - **Trem:** o adesivo "Performance Analytics" saiu de cima da porta. Ele fica entre as portas, e elas abrem sem cobrir o adesivo.

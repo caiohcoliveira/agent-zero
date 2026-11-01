@@ -58,7 +58,7 @@ const PLAYER = (() => {
     BT = BEAT.idle(tl); NOW = tl;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     const impl = STOPSCN[id], now = performance.now();
-    UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35);
+    UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35); UI.popT = (now - UI.popAt) / 1000;
     if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
     if (!(impl && impl.noPaint)) PAINT.post(ctx);
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }

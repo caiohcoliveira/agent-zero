@@ -267,17 +267,18 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
 /* ---------- slides montados: miniaturas e popup das paradas ----------
    Cada estação lista os momentos em que a cena está "montada" (cena, tempo local, título).
    A miniatura é renderizada sob demanda (uma por quadro) e guardada; o popup renderiza em tela cheia. */
+// [cena, instante montado (miniatura), título, início do loop, fim do loop] — o popup roda a animação em loop nesse trecho
 const SLIDES = {
-  1: [['s01', 10.6, 'As perguntas de negócio'], ['s01', 13.8, 'Negócio × Dados'], ['s01', 24.3, 'Nossos serviços'], ['s01', 31.2, 'O caminho do valor']],
-  2: [['s02', 16.9, 'Faturamento da track'], ['s02', 27.6, 'O marco do Brasil'], ['s02', 31.8, 'Conclusão']],
-  3: [['s03', 18.8, 'Projetos por tipo de cliente'], ['s03', 34.8, 'ML para bancos e fintechs']],
-  4: [['banana', 16.8, 'Banana · os dados'], ['banana', 31.8, 'Banana · ALS'], ['banana', 34.8, 'Banana · cosseno'], ['banana', 52.4, 'Banana · impacto'],
-    ['manga', 34.6, 'Manga · embeddings 3D'], ['manga', 43.6, 'Manga · camada ΔP'], ['manga', 52.6, 'Manga · impacto'],
-    ['lightsoff', 16.8, 'Lights-off · o trabalho manual'], ['lightsoff', 42, 'Lights-off · luzes apagadas'],
-    ['insight', 34.8, 'Agentes · o circuito'], ['insight', 47.6, 'Agentes · milhares de páginas'], ['insight', 61.6, 'Agentes · impacto']],
-  5: [['s05', 12.8, 'Do manual à IA escalável']],
-  6: [['s06', 15.3, 'Pilares, entregas e evoluções']],
-  7: [['s07', 27.6, 'As 3 direções'], ['climax', 11.6, 'Analytics & Advanced Analytics']]
+  1: [['s01', 10.6, 'As perguntas de negócio', .8, 11.6], ['s01', 13.8, 'Negócio × Dados', 11.6, 15.8], ['s01', 24.3, 'Nossos serviços', 15.6, 24.6], ['s01', 31.2, 'O caminho do valor', 24.8, 32.2]],
+  2: [['s02', 16.9, 'Faturamento da track', .6, 20.8], ['s02', 27.6, 'O marco do Brasil', 21, 28.2], ['s02', 31.8, 'Conclusão', 28.2, 32.4]],
+  3: [['s03', 18.8, 'Projetos por tipo de cliente', 2.2, 21.2], ['s03', 34.8, 'ML para bancos e fintechs', 21.6, 35.4]],
+  4: [['banana', 16.8, 'Banana · os dados', 8.9, 17.6], ['banana', 31.8, 'Banana · matriz esparsa e ALS', 22.2, 32.4], ['banana', 34.8, 'Banana · cosseno', 32.4, 35.4], ['banana', 52.4, 'Banana · solução e impacto', 35.6, 53.1],
+    ['manga', 34.6, 'Manga · clusters e embeddings 3D', 22.2, 35.3], ['manga', 43.6, 'Manga · camada ΔP', 35.6, 44.2], ['manga', 52.6, 'Manga · impacto', 44.4, 53.1],
+    ['lightsoff', 16.8, 'Fraude · o trabalho manual', 2.6, 17.4], ['lightsoff', 42, 'Fraude · automação, luz apagada e neon', 26.4, 44.2],
+    ['insight', 34.8, 'Agentes · o circuito', 22.2, 35.4], ['insight', 47.6, 'Agentes · milhares de páginas', 35.6, 48.6], ['insight', 61.6, 'Agentes · impacto', 48.9, 62.1]],
+  5: [['s05', 12.8, 'Do manual à IA escalável', .3, 13.2]],
+  6: [['s06', 15.3, 'Pilares e entregas', .3, 15.6]],
+  7: [['s07', 27.6, 'Onde queremos estar', .5, 28.6], ['climax', 11.6, 'Analytics & Advanced Analytics', 0, 11.9]]
 };
 const SLIDE = (() => {
   const cache = {}, queue = [], big = { key: null, cv: null }, scratch = makeCanvas(W, H, () => {});
@@ -287,7 +288,10 @@ const SLIDE = (() => {
     thumb(sl) { const k = key(sl); if (cache[k]) return cache[k]; if (!queue.includes(k)) queue.push(k); return null; },
     /** renderiza uma miniatura pendente por quadro */
     pump() { const k = queue.shift(); if (!k) return; const i = k.lastIndexOf('@'); render(scratch.getContext('2d'), [k.slice(0, i), +k.slice(i + 1)]); cache[k] = makeCanvas(480, 270, g => g.drawImage(scratch, 0, 0, 480, 270)); },
-    full(sl) { const k = key(sl); if (big.key !== k) { big.cv = big.cv || makeCanvas(W, H, () => {}); render(big.cv.getContext('2d'), sl); big.key = k; } return big.cv; }
+    full(sl) { const k = key(sl); if (big.key !== k) { big.cv = big.cv || makeCanvas(W, H, () => {}); render(big.cv.getContext('2d'), sl); big.key = k; } return big.cv; },
+    /** a cena rodando em loop no trecho [a, b] do slide (el = segundos desde que o popup abriu) */
+    live(sl, el) { big.cv = big.cv || makeCanvas(W, H, () => {}); big.key = null; const a = sl[3] == null ? sl[1] - 6 : sl[3], b = sl[4] == null ? sl[1] + .5 : sl[4], d = Math.max(1, b - a), u = (el % (d + .6));
+      const loc = Math.min(b, a + u); render(big.cv.getContext('2d'), [sl[0], loc]); return { cv: big.cv, fade: Math.min(1, u / .3, Math.max(0, (d + .6 - u) / .3)) }; }
   };
 })();
 /** posições das miniaturas da estação n (faixa de baixo; 2 fileiras se forem muitas) */
@@ -318,7 +322,9 @@ function slidePopup(ctx, n, ui) {
   ctx.save(); ctx.globalAlpha *= a; ctx.fillStyle = 'rgba(8,6,5,.86)'; ctx.fillRect(0, 0, W, H);
   ctx.translate(W / 2, H / 2); const s = lerp(.92, 1, a); ctx.scale(s, s); ctx.translate(-W / 2, -H / 2);
   paper(ctx, POP.x - 12, POP.y - 12, POP.w + 24, POP.h + 24, { r: 14, fill: '#F3EBDD', shadow: 14, shadowColor: '#000', lw: 4 });
-  ctx.drawImage(SLIDE.full(sl), POP.x, POP.y, POP.w, POP.h);
+  const lv = SLIDE.live(sl, ui.popT || 0); ctx.fillStyle = '#0A0706'; ctx.fillRect(POP.x, POP.y, POP.w, POP.h);
+  ctx.save(); ctx.globalAlpha *= lv.fade; ctx.drawImage(lv.cv, POP.x, POP.y, POP.w, POP.h); ctx.restore();
+  text(ctx, '⟳ animação em loop', POP.x + POP.w - 20, POP.y + POP.h + 26, { size: 16, weight: 800, mono: true, color: '#BFB3A3', align: 'right' });
   pill(ctx, POP.x + 130, POP.y - 52, `ESTAÇÃO ${TX.stations[n - 1].n}`, { size: 20, fill: C.red, color: '#FFF', weight: 900 });
   text(ctx, sl[2], POP.x + 250, POP.y - 52, { size: 30, weight: 900, color: '#FFF' });
   if (list.length > 1) text(ctx, `${idx + 1} / ${list.length}`, POP.x + POP.w - 110, POP.y - 52, { size: 22, weight: 800, mono: true, color: '#BFB3A3', align: 'right' });

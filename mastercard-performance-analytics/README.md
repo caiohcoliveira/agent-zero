@@ -35,7 +35,7 @@ São ~7:40 de vídeo no total.
 - **Paradas 1, 2 e encerramento:**
   - clique num cartaz para dar zoom na estação;
   - embaixo aparecem as **cenas montadas** da estação, em miniaturas;
-  - clique numa miniatura para abrir a cena num **popup**;
+  - clique numa miniatura para abrir a cena num **popup**, com a animação daquela etapa rodando em loop;
   - para fechar, use ✕, Esc ou clique fora;
   - para trocar de cena, use ‹ › ou as setas;
   - clique fora do zoom para voltar à plataforma.

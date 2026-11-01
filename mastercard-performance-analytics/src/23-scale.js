@@ -15,7 +15,7 @@ function ptScale(s) {
   const EX = () => {
     const ex = SEC(5).innovation_examples || [], f = re => ex.find(e => re.test(e.example || '')) || {};
     return [[{ name: 'planilhas · retrabalho', ind: 'insights escritos à mão' }], [{ name: 'Cliente Banana', ind: ptScale(f(/Banana/).scale_indicator) }],
-      [{ name: 'Cliente Manga', ind: ptScale(f(/Manga/).scale_indicator) }, { name: 'Lights-off', ind: 'reporting automatizado' }], [{ name: 'Insight Agent', ind: ptScale(f(/Insight/).scale_indicator) }]];
+      [{ name: 'Cliente Manga', ind: ptScale(f(/Manga/).scale_indicator) }, { name: 'Relatórios de fraude', ind: 'reporting automatizado' }], [{ name: 'Insight Agent', ind: ptScale(f(/Insight/).scale_indicator) }]];
   };
   T_STEP.forEach((t0, i) => { cue(id, t0, 'stab', { i }); cue(id, t0, 'pop', { p: .8 + i * .2, v: .2 }); });
   cue(id, T_GLOW, 'shimmer', { dur: 2 }); cue(id, T_KEY, 'chime', { f: 1046, up: 7 });
