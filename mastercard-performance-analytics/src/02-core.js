@@ -17,7 +17,7 @@ const twos = t => (M.onTwos ? Math.floor(t * CONFIG.fps / 2) / (CONFIG.fps / 2) 
 const E = {
   linear: x => x,
   inQuad: x => x * x, outQuad: x => 1 - (1 - x) * (1 - x),
-  inCubic: x => x * x * x, outCubic: x => 1 - Math.pow(1 - x, 3),
+  inCubic: x => x * x * x, outCubic: x => 1 - Math.pow(1 - x, 3), inOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2,
   inOutCubic: x => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
   outQuart: x => 1 - Math.pow(1 - x, 4),
   inExpo: x => (x === 0 ? 0 : Math.pow(2, 10 * x - 10)),
