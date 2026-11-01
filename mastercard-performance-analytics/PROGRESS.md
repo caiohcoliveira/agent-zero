@@ -102,6 +102,27 @@ Ordem pensada para não haver retrabalho: primeiro o que muda os tempos (a músi
 
 **v4 concluída.** Próximo passo: revisão do usuário.
 
+## v5 — riqueza visual e ajustes dos cases (ver "O que mudou" no `STORYLINE.md`)
+
+Ordem: primeiro a base que todas as cenas usam (pintura e luz), depois a personagem e a estação, depois o conteúdo.
+
+- [x] **F1. Acabamento pintado, luz volumétrica, poeira e volume** (`src/12-paint.js`).
+- [x] **F2. Personagem 2.5D, ratinho e pombo** (`src/13-people.js`).
+- [x] **F3. Estação viva:** plataforma com eventos em paralelo nas paradas, na abertura e no pré-show.
+- [x] **F4. Cases:**
+  - respiro entre os cases;
+  - matriz esparsa → ALS → cosseno nas cestas;
+  - embeddings 3D na Manga;
+  - analista no Lights-off;
+  - Agentes sem restrição nem GPU.
+- [x] **F5. Clímax por disciplinas** → "Analytics & Advanced Analytics".
+- [x] **F6. QA:**
+  - render de 0 a 461 s e de todas as paradas, sem exceções;
+  - testes de navegação e de clique;
+  - documentação atualizada.
+
+**v5 concluída.** Próximo passo: revisão do usuário.
+
 ## Como retomar numa nova sessão
 
 1. Faça checkout da branch `claude/mastercard-analytics-video-4cof1t`.

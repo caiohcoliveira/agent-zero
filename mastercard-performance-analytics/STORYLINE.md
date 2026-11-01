@@ -1,4 +1,4 @@
-# A Linha — Storyline v4
+# A Linha — Storyline v5
 
 **Sessão:** até 20 min. São ~7:40 de vídeo em 4 plays, e o resto é fala das apresentadoras nas 4 paradas.
 
@@ -7,6 +7,64 @@
 **Sem narrador:** cada cena se explica sozinha. Uma faixa de legenda na base da tela diz o que está acontecendo, e cada estação fecha com uma conclusão escrita.
 
 **Status:** implementado no `performance-analytics.html`. O roteiro da v3 está no histórico do Git (commit `62b1d98`).
+
+---
+
+## O que mudou da v4 para a v5
+
+**Visual.** A animação passou a ser híbrida 2D/3D com acabamento pintado, tendo Arcane como referência. Tudo continua num único HTML offline: o "3D" é feito com volume pintado, luz e profundidade, e não com um motor 3D.
+- **Acabamento em todos os quadros:**
+  - pinceladas pintadas à mão;
+  - gradação de cor, com luz quente no alto e sombra fria embaixo;
+  - brilho nos pontos de luz.
+- **Atmosfera:** fachos de luz volumétrica, poeira no ar e desfoque de fundo, sempre se movendo.
+- **Volume:** cartões, bolas, blocos e personagens com luz, sombra e recorte laranja.
+
+**Estação viva.** A plataforma das paradas, da abertura e do pré-show tem eventos acontecendo em paralelo:
+- a luminária pisca;
+- um ratinho cruza os trilhos;
+- uma goteira cai do teto;
+- um pombo bica o chão;
+- um passageiro passa;
+- o farol de um trem atravessa a estação e balança os cartazes;
+- há um relógio e um painel de LED rolando.
+
+**Respiro entre os cases.**
+- Cada case abre com o seu cartão: as portas do vagão abrem e mostram o case.
+- No fim de cada case, a tela escurece.
+
+**Cestas (Banana):**
+1. A matriz cliente × produto aparece **esparsa**, com o percentual vazio calculado pelo JSON.
+2. BM25.
+3. **ALS:** U e Vᵀ se ajustam em turnos (fixa V e ajusta U, fixa U e ajusta V). A curva de erro cai e a matriz fica densa.
+4. Com os vetores prontos, a similaridade de cosseno.
+
+**Principalidade (Manga):**
+1. UMAP + K-Means.
+2. Um ALS curto, por ser o mesmo processo das cestas.
+3. Os **embeddings em 3D**: clientes e produtos girando no mesmo espaço.
+
+**Lights-off.** Uma analista loira:
+1. Digita os relatórios à mão, com a pilha crescendo, o relógio correndo e o dia virando noite na janela.
+2. Levanta e vai até o interruptor.
+3. Apaga a luz no drop.
+4. Sai dançando no ritmo da música, de fones.
+
+**Agentes:**
+- Saíram a restrição e a ênfase em GPU.
+- No lugar, entra a escala do problema: 30 adquirentes, cada um com suas páginas e painéis.
+
+**Clímax.** Agora fala de disciplinas, não de técnicas soltas:
+1. Estatística;
+2. Otimização (pesquisa operacional);
+3. Modelos supervisionados;
+4. Modelos não supervisionados;
+5. NLP;
+6. Redes neurais (MLP);
+7. Deep learning (transformer);
+8. Inteligência artificial.
+
+O clímax fecha em **"Tudo se resume a Analytics & Advanced Analytics"**.
 
 ---
 

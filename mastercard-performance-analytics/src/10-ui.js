@@ -277,7 +277,7 @@ const SLIDES = {
     ['insight', 34.8, 'Agentes · o circuito'], ['insight', 47.6, 'Agentes · milhares de páginas'], ['insight', 61.6, 'Agentes · impacto']],
   5: [['s05', 12.8, 'Do manual à IA escalável']],
   6: [['s06', 15.3, 'Pilares, entregas e evoluções']],
-  7: [['s07', 27.6, 'As 3 direções'], ['climax', 11.6, 'Nossa especialidade']]
+  7: [['s07', 27.6, 'As 3 direções'], ['climax', 11.6, 'Analytics & Advanced Analytics']]
 };
 const SLIDE = (() => {
   const cache = {}, queue = [], big = { key: null, cv: null }, scratch = makeCanvas(W, H, () => {});

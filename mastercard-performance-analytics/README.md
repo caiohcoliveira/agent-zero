@@ -1,11 +1,11 @@
-# Performance Analytics — "A Linha" (v4)
+# Performance Analytics — "A Linha" (v5)
 
-Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há paradas em loop, para as apresentadoras falarem. O visual é retrô-moderno, de colagem, com traço de tinta no espírito de Arcane.
+Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há paradas em loop, para as apresentadoras falarem. O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito de Arcane. Os objetos e personagens têm volume, as texturas parecem pintadas à mão e a iluminação é cinematográfica. A estação tem eventos acontecendo em paralelo.
 
 O vídeo roda **sem narrador**: cada cena tem legenda e uma conclusão escrita. A música marca os tempos das cenas, mas os efeitos de batida ficam contidos e só crescem nos clímax.
 
 - **Arquivo final:** [`performance-analytics.html`](performance-analytics.html), um único HTML 1920×1080, 100% offline, com dados e músicas embutidos.
-- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v4).
+- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v5).
 - **Checkpoint de retomada:** [`PROGRESS.md`](PROGRESS.md).
 
 ## Como apresentar
@@ -108,6 +108,8 @@ src/
   09-fx.js         câmera e pós-processamento guiados pela música; traço de tinta, respingos, grafites, pinceladas
   10-ui.js         split-flap, mapa do metrô, mini-mapa, letreiro de estação, plataforma, cartazes, slides montados + popup, régua e comprovante
   11-station.js    vagão, trem que passa entre estações, painel "próxima estação", bilhete, legendas de tela e cartões de conexão
+  12-paint.js      acabamento pintado (pinceladas, gradação, brilho), luz volumétrica e poeira, volume (vball, vlimb, vslab, lightCone)
+  13-people.js     personagem 2.5D (poses que se misturam: digitar, andar, alcançar, dançar), ratinho e pombo
   20-open.js       pré-show, embarque e Parada 0 (mapa clicável)
   21-trecho1.js    estações 01, 02, 03 e Parada 1
   22-cases.js      estação 04: abertura e os 4 cases (problema → dados → estratégia → como → solução → impacto)
@@ -131,7 +133,7 @@ build.sh           atalho para tools/build.py
 - **Render puro em função do tempo.** Cada cena é `draw(ctx, t)` sem estado, e a música vira dados (`BT`) também em função do tempo. Por isso o seek é exato e o resultado é sempre igual.
 - **Paradas com relógio próprio.** O loop usa o tempo desde a entrada na parada, e a transição entre cartazes é uma câmera que viaja na plataforma, sem corte.
 - **Leveza:** brilhos com gradiente radial e granulação pré-renderizada. A separação RGB só roda nos picos da música.
-- **Qualidade adaptativa:** se a máquina não segurar ~30 quadros por segundo, o player tira sozinho a separação RGB, a granulação, as scanlines e o zoom de câmera. A tecla Q força o modo leve ou o máximo. Em notebook com aceleração de vídeo do Chrome/Edge, roda no máximo.
+- **Qualidade adaptativa:** se a máquina não segurar ~30 quadros por segundo, o player tira sozinho o acabamento pintado, a separação RGB, a granulação, as scanlines e o zoom de câmera. A tecla Q força o modo leve ou o máximo. Em notebook com aceleração de vídeo do Chrome/Edge, roda no máximo.
 
 ## Parâmetros úteis (`src/01-config.js`)
 
@@ -143,6 +145,7 @@ build.sh           atalho para tools/build.py
 | `stops[].items` | quantos passos o → percorre em cada parada |
 | `text` | todos os textos fixos (estações, casos de ML, rótulos) |
 | `motion.beatBase` | quanto a batida mexe fora dos clímax |
+| `motion.paint` | intensidade do acabamento pintado (0 desliga) |
 | `SCENES[id].caps` / `.peaks` | legendas e picos de batida de cada cena (nos arquivos de cena) |
 | `SLIDES` (`src/10-ui.js`) | quais momentos de cada estação viram cenas montadas nas paradas |
 | `motion.beat`, `motion.intensity`, `motion.grain` | quanto a música mexe nos visuais, energia, granulação |
