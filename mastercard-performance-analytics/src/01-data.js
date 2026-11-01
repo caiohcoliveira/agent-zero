@@ -53,6 +53,7 @@ const FMT = {
     s = String(s == null ? '—' : s).trim();
     let m;
     if ((m = s.match(/^([+-]?\d+(?:\.\d+)?)x$/i))) return FMT.mult(parseFloat(m[1]));
+    if ((m = s.match(/^([+-]?\d+(?:\.\d+)?)\s*(?:de variação )?relative?$|^([+-]?\d+(?:\.\d+)?)\s*de variação relativa$/i))) return FMT.rel(parseFloat(m[1] || m[2]));
     if ((m = s.match(/^(\d+(?:\.\d+)?)MM$/))) return FMT.mm(m[1]);
     if ((m = s.match(/^\$\s?(\d+(?:\.\d+)?)\s*->\s*\$\s?(\d+(?:\.\d+)?)$/))) return `US$ ${FMT.num(+m[1], 0)} → US$ ${FMT.num(+m[2], 0)}`;
     if ((m = s.match(/^\$\s?(\d+(?:\.\d+)?)$/))) return 'US$ ' + FMT.num(+m[1], 0);

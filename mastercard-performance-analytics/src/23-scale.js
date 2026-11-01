@@ -68,26 +68,54 @@ function ptScale(s) {
   };
 })();
 
-/* ---------- 06 · Practice ---------- */
+/* ---------- 06 · A Prática ----------
+   Tudo vem do JSON (seção 6): "pillars" = [{ pillar, highlights: [...] }, …]. A cena se ajusta à
+   quantidade de pilares (até 6) e ao tamanho dos textos (a fonte diminui para caber no cartão).
+   Também aceita pilares como texto simples ("Pessoas", …). */
 (() => {
   const id = 's06', G = grid(id), B = G.bars, bt = k => (B[k] != null ? B[k] : B[B.length - 1] + (k - B.length + 1) * 2.22);
-  const T_COL = [bt(0) + .3, bt(1), bt(2), bt(3)], T_PED = bt(4), T_DEL = bt(4) + 1.4, T_LOG = bt(4) + 4.2, T_BOARD = 16.2;
-  const CAPS = [[1, T_PED - .2, 'Os *pilares* que sustentam a prática de analytics', 'A PRÁTICA'], [T_PED + .2, T_LOG - .2, 'O que a prática já *entregou*', 'ENTREGAS'],
-    [T_LOG, T_BOARD - .3, 'E como a prática *evoluiu*, versão a versão', 'EVOLUÇÕES'], [T_BOARD, 20, 'Segunda parada: conversa sobre as estações *04, 05 e 06*', 'PARADA 2']];
-  T_COL.forEach((t0, i) => cue(id, t0, 'pop', { p: .7 + i * .12, v: .2 })); cue(id, T_PED, 'impact', { size: .8 });
-  for (let k = 0; k < 5; k++) cue(id, T_DEL + k * .45, 'hit', { size: .25 }); cue(id, T_LOG, 'type', { n: 40, gap: .05 }); cue(id, T_BOARD, 'type', { n: 22, gap: .025 });
-  const S = () => SEC(6);
+  const PIL = (() => (SEC(6).pillars || []).slice(0, 6).map(p => typeof p === 'string' ? { name: p, items: [] } : { name: p.pillar || p.name || '', items: p.highlights || p.items || [] }))();
+  const N = Math.max(1, PIL.length), T_COL = PIL.map((_, i) => .3 + i * Math.min(1.6, 7.8 / N)), T_PED = bt(4), T_CARDS = bt(4) + 1.1, T_BOARD = 16.2;
+  const COLS = [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange];
+  const CAPS = [[1, T_PED - .2, `Os *${N} pilares* que sustentam a prática de analytics`, 'A PRÁTICA'], [T_PED + .2, T_BOARD - .3, 'Cada pilar e suas *principais entregas*', 'ENTREGAS'],
+    [T_BOARD, 20, 'Segunda parada: conversa sobre as estações *04, 05 e 06*', 'PARADA 2']];
+  T_COL.forEach((t0, i) => cue(id, t0, 'pop', { p: .7 + i * .1, v: .2 })); cue(id, T_PED, 'impact', { size: .8 });
+  PIL.forEach((_, i) => cue(id, T_CARDS + i * .25, 'hit', { size: .25 })); cue(id, T_BOARD, 'type', { n: 22, gap: .025 });
+  // layout dos cartões calculado uma vez (texto quebrado e fonte que cabe)
+  const CW = Math.min(360, (W - 120 - (N - 1) * 20) / N), CH = 600, PAD = 22;
+  let LAY = null;
+  const layout = ctx => {
+    if (LAY) return LAY;
+    LAY = PIL.map(p => { for (let fs = 22; fs >= 12; fs--) { const lines = p.items.map(it => wrapText(ctx, it, CW - PAD * 2 - 22, fs, 700)), h = lines.reduce((s, l) => s + l.length * fs * 1.22 + fs * .55, 0);
+      if (h <= CH - 130 || fs === 12) return { fs, lines }; } });
+    return LAY;
+  };
 
-  function column(ctx, x, yb, h, label, p, i) {
-    if (p <= 0) return; const w = 120, hh = h * E.outBack(p);
+  function column(ctx, x, yb, h, label, p, i, w) {
+    if (p <= 0) return; const hh = h * E.outBack(p);
     ctx.save(); ctx.translate(x, yb);
-    rr(ctx, -w / 2 - 22, -24, w + 44, 24, 3); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -w / 2 - 22, -24, w + 44, 24, 3, 3, i);
+    rr(ctx, -w / 2 - 20, -24, w + 40, 24, 3); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -w / 2 - 20, -24, w + 40, 24, 3, 3, i);
     rr(ctx, -w / 2, -24 - hh, w, hh, 2); ctx.fillStyle = '#F3EBDD'; ctx.fill();
     hatch(ctx, () => rr(ctx, -w / 2, -24 - hh, w, hh, 2), -w / 2, -24 - hh, w * .35, hh, { alpha: .25, gap: 7, angle: 0 });
     for (let k = 1; k < 5; k++) line(ctx, -w / 2 + k * w / 5, -30, -w / 2 + k * w / 5, -18 - hh, rgba(INK, .35), 2);
     inkRect(ctx, -w / 2, -24 - hh, w, hh, 2, 3.5, i + 4);
-    rr(ctx, -w / 2 - 18, -48 - hh, w + 36, 28, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -w / 2 - 18, -48 - hh, w + 36, 28, 4, 3, i + 8);
-    ctx.save(); ctx.translate(0, -24 - hh / 2); ctx.rotate(-Math.PI / 2); text(ctx, label, 0, 0, { size: 26, weight: 900, color: INK, align: 'center', alpha: clamp(p * 2 - .6) }); ctx.restore();
+    rr(ctx, -w / 2 - 16, -48 - hh, w + 32, 28, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -w / 2 - 16, -48 - hh, w + 32, 28, 4, 3, i + 8);
+    ctx.save(); ctx.translate(0, -24 - hh / 2); ctx.rotate(-Math.PI / 2); const fs = Math.min(28, (hh - 30) / Math.max(1, measure(ctx, label, 28, 900)) * 28);
+    text(ctx, label, 0, 0, { size: fs, weight: 900, color: INK, align: 'center', alpha: clamp(p * 2 - .6) }); ctx.restore();
+    ctx.restore();
+  }
+  function card(ctx, k, x, y, p, L) {
+    if (p <= 0) return; const pl = PIL[k], col = COLS[k % COLS.length], s = E.outBack(p);
+    ctx.save(); ctx.translate(x + CW / 2, y + CH / 2 + (1 - s) * 80); ctx.scale(s, s); ctx.rotate([-.012, .01, -.008, .012, -.01, .008][k]);
+    paper(ctx, -CW / 2, -CH / 2, CW, CH, { torn: true, seed: 210 + k, fill: '#FFFDF8', shadow: 10, lw: 3.5, tape: [[.5, 0, .1]] });
+    rr(ctx, -CW / 2 + 14, -CH / 2 + 16, CW - 28, 62, 10); ctx.fillStyle = col; ctx.fill(); inkRect(ctx, -CW / 2 + 14, -CH / 2 + 16, CW - 28, 62, 10, 3, k);
+    const ns = Math.min(30, (CW - 60) / Math.max(1, measure(ctx, pl.name, 30, 900)) * 30);
+    text(ctx, pl.name, 0, -CH / 2 + 48, { size: ns, weight: 900, color: col === C.yellow ? INK : '#FFF', align: 'center' });
+    text(ctx, `${pl.items.length} ${pl.items.length === 1 ? 'entrega' : 'entregas'}`, 0, -CH / 2 + 100, { size: 16, weight: 800, mono: true, color: '#8A6A48', align: 'center', ls: 2 });
+    let yy = -CH / 2 + 132; const fs = L.fs;
+    L.lines.forEach((ls, j) => { const a = P(NOW, T_CARDS + k * .25 + .3 + j * .12, .3); circle(ctx, -CW / 2 + PAD + 6, yy + fs * .5, 5, col);
+      ls.forEach((l, q) => text(ctx, l, -CW / 2 + PAD + 20, yy + fs * .5 + q * fs * 1.22, { size: fs, weight: 700, color: INK, alpha: a }));
+      yy += ls.length * fs * 1.22 + fs * .55; });
     ctx.restore();
   }
 
@@ -95,26 +123,19 @@ function ptScale(s) {
     themeAt: () => 'light', fx: { invert: false, chroma: .5 }, caps: CAPS,
     draw(ctx, t) {
       bgLight(ctx, t); collage(ctx, t, { seed: 97, n: 6, theme: 'light', alpha: .7 });
-      const pil = S().pillars || [], cx = 560, yb = 900, gap = 190, colH = 430;
-      pil.slice(0, 4).forEach((l, i) => column(ctx, cx - 1.5 * gap + i * gap, yb, colH, l, P(t, T_COL[i], .5), i));
-      const pp = P(t, T_PED - .25, .25, E.inQuad); if (pp > 0) { const y = lerp(-300, yb - colH - 60, pp);
-        ctx.save(); ctx.translate(cx, y); ctx.beginPath(); ctx.moveTo(-430, 30); ctx.lineTo(0, -110); ctx.lineTo(430, 30); ctx.closePath(); ctx.fillStyle = '#F3EBDD'; ctx.fill(); ink(ctx, () => { ctx.beginPath(); ctx.moveTo(-430, 30); ctx.lineTo(0, -110); ctx.lineTo(430, 30); ctx.closePath(); }, 4, 7);
-        rr(ctx, -450, 30, 900, 44, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -450, 30, 900, 44, 4, 4, 9);
-        retroText(ctx, 'A PRÁTICA', 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
-      // entregas carimbadas
-      (S().deliveries || []).slice(0, 5).forEach((d, i) => { const p = E.outBack(P(t, T_DEL + i * .45, .35)); if (p <= 0) return;
-        const x = 1230 + (i % 2) * 330, y = 250 + Math.floor(i / 2) * 150 + (i % 2) * 40;
-        ctx.save(); ctx.translate(x, y); ctx.rotate((hash(i * 5) - .5) * .12); ctx.scale(p, p);
-        paper(ctx, -150, -55, 300, 110, { torn: true, seed: 160 + i, fill: '#FFFDF8', shadow: 7, lw: 3 }); text(ctx, twoLines(d), 0, -4, { size: 22, weight: 800, color: INK, align: 'center', lh: 1.08 });
-        ctx.save(); ctx.translate(90, 30); ctx.rotate(-.25); rr(ctx, -58, -16, 116, 32, 4); ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.stroke(); text(ctx, 'ENTREGUE', 0, 1, { size: 15, weight: 900, mono: true, color: C.red, align: 'center', ls: 2 }); ctx.restore();
-        ctx.restore(); });
-      // changelog estilo git log
-      const lp = P(t, T_LOG - .3, .4); if (lp > 0) { const ev = S().evolutions || [], x = 1180, y = 720;
-        ctx.save(); ctx.globalAlpha *= lp; holo(ctx, x - 20, y - 50, 660, 60 + ev.length * 42, { title: '$ git log --oneline', color: C.orange });
-        ev.slice().reverse().forEach((e, i) => { const n = Math.floor(clamp((t - T_LOG - i * .6) / .6) * 40); if (n <= 0) return;
-          const s = `${e.version}  ${e.year}  ${e.text}`.slice(0, n); text(ctx, s, x, y + 6 + i * 42, { size: 22, weight: 700, mono: true, color: i === 0 ? C.yellow : '#FFE9D6' }); });
+      // o templo: um pilar por coluna, depois o frontão "A PRÁTICA"
+      const tA = 1 - E.inCubic(P(t, T_CARDS - .2, .6)), cx = 960, yb = 900, colH = 430, gap = Math.min(220, 1300 / N), cw = Math.min(120, gap * .62);
+      if (tA > 0) { ctx.save(); ctx.globalAlpha *= tA;
+        PIL.forEach((pl, i) => column(ctx, cx + (i - (N - 1) / 2) * gap, yb, colH, pl.name, P(t, T_COL[i], .5), i, cw));
+        const pp = P(t, T_PED - .25, .25, E.inQuad), hw = (N - 1) * gap / 2 + cw + 60; if (pp > 0) { const y = lerp(-300, yb - colH - 60, pp);
+          ctx.save(); ctx.translate(cx, y); const tri = () => { ctx.beginPath(); ctx.moveTo(-hw, 30); ctx.lineTo(0, -110); ctx.lineTo(hw, 30); ctx.closePath(); }; tri(); ctx.fillStyle = '#F3EBDD'; ctx.fill(); ink(ctx, tri, 4, 7);
+          rr(ctx, -hw - 20, 30, hw * 2 + 40, 44, 4); ctx.fillStyle = '#E9DFCF'; ctx.fill(); inkRect(ctx, -hw - 20, 30, hw * 2 + 40, 44, 4, 4, 9);
+          retroText(ctx, 'A PRÁTICA', 0, -16, { size: 52, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3, ls: 8 }); ctx.restore(); }
         ctx.restore(); }
-      if (S().placeholder) { ctx.save(); ctx.translate(140, 980); ctx.rotate(-.04); pill(ctx, 0, 0, 'rascunho · aguardando materiais', { size: 16, fill: '#FFF', color: C.red, stroke: C.red, flat: true }); ctx.restore(); }
+      // os cartões: cada pilar com suas entregas (texto do JSON)
+      if (t > T_CARDS - .2) { const L = layout(ctx), x0 = W / 2 - (N * CW + (N - 1) * 20) / 2;
+        paintTitle(ctx, 'A PRÁTICA', W / 2, 225, { size: 58, bg: C.orange, seed: 44, p: P(t, T_CARDS - .2, .6), splat: false });
+        PIL.forEach((_, k) => card(ctx, k, x0 + k * (CW + 20), 300, P(t, T_CARDS + k * .25, .45), L[k])); }
       // chegada à Parada 2
       const bp = P(t, T_BOARD - .5, .6); if (bp > 0) { ctx.save(); ctx.globalAlpha *= bp; ctx.fillStyle = rgba('#120E0B', .75 * bp); ctx.fillRect(0, 0, W, H);
         FLAP.board(ctx, W / 2, H / 2, ['PARADA 2 · BALDEAÇÃO'], [T_BOARD], t, { tw: 56, th: 82, hiFrom: [10], header: TX.stop.label, headerCol: C.orange }); ctx.restore(); }
@@ -122,12 +143,12 @@ function ptScale(s) {
     }
   };
   POSTERS[6] = (ctx, w, h, tl) => {
-    const pil = (SEC(6).pillars || []).slice(0, 4);
-    pil.forEach((l, i) => { const x = -w / 2 + 60 + i * (w - 120) / 3, s = 1 + .03 * Math.sin(tl * 2 + i);
-      rr(ctx, x - 30, -h / 2 + 90, 60, 230 * s, 2); ctx.fillStyle = '#F3EBDD'; ctx.fill(); inkRect(ctx, x - 30, -h / 2 + 90, 60, 230 * s, 2, 2.5, i);
-      ctx.save(); ctx.translate(x, -h / 2 + 205); ctx.rotate(-Math.PI / 2); text(ctx, l, 0, 0, { size: 15, weight: 900, color: INK, align: 'center' }); ctx.restore(); });
-    const ev = (SEC(6).evolutions || []).slice(-1)[0]; if (ev) { retroText(ctx, ev.version, 0, 160, { size: 70, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3 }); text(ctx, ev.text, 0, 214, { size: 20, weight: 800, color: INK, align: 'center' }); }
-    if (SEC(6).placeholder) text(ctx, 'rascunho', 0, 262, { size: 16, weight: 800, mono: true, color: C.red, align: 'center' });
+    text(ctx, 'Pilares da prática', 0, -h / 2 + 50, { size: 26, weight: 900, color: INK, align: 'center' });
+    const rowH = Math.min(84, (h - 130) / N);
+    PIL.forEach((pl, i) => { const y = -h / 2 + 110 + i * rowH, col = COLS[i % COLS.length], on = Math.floor(tl * .8) % N === i;
+      rr(ctx, -w / 2 + 30, y, w - 60, rowH - 12, 10); ctx.fillStyle = on ? col : '#F3EBDD'; ctx.fill(); inkRect(ctx, -w / 2 + 30, y, w - 60, rowH - 12, 10, 2.5, i);
+      text(ctx, pl.name, -w / 2 + 52, y + (rowH - 12) / 2, { size: 24, weight: 900, color: on && col !== C.yellow ? '#FFF' : INK });
+      pill(ctx, w / 2 - 110, y + (rowH - 12) / 2, `${pl.items.length} entregas`, { size: 15, fill: '#FFFDF8', weight: 900 }); });
   };
 })();
 

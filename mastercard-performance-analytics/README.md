@@ -66,6 +66,21 @@ Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no 
   - edições feitas direto no HTML não voltam para o `data/presentation.json`. Para levar uma mudança adiante, atualize o JSON.
 - **Formatação:** automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita `display` para fixar o texto exato de tela.
 - **Campo faltando:** a cena mostra "—" ou a versão sem número, em vez de quebrar.
+- **Prática (estação 06):** vem toda do JSON, em `presentation_structure` → seção 6 → `pillars`:
+  ```json
+  "pillars": [
+    { "pillar": "Nome do pilar", "highlights": ["entrega 1", "entrega 2", "…"] }
+  ]
+  ```
+  - A cena aceita de 1 a 6 pilares, com quantos itens quiser.
+  - A fonte diminui sozinha para o texto caber no cartão.
+  - O templo, os cartões, o cartaz da Parada 2 e o slide em popup são montados a partir desses campos.
+- **Ambiente seguro:** os nomes do repositório estão sanitizados (pilares "Cenoura", "Brócolis"…, clientes "Banana", "Manga"…). Para trocar pelos reais:
+  1. Abra uma **cópia local** de `performance-analytics.html` num editor de texto.
+  2. Procure `id="pa-data"`.
+  3. Edite os textos e números dentro desse bloco e salve. Não é preciso rodar build.
+  - Mantenha as aspas e as vírgulas do JSON. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
+  - Não suba essa cópia para o Git.
 - **Para completar depois:**
   - `other_tracks` (seção 3): nomes das demais tracks no faixa da estação 03;
   - campos vazios do case Lights-off (seção 4): `business_problem`, `business_results.headline`, `client_type`;

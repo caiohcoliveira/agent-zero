@@ -281,7 +281,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
       [T_COS + .1, T_DROP - .2, '4 · Com os vetores prontos, a *similaridade de cosseno* junta produtos parecidos em cestas', 'COMO FIZEMOS'],
       [T_DROP + .2, T_INS - .1, `*Cestas temáticas* com seus clientes-alvo: ${BASK.map(b => b[0].toLowerCase()).join(', ')}`, 'SOLUÇÃO'],
       [T_INS + .1, T_IMP - .2, 'As cestas viraram *mecânicas de campanha* nos testes da Mesa de Performance', 'DECISÃO'],
-      [T_IMP + .2, T_END - .1, `${BEST} bateu recorde: *${HL}* a conversão da 2ª melhor campanha`, 'IMPACTO'],
+      [T_IMP + .2, T_END - .1, `${BEST} bateu recorde: *${HL}* em conversão vs. a 2ª melhor campanha`, 'IMPACTO'],
       [T_END, 53.4, `De ${MONTHS} meses de compras a *cestas que convertem mais*`, 'CONCLUSÃO']],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .85, center: '#26170E' });
@@ -350,7 +350,7 @@ const CASES = [['Cliente Banana', 'cestas de produtos', C.yellow, 'VAREJO'], ['C
     PTS.forEach(q => circle(ctx, cx + lerp(q.sx, q.x, p) * sc, cy + lerp(q.sy, q.y, p) * sc * .8, 5, p > .4 ? CCOL[q.c] : '#BFB3A3'));
     CEN.forEach(([x, y], k) => { const a = P(t, T_KM + k * .27, .3); if (a <= 0) return; const px = cx + x * sc, py = cy + y * sc * .8, s = 14 * E.outBack(a);
       glow(ctx, px, py, 60, CCOL[k], .5 * a); line(ctx, px - s, py - s, px + s, py + s, '#FFF', 5); line(ctx, px - s, py + s, px + s, py - s, '#FFF', 5);
-      text(ctx, 'Seg ' + 'ABCDEFGH'[k], px, py + 30, { size: 16, weight: 800, mono: true, color: '#FFF', align: 'center', alpha: a }); });
+      const nm = (dget(CS(), 'analytics_solution.clusters', []) || [])[k] || 'Seg ' + 'ABCDEFGH'[k]; text(ctx, measure(ctx, nm, 15, 800) > 170 ? twoLines(nm) : nm, px, py + 34, { size: 15, weight: 800, color: '#FFF', align: 'center', alpha: a, lh: 1.05 }); });
     const q = dget(CS(), 'analytics_solution.segmentation_quality', {}), eggs = [[`trustworthiness ${FMT.auto(q.umap_trustworthiness)}`, 260, 330], [`silhouette ${FMT.auto(q.silhouette)}`, 1660, 330], [`Davies-Bouldin ${FMT.auto(q.davies_bouldin)}`, 260, 860], [`Calinski-Harabasz ${FMT.num(q.calinski_harabasz || 0, 0)}`, 1660, 860]];
     eggs.forEach(([s, x, y], i) => formula(ctx, s, x, y, { size: 18, neon: i % 2 === 1, alpha: P(t, T_KM + i * .5, .4), rot: (i % 2 ? .03 : -.03), seed: 20 + i }));
     ctx.restore();

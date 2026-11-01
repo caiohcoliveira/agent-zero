@@ -23,17 +23,17 @@
         "2026_forecast": 0.0036
       },
       "revenue_growth": {
-        "2023_to_2024": "+0.4 de variação relativa",
-        "2024_to_2025": "+0.285714 de variação relativa",
-        "2023_to_2025": "+0.8 de variação relativa"
+        "2023_to_2024": "+0.4 relative",
+        "2024_to_2025": "+0.285714 relative",
+        "2023_to_2025": "+0.8 relative"
       },
       "brazil_2023_milestone": {
-        "headline": "Performance Analytics Brazil estimated to close the reference period at USD 1220, approximately 1.65x budget and 1.74x prior-period revenue",
+        "headline": "Performance Analytics Brazil estimated to close the reference period at USD 1220, approximately 1.648649x budget and 1.742857x prior-period revenue",
         "actuals_2022_usd_millions": 0.0007,
         "budget_2023_usd_millions": 0.00074,
         "actuals_2023_usd_millions": 0.00122,
-        "growth_vs_2022": "+0.742857 de variação relativa",
-        "above_budget": "+0.648649 de variação relativa",
+        "growth_vs_2022": "+0.742857 relative",
+        "above_budget": "+0.648649 relative",
         "quarterly_usd_millions": {
           "Q1": {
             "actuals_2022": 2e-05,
@@ -57,10 +57,10 @@
           }
         },
         "drivers": [
-          "Prior-period growth was in large part due to correct assignation of product",
-          "Reference-period performance was heavily steered by the partnership with the MS team"
+          "2022 growth was in large part due to correct assignation of product",
+          "2023 was heavily steered by the partnership with the MS team"
         ],
-        "source": "Internal financial reporting"
+        "source": "PSA financials"
       },
       "scale_proof_points": {
         "cliente_banana_product_baskets": {
@@ -84,7 +84,7 @@
       "section": 3,
       "title": "What We Bring to the Market",
       "objective": "Portfolio de capabilities, produtos e tipos de projetos, mostrando como Analytics complementa e potencializa as demais tracks.",
-      "source": "Guia Comercial de PA.htm",
+      "source": "Guia Comercial de PA (1).htm",
       "client_types": [
         "Emissores",
         "Adquirentes",
@@ -148,8 +148,7 @@
           "capability": "Automated Reporting",
           "example": "Lights-off Fraud Reporting"
         }
-      ],
-      "other_tracks": []
+      ]
     },
     {
       "section": 4,
@@ -171,7 +170,7 @@
               "BM25 para ponderar relevância dos produtos",
               "Matrix Factorization ALS para vetores de clientes e produtos",
               "Similaridade de cosseno produto x produto (cestas) e cliente x cesta (público-alvo)",
-              "Cestas temáticas com clientes-alvo"
+              "3 cestas com clientes-alvo"
             ],
             "baskets": [
               "Café + chocolate",
@@ -186,7 +185,7 @@
             }
           },
           "business_results": {
-            "headline": "1.1875x conversion vs. second-best campaign (Destilados, record at Cliente Banana)",
+            "headline": "+0.1875 relative conversion lift vs. second-best campaign (Destilados, record at Cliente Banana)",
             "conversion_by_mechanic": {
               "Destilados (cesta)": "1.52%",
               "Churrasco (cesta)": "1.28%",
@@ -197,9 +196,9 @@
               "Presente Surpreenda": "0.16%"
             },
             "incremental_revenue_cafe": "R$ 218",
-            "cafe_revenue_growth_non_primary_bu": "+0.245 de variação relativa"
+            "cafe_revenue_growth_non_primary_bu": "+0.245 relative"
           },
-          "executive_message": "Collaborative filtering turned 24 months of purchases into thematic offer baskets, delivering 1.1875x conversion vs. the second-best campaign and R$ 218 incremental revenue in the Café basket."
+          "executive_message": "Collaborative filtering turned 24 months of purchases into 3 offer baskets, delivering +0.1875 relative conversion lift vs. the second-best campaign and R$ 218 incremental revenue in the Café basket."
         },
         {
           "case_name": "Cliente Manga | Principality Recommendation Engine",
@@ -207,7 +206,7 @@
           "business_problem": "Evoluir a recomendação de produtos para considerar, além de afinidade e conversão, o impacto esperado de cada recomendação no indicador de principalidade.",
           "analytics_solution": {
             "modules": [
-              "Look-alike segmentation with differentiated customer profiles",
+              "Look-alike segmentation (8 clusters)",
               "Matrix Factorization (cross-sell e upsell em paralelo)",
               "Camada de incremento de principalidade (ΔP) para repriorização"
             ],
@@ -221,18 +220,18 @@
               "same_cluster_after_6_months": "82.08%"
             },
             "clusters": [
-              "Segmento A",
-              "Segmento B",
-              "Segmento C",
-              "Segmento D",
-              "Segmento E",
-              "Segmento F",
-              "Segmento G",
-              "Segmento H"
+              "Aposentados fiéis",
+              "Exclusivos do interior",
+              "Proprietários de alto potencial",
+              "Classe média multibancarizada",
+              "Classe média alta com veículo",
+              "Veteranos de elite",
+              "Jovens estudantes",
+              "Vendedores jovens"
             ]
           },
           "business_results": {
-            "headline": "+4 p.p. theoretical incremental principality gain vs. control (short recommendation list, backtest)",
+            "headline": "+4 p.p. theoretical incremental principality gain vs. control (Top 3, backtest)",
             "associates_recommended": "0.094MM",
             "associates_analyzed": "0.046MM",
             "top3": {
@@ -241,7 +240,7 @@
             },
             "top5": {
               "group_1_share": "40.8%",
-              "group_1_increase_vs_top3": "+0.416667 de variação relativa",
+              "group_1_increase_vs_top3": "+0.416667 relative",
               "incremental_gain": "+3.2 p.p."
             },
             "by_subsegment": {
@@ -250,7 +249,7 @@
               "PF III": "+4.8 p.p.",
               "PF IV+": "+3.2 p.p."
             },
-            "best_cluster": "Segmento A: +8.8 p.p.",
+            "best_cluster": "Aposentados fiéis: +8.8 p.p.",
             "principality_points_top3": "3.336 pts with principality layer vs. 2.112 pts pure MF"
           },
           "operationalization": {
@@ -268,21 +267,15 @@
             ]
           },
           "future_vision": "Unified engine combining affinity, conversion, principality and profitability, extendable to PJ.",
-          "executive_message": "A productized engine combining look-alike segmentation, product affinity and principality impact showed +4 p.p. theoretical principality gain for associates who adopted the short recommendation list."
+          "executive_message": "A productized engine combining look-alike segmentation, product affinity and principality impact showed +4 p.p. theoretical principality gain for associates who adopted Top 3 recommendations."
         },
         {
-          "case_name": "Lights-off Fraud Reporting",
-          "client_type": "",
-          "business_problem": "",
-          "analytics_solution": "",
-          "business_results": {
-            "headline": ""
-          }
+          "case_name": "Lights-off Fraud Reporting"
         },
         {
           "case_name": "Insight Agent | AI-powered Market Share & Share of Wallet Insights",
           "business_problem": {
-            "context": "Produto automatizado de Market Share e Share of Wallet para adquirentes, com requisitos de privacidade Mastercard.",
+            "context": "Produto automatizado de Market Share e Share of Wallet para adquirentes, em conformidade com a privacidade Mastercard.",
             "bottleneck": "Geração de insights manual, limitando escala para os 30 adquirentes do pipeline.",
             "constraint": "Dados restritos ao ambiente Mastercard, inviabilizando APIs externas de IA."
           },
@@ -328,9 +321,9 @@
               "composition": "2 adquirentes + 4 merchants",
               "cliente_laranja": "R$ 480 em 4 anos"
             },
-            "privacy": "IA executada localmente, mantendo o processamento dos dados no ambiente Mastercard"
+            "privacy": "100% conformidade, IA executada localmente"
           },
-          "executive_message": "A local multi-agent AI circuit generates, judges, corrects and validates insights at scale, enabling a 30-acquirer pipeline without growing the team and keeping data processing within the local environment."
+          "executive_message": "A local multi-agent AI circuit generates, judges, corrects and validates insights at scale, enabling a 30-acquirer pipeline without growing the team and with zero data exposure."
         }
       ]
     },
@@ -369,40 +362,53 @@
       "section": 6,
       "title": "Practice",
       "objective": "Pilares da prática, entregas relevantes e evoluções.",
-      "placeholder": "Rascunho: substituir pelos materiais da Nat",
       "pillars": [
-        "Pessoas & formação",
-        "Método & qualidade",
-        "Ferramentas & aceleradores",
-        "Comunidade & conhecimento"
-      ],
-      "deliveries": [
-        "Playbook de modelagem",
-        "Biblioteca de código reutilizável",
-        "Trilha de formação em IA",
-        "Governança de modelos",
-        "Guilda mensal"
-      ],
-      "evolutions": [
         {
-          "version": "v1.0",
-          "year": "2023",
-          "text": "playbook de modelagem"
+          "pillar": "Cenoura",
+          "highlights": [
+            "10 specific training sessions in collaboration with OC Training",
+            "AI & AA Practice offered 10 different training sessions for all A&CS Team",
+            "12 Round Tables for PA Team",
+            "Coffee Table knowledge-sharing initiative",
+            "Round Table under new management with junior team engagement"
+          ]
         },
         {
-          "version": "v2.0",
-          "year": "2024",
-          "text": "biblioteca de features"
+          "pillar": "Brócolis",
+          "highlights": [
+            "AI & AA Newsletter introduced in Brazil, with 6 editions since the reference period",
+            "Newsletter built using Copilot and sent through an automated Power Automate process",
+            "Automation Hub with Tools: Dispatch and Benchmark",
+            "Onboarding Kit with PA project context and validated access steps for Mastercard Data Environment"
+          ]
         },
         {
-          "version": "v3.0",
-          "year": "2025",
-          "text": "MLOps + monitoramento"
+          "pillar": "Abobrinha",
+          "highlights": [
+            "AI Contributor Learning Program as the first step toward AI Greenbelt Certification",
+            "AI Greenbelt Certification launched in the reference period",
+            "Program structured around Learn, Contribute, Collaborate, Exposure and Apply"
+          ]
         },
         {
-          "version": "v4.0",
-          "year": "2026",
-          "text": "agentes + avaliação de LLMs"
+          "pillar": "Beterraba",
+          "highlights": [
+            "Cliente Goiaba Agentic Commerce client project",
+            "Cliente Caju AI for Cards client project",
+            "AI-driven efficiency activities with Efficiency OC",
+            "Automations with Staffing OC",
+            "AI Office Hours in the reference quarter",
+            "Internal AI agents and apps: PO Requisition App, Storytelling Agent and HTML Layout Agent"
+          ]
+        },
+        {
+          "pillar": "Couve",
+          "highlights": [
+            "More than 60 Performance Analytics projects mapped in a centralized repository",
+            "10 structured dimensions",
+            "10 reference one-pagers",
+            "Standardized one-pagers covering context and application, key steps, approaches used and reference deliverables"
+          ]
         }
       ]
     },
@@ -415,27 +421,27 @@
   "headline_numbers_for_slides": [
     {
       "number": "$2000 -> $3600",
-      "meaning": "Performance Analytics revenue across reference periods (1.8x)",
+      "meaning": "Performance Analytics revenue 2023 -> 2025 (+0.8 relative)",
       "section": 2
     },
     {
       "number": "$3600",
-      "meaning": "Revenue forecast for the following period",
+      "meaning": "2026 revenue forecast",
       "section": 2
     },
     {
-      "number": "1.742857x",
-      "meaning": "PA Brazil revenue vs. prior period",
+      "number": "+0.742857 relative",
+      "meaning": "PA Brazil 2023 YoY growth",
       "section": 2
     },
     {
-      "number": "1.648649x",
-      "meaning": "PA Brazil revenue vs. budget",
+      "number": "+0.648649 relative",
+      "meaning": "PA Brazil 2023 above budget",
       "section": 2
     },
     {
-      "number": "1.1875x",
-      "meaning": "Cliente Banana conversion vs. second-best campaign",
+      "number": "+0.1875 relative",
+      "meaning": "Cliente Banana conversion lift vs. second-best campaign",
       "section": 4
     },
     {
@@ -444,8 +450,8 @@
       "section": 4
     },
     {
-      "number": "1.245x",
-      "meaning": "Café revenue in non-primary BU vs. baseline",
+      "number": "+0.245 relative",
+      "meaning": "Café revenue in non-primary BU",
       "section": 4
     },
     {
@@ -455,7 +461,7 @@
     },
     {
       "number": "+4 p.p.",
-      "meaning": "Cliente Manga theoretical principality gain for the short recommendation list",
+      "meaning": "Cliente Manga theoretical principality gain (Top 3)",
       "section": 4
     },
     {
@@ -464,7 +470,7 @@
       "section": 4
     },
     {
-      "number": "30",
+      "number": "15",
       "meaning": "Acquirers in Insight Agent pipeline",
       "section": 5
     },
@@ -480,7 +486,7 @@
     }
   ],
   "presentation_design_guidance": {
-    "section_2": "Use revenue evolution across reference periods as the dominant visual; use the Brazil milestone (1.742857x prior-period revenue, 1.648649x budget) as a callout and complement with a few scale proof points.",
+    "section_2": "Use revenue evolution (2023-2026F) as the dominant visual; use the Brazil 2023 milestone (+0.742857 relative YoY, +0.648649 relative vs. budget) as a callout and complement with a few scale proof points.",
     "section_3": "Use a capability map (not a project list), organized by client type (Emissores, Adquirentes, Merchants), linking each capability to a case.",
     "section_4": "One case card per case with Problem, Analytics, Impact and a single headline number.",
     "section_5": "Show progression: manual analysis -> advanced analytics -> productized engines -> AI-powered scalable assets."
