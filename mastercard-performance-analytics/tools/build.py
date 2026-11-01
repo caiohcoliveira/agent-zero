@@ -26,7 +26,8 @@ def data_block(path):
 def music_blocks(prev):
     out = []
     for mid in MUSIC_IDS:
-        src = ROOT / 'musica' / (f'{mid}-edit.mp3' if mid in ('funk', 'tech') else f'{mid}.mp3')  # funk e tech: remontagens (tools/edit_music.py)
+        # versão animada (tools/remix.py) → remontagem (tools/edit_music.py) → faixa original
+        src = next((ROOT / 'musica' / f for f in (f'{mid}-mix.mp3', f'{mid}-edit.mp3', f'{mid}.mp3') if (ROOT / 'musica' / f).exists()), ROOT / 'musica' / f'{mid}.mp3')
         if src.exists():
             mp3 = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(src), '-map_metadata', '-1', '-ac', '2',
                                   '-b:a', '128k', '-f', 'mp3', '-'], capture_output=True, check=True).stdout

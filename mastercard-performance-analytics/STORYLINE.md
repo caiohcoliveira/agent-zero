@@ -52,13 +52,13 @@
    - O painel de partidas vira as placas até **PERFORMANCE ANALYTICS**.
    - Embaixo, a missão escrita: "Transformamos *dados* em *decisões* e soluções de negócio."
    - A analista chega com o bilhete na mão; o trem encosta vindo da esquerda, com o farol varrendo a plataforma; o bilhete é carimbado.
-2. **Propósito (6–14 s)**
-   - As portas abrem no tempo cheio da música e o painel apaga.
-   - Título "Da *pergunta* ao *valor*" e explicação "Combinamos conhecimento de negócio, analytics e implementação para orientar decisões."
-   - Ela embarca e a câmera mergulha pela porta.
-   - Do outro lado, uma cidade pintada: a linha laranja sai de um balão "?" ("uma pergunta de negócio"), passa pelas estações Negócio, Analytics e Implementação e chega ao **Valor**, que acende.
+2. **Propósito (6–14 s)**, como na v5.4, a pedido:
+   - As portas abrem no tempo cheio da música, o painel apaga e ela embarca.
+   - O bilhete sobe em close: "LINHA PERFORMANCE ANALYTICS · DE *dados* · PARA *valor* · 7 estações · 2 baldeações". O carimbo bate: **EMBARQUE ✓ validado**.
+   - Título "Dos *dados* ao *valor*" e explicação "Combinamos conhecimento de negócio, analytics e implementação para orientar decisões."
+   - A câmera mergulha pela porta aberta.
 3. **Percurso (14–20 s)**
-   - A câmera recua e a linha vira o mapa completo.
+   - Do outro lado, o mapa completo da linha se desenha.
    - Três capítulos escritos: **Onde atuamos** (01–03), **Cases e resultados** (04–06) e **O que vem pela frente** (07).
    - Título "O percurso" e a frase "Uma viagem pelas capacidades da nossa área, em três capítulos."
 
@@ -234,6 +234,29 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 ## Encerramento
 
 O letreiro fica aceso sobre a estação viva. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
+
+## Trilha (v7.1 · versões animadas)
+
+As três faixas ganharam camadas sintetizadas no tempo da música (`tools/remix.py`).
+
+- **Technology (os cases):**
+  - **Calma:** bumbo nos tempos 1 e 3, chimbal e shaker.
+  - **Construção:**
+    - bumbo em todos os tempos e caixa acelerando até a fusa;
+    - riser de ruído e tom;
+    - o grave some aos poucos e entra meio tempo de silêncio.
+  - **Drop, na solução:**
+    - impacto (sub que despenca + prato) e bateria cheia: bumbo 4/4, palmas no 2 e no 4, chimbal aberto no contratempo e virada a cada 4 compassos;
+    - sidechain na faixa e graves reforçados: o pico de energia.
+  - **Relatórios:** a construção esvazia até o clique, fica em silêncio no escuro e o drop explode junto com o neon.
+  - **Agentes:** a construção é mais longa e o drop maior, na escala.
+- **Funk (estações 01–03):**
+  - graves e brilho reforçados, com pratos nas viradas de estação;
+  - o break antes da parte B ganha riser e grave sumindo, e a parte B entra com impacto.
+- **Piano (07, disciplinas, letreiro):**
+  - pulso épico na cidade;
+  - nas disciplinas, bumbo em todos os tempos e um tom a cada disciplina que entra;
+  - rufar + riser até "Tudo se resume a…", com impacto, e impacto no acorde final do letreiro.
 
 ## Pendências de validação (do roteiro v7)
 

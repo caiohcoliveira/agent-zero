@@ -18,7 +18,7 @@ import librosa
 import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TRACKS = {'funk': 'musica/funk-edit.mp3', 'tech': 'musica/tech-edit.mp3', 'piano': 'musica/piano.mp3'}  # funk e tech: remontagens (tools/edit_music.py)
+TRACKS = {'funk': 'musica/funk-mix.mp3', 'tech': 'musica/tech-mix.mp3', 'piano': 'musica/piano-mix.mp3'}  # remontagem (tools/edit_music.py) + versão animada (tools/remix.py)
 SR, FPS = 22050, 50
 HOP = SR // FPS  # 441 amostras = 20 ms
 
@@ -37,7 +37,12 @@ def band(S, freqs, lo, hi):
     return S[(freqs >= lo) & (freqs < hi)].sum(axis=0)
 
 
-def analyze(path):
+# um começo de compasso conhecido por faixa: fixa a fase dos compassos (as camadas do remix mudam o grave
+# e poderiam deslocar a detecção em 1–2 tempos; as cenas foram marcadas nesses compassos)
+DOWN_REF = {'funk': 11.92, 'tech': 11.111, 'piano': 29.08}
+
+
+def analyze(path, down_ref=None):
     y, sr = librosa.load(path, sr=SR, mono=True)
     dur = len(y) / sr
     onset = librosa.onset.onset_strength(y=y, sr=sr, hop_length=HOP)
@@ -62,6 +67,8 @@ def analyze(path):
     # compasso: fase (0–3) com mais grave nos tempos
     bf = np.clip(librosa.time_to_frames(bt, sr=sr, hop_length=HOP), 0, len(low) - 1)
     phase = int(np.argmax([low[bf[p::4]].mean() if len(bf[p::4]) else 0 for p in range(4)]))
+    if down_ref is not None:
+        phase = int(np.argmin([np.min(np.abs(bt[p::4] - down_ref)) if len(bt[p::4]) else 9 for p in range(4)]))
     down = bt[phase::4]
     # picos fortes (hits) com espaçamento mínimo de 0,25 s
     on = norm(onset)
@@ -83,7 +90,7 @@ def analyze(path):
 
 
 def main():
-    out = {k: analyze(ROOT / p) for k, p in TRACKS.items()}
+    out = {k: analyze(ROOT / p, DOWN_REF.get(k)) for k, p in TRACKS.items()}
     js = ('/* ============================================================================\n'
           '   7. BATIDAS — gerado por tools/music.py a partir de musica/ (não editar à mão)\n'
           '   Grade de batidas e compassos, envelopes a 50 Hz (base64, 0–255), picos e seções.\n'

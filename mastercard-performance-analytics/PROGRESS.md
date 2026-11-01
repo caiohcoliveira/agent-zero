@@ -159,7 +159,20 @@ A v5.4 continua intacta em `claude/mastercard-analytics-video-4cof1t`.
   - testes de navegação e de clique;
   - documentação reescrita para a v7.
 
-**v7 concluída.** Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
+**v7 concluída.**
+
+### v7.1 — pedidos da revisão
+
+- [x] **Músicas mais animadas** (`tools/remix.py`):
+  - Technology com bateria, construções, drops com impacto, sidechain e graves;
+  - funk e piano com graves, impactos e risers;
+  - piano com percussão no clímax.
+- [x] **Embarque:** o bilhete grande "DE dados → PARA valor" carimbado volta, como na v5.4, no lugar da linha de trem.
+- [x] **QA e folhas de cenas:**
+  - varredura sem erros e medidor de leitura (0 curtas);
+  - folhas com as fotos de todas as cenas e conversas enviadas ao usuário.
+
+Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 
 ## Como retomar numa nova sessão
 

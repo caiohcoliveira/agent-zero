@@ -42,7 +42,7 @@ const CONFIG = {
     voice: false,          // narração do navegador: DESLIGADA por padrão (botão "Voz" / tecla V)
     musicVolume: 0.42, sfxVolume: 0.5,
     trackVolume: 1.0,      // volume geral das faixas (funk, technology, piano)
-    tracks: { funk: { gain: .63 }, tech: { gain: .79 }, piano: { gain: .62 } },  // equaliza o loudness (~−14 LUFS)
+    tracks: { funk: { gain: .91 }, tech: { gain: .94 }, piano: { gain: .87 } },  // versões animadas (tools/remix.py): ~1–3 dB acima da v5.4, equilibradas entre si
     duckDuringVoice: 0.55,
     voiceRate: 1.07, voicePitch: 1.02,
     preferredVoices: ['Francisca', 'Thalita', 'Brenda', 'Giovanna', 'Leila', 'Manuela', 'Yara',

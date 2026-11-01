@@ -40,7 +40,7 @@ O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito d
 | Momento | O que acontece | Duração |
 |---|---|---|
 | Pré-show | loop de espera, com a missão escrita | até a primeira tecla |
-| Play 1 · embarque | identidade → propósito → percurso (mapa com 3 capítulos) | 0:20 |
+| Play 1 · embarque | identidade → propósito (o bilhete "DE dados → PARA valor" carimbado) → percurso (mapa com 3 capítulos) | 0:20 |
 | **Conversa 0** · mapa | missão + mapa; **clique numa estação** para ver o detalhe; → embarca | fala |
 | Play 2 · estações 01–03 | "Vintage Film Funk" remontada | 2:35 |
 | **Conversa 1** | cartazes 01, 02, 03 legíveis, chamada "Onde isso encontra o seu cliente?", "A seguir: quatro cases…" | fala |
@@ -115,7 +115,19 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - **Technology (5:04):** cada case tem 27 compassos (60 s): calma 11 → construção 5 → cheia 11, com o drop na **solução**.
     - **Relatórios:** a construção perde os agudos, corta seco no interruptor e fica um compasso em silêncio antes do drop.
     - **Agentes:** a construção é longa e o drop cai na **escala**, depois que o ciclo foi explicado.
-- **Sincronia:** `tools/music.py` (librosa) gera `src/07-beats.js`.
+- **Versão animada** (`tools/remix.py`, v7.1): camadas sintetizadas no tempo da música, masterizadas com limitador suave.
+  - **Technology** (batida quantizada, desvio < 1 ms):
+    - nas partes calmas, bumbo nos tempos 1 e 3, chimbal e shaker;
+    - na construção, bumbo em todos os tempos, caixa acelerando (colcheia → semicolcheia → fusa) e riser; o grave da faixa vai sumindo e entra meio tempo de silêncio;
+    - no **drop**, impacto (sub que despenca + prato) e bateria cheia: bumbo 4/4, palmas no 2 e no 4, chimbal aberto no contratempo e virada a cada 4 compassos;
+    - o drop tem **sidechain** (a faixa "respira" com o bumbo) e graves reforçados;
+    - no case de relatórios, a construção esvazia (só um drone grave), fica em silêncio e explode no drop.
+  - **Funk e piano** (tempo humano, sem bateria contínua):
+    - graves e brilho reforçados;
+    - riser, silêncio curto e impacto na entrada da parte B (estação 03);
+    - no piano, percussão épica nas disciplinas, rufar + riser até "Tudo se resume a…" e impacto no acorde final.
+  - Ordem: `tools/edit_music.py` → `tools/remix.py` → `tools/music.py` → `./build.sh`. O build usa `musica/<faixa>-mix.mp3` quando existe.
+- **Sincronia:** `tools/music.py` (librosa) gera `src/07-beats.js`, com a fase dos compassos presa a um começo de compasso conhecido por faixa (`DOWN_REF`).
   - As cenas marcam eventos nos compassos (`grid(id).bars`).
   - O estado da música fica em `BT`.
   - A batida mexe pouco (`CONFIG.motion.beatBase` = 0,15) e só cresce nos picos declarados em `SCENES[id].peaks`.
@@ -146,6 +158,7 @@ src/
 data/presentation.json
 tools/build.py       monta o HTML (python3; ffmpeg para as músicas)
 tools/edit_music.py  remonta funk e Technology (numpy, scipy e ffmpeg)
+tools/remix.py       versão animada das 3 faixas: bateria, risers, drops, sidechain, graves (numpy, scipy e ffmpeg)
 tools/music.py       analisa as músicas (librosa)
 tools/read_check.js  medidor de leitura (node + Playwright)
 build.sh             atalho para tools/build.py
@@ -153,7 +166,7 @@ build.sh             atalho para tools/build.py
 
 - **Para montar:** depois de editar `src/` ou `data/`, rode `./build.sh`.
   - Sem a pasta `musica/`, o build reaproveita as músicas que já estão no HTML.
-  - Ao mudar a remontagem, rode `tools/edit_music.py` → `tools/music.py` → `./build.sh` e confira os `dur` das cenas.
+  - Ao mudar a remontagem ou o remix, rode `tools/edit_music.py` → `tools/remix.py` → `tools/music.py` → `./build.sh` e confira os `dur` das cenas.
 - **Para conferir a leitura:** `node tools/read_check.js`.
 
 **Decisões principais:**
