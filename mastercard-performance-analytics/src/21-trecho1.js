@@ -100,7 +100,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       for (let k = 1; k < 6; k++) line(ctx, x + k * SEGW / 6, GY - 20, x + k * SEGW / 6, GY + 2, 'rgba(0,0,0,.35)', 2);
       if (lit > 0) { glow(ctx, x + SEGW / 2, GY - 10, 160, SCOL[i], .4 * lit); line(ctx, x + 8, GY - 30, x + SEGW - 8, GY - 30, SCOL[i], 6); }
       ctx.restore();
-      if (lit > 0) { pin(ctx, x + SEGW / 2, GY + 40, c => { c.globalAlpha *= lit; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 10; text(c, SVC[i], 0, 26, { size: 28, weight: 900, color: '#FFF', align: 'center' }); });
+      if (lit > 0) { pin(ctx, x + SEGW / 2, GY + 40, c => { c.globalAlpha *= lit; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 10; const yy = i % 2 ? 66 : 22; line(c, 0, 0, 0, yy - 18, rgba(SCOL[i], .9), 3); text(c, SVC[i], 0, yy, { size: 28, weight: 900, color: '#FFF', align: 'center' }); });
         pin(ctx, x + SEGW / 2, GY - 60, c => { c.globalAlpha *= lit; circle(c, 0, 0, 20, SCOL[i], INK, 3); text(c, `${i + 1}`, 0, 1, { size: 24, weight: 900, color: i === 3 ? INK : '#FFF', align: 'center' }); }); }
     });
     LINE.draw(ctx, cable, cp, { w: 14, head: cp < .99 });
