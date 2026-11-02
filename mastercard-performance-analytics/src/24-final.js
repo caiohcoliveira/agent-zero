@@ -90,16 +90,17 @@ const FUTURE_ART = {
 /* ---------- 07 · O futuro de analytics: uma cidade conectada ---------- */
 (() => {
   const id = 's07', DIR = TX.future, ART = ['chair', 'merge', 'tiles', 'robots', 'userpay'];
-  const POS = [560, 1360, 2600, 3400, 5040], GROUP = [0, 0, 1, 1, 2], T_G = [.6, 9.4, 18.2], CAMX = [960, 3000, 5040], RAIL = 900;
+  const POS = [560, 1360, 2600, 3400, 5040], GROUP = [0, 0, 1, 1, 2], T_G = [.6, 9.4, 18.2].map(t => onBeat(id, t)), CAMX = [960, 3000, 5040], RAIL = 900;
+  const T_P = DIR.map((d, i) => beatsFrom(id, T_G[GROUP[i]] + .5, i % 2));   // cada painel numa batida (o segundo do grupo, uma batida depois)
   const CAM = [[0, 960, 540, 1.06], [2.4, 960, 540, 1], [9.0, 960, 540, 1], [9.9, 3000, 540, 1], [17.8, 3000, 540, 1], [18.7, 5040, 540, 1], [23.6, 5040, 540, 1], [26.4, 5560, 540, 1.04]];
-  T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_G[GROUP[i]] + .5 + (i % 2) * .7, 'pop', { p: 1 + i * .06, v: .2 }));
+  T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_P[i], 'pop', { p: 1 + i * .06, v: .2 }));
   const SCRIPT = SAY.reg(id, [
     [3.8, 26.6, 'title', 'Para onde a *linha* segue'],
     [T_G[2] + 1.6, 26.6, 'note', 'Entregas analíticas com *contratação definida* para cada projeto.', { x: 1580, y: 470, w: 540, size: 30, weight: 800 }]
   ]);
-  SAY.reg(id, DIR.map((d, i) => [T_G[GROUP[i]] + .5 + (i % 2) * .7, [9.4, 18.2, 26.4][GROUP[i]], 'label', d.title + ' ' + d.sub]));
+  SAY.reg(id, DIR.map((d, i) => [T_P[i], [9.4, 18.2, 26.4][GROUP[i]], 'label', d.title + ' ' + d.sub]));
   function panelArt(ctx, t, i) {
-    const g = GROUP[i], t0 = T_G[g] + .5 + (i % 2) * .7, p = E.outBack(P(t, t0, .6)), x = POS[i], y = 480; if (p <= 0) return;
+    const g = GROUP[i], t0 = T_P[i], p = E.outBack(P(t, t0, .6)), x = POS[i], y = 480; if (p <= 0) return;
     ctx.save(); ctx.translate(x, y + (1 - p) * 60); ctx.globalAlpha *= clamp(p);
     holo(ctx, -330, -230, 660, 420, { color: [C.orange, C.red, C.yellow, C.orange, C.yellow][i] });
     ctx.save(); ctx.beginPath(); ctx.rect(-320, -220, 640, 400); ctx.clip(); FUTURE_ART[ART[i]](ctx, i === 0 ? .62 : .58, t, clamp((t - t0) / 3)); ctx.restore();
@@ -139,7 +140,7 @@ const FUTURE_ART = {
 /* ---------- clímax: as 8 disciplinas entram e ficam (painel para ler) → Analytics & Advanced Analytics ---------- */
 (() => {
   const id = 'climax', VZ = ['gaussian', 'lp', 'classification', 'clusters', 'nlp', 'mlp', 'transformer', 'agents'], N = TX.climaxWords.length;
-  const T_IN = k => .6 + k * 1.2, T_KEY = 14.4, TW = 410, TH = 330, TX0 = 105, TY0 = 250;
+  const T_IN = k => beatsFrom(id, .6, 2 * k), T_KEY = onBeat(id, 14.4), TW = 410, TH = 330, TX0 = 105, TY0 = 250;   // uma disciplina a cada 2 batidas
   for (let k = 0; k < N; k++) cue(id, T_IN(k), 'hit', { size: .3 + k * .04 }); cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
   const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *disciplinas*']]);
   SAY.reg(id, TX.climaxWords.map((w, k) => [T_IN(k), T_KEY, 'label', w + ' ' + TX.climaxSub[k]]));

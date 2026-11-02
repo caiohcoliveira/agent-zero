@@ -54,6 +54,7 @@ const PLAYER = (() => {
     if (typeof overlayPlay === 'function') overlayPlay(ctx, T, s, themeOf(s, t));
     if (CONFIG.captions) caption(VOICE.caption(T));
     grain(ctx, T);
+    mockBadge(ctx);
   }
   function renderStop(id, tl, item, prevItem, p) {
     BT = BEAT.idle(tl); NOW = tl;
@@ -67,6 +68,7 @@ const PLAYER = (() => {
     if (impl && impl.ui) impl.ui(ctx, tl, item, prevItem, p, UI);   // interface da parada (cartões, miniaturas, popup) por cima, sem pintura
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }
     grain(ctx, tl * 30);
+    mockBadge(ctx);
   }
   function render() {
     if (st.mode === 'stop') {

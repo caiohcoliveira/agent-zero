@@ -399,3 +399,16 @@ const SPACE = (() => {
   const camRot = (cam, k = .00035) => cam ? (cam.x - W / 2) * k : 0;
   return { field, ribbon, floaters, camRot, proj };
 })();
+
+/* ---------- aviso de versão mockada (canto inferior esquerdo, em todas as telas) ----------
+   Texto em presentation_context.disclaimer do JSON. Na cópia local com os dados reais, deixe o campo vazio
+   (ou apague) e o aviso some. Desenhado por último, fora da pintura e da câmera. */
+function mockBadge(ctx) {
+  const msg = String((DATA.presentation_context || {}).disclaimer || '').trim(); if (!msg) return;
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+  const size = 17, w = measure(ctx, msg, size, 800) + 52, h = 30, x = 18, y = H - 14 - h;
+  rr(ctx, x, y, w, h, 15); ctx.fillStyle = 'rgba(12,9,7,.82)'; ctx.fill(); ctx.strokeStyle = rgba(C.orange, .75); ctx.lineWidth = 1.5; ctx.stroke();
+  circle(ctx, x + 17, y + h / 2, 5, C.orange);
+  text(ctx, msg, x + 31, y + h / 2 + 1, { size, weight: 800, color: '#F3E6D6' });
+  ctx.restore();
+}

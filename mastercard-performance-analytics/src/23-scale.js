@@ -14,8 +14,9 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
 (() => {
   const id = 's05', GYc = 600;
   const N = { team: [270, GYc], motor: [700, GYc], asset: [1110, GYc] }, PROJ = [[1600, 300, 'bank'], [1680, 450, 'store'], [1720, 600, 'card'], [1680, 750, 'basket'], [1600, 900, 'chart']];
-  const T_TEAM = .6, T_MOTOR = 2.2, T_ASSET = 4.2, T_PROJ = 6.4, T_CONC = 12.4;
-  cue(id, T_MOTOR, 'pop', { p: 1, v: .2 }); cue(id, T_ASSET, 'impact', { size: .6 }); PROJ.forEach((_, i) => cue(id, T_PROJ + i * .55, 'ping', { f: 784 * Math.pow(2, i * 2 / 12) })); cue(id, T_CONC, 'chime', { f: 784, up: 7 });
+  const T_TEAM = onBeat(id, .6), T_MOTOR = onBeat(id, 2.2, 'bar'), T_ASSET = onBeat(id, 4.2, 'bar'), T_PROJ = onBeat(id, 6.4, 'bar'), T_CONC = onBeat(id, 12.4, 'bar');
+  const T_PI = PROJ.map((_, i) => beatsFrom(id, T_PROJ, i));   // um projeto por batida
+  cue(id, T_MOTOR, 'pop', { p: 1, v: .2 }); cue(id, T_ASSET, 'impact', { size: .6 }); PROJ.forEach((_, i) => cue(id, T_PI[i], 'ping', { f: 784 * Math.pow(2, i * 2 / 12) })); cue(id, T_CONC, 'chime', { f: 784, up: 7 });
   const SCRIPT = SAY.reg(id, [
     [3.8, 20.3, 'title', 'A mesma equipe, *um alcance maior*'],
     [4.2, T_CONC + .2, 'body', '*Automação*, *padronização* e *reutilização* ampliam o alcance das entregas.', { x: LAY.x, y: 812, w: 860, visual: true }],
@@ -45,10 +46,10 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       if (ap > 0) { glow(ctx, ...N.asset, 260, C.yellow, .45 * ap + .1 * BT.level); ctx.save(); ctx.translate(...N.asset); ctx.scale(ap, ap); ctx.rotate(Math.sin(t * .8) * .05);
         holo(ctx, -110, -110, 220, 220, { color: C.yellow }); icon(ctx, 'grid', 0, 0, 120, C.yellow, 9); ctx.restore(); }
       // projetos em contextos diferentes, ligados ao mesmo ativo
-      PROJ.forEach(([x, y, ic], i) => { const p = E.inOutSine(P(t, T_PROJ + i * .55, .7)); if (p <= 0) return;
+      PROJ.forEach(([x, y, ic], i) => { const p = E.inOutSine(P(t, T_PI[i], .7)); if (p <= 0) return;
         LINE.draw(ctx, [N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], p, { w: 10, col: [C.red, C.orange, C.yellow, C.orange, C.red][i], head: p < .99, shadow: false });
         if (p > .95) for (let k = 0; k < 2; k++) { const u = (t * .5 + k * .5 + i * .13) % 1, [px, py] = LINE.at([N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], u); circle(ctx, px, py, 6, '#FFE7B0'); }
-        const s = E.outBack(P(t, T_PROJ + i * .55 + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
+        const s = E.outBack(P(t, T_PI[i] + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
       // rótulos obrigatórios
       const la = k => clamp(P(t, [T_TEAM, T_MOTOR, T_ASSET, T_PROJ + 1][k] + .3, .4));
       hud(ctx, c => { c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;
@@ -62,8 +63,11 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
 /* ---------- 06 · A Prática: os pilares sustentam a linha ---------- */
 (() => {
   const id = 's06', N = Math.max(1, PILLARS.length), GYp = 900, TOPY = 430, X = i => W / 2 + (i - (N - 1) / 2) * Math.min(350, 1700 / N);
-  const T_COL = PILLARS.map((_, i) => .5 + i * .45), T_LINE = 2.4, G1 = Math.ceil(N / 2) + (N > 4 ? 1 : 0), T_G1 = 5.6, T_G2 = 12.6, T_CONC = 19.4;
-  T_COL.forEach((t0, i) => cue(id, t0, 'impact', { size: .3 })); cue(id, T_LINE, 'whoosh', { dur: 1.6, v: .3 }); cue(id, T_G1, 'pop', { p: 1, v: .2 }); cue(id, T_G2, 'pop', { p: 1.1, v: .2 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
+  // tudo no tempo da música: um pilar por batida, linha e grupos de cartões em começos de compasso, um cartão por batida
+  const T_COL = PILLARS.map((_, i) => beatsFrom(id, .5, i)), T_LINE = onBeat(id, 2.4, 'bar'), G1 = Math.ceil(N / 2) + (N > 4 ? 1 : 0);
+  const T_G1 = onBeat(id, 5.6, 'bar'), T_G2 = onBeat(id, 12.6, 'bar'), T_CONC = onBeat(id, 19.4, 'bar');
+  const T_CARD = PILLARS.map((_, i) => beatsFrom(id, i < G1 ? T_G1 : T_G2, i < G1 ? i : i - G1));
+  T_COL.forEach((t0, i) => cue(id, t0, 'impact', { size: .3 })); cue(id, T_LINE, 'whoosh', { dur: 1.6, v: .3 }); T_CARD.forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + i * .05, v: .16 })); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
   const SCRIPT = SAY.reg(id, [
     [3.8, 24.6, 'title', `Os *${NUMW[N] || N} pilares* da prática`],
     [4.0, T_G1 + 3, 'note', 'Capacidades complementares sustentam nossas entregas.', { x: LAY.x, y: 214, align: 'left', size: 30, weight: 800 }],
@@ -89,7 +93,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
       if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) * .12) % 1; LINE.head(ctx, lerp(-120, W + 120, u), TOPY - 40, 0, 18); }
       // contribuições: dois grupos, cada descrição fica na tela até o fim
-      PILLARS.forEach((p, i) => { const t0 = i < G1 ? T_G1 : T_G2, a = P(t, t0 + (i % G1) * .25, .5); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
+      PILLARS.forEach((p, i) => { const a = P(t, T_CARD[i], .4); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;
           paper(c, -w / 2, -110, w, 220, { r: 14, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5 });
           rr(c, -w / 2, -110, w, 50, 14); c.fillStyle = [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i]; c.fill();

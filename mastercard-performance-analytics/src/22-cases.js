@@ -222,7 +222,7 @@ const CASEKIT = {
     const dp = P(t, T_DROP + 4.2, .5); if (dp > 0) hud(ctx, c => { c.globalAlpha *= dp; c.translate(1560, 740); c.rotate(-.015);
       paper(c, -300, -100, 600, 200, { torn: true, seed: 33, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5, tape: [[.5, 0, .05]] });
       tag(c, -170, -64, 'DECISÃO', { size: 22, fill: C.red, color: '#FFF' });
-      para(c, `As cestas viraram *mecânicas de campanha* nos testes da Mesa de Performance${tgt ? ` (mecânica B: ${FMT.num(tgt, 0)} clientes)` : ''}.`, -270, -30, 540, { size: 28, weight: 800, color: INK, accent: C.red }); });
+      para(c, `As cestas viraram *mecânicas de campanha* nos testes do cliente${tgt ? ` (mecânica B: ${FMT.num(tgt, 0)} clientes)` : ''}.`, -270, -30, 540, { size: 28, weight: 800, color: INK, accent: C.red }); });
     ctx.restore();
   }
   /** o resultado: índice com base explícita (2ª melhor = 100) */

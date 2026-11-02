@@ -107,10 +107,15 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - uma revisão típica: um rascunho, o motivo da reprovação e o texto corrigido.
 
   O filme rotula esses textos como exemplos. Troque por um exemplo real do tipo de revisão quando puder.
-- **Ambiente seguro:** os nomes do repositório estão sanitizados (pilares "Cenoura", "Brócolis"…, clientes "Banana", "Manga"…). Para trocar pelos reais:
+- **Ambiente seguro:** os nomes do repositório estão sanitizados (pilares "Cenoura", "Brócolis"…, clientes "Banana", "Manga"…).
+  - **Lorem ipsum (v7.3):** as informações da prática estão em lorem ipsum: contribuições e entregas dos pilares. Mantêm a mesma quantidade de entregas por pilar.
+  - **Outros dados mascarados:** as fontes internas, os motivos do Brasil, os nomes das mecânicas de campanha ("Mecânica Lorem"…) e as ferramentas do case Manga.
+
+  Para trocar pelos reais:
   1. Abra uma **cópia local** de `performance-analytics.html` num editor de texto.
   2. Procure `id="pa-data"`.
   3. Edite dentro do bloco e salve. Não é preciso rodar build. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
+- **Aviso de versão mockada:** `presentation_context.disclaimer` aparece no canto inferior esquerdo de todas as telas, inclusive nas conversas ("Este vídeo é a versão mockada, com dados sanitizados."). Na cópia local com os dados reais, deixe o campo vazio (`""`) e o aviso some.
 
 ## Música e batidas
 
@@ -148,13 +153,15 @@ src/
   05-audio.js      trilha sintetizada do embarque + SFX + cues
   07-beats.js      gerado por tools/music.py · 08-music.js toca as faixas e expõe BT
   09-fx.js         câmera e pós-processamento guiados pela música; tinta, respingos, pinceladas
-  10-ui.js         split-flap, mapa, mini-mapa (canto superior direito), plataforma viva, cartazes, slides + popup, telas extras (SLIDE_SCREENS)
+  10-ui.js         grade musical por cena (grid, onBeat, beatsFrom: entradas no tempo da música), split-flap, mapa, mini-mapa,
+                   plataforma viva, cartazes, slides + popup, telas extras (SLIDE_SCREENS)
   11-station.js    vagão, trem que passa, painel "próxima estação", bilhete
   12-paint.js      acabamento pintado, luz volumétrica, volume
   13-people.js     ratinho e pombo da plataforma (o rig da personagem continua no arquivo, mas não é usado desde a v7.2)
   14-v7.js         ★ v7: TY/LAY (tipografia e grade), HUD (texto nítido), SAY (roteiro de tela), LINE (a linha laranja),
                    camKey/layer (câmera 2.5D), flowRow (diagramas nomeados), skyline, balão de pergunta,
-                   SPACE (v7.2: campo de partículas, curva 3D em fita e objetos flutuando, em perspectiva)
+                   SPACE (v7.2: campo de partículas, curva 3D em fita e objetos flutuando, em perspectiva),
+                   mockBadge (aviso de versão mockada)
   20-open.js       pré-show, embarque e Conversa 0
   21-trecho1.js    estações 01, 02, 03, cartazes 01–03, catálogo de modelos e Conversa 1
   22-cases.js      estação 04 e os 4 cases

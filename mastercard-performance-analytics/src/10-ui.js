@@ -11,7 +11,25 @@ function grid(id) {
   const s = CONFIG.sceneById[id], p = CONFIG.playById[s.play];
   if (!p.track) { const per = 60 / CONFIG.bpm, n = Math.ceil(s.dur / per); return GRIDS[id] = { beats: Array.from({ length: n }, (_, i) => i * per), bars: Array.from({ length: Math.ceil(n / 4) }, (_, i) => i * per * 4) }; }
   const d = BEATS[p.track], off = p.from + (s.start - p.start), loc = arr => arr.map(x => +(x - off).toFixed(3)).filter(x => x >= -1e-3 && x < s.dur);
-  return GRIDS[id] = { beats: loc(d.beats), bars: loc(d.down) };
+  // a grade cobre a cena inteira: onde o detector parou (fim de faixa, trecho filtrado) ela segue no mesmo período
+  const med = a => { const d2 = a.slice(1).map((x, i) => x - a[i]).sort((u, v) => u - v); return d2.length ? d2[d2.length >> 1] : 0; };
+  const ext = (a, per) => { if (!a.length || !(per > .1)) return a; const o = a.slice();
+    while (o[o.length - 1] + per < s.dur + per) o.push(+(o[o.length - 1] + per).toFixed(3));
+    while (o[0] - per > -1e-3) o.unshift(+(o[0] - per).toFixed(3)); return o; };
+  const B = loc(d.beats), D = loc(d.down), pb = med(B) || 60 / (d.bpm || 110);
+  return GRIDS[id] = { beats: ext(B, pb), bars: ext(D, med(D) || pb * 4) };
+}
+/** encaixa um tempo LOCAL da cena na batida ('beat') ou no começo de compasso ('bar') mais próximo da faixa do play */
+function onBeat(id, t, unit = 'beat') {
+  const a = unit === 'bar' ? grid(id).bars : grid(id).beats; if (!a.length) return t;
+  let b = a[0]; for (const x of a) if (Math.abs(x - t) < Math.abs(b - t)) b = x; return b;
+}
+/** a n-ésima batida depois da batida mais próxima de t (para entradas em sequência, uma por batida) */
+function beatsFrom(id, t, n = 0) {
+  const a = grid(id).beats; if (!a.length) return t + n * .5;
+  let i = 0; for (let k = 0; k < a.length; k++) if (Math.abs(a[k] - t) < Math.abs(a[i] - t)) i = k;
+  const per = a.length > 1 ? (a[a.length - 1] - a[0]) / (a.length - 1) : .5;
+  return a[i + n] != null ? a[i + n] : a[a.length - 1] + (i + n - a.length + 1) * per;
 }
 
 /* ---------- split-flap ---------- */

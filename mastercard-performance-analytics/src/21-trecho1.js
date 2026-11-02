@@ -172,7 +172,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   const VS_PREV = PREV ? ACT / PREV : null, VS_BUD = BUD ? ACT / BUD : null;
   const QS = Object.entries(BR.quarterly_usd_millions || {}), QUP = QS.filter(([, q]) => q.actuals_2023 > q.budget_2023).length;
   const qLabel = k => (k.match(/(\d)/) ? 'T' + k.match(/(\d)/)[1] : k) + (/prelim/i.test(k) ? ' (prel.)' : '');
-  const T_BAR = ROWS.map((_, i) => 1.0 + i * 1.15), T_TREND = 5.6, T_READ = 12.2, T_BR = 20.4, T_CMP = [21.9, 23.3], T_Q = 30.6, T_CONC = 38.4;
+  const T_BAR = ROWS.map((_, i) => beatsFrom(id, 1.0, 2 * i)), T_TREND = 5.6, T_READ = 12.2, T_BR = 20.4, T_CMP = [21.9, 23.3], T_Q = 30.6, T_CONC = 38.4;
   const CX = [430, 680, 930, 1180], BASE = 820, HH = 500, X0 = 250, BW = 160;
   const CAM = [[0, 960, 560, 1.05], [3.6, 960, 540, 1], [T_BR - .2, 960, 540, 1], [T_BR + 1.3, 3160, 540, 1], [43.7, 3160, 540, 1]];
   const hY = v => BASE - toU(v) / TOP * HH;
@@ -294,7 +294,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
 (() => {
   const id = 's03';
   // música: break 0–15,4 · parte B 15,4–52,36 · saída 52,36 → síntese
-  const T_CLI = [4.4, 5.5, 6.6], T_CAP = 16.0, T_INT = 25.6, T_PRED = 34.4, T_PRESC = 44.2, T_SYN = 52.3;
+  const T_CLI = [0, 1, 2].map(i => beatsFrom(id, 4.4, 2 * i)), T_CAP = 16.0, T_INT = 25.6, T_PRED = 34.4, T_PRESC = 44.2, T_SYN = 52.3;
   const ctype = SEC(3).client_types || ['Emissores', 'Adquirentes', 'Merchants'], nm = s => /merchant/i.test(s) ? 'Varejo' : s;
   const TYPES = [[nm(ctype[0] || 'Emissores'), 'bank', 'Principalidade', 'decidir qual produto oferecer', C.red], [nm(ctype[1] || 'Adquirentes'), 'card', 'Market share', 'decidir onde crescer', C.orange],
     [nm(ctype[2] || 'Varejo'), 'basket', 'Cestas de produtos', 'decidir o que promover', C.yellow]];

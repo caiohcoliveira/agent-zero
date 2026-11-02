@@ -198,6 +198,22 @@ A v5.4 continua intacta em `claude/mastercard-analytics-video-4cof1t`.
   - navegação e clique ok;
   - folhas de fotos enviadas.
 
+### v7.3 — dados mais anonimizados, aviso e entradas no tempo da música
+
+- [x] **Prática em lorem ipsum:**
+  - contribuições e entregas dos pilares;
+  - também mascarados: fontes internas, motivos do Brasil, mecânicas de campanha, ferramentas do case Manga e "Mesa de Performance".
+- [x] **Aviso de versão mockada:** fica no canto inferior esquerdo, vem de `presentation_context.disclaimer` e some com o campo vazio.
+- [x] **Entradas no tempo da música** (`onBeat`, `beatsFrom` em `src/10-ui.js`):
+  - **06:** um pilar por batida; grupos de cartões no começo do compasso e um cartão por batida;
+  - **05:** nós no começo do compasso e um projeto por batida;
+  - **07 e clímax:** painéis e disciplinas nas batidas;
+  - **02 e 03:** barras e fachadas nas batidas;
+  - a grade cobre a cena inteira, mesmo onde o detector parou.
+- [ ] **Músicas na ElevenLabs:**
+  - parte 1 encaixada (prévia; aguarda aprovação);
+  - partes 2 e 3: opções para o usuário ouvir e escolher.
+
 Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 
 ## Como retomar numa nova sessão

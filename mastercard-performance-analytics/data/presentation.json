@@ -3,6 +3,7 @@
     "title": "Performance Analytics | Analytics as a Strategic Consulting Capability",
     "organization": "Mastercard Advisors",
     "track": "Performance Analytics",
+    "disclaimer": "Este vídeo é a versão mockada, com dados sanitizados.",
     "objective": "Narrativa executiva sobre a evolução de Performance Analytics: relevância estratégica, crescimento, portfolio, cases com impacto mensurável, inovação e visão de futuro.",
     "case_structure": "Business Problem -> Analytics Solution -> Insight/Decision -> Business Impact"
   },
@@ -57,10 +58,10 @@
           }
         },
         "drivers": [
-          "2022 growth was in large part due to correct assignation of product",
-          "2023 was heavily steered by the partnership with the MS team"
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+          "Sed do eiusmod tempor incididunt ut labore et dolore"
         ],
-        "source": "PSA financials"
+        "source": "fonte interna (lorem ipsum)"
       },
       "scale_proof_points": {
         "cliente_banana_product_baskets": {
@@ -84,7 +85,7 @@
       "section": 3,
       "title": "What We Bring to the Market",
       "objective": "Portfolio de capabilities, produtos e tipos de projetos, mostrando como Analytics complementa e potencializa as demais tracks.",
-      "source": "Guia Comercial de PA (1).htm",
+      "source": "documento interno (lorem ipsum)",
       "client_types": [
         "Emissores",
         "Adquirentes",
@@ -158,7 +159,7 @@
         {
           "case_name": "Cliente Banana | Product Baskets",
           "client": "Cliente Banana",
-          "business_problem": "Aumentar transversalidade entre Cliente Banana, Cliente Maçã e Cliente Pera nos testes da Mesa de Performance: identificar cestas de SKUs estratégicos, clientes com maior propensão a cada cesta e produtos de alto valor que motivam a visita.",
+          "business_problem": "Aumentar transversalidade entre Cliente Banana, Cliente Maçã e Cliente Pera nos testes de campanha: identificar cestas de SKUs estratégicos, clientes com maior propensão a cada cesta e produtos de alto valor que motivam a visita.",
           "data_challenges": [
             "Apenas compras registradas, sem preferência declarada",
             "Itens onipresentes de baixo valor (sacola, pão) dominavam o sinal",
@@ -189,11 +190,11 @@
             "conversion_by_mechanic": {
               "Destilados (cesta)": "1.52%",
               "Churrasco (cesta)": "1.28%",
-              "Ganhe e Use I": "1.28%",
-              "Membership": "1.2%",
+              "Mecânica Lorem": "1.28%",
+              "Mecânica Ipsum": "1.2%",
               "Café + chocolate (cesta)": "1.12%",
-              "Raspou, Ganhou": "0.56%",
-              "Presente Surpreenda": "0.16%"
+              "Mecânica Dolor": "0.56%",
+              "Mecânica Sit": "0.16%"
             },
             "incremental_revenue_cafe": "R$ 218",
             "cafe_revenue_growth_non_primary_bu": "+0.245 relative"
@@ -260,10 +261,10 @@
               "Daily recommendation adjustment"
             ],
             "assets": [
-              "GitLab code",
-              "Scheduled jobs",
-              "MLflow metrics",
-              "Technical documentation"
+              "Lorem ipsum (código versionado)",
+              "Rotinas agendadas",
+              "Lorem ipsum (métricas dos modelos)",
+              "Documentação técnica"
             ]
           },
           "future_vision": "Unified engine combining affinity, conversion, principality and profitability, extendable to PJ.",
@@ -361,58 +362,58 @@
     {
       "section": 6,
       "title": "Practice",
-      "objective": "Pilares da prática, entregas relevantes e evoluções.",
+      "objective": "Lorem ipsum: pilares da prática, entregas e evoluções (conteúdo mockado).",
       "pillars": [
         {
           "pillar": "Cenoura",
-          "contribution": "Treinamentos, mesas-redondas e troca de conhecimento no time",
+          "contribution": "Lorem ipsum dolor sit amet, consectetur adipiscing",
           "highlights": [
-            "10 specific training sessions in collaboration with OC Training",
-            "AI & AA Practice offered 10 different training sessions for all A&CS Team",
-            "12 Round Tables for PA Team",
-            "Coffee Table knowledge-sharing initiative",
-            "Round Table under new management with junior team engagement"
+            "Lorem ipsum dolor sit amet",
+            "Consectetur adipiscing elit sed",
+            "Do eiusmod tempor incididunt",
+            "Ut labore et dolore magna",
+            "Aliqua ut enim ad minim"
           ]
         },
         {
           "pillar": "Brócolis",
-          "contribution": "Newsletter, automações e kit de onboarding",
+          "contribution": "Sed do eiusmod tempor, incididunt ut labore",
           "highlights": [
-            "AI & AA Newsletter introduced in Brazil, with 6 editions since the reference period",
-            "Newsletter built using Copilot and sent through an automated Power Automate process",
-            "Automation Hub with Tools: Dispatch and Benchmark",
-            "Onboarding Kit with PA project context and validated access steps for Mastercard Data Environment"
+            "Veniam quis nostrud exercitation",
+            "Ullamco laboris nisi ut aliquip",
+            "Ex ea commodo consequat",
+            "Duis aute irure dolor"
           ]
         },
         {
           "pillar": "Abobrinha",
-          "contribution": "Formação em IA e certificação Greenbelt",
+          "contribution": "Ut enim ad minim veniam, quis nostrud",
           "highlights": [
-            "AI Contributor Learning Program as the first step toward AI Greenbelt Certification",
-            "AI Greenbelt Certification launched in the reference period",
-            "Program structured around Learn, Contribute, Collaborate, Exposure and Apply"
+            "In reprehenderit in voluptate",
+            "Velit esse cillum dolore",
+            "Eu fugiat nulla pariatur"
           ]
         },
         {
           "pillar": "Beterraba",
-          "contribution": "Projetos de IA, eficiência e agentes internos",
+          "contribution": "Duis aute irure dolor in reprehenderit",
           "highlights": [
-            "Cliente Goiaba Agentic Commerce client project",
-            "Cliente Caju AI for Cards client project",
-            "AI-driven efficiency activities with Efficiency OC",
-            "Automations with Staffing OC",
-            "AI Office Hours in the reference quarter",
-            "Internal AI agents and apps: PO Requisition App, Storytelling Agent and HTML Layout Agent"
+            "Excepteur sint occaecat",
+            "Cupidatat non proident",
+            "Sunt in culpa qui officia",
+            "Deserunt mollit anim",
+            "Id est laborum lorem",
+            "Ipsum dolor sit amet"
           ]
         },
         {
           "pillar": "Couve",
-          "contribution": "Repositório com mais de 60 projetos padronizados",
+          "contribution": "Excepteur sint occaecat cupidatat non proident",
           "highlights": [
-            "More than 60 Performance Analytics projects mapped in a centralized repository",
-            "10 structured dimensions",
-            "10 reference one-pagers",
-            "Standardized one-pagers covering context and application, key steps, approaches used and reference deliverables"
+            "Lorem ipsum dolor sit",
+            "Amet consectetur adipiscing",
+            "Elit sed do eiusmod",
+            "Tempor incididunt ut labore"
           ]
         }
       ]
