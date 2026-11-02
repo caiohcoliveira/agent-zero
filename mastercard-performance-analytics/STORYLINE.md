@@ -1,4 +1,4 @@
-# A Linha — Storyline v7.2 (experimento)
+# A Linha — Storyline v7.4 (experimento)
 
 **Decisões que movem o negócio.** Esta versão aplica o roteiro criativo v7: o filme contém o contexto, o mecanismo e a conclusão de cada assunto. As apresentadoras aprofundam, mas assistir em silêncio basta.
 
@@ -243,37 +243,23 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 O letreiro fica aceso sobre a estação viva. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
 
-## Trilha (v7.1 · versões animadas)
+## Trilha (v7.4 · ElevenLabs)
 
-As três faixas ganharam camadas sintetizadas no tempo da música (`tools/remix.py`).
+As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tempos do filme (`tools/eleven_fit.py`).
 
-- **Technology (os cases):**
-  - **Calma:** bumbo nos tempos 1 e 3, chimbal e shaker.
-  - **Construção:**
-    - bumbo em todos os tempos e caixa acelerando até a fusa;
-    - riser de ruído e tom;
-    - o grave some aos poucos e entra meio tempo de silêncio.
-  - **Drop, na solução:**
-    - impacto (sub que despenca + prato) e bateria cheia: bumbo 4/4, palmas no 2 e no 4, chimbal aberto no contratempo e virada a cada 4 compassos;
-    - sidechain na faixa e graves reforçados: o pico de energia.
-  - **Relatórios:** a construção esvazia até o clique, fica em silêncio no escuro e o drop explode junto com o neon.
-  - **Agentes:** a construção é mais longa e o drop maior, na escala.
-- **Funk (estações 01–03):**
-  - graves e brilho reforçados, com pratos nas viradas de estação;
-  - o break antes da parte B ganha riser e grave sumindo, e a parte B entra com impacto.
-- **Piano (07, disciplinas, letreiro):**
-  - pulso épico na cidade;
-  - nas disciplinas, bumbo em todos os tempos e um tom a cada disciplina que entra;
-  - rufar + riser até "Tudo se resume a…", com impacto, e impacto no acorde final do letreiro.
-
-## Pendências de validação (do roteiro v7)
-
-- **Receita:** confirmar unidade, período do Brasil e o valor da previsão 2026. Os valores do repositório estão mascarados.
-- **Agentes:** confirmar universo (30), ativos (8) e oportunidades (22) e o que está em produção.
-- **Cases e métricas:**
-  - cestas: confirmar campanha e comparação;
-  - principalidade: confirmar a metodologia do backtest e a base do controle;
-  - status "produtizado" (está no JSON).
-- **Agentes:** trocar os exemplos ilustrativos (objeto `EX` em `src/22-cases.js`) por um exemplo real do tipo de revisão.
-- **Pilares:** nomes reais e contribuições finais (`contribution`) para os 5 pilares.
-- **User-Pay:** confirmar a definição comercial.
+- **Parte 1 · estações 01–03 (funk cinematográfico, 110 BPM):**
+  - intro abafada que abre no tema (0:12);
+  - o tema volta maior na estação 02;
+  - na estação 03 a música fica só com médios (o "low"), faz uma pausa e o drop entra na parte B (1:45,9) com riser e impacto;
+  - as viradas de estação caem no tempo forte.
+- **Parte 2 · os cases, 05 e 06 (uma peça contínua, 108 BPM):**
+  - a mesma banda e o mesmo motivo do começo ao fim; a tecnologia aparece em texturas discretas, sem EDM, porque é um evento corporativo;
+  - em cada case: parte calma no problema e nos dados, construção em "como fizemos" e impacto na solução;
+  - na automação a música esvazia, corta seco no interruptor e volta no neon;
+  - na IA vem o clímax da apresentação;
+  - na 05/06 a música volta ao groove de abertura da própria peça (transição de 1 compasso) e termina na cadência dela.
+- **Parte 3 · 07, disciplinas e letreiro (final orquestral, 100 BPM, sem coro):**
+  - a cidade com piano e cordas;
+  - as disciplinas entram nas batidas;
+  - a entrada da orquestra cai em "Tudo se resume a…";
+  - o letreiro acende no acento de 59,81 s e o acorde soa até o fim.

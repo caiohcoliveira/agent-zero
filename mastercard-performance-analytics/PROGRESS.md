@@ -210,9 +210,22 @@ A v5.4 continua intacta em `claude/mastercard-analytics-video-4cof1t`.
   - **07 e clímax:** painéis e disciplinas nas batidas;
   - **02 e 03:** barras e fachadas nas batidas;
   - a grade cobre a cena inteira, mesmo onde o detector parou.
-- [ ] **Músicas na ElevenLabs:**
-  - parte 1 encaixada (prévia; aguarda aprovação);
-  - partes 2 e 3: opções para o usuário ouvir e escolher.
+
+### v7.4 — trilha da ElevenLabs
+
+- [x] **Parte 1:** funk cinematográfico (versão 2) encaixado: drop em 105,897 s e viradas de estação no tempo forte.
+- [x] **Parte 2:** depois do retorno do usuário ("o final muda o ritmo", "não pode mudar de sentido", "eletrônica demais para um evento"):
+  - virou uma peça contínua;
+  - clímax na IA, 05/06 voltam ao groove de abertura da peça.
+- [x] **Parte 3:** final orquestral, opção A sem o coro (Demucs `htdemucs_ft`), com letreiro no acento de 59,81 s.
+- [x] **Pipeline:**
+  - `tools/eleven_fit.py` encaixa; `tools/music.py` usa a grade exata (`GRID`);
+  - `tools/build.py` prefere `musica/parteN.mp3`;
+  - o volume é o mesmo da trilha anterior.
+- [x] **QA:**
+  - varredura 0–551 s sem exceções;
+  - medidor de leitura: 72 telas, 0 curtas;
+  - navegação, clique e console limpos.
 
 Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 

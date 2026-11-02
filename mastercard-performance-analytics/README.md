@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.2, experimento)
+# Performance Analytics — "A Linha" (v7.4, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -119,26 +119,37 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
 
 ## Música e batidas
 
-- **Faixas (Pixabay):** berrydeep "Vintage Film Funk", kulakovka "Technology" e twisterium "Epic Piano Background". Entram embutidas no HTML, recodificadas a 128 kbps. Os MP3 avulsos ficam em `musica/`, fora do Git, porque a licença não permite redistribuir a faixa solta.
-- **Remontagem** (`tools/edit_music.py`, cortes nos compassos com crossfade):
-  - **Funk (2:35):** a frase A de 16 compassos se repete. A estação 02 começa no recomeço da frase, a 03 começa no break e a síntese cai na saída da música.
-  - **Technology (5:04):** cada case tem 27 compassos (60 s): calma 11 → construção 5 → cheia 11, com o drop na **solução**.
-    - **Relatórios:** a construção perde os agudos, corta seco no interruptor e fica um compasso em silêncio antes do drop.
-    - **Agentes:** a construção é longa e o drop cai na **escala**, depois que o ciclo foi explicado.
-- **Versão animada** (`tools/remix.py`, v7.1): camadas sintetizadas no tempo da música, masterizadas com limitador suave.
-  - **Technology** (batida quantizada, desvio < 1 ms):
-    - nas partes calmas, bumbo nos tempos 1 e 3, chimbal e shaker;
-    - na construção, bumbo em todos os tempos, caixa acelerando (colcheia → semicolcheia → fusa) e riser; o grave da faixa vai sumindo e entra meio tempo de silêncio;
-    - no **drop**, impacto (sub que despenca + prato) e bateria cheia: bumbo 4/4, palmas no 2 e no 4, chimbal aberto no contratempo e virada a cada 4 compassos;
-    - o drop tem **sidechain** (a faixa "respira" com o bumbo) e graves reforçados;
-    - no case de relatórios, a construção esvazia (só um drone grave), fica em silêncio e explode no drop.
-  - **Funk e piano** (tempo humano, sem bateria contínua):
-    - graves e brilho reforçados;
-    - riser, silêncio curto e impacto na entrada da parte B (estação 03);
-    - no piano, percussão épica nas disciplinas, rufar + riser até "Tudo se resume a…" e impacto no acorde final.
-  - Ordem: `tools/edit_music.py` → `tools/remix.py` → `tools/music.py` → `./build.sh`. O build usa `musica/<faixa>-mix.mp3` quando existe.
-- **Sincronia:** `tools/music.py` (librosa) gera `src/07-beats.js`, com a fase dos compassos presa a um começo de compasso conhecido por faixa (`DOWN_REF`).
-  - As cenas marcam eventos nos compassos (`grid(id).bars`).
+- **Faixas (v7.4, ElevenLabs Music):** as três partes foram geradas na conta ElevenLabs do usuário, como instrumentais, e encaixadas nos tempos do filme. Entram embutidas no HTML, recodificadas a 128 kbps.
+  - **Parte 1 · estações 01–03 (2:34,5):** funk cinematográfico, 110 BPM.
+    - Intro abafada que abre no tema e as viradas de estação no tempo forte.
+    - Low só com médios antes da parte B, pausa, riser e drop na estação 03.
+  - **Parte 2 · estação 04, os 4 cases, 05 e 06 (5:04):** uma peça contínua de funk corporativo com toques eletrônicos discretos, 108 BPM. Mantém a mesma banda e o mesmo motivo do começo ao fim, sem EDM.
+    - Cada case tem parte calma, construção e impacto na **solução**.
+    - Na automação, a música corta seco no interruptor e fica em silêncio até o drop.
+    - O clímax é a **IA**.
+    - A 05/06 volta ao groove de abertura da própria peça, com uma transição de 1 compasso.
+  - **Parte 3 · 07, disciplinas e letreiro (1:12):** final orquestral, 100 BPM, **sem o coro**.
+    - A entrada da orquestra cai na frase-chave e o letreiro acende no acento de 59,81 s.
+    - O acorde soa até o fim.
+- **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos. O encaixe faz:
+  - cortes e repetições de compassos;
+  - filtros (intro abafada, parte calma, quebra só com médios);
+  - camadas de `tools/remix.py`: riser, impacto, prato e o silêncio do interruptor.
+  - Só a parte 1 tem andamento ajustado (0,95%, rubberband), para a grade de 110 BPM das cenas.
+- **Arquivos (fora do Git):**
+  - versões brutas em `musica/elevenlabs/`: `parte1-bruta.mp3`, `parte2-bruta.mp3`, `parte3-bruta-A.mp3` e `parte3-sem-coro.wav`;
+  - mixes finais em `musica/parte1.mp3`, `musica/parte2.mp3` e `musica/parte3.mp3`.
+  - **Sem coro:** `parte3-sem-coro.wav` sai do Demucs: `python -m demucs --two-stems=vocals -n htdemucs_ft parte3-bruta-A.mp3`, arquivo `no_vocals.wav`. Precisa de torch e demucs num ambiente à parte.
+- **Ordem:** `python3 tools/eleven_fit.py todas` → `python3 tools/music.py` → `./build.sh`.
+  - O build usa `musica/parteN.mp3` quando existe.
+  - Sem esses arquivos, cai na trilha Pixabay anterior (`tools/edit_music.py` → `tools/remix.py`, arquivos `<faixa>-mix.mp3`).
+  - Os ids internos das faixas (`funk`, `tech`, `piano`) continuam os mesmos.
+- **Volume:** `CONFIG.tracks` (0,81 · 0,77 · 0,72) mantém o mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS), equilibrado com os efeitos.
+- **Uso:** confira os termos do plano da conta ElevenLabs para uso das músicas geradas no evento.
+- **Sincronia:** `tools/music.py` gera `src/07-beats.js`.
+  - Para as três faixas, a grade é **exata** (`GRID`: andamento, um tempo forte conhecido e as seções), em vez de detectada.
+  - Assim as cenas acertam a batida mesmo em intros filtradas.
+  - As cenas marcam eventos nos compassos (`grid(id).bars`) e encaixam as entradas nas batidas (`onBeat`, `beatsFrom`).
   - O estado da música fica em `BT`.
   - A batida mexe pouco (`CONFIG.motion.beatBase` = 0,15) e só cresce nos picos declarados em `SCENES[id].peaks`.
 

@@ -2,7 +2,8 @@
 
 Junta src/00-head.html + JSON de dados + músicas + src/[0-9][0-9]-*.js + src/99-tail.html.
 - Dados: data/presentation.json (ou o caminho passado como argumento), embutido e editável no topo.
-- Músicas: musica/<id>.mp3 (fora do Git), recodificadas a 128 kbps e embutidas em base64.
+- Músicas: musica/parte1.mp3, parte2.mp3, parte3.mp3 (ElevenLabs, tools/eleven_fit.py; fora do Git), recodificadas a
+  128 kbps e embutidas em base64. Sem elas, usa a trilha Pixabay (musica/<id>-mix.mp3).
   Sem a pasta musica/, reaproveita as músicas que já estão no HTML atual.
 Uso: python3 tools/build.py [dados.json]
 """
@@ -16,6 +17,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'performance-analytics.html'
 MUSIC_IDS = ['funk', 'tech', 'piano']
+ELEVEN = {'funk': 'parte1.mp3', 'tech': 'parte2.mp3', 'piano': 'parte3.mp3'}   # v7.4: músicas geradas na ElevenLabs
 
 
 def data_block(path):
@@ -26,8 +28,8 @@ def data_block(path):
 def music_blocks(prev):
     out = []
     for mid in MUSIC_IDS:
-        # versão animada (tools/remix.py) → remontagem (tools/edit_music.py) → faixa original
-        src = next((ROOT / 'musica' / f for f in (f'{mid}-mix.mp3', f'{mid}-edit.mp3', f'{mid}.mp3') if (ROOT / 'musica' / f).exists()), ROOT / 'musica' / f'{mid}.mp3')
+        # ElevenLabs encaixada (tools/eleven_fit.py) → trilha Pixabay: versão animada (remix) → remontagem → original
+        src = next((ROOT / 'musica' / f for f in (ELEVEN[mid], f'{mid}-mix.mp3', f'{mid}-edit.mp3', f'{mid}.mp3') if (ROOT / 'musica' / f).exists()), ROOT / 'musica' / f'{mid}.mp3')
         if src.exists():
             mp3 = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(src), '-map_metadata', '-1', '-ac', '2',
                                   '-b:a', '128k', '-f', 'mp3', '-'], capture_output=True, check=True).stdout

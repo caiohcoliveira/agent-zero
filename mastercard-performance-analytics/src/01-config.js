@@ -42,7 +42,7 @@ const CONFIG = {
     voice: false,          // narração do navegador: DESLIGADA por padrão (botão "Voz" / tecla V)
     musicVolume: 0.42, sfxVolume: 0.5,
     trackVolume: 1.0,      // volume geral das faixas (funk, technology, piano)
-    tracks: { funk: { gain: .91 }, tech: { gain: .94 }, piano: { gain: .87 } },  // versões animadas (tools/remix.py): ~1–3 dB acima da v5.4, equilibradas entre si
+    tracks: { funk: { gain: .81 }, tech: { gain: .77 }, piano: { gain: .72 } },  // ElevenLabs (v7.4): mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS)
     duckDuringVoice: 0.55,
     voiceRate: 1.07, voicePitch: 1.02,
     preferredVoices: ['Francisca', 'Thalita', 'Brenda', 'Giovanna', 'Leila', 'Manuela', 'Yara',
@@ -56,9 +56,9 @@ const CONFIG = {
   // track = faixa embutida (src/07-beats.js) · from = de onde a faixa começa (s)
   plays: [
     { id: 1, track: null },                    // embarque: trilha sintetizada (src/05-audio.js)
-    { id: 2, track: 'funk', from: 0 },         // "Vintage Film Funk" remontada (tools/edit_music.py, 2:34)
-    { id: 3, track: 'tech', from: 0 },         // "Technology" remontada para os cases (tools/edit_music.py, 5:04)
-    { id: 4, track: 'piano', from: 2.7 }       // "Epic Piano" do 2º compasso: o acorde final cai no letreiro (14,06 s)
+    { id: 2, track: 'funk', from: 0 },         // parte 1 · ElevenLabs, funk cinematográfico encaixado (tools/eleven_fit.py, 2:34,5, 110 BPM)
+    { id: 3, track: 'tech', from: 0 },         // parte 2 · ElevenLabs, uma peça contínua (5:04, 108 BPM): drops nas soluções, pico na IA
+    { id: 4, track: 'piano', from: 0 }         // parte 3 · ElevenLabs, final orquestral sem coro (1:12, 100 BPM): frase-chave em 40,78
   ],
 
   // ---------------------------------------------------------------- CENAS (ordem = ordem do filme)

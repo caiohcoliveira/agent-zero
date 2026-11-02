@@ -181,7 +181,8 @@ const FUTURE_ART = {
 
 /* ---------- letreiro final (split-flap) + encerramento ---------- */
 const CLOSE = (() => {
-  const id = 'close', FL = TX.flap, T_F = [1.2, 5.0, 9.0, 13.2], T_CHORD = 14.08, HI = [11, 11, 11, FL[3].indexOf(' ') + 1];
+  // T_CHORD: o letreiro acende no acento da parte 3 (59,81 s do play)
+  const id = 'close', FL = TX.flap, T_F = [1.2, 5.0, 9.0, 13.2], T_CHORD = 14.21, HI = [11, 11, 11, FL[3].indexOf(' ') + 1];
   T_F.forEach((t0, k) => { cue(id, t0, 'type', { n: 26, gap: .024 }); }); cue(id, T_CHORD, 'combo'); cue(id, T_CHORD, 'shimmer', { dur: 2.5 });
   /** quadro do letreiro; t = tempo desde o início do letreiro (as paradas usam t grande = letreiro pronto) */
   function draw(ctx, t, o = {}) {

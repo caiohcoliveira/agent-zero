@@ -18,7 +18,7 @@ import librosa
 import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TRACKS = {'funk': 'musica/funk-mix.mp3', 'tech': 'musica/tech-mix.mp3', 'piano': 'musica/piano-mix.mp3'}  # remontagem (tools/edit_music.py) + versão animada (tools/remix.py)
+TRACKS = {'funk': 'musica/parte1.mp3', 'tech': 'musica/parte2.mp3', 'piano': 'musica/parte3.mp3'}  # ElevenLabs encaixada (tools/eleven_fit.py); ids antigos mantidos
 SR, FPS = 22050, 50
 HOP = SR // FPS  # 441 amostras = 20 ms
 
@@ -42,7 +42,14 @@ def band(S, freqs, lo, hi):
 DOWN_REF = {'funk': 11.92, 'tech': 11.111, 'piano': 29.08}
 
 
-def analyze(path, down_ref=None):
+# grade conhecida (BPM exato, um começo de compasso/batida e as seções): as faixas encaixadas por tools/eleven_fit.py
+# têm andamento fixo, e o detector erraria (introduções filtradas sem batida, contratempos de chimbal fortes)
+GRID = {'funk': (110.0, 105.897, [1.17, 12.079, 90.62, 105.897, 143.0]),      # parte 1: drop da parte B em 105,897
+        'tech': (108.0, 0.0, [46.667, 106.667, 166.667, 240.0]),            # parte 2: grade a partir de 0; drops nas soluções
+        'piano': (100.0, 40.668, [40.78, 59.81])}                           # parte 3: frase-chave e o acento do letreiro
+
+
+def analyze(path, down_ref=None, grid=None):
     y, sr = librosa.load(path, sr=SR, mono=True)
     dur = len(y) / sr
     onset = librosa.onset.onset_strength(y=y, sr=sr, hop_length=HOP)
@@ -53,6 +60,8 @@ def analyze(path, down_ref=None):
     a, b = np.polyfit(i, bt, 1)
     if np.std(bt - (a * i + b)) < .03:
         bt = a * i + b
+    if grid:
+        per = 60 / grid[0]; bt = np.arange(grid[1] % per, dur, per); down_ref = grid[1]
     S = np.abs(librosa.stft(y, n_fft=2048, hop_length=HOP))
     freqs = librosa.fft_frequencies(sr=sr, n_fft=2048)
     low = np.log1p(band(S, freqs, 30, 150))
@@ -81,6 +90,8 @@ def analyze(path, down_ref=None):
     feat = np.vstack([librosa.util.sync(mf, dbf), librosa.util.sync(ch, dbf)])
     k = int(np.clip(round(dur / 25), 4, 9))
     sections = sorted({round(float(down[min(x, len(down) - 1)]), 3) for x in librosa.segment.agglomerative(feat, k)})
+    if grid and len(grid) > 2:
+        sections = [round(float(x), 3) for x in grid[2]]
     return {
         'dur': round(dur, 3), 'bpm': round(float(60 / np.median(np.diff(bt))), 2), 'fps': FPS,
         'beats': [round(float(t), 3) for t in bt], 'down': [round(float(t), 3) for t in down],
@@ -90,7 +101,7 @@ def analyze(path, down_ref=None):
 
 
 def main():
-    out = {k: analyze(ROOT / p, DOWN_REF.get(k)) for k, p in TRACKS.items()}
+    out = {k: analyze(ROOT / p, DOWN_REF.get(k), GRID.get(k)) for k, p in TRACKS.items()}
     js = ('/* ============================================================================\n'
           '   7. BATIDAS — gerado por tools/music.py a partir de musica/ (não editar à mão)\n'
           '   Grade de batidas e compassos, envelopes a 50 Hz (base64, 0–255), picos e seções.\n'
