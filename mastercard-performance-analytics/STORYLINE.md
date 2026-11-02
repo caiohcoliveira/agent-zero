@@ -1,4 +1,4 @@
-# A Linha — Storyline v7 (experimento)
+# A Linha — Storyline v7.2 (experimento)
 
 **Decisões que movem o negócio.** Esta versão aplica o roteiro criativo v7: o filme contém o contexto, o mecanismo e a conclusão de cada assunto. As apresentadoras aprofundam, mas assistir em silêncio basta.
 
@@ -15,7 +15,13 @@
 - **Tempo de leitura medido:** `tools/read_check.js` mede o tempo de cada texto (2,5 palavras/s + 2,5 s por visual novo). Resultado: 72 telas, 0 curtas.
 - **Filme:** 7:41 → **9:11**, com as músicas remontadas para dar tempo de ler.
 - **A linha laranja** vira o fio do filme: a pergunta ligada ao valor, a ponte, a tendência do gráfico, a cidade das capabilities, o fluxo da automação, o ciclo dos agentes e o viaduto dos pilares.
-- **A analista reaparece** no embarque (com o bilhete), atravessando a ponte na 01, nas equipes da 05 e caminhando pela cidade da 07.
+- **Sem personagem (v7.2):** a analista saiu do filme. Onde ela aparecia, outra imagem conta o mesmo:
+  - no embarque, o bilhete grande entra sozinho pela porta aberta;
+  - na ponte da 01, um trem atravessa os vãos;
+  - na 05, a equipe vira três ícones planos;
+  - nos relatórios de fraude, a tela, o cursor e o interruptor contam a história;
+  - na 07, um trem segue pela cidade junto com a câmera.
+- **Espaço 3D (v7.2):** atrás do conteúdo há partículas com constelações, curvas 3D em fita e objetos flutuando (cubos e octaedros em arame, anéis, orbes), em perspectiva e girando com a câmera. Eles ficam perto da câmera com brilho e longe apagados (profundidade de campo).
 
 **Dados e qualificadores**
 - **Números com qualificador:**
@@ -51,14 +57,14 @@
    - As luzes da plataforma acendem.
    - O painel de partidas vira as placas até **PERFORMANCE ANALYTICS**.
    - Embaixo, a missão escrita: "Transformamos *dados* em *decisões* e soluções de negócio."
-   - A analista chega com o bilhete na mão; o trem encosta vindo da esquerda, com o farol varrendo a plataforma; o bilhete é carimbado.
+   - O trem encosta vindo da esquerda, com o farol varrendo a plataforma.
 2. **Propósito (6–14 s)**, como na v5.4, a pedido:
-   - As portas abrem no tempo cheio da música, o painel apaga e ela embarca.
+   - As portas abrem no tempo cheio da música e o painel apaga.
    - O bilhete sobe em close: "LINHA PERFORMANCE ANALYTICS · DE *dados* · PARA *valor* · 7 estações · 2 baldeações". O carimbo bate: **EMBARQUE ✓ validado**.
    - Título "Dos *dados* ao *valor*" e explicação "Combinamos conhecimento de negócio, analytics e implementação para orientar decisões."
    - A câmera mergulha pela porta aberta.
 3. **Percurso (14–20 s)**
-   - Do outro lado, o mapa completo da linha se desenha.
+   - Do outro lado, o mapa completo da linha se desenha sobre um campo de estrelas em 3D.
    - Três capítulos escritos: **Onde atuamos** (01–03), **Cases e resultados** (04–06) e **O que vem pela frente** (07).
    - Título "O percurso" e a frase "Uma viagem pelas capacidades da nossa área, em três capítulos."
 
@@ -71,7 +77,7 @@
 
 ### 01 · Papel estratégico (47 s) — o mundo das perguntas encontra uma ponte
 
-1. **Perguntas:** a analista atravessa o corredor das perguntas. Há postes com cartões pendurados ("Por que caiu?", "Quem priorizar?", "Onde investir?") e a cidade das perguntas ao fundo.
+1. **Perguntas:** a câmera atravessa o corredor das perguntas, com pontos de interrogação flutuando em 3D. Há postes com cartões pendurados ("Por que caiu?", "Quem priorizar?", "Onde investir?") e a cidade das perguntas ao fundo.
    - Título "Decisões difíceis começam com perguntas".
 2. **A ponte:** a câmera recua e mostra dois penhascos com etiquetas **NEGÓCIO** e **DADOS**.
    - "O papel da área": "Conectamos perguntas de negócio aos dados necessários para respondê-las."
@@ -87,7 +93,7 @@
 
 1. **Faturamento anual da track:** gráfico com eixo de base zero, unidade (US$ mil, conforme o JSON) e marcas.
    - Valor em cima de cada barra, anos embaixo, 2026 hachurado como "(previsão)" e a fonte.
-   - A linha laranja liga os topos.
+   - Um brilho percorre o topo das barras de 2023 a 2025 (a tendência), sem traço por cima dos rótulos.
 2. **Leitura:** 2023 e 2025 acendem e uma régua mede "×1,8".
    - "Entre 2023 e 2025, o faturamento passou a 1,8 vez o valor inicial."
 3. **Brasil:** "período de referência · estimativa de fechamento". Dois comparadores separados, na mesma unidade:
@@ -101,7 +107,7 @@
 
 A câmera viaja por uma avenida noturna, com a linha no chão.
 
-1. **Onde aplicamos analytics:** três fachadas, cada uma com uma aplicação e a decisão que ela apoia.
+1. **Onde aplicamos analytics:** três fachadas, cada uma com um ícone plano (como em "Analytics em ação"), uma aplicação e a decisão que ela apoia.
    - Emissores · *Principalidade* · decidir qual produto oferecer.
    - Adquirentes · *Market share* · decidir onde crescer.
    - Varejo · *Cestas de produtos* · decidir o que promover.
@@ -122,6 +128,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ## Conversa 1
 
+- **Entrada (v7.2):** o último quadro do vídeo some em zoom, um véu escuro com o rastro de luz de um trem cobre a tela e só depois a estação aparece. Os textos das duas telas nunca ficam juntos.
 - **Tela:** a estação viva e a chamada no topo, "ONDE ISSO ENCONTRA O SEU CLIENTE?".
 - **Cartazes legíveis sem clicar:**
   - **01:** os 4 serviços com definição;
@@ -160,21 +167,21 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 |---|---|---|
 | Objetivo | *Principalidade* é tornar o banco a *principal escolha* do cliente. + "Quais produtos ajudam a fortalecer esse relacionamento?" | a carteira; o cartão do banco sobe com a coroa "o banco principal" |
 | Dados | Analisamos 92 mil associados, seus produtos e sua principalidade atual. | fichas e "cada associado recebe a sua recomendação" |
-| Como fizemos | *UMAP* e *K-Means* organizam perfis. *ALS* estima afinidades… | 8 perfis com nomes do JSON; embeddings 3D ("representações numéricas · perto = afinidade · projeção ilustrativa") |
+| Como fizemos | *UMAP* e *K-Means* organizam perfis. *ALS* estima afinidades… | 8 perfis com nomes do JSON; embeddings 3D imersivos, sem moldura: clientes e produtos flutuam pela tela toda com profundidade de campo; "um associado" fica no centro, ligado aos 3 produtos mais próximos ("representações numéricas · perto = afinidade · projeção ilustrativa") |
 | Solução (drop) | A recomendação combina afinidade, conversão e ganho de principalidade. | ranking **ANTES** (só afinidade) × **DEPOIS** (critérios combinados); pontos de principalidade do Top 3 |
 | Resultado | *+4 p.p. de principalidade* versus controle, em backtest. | ganho em p.p. sobre o controle (= 0), geral e por subsegmento (PF I–IV+); "backtest: avaliação retrospectiva · ganho teórico · Top 3"; melhor perfil |
 | Conclusão | O motor prioriza produtos pelo *objetivo de relacionamento* do banco. | — |
 
-### Case 3 · Relatórios automatizados (fraude, 60 s) — ela apaga a luz, o processo continua
+### Case 3 · Relatórios automatizados (fraude, 60 s) — a automação apaga a luz, o processo continua
 
 | Etapa | Texto | Visual |
 |---|---|---|
-| Antes | Cada relatório de fraude para o board era *montado manualmente*. | ela digita cansada; cada gesto escrito ao lado: 1 extrair os dados · 2 conferir · 3 copiar e colar · 4 montar o relatório |
-| Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | relógio acelerado, pilhas crescendo, o dia vira noite, "e de novo… ↻" (sem contador de horas inventado) |
-| Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia; o fluxo nomeado se monta: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
-| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | ela vai ao interruptor; a trilha esvazia; clique seco, escuro e silêncio; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, e o dado corre sozinho com "execuções: NNNN"; o escritório fica escuro |
-| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); ela põe os fones, dança e sai |
-| Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; a câmera mergulha nela |
+| Antes | Cada relatório de fraude para o board era *montado manualmente*. | close na tela: o cursor seleciona a planilha, confere linha a linha, copia e cola e monta o gráfico; cada gesto escrito ao lado: 1 extrair os dados · 2 conferir · 3 copiar e colar · 4 montar o relatório |
+| Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | a câmera abre: cadeira vazia, relógio acelerado, pilhas crescendo, o dia vira noite, "↻ de novo · relatório N" (sem contador de horas inventado) |
+| Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia acende na tela; o código se escreve com a barra "automação %"; faíscas saem da tela e montam o fluxo nomeado: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
+| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; a trilha esvazia; clique seco, escuro e silêncio; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
+| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); a cadeira vazia gira num foco de luz, um equalizador neon pulsa e os relatórios voam como confete |
+| Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; o fluxo se apaga e a câmera mergulha nela |
 
 ### Case 4 · Agentes de IA para insights (Insight Agent · adquirentes, 69 s)
 
@@ -189,14 +196,15 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ### 05 · Escalando o impacto (20 s) — a mesma equipe, um alcance maior
 
-- **Diagrama nomeado:** **Equipe** (a analista e colegas) → **Motor produtizado** → **Ativo reutilizável**.
+- **Diagrama nomeado:** **Equipe** (três pessoas em ícones planos) → **Motor produtizado** → **Ativo reutilizável**.
+- **Espaço:** uma curva 3D em fita ganha corpo quando os projetos se ligam ao ativo.
 - **Projetos:** cinco contextos diferentes ligados ao mesmo ativo; a equipe fica na origem.
 - **Texto:** "*Automação*, *padronização* e *reutilização* ampliam o alcance das entregas."
 - **Conclusão:** "Um *ativo reutilizável* permite aplicar capacidades em *novos projetos*."
 
 ### 06 · A Prática (24 s) — os pilares viram a infraestrutura da viagem
 
-- **Visual:** os pilares sobem como colunas de viaduto com os nomes, e a linha corre por cima.
+- **Visual:** os pilares sobem como colunas de viaduto com os nomes, e a linha corre por cima. Objetos 3D flutuam no céu.
 - **Contribuições:** cada pilar ganha um cartão com uma contribuição curta (campo `contribution` do JSON) e "N entregas", em dois grupos que ficam até o fim.
 - **Conclusão:** "A combinação dessas capacidades permite *executar os projetos*."
 
@@ -216,7 +224,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
      - Apoiar decisões estratégicas · dos clientes (sala do board) e Combinar analytics · com as demais tracks;
      - Reutilizar ativos · para ampliar o alcance e Automatizar rotinas · para ganhar eficiência (robôs);
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
-   - As outras linhas chegam à cidade e a analista caminha junto da linha.
+   - As outras linhas chegam à cidade e um trem segue pela linha junto com a câmera; partículas e objetos 3D giram com o passeio.
    - No fim, uma estação tracejada "?": a próxima estação.
 2. **Disciplinas (19 s):** "Por trás de tudo, *disciplinas*". As 8 entram uma a uma num painel 4 × 2 e **ficam na tela**, cada uma com visualização, nome e subtítulo:
    - Estatística · setup de projetos de marketing e estratégia
@@ -228,7 +236,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
    - Deep learning (transformer)
    - IA (agentes)
 
-   No fecho, "Tudo se resume a *Analytics & Advanced Analytics*."
+   Uma curva 3D corre atrás dos painéis. No fecho, os painéis recuam no espaço e escurecem, a curva e as partículas ganham força e só a frase fica: "Tudo se resume a *Analytics & Advanced Analytics*."
 3. **Letreiro (26 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português; o acorde final acende o letreiro.
 
 ## Encerramento

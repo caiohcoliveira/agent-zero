@@ -114,6 +114,7 @@ const FUTURE_ART = {
       const cam = camKey(t, CAM);
       ctx.drawImage(TEX.dark, 0, 0); const sky = ctx.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#120C1C'); sky.addColorStop(.7, '#3A1E2A'); sky.addColorStop(1, '#120A08'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
       layer(ctx, cam, 0, () => { sun(ctx, W / 2 + 240, 700, 260, t); for (let k = 0; k < 50; k++) circle(ctx, hash(k * 3.3) * W, hash(k * 8.1) * 420, 1.3 + hash(k) * 1.4, rgba('#FFF4DC', .4 + .4 * Math.sin(t * 2 + k))); });
+      SPACE.field(ctx, t, { alpha: .3, cy: 330, tilt: .45, rot: SPACE.camRot(cam, .00018), spin: .03 });
       layer(ctx, cam, .2, () => skyline(ctx, t, { y: 900, h: 520, seed: 101, col: '#1C1220', lit: .55 }));
       layer(ctx, cam, .45, () => { skyline(ctx, t, { y: 980, h: 360, seed: 113, col: '#120C10', lit: .4 }); skyline(ctx, t, { y: 980, h: 360, seed: 113, col: '#120C10', lit: .4, x: 2120 }); });
       layer(ctx, cam, 1, () => {
@@ -125,9 +126,11 @@ const FUTURE_ART = {
         // uma estação ainda em aberto
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
           pin(ctx, x, RAIL, c => { c.globalAlpha *= op; text(c, '?', 0, 4, { size: 54, weight: 900, color: C.yellow, align: 'center' }); text(c, 'a próxima estação', 0, -90, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); }
-        // a analista caminha pela cidade, ao longo da linha
-        const gx = cam.x - 520 + 40 * Math.sin(t * .5); PEOPLE.draw(ctx, gx, RAIL + 150, .62, t > 23.6 ? PEOPLE.point(E.outCubic(P(t, 23.6, .5)), PEOPLE.POSE.stand) : PEOPLE.walk(t * 14), { dir: 1, t, phones: 'neck', mood: 'happy' });
+        // um trem segue pela cidade junto com a câmera, de estação em estação
+        const tx = cam.x - 380 + 60 * Math.sin(t * .5); if (t > .8) { glow(ctx, tx, RAIL, 120, C.orange, .25 + .15 * BT.level); LINE.head(ctx, tx, RAIL, 0, 20); }
       });
+      // objetos flutuando à frente da cidade (giram com o passeio da câmera: sensação de profundidade)
+      SPACE.floaters(ctx, t, { alpha: .26, n: 10, cy: 300, rot: SPACE.camRot(cam, .00018), scale: 940, spin: .02 });
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
@@ -145,24 +148,31 @@ const FUTURE_ART = {
     peaks: [[0, 19.2, .45], [T_KEY - .1, T_KEY + 1.6, 1]], script: SCRIPT,
     themeAt: () => 'dark',
     draw(ctx, t) {
-      bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' }); neonGrid(ctx, t, { horizon: 960, alpha: .3, speed: 1 });
-      const dim = 1 - .7 * E.inOutCubic(P(t, T_KEY, .6));
+      bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' });
+      const kp = E.inOutCubic(P(t, T_KEY - .2, 1.2));
+      SPACE.field(ctx, t, { alpha: .3 + .25 * kp, spin: .05 + .12 * kp, n: 200, size: 1 + .4 * kp });
+      SPACE.ribbon(ctx, t, { alpha: .22 + .5 * kp, cy: 540, amp: .42 + .14 * kp, width: 30 + 16 * kp, spin: .07 + .1 * kp, speed: .7 + .6 * kp, rot: .2 });
+      neonGrid(ctx, t, { horizon: 960, alpha: .3, speed: 1 });
+      // na frase-chave os painéis recuam no espaço (encolhem e escurecem): só a frase fica legível
+      const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - .82 * kd;
       for (let k = 0; k < N; k++) {
         const p = P(t, T_IN(k), .5); if (p <= 0) continue; const c = k % 4, r = Math.floor(k / 4), x = TX0 + c * (TW + 24), y = TY0 + r * (TH + 30), light = (c + r) % 2 === 1, s = lerp(1.25, 1, E.outExpo(p));
-        ctx.save(); ctx.globalAlpha *= clamp(p * 2) * dim; ctx.translate(x + TW / 2, y + TH / 2); ctx.scale(s, s); ctx.translate(-TW / 2, -TH / 2);
+        ctx.save(); ctx.globalAlpha *= clamp(p * 2) * dim; ctx.translate(lerp(x + TW / 2, W / 2, .06 * kd), lerp(y + TH / 2, H / 2, .06 * kd)); ctx.scale(s * (1 - .08 * kd), s * (1 - .08 * kd)); ctx.translate(-TW / 2, -TH / 2);
         if (light) paper(ctx, 0, 0, TW, TH, { r: 16, fill: '#FFFDF8', shadow: 10, shadowColor: '#000', lw: 3.5 }); else holo(ctx, 0, 0, TW, TH, { color: [C.orange, C.red, C.yellow][k % 3] });
         VIZ[VZ[k]](ctx, 24, 20, TW - 48, 180, E.outCubic(clamp((t - T_IN(k)) / 1.4)), { t, theme: light ? 'light' : 'dark' });
         const nm = TX.climaxWords[k], sub = TX.climaxSub[k], col = light ? INK : '#FFF';
-        late(ctx, cc => { const fs = Math.min(32, (TW - 30) / Math.max(1, measure(cc, nm, 32, 900)) * 32); text(cc, nm, TW / 2, 238, { size: fs, weight: 900, color: col, align: 'center' });
+        late(ctx, cc => { cc.globalAlpha *= 1 - .7 * kd; const fs = Math.min(32, (TW - 30) / Math.max(1, measure(cc, nm, 32, 900)) * 32); text(cc, nm, TW / 2, 238, { size: fs, weight: 900, color: col, align: 'center' });
           para(cc, sub, TW / 2, 262, TW - 40, { size: 23, weight: 700, color: light ? '#4A4038' : '#F3E6D6', align: 'center', lh: 1.12 }); });
         ctx.restore();
         if (t - T_IN(k) < .08) flash(ctx, (1 - (t - T_IN(k)) / .08) * .25, '#FFF8EE');
       }
-      if (t >= T_KEY) { const p = P(t, T_KEY, .5); glow(ctx, W / 2, H / 2, 700, C.orange, .35 + .25 * BT.level);
+      if (t >= T_KEY) { const p = P(t, T_KEY, .5);
+        const band = ctx.createRadialGradient(W / 2, H / 2 - 20, 80, W / 2, H / 2 - 20, 1000); band.addColorStop(0, rgba('#0A0604', .72 * p)); band.addColorStop(1, rgba('#0A0604', 0)); ctx.fillStyle = band; ctx.fillRect(0, 0, W, H);
+        glow(ctx, W / 2, H / 2, 700, C.orange, .35 + .25 * BT.level);
         [[460, 360, 160, C.red], [1460, 420, 190, C.orange], [960, 780, 140, C.yellow]].forEach(([x, y, r, cc], i) => splat(ctx, x, y, r, cc, 140 + i, E.outBack(P(t, T_KEY + i * .08, .35)), .8));
         hud(ctx, c => { c.translate(W / 2, H / 2); const s = lerp(1.6, 1, E.outExpo(p)) * (1 + .02 * BT.beat); c.scale(s, s);
           const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); c.shadowColor = '#000'; c.shadowBlur = 20; text(c, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
-          rich(c, k2 || '', 0, 30, { size: 100, weight: 900, color: '#FFF', retro: true, depth: 7, lw: 5 }); }, p); }
+          rich(c, k2 || '', 0, 30, { size: 100, weight: 900, color: '#FFF', retro: true, depth: 7, lw: 5 }); }, P(t, T_KEY + .2, .45)); }
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
@@ -201,7 +211,7 @@ STOPSCN.end = {
   ui(ctx, tl, item, prevItem, p, ui) {
     ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
     const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0, L = slideRects(7), ph = L.top - 90, pw = ph * .78;
-    if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H); HUD.begin(); poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); HUD.flush(ctx); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
+    if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H); HUD.begin(ctx); poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); HUD.flush(ctx); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
     if (item === 1) slidePopup(ctx, 7, ui);
     if (!item) text(ctx, 'clique no letreiro para rever a estação 07', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .4 + .2 * Math.sin(tl * 2.4) });
     hint(ctx, tl, item === 0 ? '→' : '←');

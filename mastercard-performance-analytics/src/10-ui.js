@@ -251,7 +251,11 @@ function platformLife(ctx, tl, o = {}) {
       const g = ctx.createRadialGradient(x, 560, 20, x, 560, 700); g.addColorStop(0, 'rgba(255,236,200,.35)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, PIT); ctx.restore();
       for (let k = 0; k < 14; k++) { const yy = 130 + hash(k * 7) * 760, xx = ((x + hash(k * 3) * 900) % (W + 200)) - 100; line(ctx, xx, yy, xx + 160, yy, 'rgba(255,240,220,.18)', 2); } } }
   // passageiro passando em primeiro plano (silhueta desfocada)
-  { const c = (tl + 2) % 23, d = 7; if (c < d && o.people !== false) { const u = c / d, x = lerp(W + 120, -120, u); ctx.save(); ctx.globalAlpha = .9; PEOPLE.draw(ctx, x, H + 10, .95, PEOPLE.walk(tl * 13), { dir: -1, sil: true, t: tl }); ctx.restore(); } }
+  // papéis soltos voando com o vento (objetos flutuando pela estação)
+  { const c = (tl + 2) % 23, d = 6.5; if (c < d && o.people !== false) { const u = c / d;
+      for (let k = 0; k < 4; k++) { const v = clamp(u * 1.25 - k * .08), x = lerp(W + 140, -200, v), y = 780 - k * 80 + Math.sin(v * 9 + k * 2) * 70 - v * 120, sq = Math.cos(v * 14 + k * 1.7);
+        ctx.save(); ctx.translate(x, y); ctx.rotate(v * 6 + k); ctx.scale(Math.max(.12, Math.abs(sq)), 1); paper(ctx, -24, -32, 48, 64, { r: 3, fill: sq > 0 ? '#F6EEDF' : '#E6D9C3', shadow: 3, shadowColor: 'rgba(0,0,0,.5)', lw: 2, volume: false });
+        line(ctx, -14, -14, 14, -14, '#8A8378', 3); line(ctx, -14, -2, 8, -2, '#8A8378', 3); line(ctx, -14, 10, 12, 10, '#8A8378', 3); ctx.restore(); } } }
 }
 /** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
 const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz
@@ -289,7 +293,7 @@ const SLIDE = (() => {
   const cache = {}, queue = [], big = { key: null, cv: null }, scratch = makeCanvas(W, H, () => {});
   const key = sl => sl[0] + '@' + sl[1];
   const render = (c, sl) => { c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
-    if (sl[0][0] === '@') { HUD.begin(); try { (SLIDE_SCREENS[sl[0].slice(1)] || (g => { bgDark(g, 0); }))(c, sl[1]); } finally { HUD.flush(c); } return; }
+    if (sl[0][0] === '@') { HUD.begin(c); try { (SLIDE_SCREENS[sl[0].slice(1)] || (g => { bgDark(g, 0); }))(c, sl[1]); } finally { HUD.flush(c); } return; }
     PLAYER.slideAt(c, CONFIG.sceneById[sl[0]].start + sl[1]); };
   return {
     thumb(sl) { const k = key(sl); if (cache[k]) return cache[k]; if (!queue.includes(k)) queue.push(k); return null; },
@@ -380,12 +384,23 @@ function recapScene(o) {
       const wind = platformWind(tl);
       N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), PLAT.PY - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] + wind * .025 * Math.sin(tl * 9 + i * 2) }); if (hov) glow(ctx, px(i), PLAT.PY, 380, C.orange, .18); });
       ctx.restore();
-      if (o.from != null && tl < 1.4) { ctx.save(); ctx.globalAlpha = 1 - E.inOutCubic(tl / 1.4); const z = 1 + tl * .25; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); }
     },
     /** interface por cima da pintura: chamada, passagem, miniaturas, popup e dicas */
     ui(ctx, tl, item, prevItem, p, ui) {
       ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
       const e = E.inOutCubic(p), sa = item ? (prevItem ? 1 : e) : (prevItem ? 1 - e : 0), sn = curN(item) || curN(prevItem);
+      // transição em "mergulho no escuro": o último quadro do vídeo some em zoom enquanto um véu escuro (com o rastro
+      // de luz de um trem passando) cobre a estação; o véu só abre depois que o quadro antigo sumiu, então os textos
+      // das duas telas nunca aparecem juntos
+      if (o.from != null && tl < 1.5) {
+        const veil = tl < .55 ? E.outCubic(tl / .55) : 1 - E.inOutCubic(clamp((tl - .55) / .9)), old = 1 - E.inOutCubic(clamp(tl / .7));
+        if (veil > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', veil); ctx.fillRect(0, 0, W, H);
+          const sp = clamp((tl - .15) / 1.1); if (sp > 0 && sp < 1) { ctx.globalCompositeOperation = 'lighter'; const r = rng(77), x0 = lerp(-900, W + 200, E.inOutSine(sp));
+            for (let k = 0; k < 14; k++) { const y = 140 + r() * (H - 280), len = 500 + r() * 900, x = x0 + r() * 500 - 250; ctx.globalAlpha = veil * (.25 + r() * .35) * Math.sin(sp * Math.PI);
+              const g = ctx.createLinearGradient(x, 0, x + len, 0); g.addColorStop(0, 'rgba(255,95,0,0)'); g.addColorStop(.8, k % 3 ? 'rgba(255,214,160,.9)' : 'rgba(255,95,0,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.fillRect(x, y, len, 2 + r() * 5); } }
+          ctx.restore(); }
+        if (old > 0) { ctx.save(); ctx.globalAlpha = old; const z = 1 + tl * .3; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
+          const snap = PLAYER.snapshot(o.from); if (snap) ctx.drawImage(snap, 0, 0); else PLAYER.frameAt(ctx, o.from - 1e-3); ctx.restore(); } }
       const ov = (item ? (prevItem ? 0 : 1 - e) : (prevItem ? e : 1)) * clamp((tl - .9) / .6);
       if (o.call && ov > 0) { ctx.save(); ctx.globalAlpha *= ov; const w = measure(ctx, o.call, 34, 900, true, 3) + 90;
         rr(ctx, W / 2 - w / 2, 22, w, 74, 12); ctx.fillStyle = '#0A0807'; ctx.fill(); ctx.strokeStyle = '#3A2A1E'; ctx.lineWidth = 3; ctx.stroke();

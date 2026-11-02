@@ -3,8 +3,8 @@
    ----------------------------------------------------------------------------
    v7: o bilhete já diz por que estamos embarcando.
      0–6 s   IDENTIDADE  painel de partidas "PERFORMANCE ANALYTICS" + a missão escrita;
-                         a analista chega à plataforma com o bilhete; o trem encosta
-     6–13 s  PROPÓSITO   as portas abrem, ela embarca; o bilhete em close (DE dados →
+                         o trem encosta, com o farol varrendo a plataforma
+     6–13 s  PROPÓSITO   as portas abrem; o bilhete em close (DE dados →
                          PARA valor) é carimbado; a câmera mergulha na porta
      14–20 s PERCURSO    o mapa da linha, com os 3 capítulos escritos
    ========================================================================== */
@@ -48,9 +48,9 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
 /* ---------- embarque (20 s, trilha sintetizada a 120 BPM: compasso = 2 s) ---------- */
 (() => {
   const id = 'open';
-  const T_WALK0 = .4, T_WALK1 = 2.7, T_ARR = 1.3, T_STOP = 5.0, T_DOOR = 6.0, T_GO = 6.15, T_IN = 7.25;
+  const T_ARR = 1.3, T_STOP = 5.0, T_DOOR = 6.0;
   const T_TIX = 6.3, T_PUNCH = 7.6, T_DIVE = 13.0, T_MAP = 13.9;
-  const L = 1500, S = 1.18, TY0 = 930 - 408 * S, DOOR = L * .5, GX = 1500, GY = 1052, GS = 1.3;
+  const L = 1500, S = 1.18, TY0 = 930 - 408 * S, DOOR = L * .5;
   const BOARD = 'PERFORMANCE ANALYTICS';
   cue(id, .3, 'type', { n: 22, gap: .03 }); cue(id, T_ARR, 'whoosh', { dur: 3.4, v: .35 });
   cue(id, T_DOOR, 'impact', { size: .8 }); cue(id, T_DOOR + .05, 'chime', { f: 987.8, up: -4 }); cue(id, T_TIX, 'pop', { p: 1, v: .2 });
@@ -65,19 +65,6 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     [14.7, 20.3, 'note', 'Uma viagem pelas capacidades da nossa área, em *três capítulos*.', { x: 480, y: 128, w: 1340, align: 'left', size: 34, weight: 800 }]
   ]);
 
-  function girl(ctx, t) {
-    if (t < T_WALK0 || t > T_IN + .4) return;
-    let x = GX, y = GY, s = GS, pose, a = 1; const dir = -1;
-    if (t < T_WALK1) { const u = clamp((t - T_WALK0) / (T_WALK1 - T_WALK0)); x = lerp(W + 150, GX, E.outCubic(u)); pose = PEOPLE.walk((t - T_WALK0) * 16); }
-    else if (t < T_GO) pose = PEOPLE.hold(E.outCubic(P(t, T_WALK1, .5)), PEOPLE.mixPose(PEOPLE.walk(0), PEOPLE.POSE.stand, clamp((t - T_WALK1) / .3)));
-    else { const u = clamp((t - T_GO) / (T_IN - T_GO)), e = E.inOutSine(u); x = lerp(GX, W / 2 + 30, e); y = lerp(GY, 934, e); s = lerp(GS, .96, e); pose = PEOPLE.hold(1, PEOPLE.walk((t - T_GO) * 15)); a = 1 - P(t, T_IN - .2, .4); }
-    ctx.save(); ctx.globalAlpha *= a;
-    glow(ctx, x, y - 200 * s, 260 * s, '#FFD9A8', .16);
-    PEOPLE.draw(ctx, x, y, s, pose, { dir, t, phones: 'neck', mood: t > T_DOOR ? 'happy' : 'calm' });
-    const [hx, hy] = PEOPLE.hand(x, y, s, pose, { dir }), ta = 1 - P(t, T_TIX - .1, .3);   // o bilhete pequeno vira o close
-    if (t > T_WALK1 && ta > 0) { ctx.save(); ctx.globalAlpha *= ta; ticket(ctx, hx - 54 * s, hy - 18 * s, .3 * s * E.outBack(P(t, T_WALK1, .45)), { rot: .07 }); ctx.restore(); }
-    ctx.restore();
-  }
   function platformShot(ctx, t) {
     const dive = E.inCubic(P(t, T_DIVE, .9)), wake = 1 - E.outCubic(P(t, 0, 1.4)), push = 1 + .05 * E.inOutSine(P(t, T_DOOR, T_DIVE - T_DOOR));
     ctx.save();
@@ -93,7 +80,6 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
       if (arr < .97) { const r = rng(3); ctx.save(); ctx.globalAlpha = .45 * (1 - arr); for (let k = 0; k < 14; k++) { const ly = TY0 + r() * 420 * S, lx = x + r() * L * S; line(ctx, lx, ly, lx - 300 - r() * 400, ly, 'rgba(255,240,220,.6)', 3); } ctx.restore(); }
       if (t > T_DOOR) glow(ctx, W / 2, TY0 + 200 * S, 300, '#FFE2B0', .4 * P(t, T_DOOR, .6));
     }
-    girl(ctx, t);
     ctx.restore();
     // o bilhete em close: DE dados → PARA valor, carimbado no embarque (como na v5.4)
     const tp = E.outBack(P(t, T_TIX, .5)) * (1 - P(t, T_DIVE - .2, .4));
@@ -105,6 +91,7 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     const a = P(t, T_MAP, .7); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     bgDark(ctx, t, { centerA: .9, center: '#33200F' }); glow(ctx, 960, 590, 900, C.orange, .14);
+    SPACE.field(ctx, t, { alpha: .45, spin: .06, rot: -.4 + (1 - E.outCubic(P(t, T_MAP, 1.6))) * 1.2 });
     const z = lerp(1.6, 1, E.outCubic(P(t, T_MAP, 1.4)));
     mapWorld(ctx, { ...MAPVIEW, s: MAPVIEW.s * z }, () => {
       metroMap(ctx, t, { reveal: E.inOutCubic(P(t, T_MAP, 1.5)), train: 0 });

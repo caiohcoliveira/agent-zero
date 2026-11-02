@@ -25,14 +25,20 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_ASSET - .1, T_ASSET + .8, .5]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
+      SPACE.field(ctx, t, { alpha: .26, spin: .04, cy: 420 });
+      // a curva 3D cresce junto com o alcance: começa discreta e ganha corpo quando os projetos se ligam ao ativo
+      SPACE.ribbon(ctx, t, { alpha: .14 + .24 * E.inOutSine(P(t, T_PROJ, 3)), cy: 560, amp: .36 + .12 * E.inOutSine(P(t, T_PROJ, 3)), width: 26, spin: .06, speed: .5, rot: .35 });
       neonGrid(ctx, t, { horizon: 820, alpha: .35, speed: .6 });
       // a equipe (fica na origem)
       const tp = E.outBack(P(t, T_TEAM, .5));
       if (tp > 0) { ctx.save(); ctx.translate(...N.team); ctx.scale(tp, tp); holo(ctx, -150, -120, 300, 240, { color: C.yellow, corners: false });
-        [-70, 0, 70].forEach((dx, k) => PEOPLE.draw(ctx, dx, 90, .42, PEOPLE.wave(t + k, k === 1 ? .6 : 0), { dir: k ? -1 : 1, t: t + k, phones: 'neck', mood: 'happy' })); ctx.restore(); }
+        // a equipe em ícones planos (como em "Analytics em ação"): três pessoas, cada uma com uma cor da marca
+        [[-82, C.red], [0, C.orange], [82, C.yellow]].forEach(([dx, col], k) => { const bob = Math.sin(t * 1.8 + k * 1.4) * 5, y = 6 + bob, pu = 1 + .08 * Math.exp(-Math.max(0, t - T_MOTOR - k * .15) * 5) * (t > T_MOTOR);
+          ctx.save(); ctx.translate(dx, y); ctx.scale(pu, pu); glow(ctx, 0, 0, 92, col, .3); circle(ctx, 0, 0, 40, col, INK, 5); icon(ctx, 'user', 0, 0, 46, col === C.yellow ? INK : '#FFF', 6); ctx.restore(); });
+        ctx.restore(); }
       // a linha: equipe → motor → ativo
       const lp = E.inOutSine(P(t, T_TEAM + .4, T_ASSET - T_TEAM));
-      LINE.draw(ctx, [N.team, N.motor, N.asset], lp, { w: 20, head: lp < .99, glow: 12 });
+      LINE.draw(ctx, [[N.team[0] + 150, N.team[1]], N.motor, N.asset], lp, { w: 20, head: lp < .99, glow: 12 });
       const mp = E.outBack(P(t, T_MOTOR, .5));
       if (mp > 0) { ctx.save(); ctx.translate(...N.motor); ctx.scale(mp, mp); vslab(ctx, -110, -90, 220, 180, 34, '#3A3640', { lw: 4 }); for (let k = 0; k < 2; k++) { ctx.save(); ctx.translate(-40 + k * 80, -10); ctx.rotate(t * (k ? -2 : 2)); icon(ctx, 'gear', 0, 0, 74, C.orange, 9); ctx.restore(); } ctx.restore(); }
       const ap = E.outBack(P(t, T_ASSET, .6));
@@ -68,6 +74,8 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_LINE - .1, T_LINE + 1, .4]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1C10' });
+      SPACE.field(ctx, t, { alpha: .24, spin: .035, cy: 300, tilt: .5 });
+      SPACE.floaters(ctx, t, { alpha: .3, n: 12, cy: 260, scale: 900, spin: .03 });
       skyline(ctx, t, { y: 960, h: 320, seed: 88, col: '#1A1216', lit: .4 });
       const g = ctx.createLinearGradient(0, GYp, 0, H); g.addColorStop(0, '#2A1C14'); g.addColorStop(1, '#0E0907'); ctx.fillStyle = g; ctx.fillRect(0, GYp, W, H - GYp); line(ctx, 0, GYp, W, GYp, INK, 6);
       // pilares (colunas de viaduto) sobem

@@ -120,13 +120,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     RST.slice(0, 3).forEach(([, , u], i) => { const a = P(t, T_RES + .6 + i * .55, .4); if (a <= 0) return; const [x1, y1] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], u + .04), [x2, y2] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], RST[i + 1][2] + .04);
       late(ctx, c => { c.globalAlpha *= a; text(c, '›', (x1 + x2) / 2, (y1 + y2) / 2 - 46, { size: 54, weight: 900, color: C.yellow, align: 'center' }); }); });
   }
-  function girl(ctx, t) {
-    let x, pose, dir = 1, mood = 'calm';
-    if (t < 11.5) { const u = clamp(t / 11.5); x = lerp(40, 1040, E.inOutSine(u)); pose = PEOPLE.walk(t * 15); }
-    else if (t < T_CROSS0) { x = 1040; pose = PEOPLE.mixPose(PEOPLE.walk(11.5 * 15), PEOPLE.POSE.stand, clamp((t - 11.5) / .4)); if (t > T_SEG[0] && t < T_SEG[3] + 1) pose = PEOPLE.point(E.outCubic(clamp((t - T_SEG[0]) / .5)) * (1 - P(t, T_SEG[3] + .4, .5)), pose); }
-    else if (t < T_CROSS1) { x = lerp(1040, 2260, E.inOutSine((t - T_CROSS0) / (T_CROSS1 - T_CROSS0))); pose = PEOPLE.walk(t * 15); mood = 'happy'; }
-    else { x = 2260; pose = PEOPLE.wave(t, E.outCubic(P(t, T_CROSS1, .4)) * (1 - P(t, T_CROSS1 + 2.4, .5))); mood = 'happy'; }
-    PEOPLE.draw(ctx, x, GY + 2, .78, pose, { dir, t, phones: 'neck', mood });
+  /** com a ponte pronta, um trem atravessa de Negócio para Dados (e o lado dos dados amanhece) */
+  function crossing(ctx, t) {
+    const u = P(t, T_CROSS0, T_CROSS1 - T_CROSS0); if (u <= 0 || u >= 1) return;
+    const e = E.inOutSine(u), x = lerp(BX0 - 140, BX1 + 160, e), y = GY - 40;
+    glow(ctx, x, y, 260, '#FFE2B0', .35);
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(x - 520, 0, x, 0); g.addColorStop(0, 'rgba(255,200,140,0)'); g.addColorStop(1, 'rgba(255,214,160,.55)'); ctx.fillStyle = g; ctx.fillRect(x - 520, y - 8, 520, 16); ctx.restore();
+    LINE.head(ctx, x, y, 0, 26);
   }
   SCENES[id] = {
     themeAt: () => 'dark', script: SCRIPT,
@@ -135,6 +135,8 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       const cam = camKey(t, CAM);
       layer(ctx, cam, 0, () => sky(ctx, t));
       layer(ctx, cam, .25, () => mountains(ctx));
+      // perguntas flutuando no céu, em 3D (giram com a câmera)
+      SPACE.floaters(ctx, t, { glyph: '?', alpha: .32 * (1 - P(t, T_REV + 2, 3)) + .12, n: 12, rot: SPACE.camRot(cam, .0006), cy: 300, scale: 820, col: '#F79E1B', size: .9 });
       layer(ctx, cam, .55, () => fog(ctx, t));
       layer(ctx, cam, .8, () => cityOfQuestions(ctx, t));
       layer(ctx, cam, 1, () => {
@@ -147,8 +149,8 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
           text(cc, l, 0, 2, { size: 44, weight: 900, color: c === C.yellow ? INK : '#FFF', align: 'center', ls: 6 }); }));
         questionPosts(ctx, t);
         bridge(ctx, t);
+        crossing(ctx, t);
         resultLine(ctx, t);
-        girl(ctx, t);
       });
       layer(ctx, cam, 1.35, () => { const r = rng(12); ctx.beginPath(); ctx.moveTo(-900, H + 300); for (let x = -900; x <= 4800; x += 70) ctx.lineTo(x, H + 30 - r() * 70 - (Math.sin(x * .004) + 1) * 30); ctx.lineTo(4800, H + 300); ctx.closePath(); ctx.fillStyle = '#100906'; ctx.fill();
         for (let k = 0; k < 60; k++) { const x = -900 + k * 95, h = 30 + r() * 50; line(ctx, x, H + 10, x + (r() - .5) * 26 + Math.sin(t * 1.3 + k) * 6, H - h, '#1E140C', 5); } });
@@ -205,7 +207,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       if (p <= 0) return;
       ctx.save(); ctx.globalAlpha *= 1 - dim;
       if (f) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, BASE - hgt, BW, hgt, 6); ctx.strokeStyle = C.yellow; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); hatch(ctx, () => rr(ctx, x, BASE - hgt, BW, hgt, 6), x, BASE - hgt, BW, hgt, { color: C.yellow, alpha: .35, gap: 14 }); }
-      else { vslab(ctx, x, BASE - hgt, BW, hgt, 30, mix(C.red, C.orange, i / 2), { lw: 4 }); brush(ctx, x + 10, BASE - hgt + 14, BW - 20, 18, '#FFFFFF', 30 + i, .5); }
+      else vslab(ctx, x, BASE - hgt, BW, hgt, 30, mix(C.red, C.orange, i / 2), { lw: 4 });
       if (hi && read > 0) glow(ctx, CX[i], BASE - hgt / 2, 220, C.yellow, .35 * read);
       ctx.restore();
       const la = clamp(p) * (1 - dim * .6);
@@ -213,8 +215,10 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
         text(c, yr(k), CX[i] + 10, BASE + 36, { size: 30, weight: 900, color: f ? C.yellow : '#FFF', align: 'center' });
         if (f) text(c, '(previsão)', CX[i] + 10, BASE + 70, { size: 24, weight: 800, color: C.yellow, align: 'center' }); });
     });
-    // a linha laranja liga os topos (a tendência)
-    const tp = E.inOutSine(P(t, T_TREND, 1.4)); if (tp > 0) { const pts = ROWS.slice(0, 3).map(([k, v], i) => [CX[i] + 10, hY(+v) - 76]); LINE.draw(ctx, pts, tp, { w: 10, head: tp < .99, alpha: 1 - read * .5 }); }
+    // a tendência: um brilho percorre o topo das barras 2023 → 2025 (sem traço por cima dos rótulos)
+    if (t > T_TREND && t < T_TREND + 2.2) ROWS.slice(0, 3).forEach(([k, v], i) => { const u = (t - T_TREND - i * .3) / 1.2; if (u <= 0 || u >= 1) return;
+      const a = Math.sin(u * Math.PI), y = hY(+v), x = CX[i] - BW / 2; glow(ctx, CX[i] + 10, y, 170, '#FFE7C8', .5 * a);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; line(ctx, x + 4, y + 2, x + BW - 4, y + 2, rgba('#FFF1DC', .85 * a), 5); ctx.restore(); });
     // a régua: 2023 → 2025
     if (read > 0 && MULT) { const xa = CX[0] + BW / 2 + 40, y0 = hY(VALS[0]), y2 = hY(VALS[2]), xr = CX[2] + BW / 2 + 70, g = E.outCubic(read);
       ctx.save(); ctx.globalAlpha *= g;
@@ -269,6 +273,8 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     draw(ctx, t) {
       const cam = camKey(t, CAM);
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0E' });
+      SPACE.field(ctx, t, { alpha: .32, rot: SPACE.camRot(cam, .0004), spin: .04 });
+      SPACE.ribbon(ctx, t, { alpha: .3, rot: .5 + SPACE.camRot(cam, .0004), cy: 470, amp: .42, width: 30, spin: .05 });
       layer(ctx, cam, .25, () => skyline(ctx, t, { y: 980, h: 360, seed: 14, col: '#1A1216', lit: .4 }));
       layer(ctx, cam, .6, () => neonGrid(ctx, t, { horizon: 860, alpha: .3, speed: .4 }));
       layer(ctx, cam, 1, () => {
@@ -324,7 +330,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       if (i === 0) { ctx.beginPath(); ctx.moveTo(-190, -330); ctx.lineTo(0, -410); ctx.lineTo(190, -330); ctx.closePath(); ctx.fillStyle = mix('#5A3A30', col, .3); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.stroke(); for (let k = 0; k < 5; k++) vslab(ctx, -150 + k * 66, -80, 22, 80, 6, '#E9DCC8', { lw: 2 }); }
       if (i === 2) { for (let k = 0; k < 6; k++) { ctx.beginPath(); ctx.moveTo(-180 + k * 60, -120); ctx.lineTo(-150 + k * 60, -80); ctx.lineTo(-120 + k * 60, -120); ctx.closePath(); ctx.fillStyle = k % 2 ? C.yellow : C.red; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.stroke(); } }
       ctx.restore();
-      if (p > .2) { vball(ctx, x, GY - 400 - (i === 0 ? 40 : 0), 58, col, { lw: 4 }); icon(ctx, ic, x, GY - 400 - (i === 0 ? 40 : 0), 60, col === C.yellow ? INK : '#FFF', 7); }
+      if (p > .2) { const iy = GY - 400 - (i === 0 ? 40 : 0), s = E.outBack(clamp((p - .2) * 1.3)); ctx.save(); ctx.translate(x, iy); ctx.scale(s, s); glow(ctx, 0, 0, 120, col, .35); circle(ctx, 0, 0, 50, col, INK, 6); icon(ctx, ic, 0, 0, 56, col === C.yellow ? INK : '#FFF', 7); ctx.restore(); }
       const la = P(t, T_CLI[i] + .3, .5);
       late(ctx, c => { c.globalAlpha *= la; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;
         text(c, name, x, GY - 490 - (i === 0 ? 40 : 0), { size: 40, weight: 900, color: '#FFF', align: 'center' }); c.shadowBlur = 0;
@@ -424,6 +430,8 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     draw(ctx, t) {
       const cam = camKey(t, CAM), pan = [T_CAP, T_INT, T_PRED, T_PRESC].some(t0 => t > t0 - 1.2 && t < t0);
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
+      SPACE.field(ctx, t, { alpha: .3, rot: SPACE.camRot(cam, .00025), cy: 420 });
+      SPACE.floaters(ctx, t, { alpha: .34, rot: SPACE.camRot(cam, .00025), cy: 380, n: 12 });
       layer(ctx, cam, .2, () => skyline(ctx, t, { y: 900, h: 460, seed: 33, col: '#1E1418', lit: .5 }));
       layer(ctx, cam, .45, () => skyline(ctx, t, { y: 980, h: 300, seed: 41, col: '#120C0E', lit: .3, x: 1200 }));
       layer(ctx, cam, 1, () => {

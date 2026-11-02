@@ -35,12 +35,12 @@ const PLAYER = (() => {
   }
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
-  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; HUD.begin(); try { (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); } finally { HUD.flush(c); } [BT, NOW] = keep; }
+  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; HUD.begin(c); try { (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); } finally { HUD.flush(c); } [BT, NOW] = keep; }
   /** slide "montado" para as paradas: o quadro do trecho sem batida, com a legenda daquele momento */
-  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; HUD.begin(); try { c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); } finally { HUD.flush(c); } captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
+  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; HUD.begin(c); try { c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); } finally { HUD.flush(c); } captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
 
   function renderPlay(T) {
-    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T; HUD.reset(); HUD.begin();
+    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T; HUD.reset(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; HUD.begin(ctx);
     const s = sceneAt(T), t = T - s.start, sh = shakeAt(T), fx = typeof FX !== 'undefined';
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.save(); ctx.translate(sh.x, sh.y); ctx.translate(W / 2, H / 2); ctx.rotate(sh.r);
@@ -60,7 +60,7 @@ const PLAYER = (() => {
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     const impl = STOPSCN[id], now = performance.now();
     UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35); UI.popT = (now - UI.popAt) / 1000;
-    HUD.reset(); HUD.begin();
+    HUD.reset(); HUD.begin(ctx);
     if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
     if (!(impl && impl.noPaint)) PAINT.post(ctx);
     HUD.flush(ctx);
@@ -102,7 +102,11 @@ const PLAYER = (() => {
     if (was) play(); else { VOICE.reset(st.T); syncUI(); }
   }
   function toggle() { if (st.mode === 'stop') return next(); st.playing ? pause() : play(); }
+  const SNAP = { cv: null, T: -1 };
+  /** o último quadro do vídeo, se foi o instante T (a transição para a conversa usa ele) */
+  function snapshot(T) { return SNAP.cv && Math.abs(SNAP.T - T) < .3 ? SNAP.cv : null; }
   function enterStop(i) {
+    if (st.mode === 'play') { SNAP.cv = SNAP.cv || makeCanvas(W, H, () => {}); const g = SNAP.cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.drawImage(cv, 0, 0); SNAP.T = STOPS[i].T; }
     if (st.playing) { st.playing = false; AUDIO.stop(); VOICE.pause(); }
     st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
     syncUI(); poke();
@@ -212,5 +216,5 @@ const PLAYER = (() => {
   window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1, ui) => { const keep = { ...UI }; if (ui) Object.assign(UI, { selAt: -1e9, popAt: -1e9 }, ui); renderStop(id, tl, item, prevItem, p); Object.assign(UI, keep); };
   window.__ui = UI; window.__ctl = CTL;
   window.__seek = seek; window.__state = st; window.__next = next; window.__prev = prev; window.__gotoStop = gotoStop; window.__jump = jumpStation;
-  return { play, pause, seek, frameAt, slideAt, next, prev };
+  return { play, pause, seek, frameAt, slideAt, snapshot, next, prev };
 })();

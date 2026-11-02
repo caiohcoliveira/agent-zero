@@ -1,10 +1,15 @@
-# Performance Analytics — "A Linha" (v7, experimento)
+# Performance Analytics — "A Linha" (v7.2, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
 > - as 8 disciplinas acumulando no clímax;
 > - o letreiro WELCOME TO… no final;
 > - a estação viva atrás das conversas.
+>
+> **v7.2:**
+> - **sem personagem:** cada aparição virou outra solução visual (o bilhete sozinho, um trem que cruza a ponte, a equipe em ícones planos, a tela e o interruptor contando a fraude, um trem que segue pela cidade);
+> - **espaço 3D:** campo de partículas com constelações, curvas 3D em fita e objetos flutuando (cubos, octaedros, anéis, orbes) atrás do conteúdo, girando com a câmera;
+> - **correções:** entrada das conversas sem textos misturados, barras do faturamento sem a "sujeira" no topo, ícones planos em "Onde aplicamos analytics" e embeddings imersivos (sem moldura).
 
 Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há **conversas**, telas em loop para as apresentadoras falarem.
 
@@ -146,9 +151,10 @@ src/
   10-ui.js         split-flap, mapa, mini-mapa (canto superior direito), plataforma viva, cartazes, slides + popup, telas extras (SLIDE_SCREENS)
   11-station.js    vagão, trem que passa, painel "próxima estação", bilhete
   12-paint.js      acabamento pintado, luz volumétrica, volume
-  13-people.js     a analista (poses: digitar, andar, alcançar, dançar, segurar, acenar, apontar; posição da mão)
+  13-people.js     ratinho e pombo da plataforma (o rig da personagem continua no arquivo, mas não é usado desde a v7.2)
   14-v7.js         ★ v7: TY/LAY (tipografia e grade), HUD (texto nítido), SAY (roteiro de tela), LINE (a linha laranja),
-                   camKey/layer (câmera 2.5D), flowRow (diagramas nomeados), skyline, balão de pergunta
+                   camKey/layer (câmera 2.5D), flowRow (diagramas nomeados), skyline, balão de pergunta,
+                   SPACE (v7.2: campo de partículas, curva 3D em fita e objetos flutuando, em perspectiva)
   20-open.js       pré-show, embarque e Conversa 0
   21-trecho1.js    estações 01, 02, 03, cartazes 01–03, catálogo de modelos e Conversa 1
   22-cases.js      estação 04 e os 4 cases

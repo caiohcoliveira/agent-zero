@@ -17,21 +17,24 @@ const LAY = { x: 96, kickerY: 84, titleY: 150, conclY: 992, bodyX: 1196, bodyY: 
 /* ---------- texto nítido: fila desenhada depois do acabamento pintado ---------- */
 const HUD = {
   st: [],
-  begin() { this.st.push([]); },
-  add(ctx, fn) { const q = this.st[this.st.length - 1]; if (q) q.push(fn); else { ctx.save(); fn(ctx); ctx.restore(); } },
+  /** abre uma fila; guarda a transformação e a opacidade do quadro (um quadro desenhado dentro de uma transição herda o zoom e o fade) */
+  begin(ctx) { this.st.push({ q: [], m: ctx ? ctx.getTransform() : null, a: ctx ? ctx.globalAlpha : 1 }); },
+  base() { return this.st[this.st.length - 1] || { m: null, a: 1 }; },
+  add(ctx, fn) { const top = this.st[this.st.length - 1]; if (top) top.q.push(fn); else { ctx.save(); fn(ctx); ctx.restore(); } },
   flush(ctx) {
-    const q = this.st.pop() || [];
-    for (const fn of q) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0; fn(ctx); ctx.restore(); }
+    const top = this.st.pop(); if (!top) return;
+    for (const fn of top.q) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0; fn(ctx); ctx.restore(); }
   },
   reset() { this.st = []; }
 };
 /** desenha depois do acabamento, preso ao visual (mesma transformação e opacidade de agora) */
 function late(ctx, fn) { const m = ctx.getTransform(), a = ctx.globalAlpha; HUD.add(ctx, c => { c.setTransform(m); c.globalAlpha = a; fn(c); }); }
 /** desenha depois do acabamento na posição de tela do ponto (x, y) do mundo, sem a escala da câmera (texto sempre do mesmo tamanho) */
-function pin(ctx, x, y, fn) { const p = ctx.getTransform().transformPoint(new DOMPoint(x, y)), a = ctx.globalAlpha; HUD.add(ctx, c => { c.setTransform(1, 0, 0, 1, p.x, p.y); c.globalAlpha = a; fn(c); }); }
+function pin(ctx, x, y, fn) { const p = ctx.getTransform().transformPoint(new DOMPoint(x, y)), a = ctx.globalAlpha, b = HUD.base(), k = b.m ? Math.hypot(b.m.a, b.m.b) : 1;
+  HUD.add(ctx, c => { c.setTransform(k, 0, 0, k, p.x, p.y); c.globalAlpha = a; fn(c); }); }
 const camScale = ctx => { const m = ctx.getTransform(); return Math.hypot(m.a, m.b); };
-/** desenha depois do acabamento, em coordenadas de tela */
-function hud(ctx, fn, a = 1) { HUD.add(ctx, c => { c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = a; fn(c); }); }
+/** desenha depois do acabamento, em coordenadas de tela (as do quadro: dentro de uma transição, segue o zoom e o fade dela) */
+function hud(ctx, fn, a = 1) { const b = HUD.base(); HUD.add(ctx, c => { if (b.m) c.setTransform(b.m); else c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = b.a * a; fn(c); }); }
 
 /* ---------- parágrafos com *destaques* (quebra por largura, com cache) ---------- */
 const _wrapCache = new Map();
@@ -320,3 +323,79 @@ function qBubble(ctx, x, y, r, p, o = {}) {
   retroText(ctx, o.mark || '?', 0, 4, { size: r * 1.15, weight: 900, color: o.col || C.red, align: 'center', depth: 5, lw: 4 });
   ctx.restore();
 }
+
+/* ---------- ESPAÇO 3D: partículas, curvas e objetos flutuando em perspectiva (atrás do conteúdo) ----------
+   Tudo num espaço [-1, 1]³ girando devagar; o giro também acompanha a câmera da cena (o.rot).
+   Perto da câmera: maior, mais claro e com brilho (profundidade de campo); longe: pequeno e apagado.
+   SPACE.field (campo de partículas e constelações) · SPACE.ribbon (curva 3D em fita) · SPACE.floaters (objetos) */
+const SPACE = (() => {
+  const R = rng(9090), PAL = ['#FF5F00', '#F79E1B', '#EB001B', '#FFE7C8'];
+  const PTS = Array.from({ length: 240 }, (_, i) => ({ x: R() * 2.4 - 1.2, y: R() * 2 - 1, z: R() * 2 - 1, c: PAL[i % 4], s: .4 + R() }));
+  const OBJ = Array.from({ length: 18 }, (_, i) => ({ x: (R() * 2 - 1) * 1.25, y: (R() * 2 - 1) * .85, z: R() * 2 - 1, k: i % 4, s: .05 + R() * .07, sp: .25 + R() * .55, ph: R() * TAU, c: PAL[i % 4] }));
+  const CUBE = [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]], CE = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
+  const OCTA = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], OE = [[0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1, 3], [1, 4], [1, 5], [2, 4], [4, 3], [3, 5], [5, 2]];
+  /** projeção: gira em y (rot) e x (tilt); câmera à distância D; S = escala em px */
+  function proj(o) {
+    const rot = o.rot || 0, tilt = o.tilt == null ? .28 : o.tilt, cx = o.cx == null ? W / 2 : o.cx, cy = o.cy == null ? H / 2 : o.cy, S = o.scale || 760, D = o.dist || 2.4;
+    const cr = Math.cos(rot), sr = Math.sin(rot), ct = Math.cos(tilt), st = Math.sin(tilt);
+    return (x, y, z) => { const X = x * cr + z * sr, Z0 = -x * sr + z * cr, Y = y * ct - Z0 * st, Z = y * st + Z0 * ct, f = D / Math.max(.35, D + Z); return [cx + X * S * f, cy + Y * S * f, Z, f]; };
+  }
+  const depthA = f => clamp((f - .6) / 1.2, .08, 1);
+  /** campo de partículas com algumas constelações */
+  function field(ctx, t, o = {}) {
+    const A = o.alpha == null ? .5 : o.alpha; if (A <= 0) return;
+    const pr = proj({ ...o, rot: (o.rot || 0) + t * (o.spin == null ? .05 : o.spin) }), n = o.n || 160, P2 = [];
+    for (let i = 0; i < n; i++) { const p = PTS[i], q = pr(p.x, p.y + Math.sin(t * .4 + i) * .02, p.z); P2.push([q, p]); }
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    if (o.links !== false) { ctx.lineWidth = 1.2; for (let i = 0; i < 70; i++) for (let j = i + 1; j < 70; j++) { const a = P2[i][1], b = P2[j][1], d = Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z); if (d > .26) continue;
+      const qa = P2[i][0], qb = P2[j][0], al = A * .35 * (1 - d / .26) * depthA((qa[3] + qb[3]) / 2); ctx.strokeStyle = rgba('#FFC98A', al); ctx.beginPath(); ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); ctx.stroke(); } }
+    P2.sort((u, v) => v[0][2] - u[0][2]);
+    for (const [q, p] of P2) { const [x, y, , f] = q; if (x < -60 || x > W + 60 || y < -60 || y > H + 60) continue; const r = (1 + 2.4 * p.s) * f * f * (o.size || 1), al = A * depthA(f);
+      if (f > 1.35 && !QUALITY.low) glow(ctx, x, y, r * 7, p.c, al * .5); ctx.fillStyle = rgba(p.c, al); ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); }
+    ctx.restore();
+  }
+  /** curva 3D em fita (duas tranças), ordenada por profundidade */
+  function ribbon(ctx, t, o = {}) {
+    const A = o.alpha == null ? .55 : o.alpha; if (A <= 0) return;
+    const pr = proj({ ...o, rot: (o.rot || 0) + t * (o.spin == null ? .08 : o.spin) }), N = o.seg || 120, wd = o.width || 26, amp = o.amp || .55, f1 = o.f1 || 1.3, f2 = o.f2 || .9, sp = o.speed == null ? .35 : o.speed;
+    const quads = [];
+    [0, 1].forEach(strand => {
+      const off = strand * Math.PI, pts = [];
+      for (let i = 0; i <= N; i++) { const s = i / N, x = (s - .5) * (o.len || 3.6), y = amp * Math.sin(TAU * f1 * s + t * sp + off) * (.65 + .35 * Math.sin(TAU * .5 * s + t * .2)) + (o.y || 0), z = amp * .9 * Math.cos(TAU * f2 * s + t * sp * .8 + off);
+        pts.push(pr(x, y, z)); }
+      for (let i = 0; i < N; i++) { const a = pts[i], b = pts[i + 1], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, wa = wd * a[3] * .5, wb = wd * b[3] * .5;
+        quads.push({ z: (a[2] + b[2]) / 2, f: (a[3] + b[3]) / 2, s: i / N, strand, p: [[a[0] + nx * wa, a[1] + ny * wa], [b[0] + nx * wb, b[1] + ny * wb], [b[0] - nx * wb, b[1] - ny * wb], [a[0] - nx * wa, a[1] - ny * wa]] }); }
+    });
+    quads.sort((u, v) => v.z - u.z);
+    ctx.save();
+    for (const q of quads) { const col = q.strand ? mix(PAL[2], PAL[1], q.s) : mix(PAL[0], PAL[1], 1 - q.s), al = A * depthA(q.f) * (.55 + .45 * Math.sin(q.s * Math.PI));
+      ctx.fillStyle = rgba(col, al); ctx.beginPath(); ctx.moveTo(...q.p[0]); ctx.lineTo(...q.p[1]); ctx.lineTo(...q.p[2]); ctx.lineTo(...q.p[3]); ctx.closePath(); ctx.fill();
+      if (q.f > 1.15) { ctx.strokeStyle = rgba('#FFF1DC', al * .5); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo((q.p[0][0] + q.p[3][0]) / 2, (q.p[0][1] + q.p[3][1]) / 2); ctx.lineTo((q.p[1][0] + q.p[2][0]) / 2, (q.p[1][1] + q.p[2][1]) / 2); ctx.stroke(); } }
+    // faíscas correndo pela curva
+    if (!QUALITY.low) { ctx.globalCompositeOperation = 'lighter'; for (let k = 0; k < 6; k++) { const s = ((t * .09 + k / 6) % 1), x = (s - .5) * (o.len || 3.6), y = amp * Math.sin(TAU * f1 * s + t * sp) * (.65 + .35 * Math.sin(TAU * .5 * s + t * .2)) + (o.y || 0), z = amp * .9 * Math.cos(TAU * f2 * s + t * sp * .8);
+      const [px, py, , f] = pr(x, y, z); glow(ctx, px, py, 22 * f, '#FFE7C8', A * .8 * depthA(f)); } }
+    ctx.restore();
+  }
+  /** objetos flutuando: cubos e octaedros em arame, anéis e orbes (o.glyph: um caractere no lugar dos objetos) */
+  function floaters(ctx, t, o = {}) {
+    const A = o.alpha == null ? .5 : o.alpha; if (A <= 0) return;
+    const pr = proj({ ...o, rot: (o.rot || 0) + t * (o.spin == null ? .04 : o.spin) }), n = o.n || 14;
+    const items = OBJ.slice(0, n).map((b, i) => { const y = b.y + Math.sin(t * b.sp + b.ph) * .07, c = pr(b.x, y, b.z); return { b, c, y, i }; }).sort((u, v) => v.c[2] - u.c[2]);
+    ctx.save(); ctx.lineJoin = 'round';
+    for (const { b, c, y } of items) {
+      const [cx0, cy0, , f] = c, al = A * depthA(f), s = b.s * (o.size || 1), ra = t * b.sp + b.ph, rb = t * b.sp * .7, col = o.col || b.c;
+      if (cx0 < -200 || cx0 > W + 200) continue;
+      const rot3 = ([x, yy, z]) => { const x1 = x * Math.cos(ra) + z * Math.sin(ra), z1 = -x * Math.sin(ra) + z * Math.cos(ra), y1 = yy * Math.cos(rb) - z1 * Math.sin(rb), z2 = yy * Math.sin(rb) + z1 * Math.cos(rb); return pr(b.x + x1 * s, y + y1 * s, b.z + z2 * s); };
+      ctx.lineWidth = Math.max(1, 2.2 * f); ctx.strokeStyle = rgba(col, al);
+      if (o.glyph) { ctx.fillStyle = rgba(col, al); ctx.font = font(Math.round(90 * f * (o.size || 1) * (.6 + b.s * 4)), 900); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.save(); ctx.translate(cx0, cy0); ctx.rotate(Math.sin(ra) * .3); ctx.fillText(o.glyph, 0, 0); ctx.restore(); continue; }
+      if (b.k === 0 || b.k === 2) { const V = (b.k === 0 ? CUBE : OCTA).map(rot3); ctx.beginPath(); (b.k === 0 ? CE : OE).forEach(([i, j]) => { ctx.moveTo(V[i][0], V[i][1]); ctx.lineTo(V[j][0], V[j][1]); }); ctx.stroke();
+        if (f > 1.2 && !QUALITY.low) glow(ctx, cx0, cy0, 60 * f * s * 6, col, al * .25); }
+      else if (b.k === 1) { ctx.beginPath(); for (let k = 0; k <= 28; k++) { const a = k / 28 * TAU, q = rot3([Math.cos(a) * 1.2, Math.sin(a) * 1.2, 0]); k ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); } ctx.stroke(); }
+      else { const r = 700 * s * f * .12, g = ctx.createRadialGradient(cx0 - r * .3, cy0 - r * .3, r * .1, cx0, cy0, r); g.addColorStop(0, rgba('#FFF1DC', al)); g.addColorStop(.5, rgba(col, al * .8)); g.addColorStop(1, rgba(col, 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx0, cy0, r, 0, TAU); ctx.fill(); }
+    }
+    ctx.restore();
+  }
+  /** atalho: rot pela câmera (cam.x) para o espaço acompanhar os movimentos da cena */
+  const camRot = (cam, k = .00035) => cam ? (cam.x - W / 2) * k : 0;
+  return { field, ribbon, floaters, camRot, proj };
+})();

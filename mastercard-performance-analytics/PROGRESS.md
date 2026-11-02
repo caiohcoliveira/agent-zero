@@ -139,7 +139,7 @@ A v5.4 continua intacta em `claude/mastercard-analytics-video-4cof1t`.
   - linha laranja (LINE), câmera com paralaxe, diagramas nomeados (`src/14-v7.js`);
   - mini-mapa e painel de LED no canto direito.
 - [x] **E2. Play 1, Conversa 0 e estações 01–03:**
-  - embarque com a analista e o bilhete, missão e mapa com 3 capítulos;
+  - embarque com o bilhete, missão e mapa com 3 capítulos;
   - ponte dos 4 serviços;
   - gráficos com eixo, unidade e base;
   - capabilities, preditivos × prescritivos.
@@ -171,6 +171,32 @@ A v5.4 continua intacta em `claude/mastercard-analytics-video-4cof1t`.
 - [x] **QA e folhas de cenas:**
   - varredura sem erros e medidor de leitura (0 curtas);
   - folhas com as fotos de todas as cenas e conversas enviadas ao usuário.
+
+### v7.2 — pedidos da revisão
+
+- [x] **Sem personagem** (com soluções no lugar):
+  - embarque com o bilhete sozinho;
+  - um trem cruza a ponte da 01 e segue pela cidade da 07;
+  - equipe da 05 em ícones planos;
+  - fraude contada pela tela, pelo cursor e pelo interruptor, que desliga sozinho. Na festa, a cadeira vazia gira no foco de luz;
+  - nenhum `PEOPLE.draw` no filme.
+- [x] **Espaço 3D** (`SPACE` em `src/14-v7.js`):
+  - campo de partículas com constelações, curva 3D em fita e objetos flutuando;
+  - aplicado no mapa do embarque, 01, 02, 03, 04, cases, 05, 06, 07 e clímax;
+  - gira com a câmera.
+- [x] **Correções:**
+  - entrada das conversas em "mergulho no escuro" (sem textos misturados; HUD com transformação/alfa de base);
+  - faturamento sem a pincelada e sem o traço sobre os topos (agora um brilho);
+  - ícones planos em "Onde aplicamos analytics";
+  - embeddings sem moldura, com "um associado" sempre na tela;
+  - fluxo da fraude sem rótulos encostando na tela;
+  - "rodando sozinha" no lugar do contador de execuções;
+  - painéis do clímax recuam na frase-chave.
+- [x] **QA:**
+  - varredura 0–551 s e conversas sem exceções;
+  - medidor de leitura: 72 telas, 0 curtas;
+  - navegação e clique ok;
+  - folhas de fotos enviadas.
 
 Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 
