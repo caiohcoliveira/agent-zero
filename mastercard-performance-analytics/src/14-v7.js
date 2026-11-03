@@ -36,6 +36,12 @@ const camScale = ctx => { const m = ctx.getTransform(); return Math.hypot(m.a, m
 /** desenha depois do acabamento, em coordenadas de tela (as do quadro: dentro de uma transição, segue o zoom e o fade dela) */
 function hud(ctx, fn, a = 1) { const b = HUD.base(); HUD.add(ctx, c => { if (b.m) c.setTransform(b.m); else c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = b.a * a; fn(c); }); }
 
+/** barra chapada dos gráficos (v7.11): cantos de cima arredondados, sem volume 3D nem contorno */
+function fbar(ctx, x, y, w, h, col, o = {}) {
+  if (h <= 0 || w <= 0) return; const r = Math.min(o.r == null ? 8 : o.r, w / 2, h);
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h); ctx.closePath();
+  ctx.fillStyle = col; ctx.fill();
+}
 /* ---------- parágrafos com *destaques* (quebra por largura, com cache) ---------- */
 const _wrapCache = new Map();
 function wrapRich(ctx, str, maxW, size, weight = 700) {

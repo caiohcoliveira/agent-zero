@@ -1,10 +1,18 @@
-# Performance Analytics — "A Linha" (v7.9, experimento)
+# Performance Analytics — "A Linha" (v7.11, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
-> - as 8 disciplinas acumulando no clímax;
+> - o clímax com cards nos tempos fortes da música (v7.11: 5 cases que viram para mostrar as técnicas);
 > - o letreiro WELCOME TO… no final;
-> - a estação viva atrás das conversas.
+> - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.11:**
+> - **estação das conversas:** saiu o metrô subterrâneo (azulejos, ratinho, pombo, goteira, grafites). Agora é uma estação ao ar livre, com cobertura de nervuras brancas e vidro, parede de vidro com a cidade clara e um viaduto onde um trem bala passa ao longe, jardins verticais, árvores e floreiras, e painéis brancos pendurados no lugar dos cartazes de papel. Referências: Oculus (WTC), Zaragoza-Delicias, West Kowloon, "Train Station in the Forest" (MAD), Jönköping e o jardim de Atocha;
+> - **trem bala:** o vagão antigo virou um trem bala de dois vagões (nariz aerodinâmico, faixa contínua de janelas, saia lisa e as cores da Mastercard), no embarque, na ponte, no viaduto, na 07, na passagem entre estações e ao fundo da estação;
+> - **telas com gráfico minimalistas:** sem fachos de luz, poeira, partículas, objetos flutuando, fitas 3D, grade neon, rastros de velocidade e prédios ao fundo. A cidade só aparece onde o trem passa (ponte da 01, viaduto da 06 e cidade da 07);
+> - **barras chapadas** (sem volume 3D nem brilho) e números-manchete sem respingo;
+> - **cases:** os clusters 3D da v5 na principalidade e a resolução de erros da v5 no case de IA, com a pilha de painéis gerados (a imagem do dashboard) no canto inferior esquerdo;
+> - **clímax:** 5 cases que entram nos compassos e viram (frente: case e método; verso: técnicas).
 >
 > **v7.2:**
 > - **sem personagem:** cada aparição virou outra solução visual (o bilhete sozinho, um trem que cruza a ponte, a equipe em ícones planos, a tela e o interruptor contando a fraude, um trem que segue pela cidade);
@@ -51,7 +59,7 @@ O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito d
 | **Conversa 1** | cartazes 01, 02, 03 legíveis, chamada "Onde isso encontra o seu cliente?", "A seguir: quatro cases…" | fala |
 | Play 3 · estações 04–06 | opção A (ElevenLabs): uma versão por case, como foi composta; as cenas seguem a música | 4:42 |
 | **Conversa 2** | cartazes 04, 05, 06, chamada "Qual desafio pode virar o próximo case?" | fala |
-| Play 4 · 07, disciplinas e letreiro | final orquestral (ElevenLabs), inteiro; termina com o vídeo | 1:11 |
+| Play 4 · 07, clímax e letreiro | final orquestral (ElevenLabs), inteiro; termina com o vídeo | 1:11 |
 | **Encerramento** | letreiro vivo; clique ou → abre o cartaz 07 | fala |
 
 São **8:48 de vídeo**. Com as conversas, a sessão cabe em 20 minutos.
@@ -134,10 +142,10 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
     - **Automação:** a pausa de 2 tempos composta na própria música é o interruptor, e o drop dela acende o neon. O acorde final soa no mergulho.
     - **IA:** a cena começa com o crescendo de 16 compassos da versão; o maior drop da parte cai na escala, e o acorde final soa até a 05.
     - **05 e 06:** 16 compassos de groove, e o acorde final cai na conclusão da 06.
-  - **Parte 3 · 07, disciplinas e letreiro (1:11):** final orquestral, 100 BPM, **sem o coro**, tocado **inteiro, do jeito que foi composto** (v7.5).
+  - **Parte 3 · 07, clímax e letreiro (1:11):** final orquestral, 100 BPM, **sem o coro**, tocado **inteiro, do jeito que foi composto** (v7.5).
     - Toca a gravação original até pouco antes do coro e, depois, a versão sem coro, alinhada à amostra.
     - O filme se ajusta à música (v7.7):
-      - as disciplinas entram nos tempos fortes (v7.8): a fileira de cima uma por compasso desde que a batida começa (30,0 s), a de baixo acelerando, uma a cada 2 tempos;
+      - os 5 cards do clímax entram um por compasso desde que a batida começa (30,0 s) e viram 2 tempos depois (v7.11);
       - a frase-chave aparece no grande ataque da orquestra (46,8 s);
       - o letreiro acende no prato da cadência final (67,2 s);
       - o vídeo termina com a cauda desse acorde (71,4 s).
@@ -166,26 +174,27 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
 ```
 src/
   00-head.html     HTML + CSS, bloco de dados (pa-data) e blocos de música
-  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, conversas, textos (estações, capítulos, missão, futuro, disciplinas)
+  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, conversas, textos (estações, capítulos, missão, futuro, cases do clímax)
   01-data.js       ★ DADOS: lê o JSON, acessos seguros (SEC, CASE, HEADLINES) e formatação pt-BR (FMT)
   02-core.js · 03-collage.js · 03-components.js · 04-viz.js   primitivas, papel, ícones, agentes, visualizações
   05-audio.js      trilha sintetizada do embarque + SFX + cues
   07-beats.js      gerado por tools/music.py · 08-music.js toca as faixas e expõe BT
   09-fx.js         câmera e pós-processamento guiados pela música; tinta, respingos, pinceladas
   10-ui.js         grade musical por cena (grid, onBeat, beatsFrom: entradas no tempo da música), split-flap, mapa, mini-mapa,
-                   plataforma viva, cartazes, slides + popup, telas extras (SLIDE_SCREENS)
-  11-station.js    vagão, trem que passa, painel "próxima estação", bilhete
+                   estação das conversas (v7.11: futurista, arejada e verde), painéis, slides + popup, telas extras (SLIDE_SCREENS)
+  11-station.js    trem bala (v7.11; trainCar/sideTrain/trainLen), trem que passa, painel "próxima estação", bilhete
   12-paint.js      acabamento pintado, luz volumétrica, volume
-  13-people.js     ratinho e pombo da plataforma (o rig da personagem continua no arquivo, mas não é usado desde a v7.2)
+  13-people.js     personagens antigos (ratinho, pombo e o rig): ficam no arquivo, mas não são usados desde a v7.11
   14-v7.js         ★ v7: TY/LAY (tipografia e grade), HUD (texto nítido), SAY (roteiro de tela), LINE (a linha laranja),
                    camKey/layer (câmera 2.5D), flowRow (diagramas nomeados), skyline, balão de pergunta,
-                   SPACE (v7.2: campo de partículas, curva 3D em fita e objetos flutuando, em perspectiva),
+                   SPACE (v7.2: campo de partículas, curva 3D em fita e objetos flutuando; v7.11: fora das telas com gráfico),
+                   fbar (v7.11: barras chapadas dos gráficos),
                    mockBadge (aviso de versão mockada)
   20-open.js       pré-show, embarque e Conversa 0
   21-trecho1.js    estações 01, 02, 03, cartazes 01–03, catálogo de modelos e Conversa 1
   22-cases.js      estação 04 e os 4 cases
   23-scale.js      estações 05 e 06, cartazes 04–06 e Conversa 2
-  24-final.js      estação 07, disciplinas, letreiro final, cartaz 07 e encerramento
+  24-final.js      estação 07, clímax (5 cases que viram), letreiro final, cartaz 07 e encerramento
   90-player.js     modo apresentação (HUD depois da pintura; interface das conversas por cima, sem pintura)
 data/presentation.json
 tools/build.py       monta o HTML (python3; ffmpeg para as músicas)
@@ -219,7 +228,7 @@ build.sh             atalho para tools/build.py
 | `src/01-config.js` | `mode` | `'show'` (conversas em loop) ou `'reel'` (direto) |
 | | `scenes[].dur` | duração de cada cena; casada com os compassos da faixa |
 | | `text.mission`, `text.chapters`, `text.stations` | missão, capítulos do mapa e textos das estações |
-| | `text.future`, `text.climaxWords`, `text.climaxSub` | direções do futuro e as 8 disciplinas |
+| | `text.future`, `text.climaxCases` | direções do futuro e os 5 cases do clímax (case, método, técnicas; `etc` acrescenta "e outras técnicas") |
 | | `motion.beatBase`, `motion.paint` | batida fora dos clímax; acabamento pintado (0 desliga) |
 | `src/14-v7.js` | `TY`, `LAY` | tamanhos de texto e posições do contrato de tela |
 | arquivos de cena | `SCENES[id].script` | o roteiro de tela: título, explicação, conclusão e os tempos |

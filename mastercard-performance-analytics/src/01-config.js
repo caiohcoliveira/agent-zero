@@ -155,8 +155,14 @@ const CONFIG = {
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
     // clímax: as disciplinas por trás de tudo (não técnicas soltas)
-    climaxWords: ['Estatística', 'Otimização & Pesquisa operacional', 'Modelos supervisionados', 'Modelos não supervisionados', 'NLP', 'Redes neurais', 'Deep learning', 'Inteligência artificial'],
-    climaxSub: ['setup de projetos de marketing e estratégia', 'modelos para tomada de decisão', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'entendem a linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
+    // clímax (v7.11): 5 cases que viram — frente: o case e o método; verso: as técnicas (etc = lista não exaustiva)
+    climaxCases: [
+      { name: 'Mesa de performance', method: 'teste A/B', tech: ['power analysis', 'testes de hipótese', 'plano de amostragem'] },
+      { name: 'Prevenção a fraude', method: 'modelo supervisionado', tech: ['cross validation', 'PCA', 'gradient boosting'], etc: true },
+      { name: 'Segmentação / Recomendação', method: 'modelo não supervisionado', tech: ['k-means', 'filtro colaborativo', 'matrix factorization'], etc: true },
+      { name: 'Forecast', method: 'séries temporais', tech: ['ARIMA', 'SARIMAX', 'boosting', 'componentes de Fourier'] },
+      { name: 'Pricing / dimensionamento', method: 'otimização', tech: ['PO · pesquisa operacional', 'simulação de Monte Carlo', 'programação linear', 'modelos de estoque'] }
+    ],
     climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },

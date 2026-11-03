@@ -342,3 +342,34 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - medidor de leitura: 77 telas, 0 curtas;
   - navegação, clique e console limpos;
   - fotos de cada passo conferidas.
+
+### v7.11 — clusters 3D, agentes e clímax da v5; estação futurista, trem bala e telas mais sóbrias
+
+- [x] **Principalidade (case 2):** os clusters 3D da v5 (`src/legacy/14-scene-embed.js`) no COMO FIZEMOS, nos mesmos tempos:
+  - produtos soltos → UMAP (eixos dim 1/2/3 … dim 128) → K-Means com as 4 famílias;
+  - "proximidade = afinidade", cos θ alto (CDB e LCI) e baixo (Cashback e Consignado), d_cos;
+  - um associado percorre a trilha até o núcleo de principalidade.
+- [x] **Agentes de IA (case 4):** GERAR e AVALIAR E CORRIGIR com a animação da v5 (`src/legacy/12-scene-insights.js`):
+  - geradores leem o relatório e os painéis e escrevem;
+  - o Validador reprova (✕ e o motivo) e os rascunhos voltam pela seta "refazer";
+  - saem as versões 2 e o Validador aprova;
+  - o Embalador fecha o título, que entra no DESTAQUE do relatório e como faixa no painel;
+  - no canto inferior esquerdo fica a pilha de painéis gerados pela automação (a imagem `dashboard_image`, com o contador).
+- [x] **Clímax:** 5 cases (Mesa de performance, Prevenção a fraude, Segmentação / Recomendação, Forecast, Pricing / dimensionamento):
+  - entram um por compasso e viram 2 tempos depois (frente: case e método; verso: técnicas);
+  - a frase-chave segue no grande ataque.
+- [x] **Estação das conversas:**
+  - futurista, arejada e verde, ao ar livre (cobertura de nervuras brancas e vidro, cidade clara, jardins, árvores, painéis brancos);
+  - um trem bala passa ao longe;
+  - saíram ratinho, pombo, goteira, luz piscando, papéis voando e grafites.
+- [x] **Trem bala:** dois vagões com nariz aerodinâmico em todas as cenas com trem.
+- [x] **Telas com gráfico minimalistas:**
+  - sem fachos de luz, poeira, partículas, objetos flutuando, fitas 3D, grade neon, rastros e prédios;
+  - a cidade só aparece onde o trem passa;
+  - barras chapadas e números-manchete sem respingo.
+- [x] **Tempos e música:** nenhum tempo de cena mudou; as músicas embutidas são idênticas às da v7.10.
+- [x] **QA:**
+  - varredura sem exceções (528,14 s);
+  - medidor de leitura: 79 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - fotos de cada cena, das paradas e dos trens conferidas.

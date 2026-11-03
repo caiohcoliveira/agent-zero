@@ -184,106 +184,118 @@ function overlayPlay(ctx, T, s) {
   TRAIN_PASS.draw(ctx, T);
 }
 
-/* ---------- plataforma das paradas: estação viva ----------
-   Teto com luminárias e cones de luz, parede de azulejos pintados, fosso dos trilhos e a
-   plataforma. Eventos em paralelo, em ciclos próprios (tudo função do tempo da parada):
-   luminária que pisca, ratinho nos trilhos, goteira, pombo bicando, passageiro passando,
-   farol de um trem que cruza a estação (com vento nos cartazes), relógio e painel de LED. */
+/* ---------- plataforma das paradas (v7.11): estação futurista, arejada e verde ----------
+   Referências: estações com cobertura de nervuras brancas e vidro (Oculus/WTC, Zaragoza-Delicias, Liège), muita luz natural,
+   jardins e árvores no lugar de paredes fechadas (West Kowloon, "Train Station in the Forest" do MAD, Jönköping, Atocha).
+   Camadas: céu (fundo) → nuvens → cidade clara e morros verdes atrás do vidro, com o viaduto onde um trem bala passa ao longe
+   → parede de vidro com montantes brancos, jardins verticais e floreiras → cobertura de nervuras → via limpa e plataforma clara.
+   Sem ratos, goteira, grafites ou luz piscando: a vida da estação é o céu, as plantas, o painel digital e os trens. */
 const PLAT = { wall: 830, pit: 950, PY: 518 };
-/** vento do trem que passa (0–1) — os cartazes balançam */
-function platformWind(tl) { const c = (tl + 9) % 29; return c < 3.2 ? Math.sin(c / 3.2 * Math.PI) : 0; }
-const TILES = makeCanvas(W, PLAT.wall, (g, w, h) => {
-  g.fillStyle = '#1C1612'; g.fillRect(0, 0, w, h);
-  const r = rng(5), tw = 96, th = 48;
-  for (let row = 0; row * th < h; row++) for (let c = -1; c * tw < w + tw; c++) {
-    const x = c * tw + (row % 2 ? tw / 2 : 0), y = row * th, v = r(), base = v < .06 ? '#4A3424' : v < .14 ? '#3A2E26' : v < .5 ? '#2F2620' : '#2A221D';
-    const gr = g.createLinearGradient(x, y, x + tw * .4, y + th); gr.addColorStop(0, mix(base, '#FFE6C8', .1)); gr.addColorStop(1, mix(base, '#000000', .25));
-    rr(g, x + 3, y + 3, tw - 6, th - 6, 7); g.fillStyle = gr; g.fill();
-    g.fillStyle = 'rgba(255,240,220,.08)'; rr(g, x + 7, y + 6, tw * .5, 5, 3); g.fill();
-  }
-  // faixa Mastercard na parede
-  [[C.red, 236], [C.orange, 252], [C.yellow, 268]].forEach(([c, y]) => { g.fillStyle = mix(c, '#000000', .35); g.fillRect(0, y, w, 16); });
-  // manchas de umidade
-  const r2 = rng(9); for (let k = 0; k < 14; k++) { const x = r2() * w, y = 300 + r2() * 480, rad = 40 + r2() * 120, gr = g.createRadialGradient(x, y, 4, x, y, rad); gr.addColorStop(0, 'rgba(10,6,4,.35)'); gr.addColorStop(1, 'rgba(10,6,4,0)'); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
-});
-function platform(ctx, tl, o = {}) {
-  const br = BT.breath == null ? .5 : BT.breath, WALL = PLAT.wall, PIT = PLAT.pit;
-  ctx.fillStyle = '#0E0B09'; ctx.fillRect(-W, -H, W * 3, H * 3);
-  ctx.drawImage(TILES, 0, 0);
-  // teto abobadado
-  const cg = ctx.createLinearGradient(0, 0, 0, 120); cg.addColorStop(0, '#0B0908'); cg.addColorStop(1, '#2A211B'); ctx.fillStyle = cg; ctx.fillRect(0, 0, W, 110);
-  line(ctx, 0, 110, W, 110, INK, 6);
-  // luminárias: a 3ª pisca de tempos em tempos
-  const LAMPS = [200, 620, 1040, 1460, 1840];
-  LAMPS.forEach((x, k) => {
-    let on = .85 + .15 * br; if (k === 2) { const c = tl % 11; if (c < 1.1) on = hash(Math.floor(tl * 16)) > .45 ? 1 : .08; }
-    if (k === 4) { const c = (tl + 5) % 23; if (c < .6) on = hash(Math.floor(tl * 20) + 7) > .5 ? 1 : .1; }
-    rr(ctx, x - 90, 78, 180, 22, 8); ctx.fillStyle = '#2E2620'; ctx.fill(); inkRect(ctx, x - 90, 78, 180, 22, 8, 3, k);
-    rr(ctx, x - 80, 92, 160, 10, 5); ctx.fillStyle = mix('#3A3028', '#FFF1D6', on); ctx.fill();
-    if (on > .3) { glow(ctx, x, 100, 160, '#FFD9A0', .35 * on); lightCone(ctx, x, 100, 160, 620, 860, '#FFD9A0', .5 * on); }
+/** vento do trem que passa (0–1) — mantido para compatibilidade: na estação nova os painéis não balançam */
+function platformWind(tl) { return 0; }
+const STN = (() => {
+  const GREENS = ['#2F6B4A', '#3E8558', '#4F9A66', '#6BB27A', '#8CC58E'];
+  /** folhagem: tufos de folhas elípticas em vários verdes, dentro do retângulo */
+  const foliage = (g, x, y, w, h, seed, dens = 1) => { const r = rng(seed); g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    g.fillStyle = '#24543B'; g.fillRect(x, y, w, h);
+    for (let k = 0; k < w * h / 260 * dens; k++) { const lx = x + r() * w, ly = y + r() * h, s = 9 + r() * 16, a = r() * TAU;
+      g.save(); g.translate(lx, ly); g.rotate(a); g.fillStyle = GREENS[Math.floor(r() * GREENS.length)]; g.beginPath(); g.ellipse(0, 0, s, s * .42, 0, 0, TAU); g.fill();
+      g.strokeStyle = 'rgba(20,50,32,.35)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-s * .8, 0); g.lineTo(s * .8, 0); g.stroke(); g.restore(); }
+    g.restore(); };
+  /** copa de árvore: nuvem de círculos verdes com luz do alto */
+  const crown = (g, cx, cy, rad, seed) => { const r = rng(seed); for (let k = 0; k < 26; k++) { const a = r() * TAU, d = r() * rad * .75, rr0 = rad * (.28 + r() * .3), x = cx + Math.cos(a) * d * 1.15, y = cy + Math.sin(a) * d * .8;
+      const gg = g.createRadialGradient(x - rr0 * .3, y - rr0 * .4, rr0 * .1, x, y, rr0); gg.addColorStop(0, '#8CC58E'); gg.addColorStop(1, GREENS[Math.floor(r() * 3)]); g.fillStyle = gg; g.beginPath(); g.arc(x, y, rr0, 0, TAU); g.fill(); } };
+  // 1) céu claro
+  const SKY = makeCanvas(W, PLAT.wall, (g, w, h) => { const s = g.createLinearGradient(0, 0, 0, h); s.addColorStop(0, '#B9DCE6'); s.addColorStop(.55, '#DDEEEB'); s.addColorStop(1, '#F3EFE4'); g.fillStyle = s; g.fillRect(0, 0, w, h); });
+  // 2) cidade clara, morros verdes e o viaduto distante (atrás do vidro)
+  const MID = makeCanvas(W, PLAT.wall, (g, w) => {
+    const r = rng(41);
+    [[640, '#C9D6D9', 70, 300], [700, '#B4C6CA', 50, 200]].forEach(([base, col, hmin, hvar], L) => { g.fillStyle = col;
+      for (let x = -20; x < w + 40;) { const bw = 50 + r() * 90, bh = hmin + r() * hvar; rr(g, x, base - bh, bw, bh + 200, L ? 4 : 10); g.fill();
+        if (!L && r() < .35) { g.fillRect(x + bw * .45, base - bh - 40, 4, 40); } x += bw + 6 + r() * 26; } });
+    // janelas discretas (dia): faixas horizontais claras
+    g.fillStyle = 'rgba(255,255,255,.35)'; for (let k = 0; k < 160; k++) { const x = r() * w, y = 420 + r() * 260; g.fillRect(x, y, 14 + r() * 20, 3); }
+    // morros e árvores
+    g.fillStyle = '#9CC7A0'; g.beginPath(); g.moveTo(0, 720); for (let x = 0; x <= w; x += 40) g.lineTo(x, 700 - 34 * Math.sin(x / 260) - 18 * Math.sin(x / 97)); g.lineTo(w, 830); g.lineTo(0, 830); g.closePath(); g.fill();
+    for (let x = 10; x < w; x += 46 + r() * 40) crown(g, x, 716 + r() * 30, 26 + r() * 22, 100 + x);
+    // viaduto ao longe: tabuleiro fino e pilares
+    g.fillStyle = '#E6EAE8'; g.fillRect(0, 586, w, 12); g.fillStyle = '#CDD4D3'; g.fillRect(0, 598, w, 5);
+    for (let x = 60; x < w; x += 190) { g.fillStyle = '#D9DFDE'; g.fillRect(x, 603, 10, 110); }
   });
-  // placa esmaltada com o nome da parada
-  if (o.sign) { const sw = measure(ctx, o.sign, 34, 900, false, 4) + 180;
-    paper(ctx, W / 2 - sw / 2, 120, sw, 60, { r: 12, fill: '#F3EBDD', shadow: 7, shadowColor: '#000', lw: 4 });
-    intersection(ctx, W / 2 - sw / 2 + 60, 150, 17, 21);
-    text(ctx, o.sign, W / 2 + 34, 151, { size: 30, weight: 900, color: INK, align: 'center', ls: 4 }); }
-  // painel de LED rolando e relógio de estação
-  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   MANTENHA-SE ATRÁS DA FAIXA AMARELA   ', lx = 40, lw = 330;
-    rr(ctx, lx, 120, lw, 52, 8); ctx.fillStyle = '#080605'; ctx.fill(); inkRect(ctx, lx, 120, lw, 52, 8, 3, 3);
-    ctx.save(); ctx.beginPath(); ctx.rect(lx + 8, 124, lw - 16, 44); ctx.clip(); ctx.font = font(22, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 90) % mw;
-    ctx.shadowColor = C.orange; ctx.shadowBlur = 8; ctx.fillStyle = C.orange; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 8 - off, 147); ctx.restore();
-    ctx.fillStyle = 'rgba(0,0,0,.4)'; for (let k = 0; k < 9; k++) ctx.fillRect(lx + 6, 124 + k * 5, lw - 12, 1.5);
-    const cx = W - 52, cy = 150; circle(ctx, cx + 4, cy + 5, 44, 'rgba(0,0,0,.6)'); vball(ctx, cx, cy, 44, '#F3EBDD', { rim: false, lw: 4 });
-    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; line(ctx, cx + Math.cos(a) * 34, cy + Math.sin(a) * 34, cx + Math.cos(a) * 39, cy + Math.sin(a) * 39, INK, 3); }
-    const sec = tl % 60, mn = 37 + tl / 60; [[mn / 60 * TAU, 30, 4, INK], [((9 + mn / 60) / 12) * TAU, 20, 6, INK], [sec / 60 * TAU, 34, 2, C.red]].forEach(([a, l, w, c]) => line(ctx, cx, cy, cx + Math.sin(a) * l, cy - Math.cos(a) * l, c, w));
-    circle(ctx, cx, cy, 4, C.red); }
-  // rodapé, fosso dos trilhos e trilhos
-  ctx.fillStyle = '#120E0C'; ctx.fillRect(0, WALL, W, PIT - WALL); line(ctx, 0, WALL, W, WALL, INK, 5);
-  for (let x = -40; x < W + 40; x += 70) { ctx.fillStyle = '#2A1F18'; ctx.beginPath(); ctx.moveTo(x, 900); ctx.lineTo(x + 46, 900); ctx.lineTo(x + 56, 940); ctx.lineTo(x - 8, 940); ctx.closePath(); ctx.fill(); }
-  [886, 926].forEach((y, k) => { line(ctx, 0, y, W, y, '#5A5048', 9); line(ctx, 0, y - 3, W, y - 3, rgba('#FFE2BC', .45 + .2 * br), 2); });
-  // poça da goteira
-  ctx.save(); ctx.globalAlpha = .55; ctx.beginPath(); ctx.ellipse(1480, 912, 90, 12, 0, 0, TAU); ctx.fillStyle = '#2A3440'; ctx.fill(); ctx.restore();
-  // plataforma: faixa tátil amarela e piso com reflexo das luminárias
-  ctx.fillStyle = '#17120F'; ctx.fillRect(0, PIT, W, H - PIT + 200);
-  ctx.fillStyle = C.yellow; for (let x = 0; x < W; x += 60) { ctx.save(); ctx.translate(x, PIT + 12); ctx.transform(1, 0, -.5, 1, 0, 0); ctx.fillRect(0, 0, 36, 20); ctx.restore(); }
-  line(ctx, 0, PIT, W, PIT, INK, 6);
-  LAMPS.forEach(x => { const g = ctx.createRadialGradient(x, PIT + 80, 4, x, PIT + 80, 170); g.addColorStop(0, 'rgba(255,214,160,.16)'); g.addColorStop(1, 'rgba(255,214,160,0)'); ctx.fillStyle = g; ctx.fillRect(x - 170, PIT + 30, 340, 120); });
-  // grafites que respiram nas paredes
-  (o.doodles || []).forEach((d, i) => scribble(ctx, d[0], d[1], d[2], d[3], d[4] || C.orange, 300 + i, 1, { rot: d[5] || 0, alpha: .5 + .2 * Math.sin(tl * 1.3 + i), glow: true }));
-  platformLife(ctx, tl, o);
+  // 3) frente: vidro, montantes, jardins, floreiras, cobertura, via e plataforma
+  const FRONT = makeCanvas(W, H, (g, w, h) => {
+    const WALL = PLAT.wall, PIT = PLAT.pit, r = rng(77);
+    // reflexo suave no vidro
+    const gl = g.createLinearGradient(0, 120, w, WALL); gl.addColorStop(0, 'rgba(255,255,255,.18)'); gl.addColorStop(.5, 'rgba(210,235,240,.08)'); gl.addColorStop(1, 'rgba(255,255,255,.14)'); g.fillStyle = gl; g.fillRect(0, 120, w, WALL - 120);
+    for (let k = 0; k < 7; k++) { const x = k * 320 + 60; g.fillStyle = 'rgba(255,255,255,.07)'; g.beginPath(); g.moveTo(x, 120); g.lineTo(x + 90, 120); g.lineTo(x - 140, WALL); g.lineTo(x - 230, WALL); g.closePath(); g.fill(); }
+    // montantes e travessas brancas
+    for (let x = 0; x <= w; x += 240) { g.fillStyle = 'rgba(40,60,64,.12)'; g.fillRect(x + 6, 120, 4, WALL - 120); g.fillStyle = '#FBFBF8'; g.fillRect(x - 4, 120, 10, WALL - 120); }
+    [400, 640].forEach(y => { g.fillStyle = '#FBFBF8'; g.fillRect(0, y - 3, w, 7); g.fillStyle = 'rgba(40,60,64,.1)'; g.fillRect(0, y + 4, w, 3); });
+    // jardins verticais nas laterais e floreiras ao pé do vidro
+    [[0, 96], [w - 96, 96]].forEach(([x, ww], i) => { foliage(g, x, 150, ww, WALL - 150, 11 + i, 1.4); g.fillStyle = '#FBFBF8'; g.fillRect(i ? x - 8 : x + ww, 150, 8, WALL - 150); });
+    rr(g, 0, WALL - 64, w, 64, 0); g.fillStyle = '#E7E4DC'; g.fill(); g.fillStyle = '#CFCAC0'; g.fillRect(0, WALL - 64, w, 6);
+    for (let x = 0; x < w; x += 34) { const hh = 34 + r() * 30; foliage(g, x - 6, WALL - 64 - hh + 10, 48, hh, 300 + x, 1.6); }
+    // árvores esguias nos vãos entre os painéis
+    [660, 1260].forEach((x, i) => { g.fillStyle = '#6B5640'; g.fillRect(x - 5, 420, 10, WALL - 64 - 420); crown(g, x, 380, 92, 500 + i); crown(g, x - 30, 450, 60, 520 + i); crown(g, x + 34, 440, 64, 540 + i);
+      rr(g, x - 46, WALL - 96, 92, 40, 8); g.fillStyle = '#F4F2EC'; g.fill(); g.strokeStyle = '#CFCAC0'; g.lineWidth = 3; g.stroke(); });
+    // cobertura: nervuras brancas convergindo, vidro entre elas e a viga de borda
+    const cg = g.createLinearGradient(0, 0, 0, 132); cg.addColorStop(0, '#E8F2F3'); cg.addColorStop(1, '#F7F8F5'); g.fillStyle = cg; g.fillRect(0, 0, w, 132);
+    for (let k = -8; k <= 8; k++) { const xb = w / 2 + k * 150, xt = w / 2 + k * 60; g.strokeStyle = '#FFFFFF'; g.lineWidth = 12; g.beginPath(); g.moveTo(xt, -10); g.lineTo(xb, 132); g.stroke();
+      g.strokeStyle = 'rgba(40,60,64,.12)'; g.lineWidth = 3; g.beginPath(); g.moveTo(xt + 7, -10); g.lineTo(xb + 9, 132); g.stroke(); }
+    g.fillStyle = '#FFFFFF'; g.fillRect(0, 120, w, 22); g.fillStyle = 'rgba(30,50,55,.16)'; g.fillRect(0, 142, w, 8);
+    // via: laje clara, dois trilhos e a guia de LED verde
+    const tg = g.createLinearGradient(0, WALL, 0, PIT); tg.addColorStop(0, '#D3D0C8'); tg.addColorStop(1, '#C4C0B7'); g.fillStyle = tg; g.fillRect(0, WALL, w, PIT - WALL);
+    g.fillStyle = '#F6F4EE'; g.fillRect(0, WALL, w, 8);
+    [884, 922].forEach(y => { g.fillStyle = '#8E979B'; g.fillRect(0, y - 4, w, 8); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(0, y - 4, w, 2); });
+    g.fillStyle = 'rgba(63,191,160,.75)'; g.fillRect(0, 902, w, 3);
+    // plataforma clara: faixa tátil, borda e juntas em perspectiva
+    const fg = g.createLinearGradient(0, PIT, 0, h); fg.addColorStop(0, '#EEEBE4'); fg.addColorStop(1, '#E1DDD4'); g.fillStyle = fg; g.fillRect(0, PIT, w, h - PIT);
+    g.fillStyle = '#FFFFFF'; g.fillRect(0, PIT, w, 6); g.fillStyle = '#F0C43A'; g.fillRect(0, PIT + 12, w, 16);
+    g.fillStyle = 'rgba(160,120,20,.35)'; for (let x = 6; x < w; x += 16) { g.beginPath(); g.arc(x, PIT + 20, 2.6, 0, TAU); g.fill(); }
+    g.strokeStyle = 'rgba(150,140,125,.35)'; g.lineWidth = 2; for (let k = -14; k <= 14; k++) { g.beginPath(); g.moveTo(w / 2 + k * 70, PIT + 32); g.lineTo(w / 2 + k * 190, h + 10); g.stroke(); }
+    [1000, 1046].forEach(y => { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); });
+  });
+  return { SKY, MID, FRONT };
+})();
+function platform(ctx, tl, o = {}) {
+  ctx.fillStyle = '#EEEBE4'; ctx.fillRect(-W, -H, W * 3, H * 3);
+  ctx.drawImage(STN.SKY, 0, 0);
+  // nuvens passando devagar
+  for (let k = 0; k < 5; k++) { const sp = 6 + k * 2.2, x = ((hash(k * 7) * (W + 600) + tl * sp) % (W + 600)) - 300, y = 190 + hash(k * 3) * 260, s = .7 + hash(k * 5) * .8;
+    ctx.save(); ctx.globalAlpha = .75; ctx.fillStyle = '#FFFFFF'; [[0, 0, 90], [70, 12, 70], [-70, 16, 64], [30, -26, 60]].forEach(([dx, dy, rr0]) => { ctx.beginPath(); ctx.ellipse(x + dx * s, y + dy * s, rr0 * s, rr0 * s * .55, 0, 0, TAU); ctx.fill(); }); ctx.restore(); }
+  ctx.drawImage(STN.MID, 0, 0);
+  // um trem bala cruza o viaduto lá longe a cada 17 s
+  { const c = (tl + 6) % 17, d = 6; if (c < d) { const u = c / d; sideTrain(ctx, lerp(-200, W + 420, E.inOutSine(u)), 586, { s: .07 }); } }
+  ctx.drawImage(STN.FRONT, 0, 0);
+  // placa da parada pendurada na cobertura
+  if (o.sign) { const sw = measure(ctx, o.sign, 24, 900, false, 4) + 150, x0 = W / 2 - sw / 2;
+    rr(ctx, x0 + 4, 154, sw, 40, 10); ctx.fillStyle = 'rgba(20,30,34,.18)'; ctx.fill();
+    rr(ctx, x0, 150, sw, 40, 10); ctx.fillStyle = '#1F2B30'; ctx.fill();
+    intersection(ctx, x0 + 44, 170, 11, 14);
+    text(ctx, o.sign, W / 2 + 26, 171, { size: 22, weight: 900, color: '#FFFFFF', align: 'center', ls: 4 }); }
+  // painel digital de partidas e relógio
+  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   EMBARQUE PELA FAIXA AMARELA   ', lx = 120, lw = 300, ly = 150;
+    rr(ctx, lx, ly, lw, 40, 10); ctx.fillStyle = '#1F2B30'; ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.rect(lx + 10, ly + 3, lw - 20, 34); ctx.clip(); ctx.font = font(18, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 60) % mw;
+    ctx.fillStyle = '#7FE0C4'; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 10 - off, ly + 21); ctx.restore();
+    const cx = W - 160, cy = 172; circle(ctx, cx + 3, cy + 4, 24, 'rgba(20,30,34,.18)'); circle(ctx, cx, cy, 24, '#FFFFFF', '#1F2B30', 4);
+    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; line(ctx, cx + Math.cos(a) * 17, cy + Math.sin(a) * 17, cx + Math.cos(a) * 21, cy + Math.sin(a) * 21, '#1F2B30', k % 3 ? 1.5 : 3); }
+    const sec = tl % 60, mn = 37 + tl / 60; [[mn / 60 * TAU, 16, 3, '#1F2B30'], [((9 + mn / 60) / 12) * TAU, 11, 4, '#1F2B30'], [sec / 60 * TAU, 19, 1.5, C.orange]].forEach(([a, l, w, c]) => line(ctx, cx, cy, cx + Math.sin(a) * l, cy - Math.cos(a) * l, c, w));
+    circle(ctx, cx, cy, 4, C.orange); }
 }
-/** os eventos da estação (desenhados por cima da parede, atrás dos cartazes só o que é de fundo) */
-function platformLife(ctx, tl, o = {}) {
-  const PIT = PLAT.pit;
-  // goteira: a gota cai do teto e abre um anel na poça
-  { const c = tl % 5.3, fall = .9; if (c < fall) { const y = lerp(112, 905, (c / fall) ** 2); ctx.fillStyle = 'rgba(170,210,240,.85)'; ctx.beginPath(); ctx.ellipse(1480, y, 4, 7, 0, 0, TAU); ctx.fill(); }
-    else if (c < fall + .8) { const k = (c - fall) / .8; ctx.save(); ctx.globalAlpha = 1 - k; ctx.strokeStyle = 'rgba(190,220,250,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(1480, 910, 10 + 70 * k, 2 + 8 * k, 0, 0, TAU); ctx.stroke(); ctx.restore(); } }
-  // ratinho atravessando os trilhos (com uma parada para farejar)
-  { const c = (tl + 4) % 17, d = 3.6; if (c < d) { let u = c / d; const stop = u > .42 && u < .58; u = u < .42 ? u : u > .58 ? u - .16 : .42; const x = lerp(-80, W + 80, u / .84);
-      PEOPLE.mouse(ctx, x, 924, .9, 1, stop ? 0 : tl * 30); } }
-  // pombo na plataforma: bica, anda um pouco, bica de novo
-  { const c = tl % 13, walk = c > 8 && c < 10, x = 250 + (c > 10 ? 70 : walk ? (c - 8) * 35 : 0), peck = walk ? 0 : Math.max(0, Math.sin(tl * 6)) ** 3;
-    PEOPLE.pigeon(ctx, x, PIT + 105, 1, 1, peck); }
-  // farol de trem cruzando a estação (luz varre a parede da esquerda para a direita)
-  { const c = (tl + 9) % 29; if (c < 3.2) { const u = c / 3.2, x = lerp(-600, W + 600, u); ctx.save(); ctx.globalCompositeOperation = 'screen';
-      const g = ctx.createRadialGradient(x, 560, 20, x, 560, 700); g.addColorStop(0, 'rgba(255,236,200,.35)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, PIT); ctx.restore();
-      for (let k = 0; k < 14; k++) { const yy = 130 + hash(k * 7) * 760, xx = ((x + hash(k * 3) * 900) % (W + 200)) - 100; line(ctx, xx, yy, xx + 160, yy, 'rgba(255,240,220,.18)', 2); } } }
-  // passageiro passando em primeiro plano (silhueta desfocada)
-  // papéis soltos voando com o vento (objetos flutuando pela estação)
-  { const c = (tl + 2) % 23, d = 6.5; if (c < d && o.people !== false) { const u = c / d;
-      for (let k = 0; k < 4; k++) { const v = clamp(u * 1.25 - k * .08), x = lerp(W + 140, -200, v), y = 780 - k * 80 + Math.sin(v * 9 + k * 2) * 70 - v * 120, sq = Math.cos(v * 14 + k * 1.7);
-        ctx.save(); ctx.translate(x, y); ctx.rotate(v * 6 + k); ctx.scale(Math.max(.12, Math.abs(sq)), 1); paper(ctx, -24, -32, 48, 64, { r: 3, fill: sq > 0 ? '#F6EEDF' : '#E6D9C3', shadow: 3, shadowColor: 'rgba(0,0,0,.5)', lw: 2, volume: false });
-        line(ctx, -14, -14, 14, -14, '#8A8378', 3); line(ctx, -14, -2, 8, -2, '#8A8378', 3); line(ctx, -14, 10, 12, 10, '#8A8378', 3); ctx.restore(); } } }
-}
-/** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
+/** compatibilidade: a vida da estação já está em platform() */
+function platformLife() {}
+/** painel da estação (v7.11): caixa de luz branca pendurada na cobertura, cabeçalho com o número da estação e conteúdo */
 const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz
 function poster(ctx, x, y, w, h, n, tl, o = {}) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0);
-  paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 60 + n, amp: 3, fill: '#F6EEDF', shadow: 14, shadowColor: '#000', lw: 4, halftone: .05, tape: [[.15, 0, -.4], [.85, 0, .35]] });
-  const st = TX.stations[n - 1];
-  rr(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 74, 8); ctx.fillStyle = n <= 3 ? C.red : n <= 6 ? C.orange : C.yellow; ctx.fill(); inkRect(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 74, 8, 3, n);
-  retroText(ctx, st.n, -w / 2 + 54, -h / 2 + 63, { size: 46, weight: 900, color: '#FFF', depth: 3, lw: 3 });
-  text(ctx, st.short, -w / 2 + 120, -h / 2 + 63, { size: Math.min(26, (w - 170) / st.short.length * 1.7), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
+  if (o.cables !== false) [-1, 1].forEach(sd => line(ctx, sd * (w / 2 - 70), -h / 2, sd * (w / 2 - 70), -h / 2 - 380, 'rgba(70,82,86,.55)', 3));
+  rr(ctx, -w / 2 + 8, -h / 2 + 14, w, h, 22); ctx.fillStyle = 'rgba(20,30,34,.16)'; ctx.fill();
+  rr(ctx, -w / 2, -h / 2, w, h, 22); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.strokeStyle = '#C9D1D3'; ctx.lineWidth = 3; ctx.stroke();
+  const st = TX.stations[n - 1], col = n <= 3 ? C.red : n <= 6 ? C.orange : C.yellow;
+  rr(ctx, -w / 2 + 22, -h / 2 + 24, w - 44, 74, 14); ctx.fillStyle = col; ctx.fill();
+  text(ctx, st.n, -w / 2 + 62, -h / 2 + 62, { size: 44, weight: 900, color: n <= 6 ? '#FFF' : INK, align: 'center' });
+  text(ctx, st.short, -w / 2 + 112, -h / 2 + 62, { size: Math.min(26, 26 * (w - 160) / measure(ctx, st.short, 26, 900, false, 1)), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
   ctx.save(); ctx.translate(0, 40); ctx.beginPath(); ctx.rect(-w / 2 + 20, -h / 2 + 70, w - 40, h - 120); ctx.clip();
   if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, st.title, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
   ctx.restore(); ctx.restore();
@@ -303,7 +315,7 @@ const SLIDES = {
     ['insight', 26.8, 'Agentes · avaliar e corrigir', 18.6, 27.4], ['insight', 45.6, 'Agentes · escala', 35.6, 46.5], ['insight', 54.6, 'Agentes · situação', 46.7, 55.4]],
   5: [['s05', 19.5, 'A mesma equipe, mais alcance', 3.8, 19.8]],
   6: [['s06', 24.0, 'Pilares e contribuições', 3.8, 24.3]],
-  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 25.5, 'Disciplinas · Analytics & Advanced Analytics', 0, 26.3]]
+  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 19.5, 'Por trás de tudo · métodos e técnicas', 0, 26.3]]
 };
 /** telas extras das paradas (lupa) que não são cenas do filme: SLIDES com nome '@tela' */
 const SLIDE_SCREENS = {};
@@ -396,11 +408,11 @@ function recapScene(o) {
       ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
       const e = E.inOutCubic(p), a = viewOf(Math.min(prevItem, N.length)), b = viewOf(Math.min(item, N.length));
       const vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e) * (1 + .004 * Math.sin(tl * .7));
-      ctx.fillStyle = '#17120F'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#EEEBE4'; ctx.fillRect(0, 0, W, H);
       ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
-      platform(ctx, tl, { sign: o.sign, doodles: o.doodles });
-      const wind = platformWind(tl);
-      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), PLAT.PY - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] + wind * .025 * Math.sin(tl * 9 + i * 2) }); if (hov) glow(ctx, px(i), PLAT.PY, 380, C.orange, .18); });
+      platform(ctx, tl, { sign: o.sign });
+      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i, py = PLAT.PY - (hov ? 12 : 0); poster(ctx, px(i), py, 500, 640, n, tl);
+        if (hov) { rr(ctx, px(i) - 258, py - 328, 516, 656, 28); ctx.strokeStyle = C.orange; ctx.lineWidth = 6; ctx.stroke(); } });
       ctx.restore();
     },
     /** interface por cima da pintura: chamada, passagem, miniaturas, popup e dicas */
@@ -427,7 +439,7 @@ function recapScene(o) {
         para(ctx, o.banner, W / 2, H - 134, 1700, { size: 34, weight: 800, color: '#FFF', accent: C.yellow, align: 'center' }); ctx.restore(); }
       if (sn) slideStrip(ctx, sn, sa, ui);
       SLIDE.pump();
-      if (!item) text(ctx, 'clique num cartaz para abrir a estação', W / 2, H - 36, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: (.5 + .2 * Math.sin(tl * 2.4)) * clamp((tl - .9) / .6) });
+      if (!item) uiNote(ctx, 'clique num painel para abrir a estação', W / 2, H - 40, clamp((tl - .9) / .6), tl);
       if (item && sn) slidePopup(ctx, sn, ui);
       hint(ctx, tl, item === N.length ? TX.stop.go : '→', item);
     },
@@ -449,9 +461,17 @@ function recapScene(o) {
     key(k, ui, ctl) { const item = __state.item, n = curN(item); if (n && popupKey(n, k, ui, ctl)) return true; if (k === 'Escape' && item) { ctl.setItem(0); return true; } return false; }
   };
 }
-/** dica discreta para quem apresenta (canto inferior direito) */
+/** dica discreta para quem apresenta (canto inferior direito), numa pílula escura: legível na estação clara e no escuro */
 function hint(ctx, tl, label, item) {
-  const a = .35 + .25 * Math.sin(tl * 2.4); text(ctx, label, W - 60, H - 46, { size: 20, weight: 700, mono: true, color: '#FFF', align: 'right', ls: 2, alpha: a });
+  const a = .6 + .2 * Math.sin(tl * 2.4), w = measure(ctx, label, 20, 700, true, 2) + 40;
+  ctx.save(); ctx.globalAlpha *= a; rr(ctx, W - 40 - w, H - 68, w, 44, 22); ctx.fillStyle = 'rgba(20,28,32,.78)'; ctx.fill();
+  text(ctx, label, W - 60, H - 46, { size: 20, weight: 700, mono: true, color: '#FFF', align: 'right', ls: 2 }); ctx.restore();
+}
+/** aviso centralizado numa pílula escura (instruções das paradas) */
+function uiNote(ctx, str, x, y, a = 1, tl = 0) {
+  if (a <= 0) return; const w = measure(ctx, str, 22, 700, true, 2) + 56;
+  ctx.save(); ctx.globalAlpha *= a * (.8 + .2 * Math.sin(tl * 2.4)); rr(ctx, x - w / 2, y - 24, w, 48, 24); ctx.fillStyle = 'rgba(20,28,32,.8)'; ctx.fill();
+  text(ctx, str, x, y + 1, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2 }); ctx.restore();
 }
 
 /* ---------- cases: régua, comprovante ---------- */

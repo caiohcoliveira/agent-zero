@@ -22,6 +22,12 @@
   - nos relatórios de fraude, a tela, o cursor e o interruptor contam a história;
   - na 07, um trem de dois vagões puxa a linha pela cidade e para na próxima estação.
 - **Espaço 3D (v7.2):** atrás do conteúdo há partículas com constelações, curvas 3D em fita e objetos flutuando (cubos e octaedros em arame, anéis, orbes), em perspectiva e girando com a câmera. Eles ficam perto da câmera com brilho e longe apagados (profundidade de campo).
+- **Mais sóbrio (v7.11):**
+  - nas telas com gráfico saem fachos de luz, poeira, partículas, objetos flutuando, fitas 3D, grade neon, rastros de velocidade e prédios ao fundo;
+  - a cidade só aparece onde o trem passa: ponte da 01, viaduto da 06 e cidade da 07;
+  - barras chapadas, sem volume 3D, e números-manchete sem respingo;
+  - o trem da linha é um **trem bala** de dois vagões;
+  - a **estação das conversas** é futurista, arejada e verde: ao ar livre, com cobertura de nervuras brancas e vidro, cidade clara e um trem bala ao longe atrás da parede de vidro, jardins verticais, árvores e painéis brancos pendurados. Referências: Oculus (WTC), Zaragoza-Delicias, West Kowloon, "Train Station in the Forest" (MAD), Jönköping e Atocha.
 
 **Dados e qualificadores**
 - **Números com qualificador:**
@@ -34,9 +40,9 @@
 
 **Mantido da v5.4, por escolha**
 - explosão de neon só no fluxo e na placa;
-- as 8 disciplinas acumulando;
+- o clímax com cards nos tempos fortes (v7.11: 5 cases que viram);
 - o letreiro WELCOME TO…;
-- a estação viva nas conversas.
+- a estação nas conversas (v7.11: futurista, arejada e verde).
 
 ## A sessão (até 20 min)
 
@@ -48,7 +54,7 @@
 | Conversa 1 | fala | — |
 | Play 3 · estação 04 (4 cases), 05, 06 | vídeo | 2:55–7:37 |
 | Conversa 2 | fala | — |
-| Play 4 · 07, disciplinas, letreiro | vídeo | 7:37–8:48 |
+| Play 4 · 07, clímax, letreiro | vídeo | 7:37–8:48 |
 | Encerramento | fala | — |
 
 ## Play 1 · embarque (20 s, trilha sintetizada)
@@ -70,7 +76,7 @@
 
 ## Conversa 0
 
-- **Tela:** a estação viva ao fundo, a missão escrita no topo e o mapa com os 3 capítulos.
+- **Tela:** a estação futurista ao fundo, a missão escrita no topo e o mapa com os 3 capítulos.
 - **Interação:** clique numa estação para aproximar e ver o cartão (título, o que mostra, tópicos); → embarca.
 
 ## Play 2 · estações 01–03 ("Vintage Film Funk" remontada, 2:35)
@@ -129,7 +135,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 ## Conversa 1
 
 - **Entrada (v7.2):** o último quadro do vídeo some em zoom, um véu escuro com o rastro de luz de um trem cobre a tela e só depois a estação aparece. Os textos das duas telas nunca ficam juntos.
-- **Tela:** a estação viva e a chamada no topo, "ONDE ISSO ENCONTRA O SEU CLIENTE?".
+- **Tela:** a estação futurista e a chamada no topo, "ONDE ISSO ENCONTRA O SEU CLIENTE?".
 - **Cartazes legíveis sem clicar:**
   - **01:** os 4 serviços com definição;
   - **02:** gráfico de faturamento, 1,8×, Brasil (estimativa) e conclusão;
@@ -167,7 +173,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 |---|---|---|
 | Objetivo | *Principalidade* é tornar o banco a *principal escolha* do cliente. + "Quais produtos ajudam a fortalecer esse relacionamento?" | a carteira; o cartão do banco sobe com a coroa "o banco principal" |
 | Dados | Analisamos 92 mil associados, seus produtos e sua principalidade atual. | fichas e "cada associado recebe a sua recomendação" |
-| Como fizemos | *UMAP* e *K-Means* organizam perfis. *ALS* estima afinidades… | 8 perfis com nomes do JSON; embeddings 3D imersivos, sem moldura: clientes e produtos flutuam pela tela toda com profundidade de campo; "um associado" fica no centro, ligado aos 3 produtos mais próximos ("representações numéricas · perto = afinidade · projeção ilustrativa") |
+| Como fizemos | *UMAP* e *K-Means* organizam perfis. *ALS* estima afinidades… | v7.11, os clusters 3D da v5: os produtos (vetores) saem soltos e o UMAP os leva para o espaço 3D (dim 1, dim 2, dim 3 … dim 128); o K-Means agrupa as famílias (Dia a dia, Investimentos, Crédito, Proteção); "proximidade = afinidade"; cos θ = 0,94 (CDB e LCI, alta afinidade) e cos θ = 0,12 (Cashback e Consignado, baixa); d_cos(a,b) = 1 − a·b / (‖a‖ ‖b‖); um associado percorre a trilha até o núcleo de principalidade |
 | Solução (drop) | A recomendação combina afinidade, conversão e ganho de principalidade. | ranking **ANTES** (só afinidade) × **DEPOIS** (critérios combinados); pontos de principalidade do Top 3 |
 | Resultado | *+4 p.p. de principalidade* versus controle, em backtest. | ganho em p.p. sobre o controle (= 0), geral e por subsegmento (PF I–IV+); "backtest: avaliação retrospectiva · ganho teórico · Top 3"; melhor perfil |
 | Conclusão | O motor prioriza produtos pelo *objetivo de relacionamento* do banco. | — |
@@ -188,8 +194,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Etapa | Texto | Visual |
 |---|---|---|
 | Problema | A escrita manual de insights *não acompanhava* o volume… | painel "Market share e share of wallet · adquirentes", insight escrito à mão, fila de páginas |
-| Gerar | Agentes *geradores* produzem versões… para *diferentes públicos*. | o mesmo fato vira três versões, "para: Analista / Business / C-Level" (exemplos ilustrativos) |
-| Avaliar e corrigir | Agentes *avaliam* os textos e encaminham os *reprovados*… | ciclo gerar → avaliar → (reprovado) corrigir → avaliar de novo → aprovado; exemplo de revisão |
+| Gerar | Agentes *geradores* produzem versões… para *diferentes públicos*. | v7.11, como na v5: o relatório "REPORT DE FRAUDE · BOARD" com o DESTAQUE vazio e, no canto inferior esquerdo, a pilha de painéis gerados pela automação (a imagem do dashboard do case 3, com o contador); Analista, Business e C-Level caem no palco, leem o relatório e os painéis e escrevem (exemplos ilustrativos) |
+| Avaliar e corrigir | Agentes *avaliam* os textos e encaminham os *reprovados*… | os rascunhos vão ao Validador, que reprova (✕, "reprovado: sem período de comparação"); eles voltam pela seta tracejada "refazer"; saem as versões 2, o Validador aprova (✓), o Embalador fecha o título e ele entra no DESTAQUE do relatório e como faixa no painel da frente |
 | Qualidade | *Regras* e *modelos* avaliam critérios de qualidade do texto. | Regex · regras textuais; BERT · modelo de linguagem; Random Forest · nota de qualidade (164 características); "é uma avaliação do sistema, não uma garantia" |
 | Escala (drop) | O mesmo processo se repete em *milhares* de páginas e painéis. | a parede de páginas se abre; uma janela ampliada mostra o ciclo em cada página |
 | Situação | 8 adquirentes ativos. 22 oportunidades adicionais. Universo apresentado: 30. | 30 marcas: 8 acesas e 22 tracejadas, com legenda |
@@ -210,7 +216,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ## Conversa 2
 
-- **Tela:** a estação viva e a chamada "QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?".
+- **Tela:** a estação futurista e a chamada "QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?".
 - **Cartazes:**
   - **04:** as quatro provas lado a lado (+18,8% · +4 p.p. · automáticos · 8 + 22);
   - **05:** o diagrama do reuso;
@@ -226,22 +232,19 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
    - As outras linhas chegam à cidade e um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?"; partículas e objetos 3D giram com o passeio.
    - No fim, uma estação tracejada "?": a próxima estação.
-2. **Disciplinas (26 s):** "Por trás de tudo, *disciplinas*". As 8 entram uma a uma num painel 4 × 2, nos tempos fortes da música (a fileira de cima uma por compasso, a de baixo a cada 2 tempos), e **ficam na tela**, cada uma com visualização, nome e subtítulo:
-   - Estatística · setup de projetos de marketing e estratégia
-   - Otimização & PO · modelos para tomada de decisão
-   - Supervisionados
-   - Não supervisionados
-   - NLP
-   - Redes neurais (MLP)
-   - Deep learning (transformer)
-   - IA (agentes)
+2. **Por trás de tudo (26 s, v7.11):** "Por trás de tudo, *métodos* e *técnicas*". Cinco cases entram numa fileira, um por compasso desde que a batida começa, e cada card **vira** 2 tempos depois. Frente: visualização, case e método. Verso: as técnicas. Todos ficam virados para leitura até a frase-chave:
+   - Mesa de performance · teste A/B → power analysis, testes de hipótese, plano de amostragem
+   - Prevenção a fraude · modelo supervisionado → cross validation, PCA, gradient boosting e outras técnicas
+   - Segmentação / Recomendação · modelo não supervisionado → k-means, filtro colaborativo, matrix factorization e outras técnicas
+   - Forecast · séries temporais → ARIMA, SARIMAX, boosting, componentes de Fourier
+   - Pricing / dimensionamento · otimização → PO (pesquisa operacional), simulação de Monte Carlo, programação linear, modelos de estoque
 
-   Uma curva 3D corre atrás dos painéis. No fecho, os painéis recuam no espaço e escurecem, a curva e as partículas ganham força e só a frase fica: "Tudo se resume a *Analytics & Advanced Analytics*."
+   No fecho, os cards recuam e escurecem e só a frase fica: "Tudo se resume a *Analytics & Advanced Analytics*."
 3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português; o prato da cadência final acende o letreiro, e o vídeo termina com a cauda do acorde.
 
 ## Encerramento
 
-O letreiro fica aceso sobre a estação viva. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
+O letreiro fica aceso sobre a estação futurista. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
 
 ## Trilha (v7.4–v7.7 · ElevenLabs)
 
@@ -259,8 +262,8 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - automação: a pausa composta na própria música é o interruptor, e o drop acende o neon;
   - IA: a cena começa com o crescendo de 16 compassos, e o maior drop cai na escala, o pico da apresentação;
   - 05/06: o acorde final da música cai na conclusão da 06.
-- **Parte 3 · 07, disciplinas e letreiro (final orquestral, 100 BPM, sem coro):**
+- **Parte 3 · 07, clímax e letreiro (final orquestral, 100 BPM, sem coro):**
   - tocado inteiro, do jeito que foi composto; o filme se ajusta à música;
   - a cidade tem piano e cordas;
-  - as disciplinas entram nos tempos fortes (a fileira de cima uma por compasso, a de baixo a cada 2 tempos), e a frase-chave aparece no grande ataque;
+  - os 5 cards do clímax entram um por compasso e viram 2 tempos depois, e a frase-chave aparece no grande ataque;
   - o letreiro acende no prato da cadência final, e o vídeo termina com a cauda desse acorde.

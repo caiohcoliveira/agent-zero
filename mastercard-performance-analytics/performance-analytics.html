@@ -794,8 +794,14 @@ const CONFIG = {
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
     // clímax: as disciplinas por trás de tudo (não técnicas soltas)
-    climaxWords: ['Estatística', 'Otimização & Pesquisa operacional', 'Modelos supervisionados', 'Modelos não supervisionados', 'NLP', 'Redes neurais', 'Deep learning', 'Inteligência artificial'],
-    climaxSub: ['setup de projetos de marketing e estratégia', 'modelos para tomada de decisão', 'aprendem com exemplos rotulados', 'encontram padrões sozinhos', 'entendem a linguagem natural', 'perceptron multicamadas (MLP)', 'transformers e atenção', 'agentes que percebem, raciocinam e agem'],
+    // clímax (v7.11): 5 cases que viram — frente: o case e o método; verso: as técnicas (etc = lista não exaustiva)
+    climaxCases: [
+      { name: 'Mesa de performance', method: 'teste A/B', tech: ['power analysis', 'testes de hipótese', 'plano de amostragem'] },
+      { name: 'Prevenção a fraude', method: 'modelo supervisionado', tech: ['cross validation', 'PCA', 'gradient boosting'], etc: true },
+      { name: 'Segmentação / Recomendação', method: 'modelo não supervisionado', tech: ['k-means', 'filtro colaborativo', 'matrix factorization'], etc: true },
+      { name: 'Forecast', method: 'séries temporais', tech: ['ARIMA', 'SARIMAX', 'boosting', 'componentes de Fourier'] },
+      { name: 'Pricing / dimensionamento', method: 'otimização', tech: ['PO · pesquisa operacional', 'simulação de Monte Carlo', 'programação linear', 'modelos de estoque'] }
+    ],
     climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },
@@ -1112,7 +1118,7 @@ function bgDark(ctx, t, o = {}) {
   g.addColorStop(0, rgba(o.center || '#2B2622', o.centerA == null ? .9 : o.centerA * .85)); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if (o.grid) dotGrid(ctx, t, rgba('#FFFFFF', .05), o.drift);
-  if (o.atmos !== false && typeof atmos === 'function') atmos(ctx, t, { alpha: o.atmosA == null ? .85 : o.atmosA, light: o.light });
+  if (o.atmos && typeof atmos === 'function') atmos(ctx, t, { alpha: o.atmosA == null ? .85 : o.atmosA, light: o.light });   // v7.11: sem fachos/poeira por padrão
 }
 function bgLight(ctx, t, o = {}) {
   ctx.drawImage(TEX.light, 0, 0);
@@ -1122,7 +1128,7 @@ function bgLight(ctx, t, o = {}) {
     ctx.beginPath(); for (let x = -s + off; x < W + s; x += s) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
     for (let y = 0; y < H; y += s) { ctx.moveTo(0, y); ctx.lineTo(W, y); } ctx.stroke(); ctx.restore();
   }
-  if (o.atmos !== false && typeof atmos === 'function') atmos(ctx, t, { alpha: o.atmosA == null ? .55 : o.atmosA, bokeh: 3, dust: 30 });
+  if (o.atmos && typeof atmos === 'function') atmos(ctx, t, { alpha: o.atmosA == null ? .55 : o.atmosA, bokeh: 3, dust: 30 });
 }
 function dotGrid(ctx, t, color, drift = 6) {
   ctx.save(); ctx.fillStyle = color; const s = 48, off = (t * drift) % s;
@@ -2541,106 +2547,118 @@ function overlayPlay(ctx, T, s) {
   TRAIN_PASS.draw(ctx, T);
 }
 
-/* ---------- plataforma das paradas: estação viva ----------
-   Teto com luminárias e cones de luz, parede de azulejos pintados, fosso dos trilhos e a
-   plataforma. Eventos em paralelo, em ciclos próprios (tudo função do tempo da parada):
-   luminária que pisca, ratinho nos trilhos, goteira, pombo bicando, passageiro passando,
-   farol de um trem que cruza a estação (com vento nos cartazes), relógio e painel de LED. */
+/* ---------- plataforma das paradas (v7.11): estação futurista, arejada e verde ----------
+   Referências: estações com cobertura de nervuras brancas e vidro (Oculus/WTC, Zaragoza-Delicias, Liège), muita luz natural,
+   jardins e árvores no lugar de paredes fechadas (West Kowloon, "Train Station in the Forest" do MAD, Jönköping, Atocha).
+   Camadas: céu (fundo) → nuvens → cidade clara e morros verdes atrás do vidro, com o viaduto onde um trem bala passa ao longe
+   → parede de vidro com montantes brancos, jardins verticais e floreiras → cobertura de nervuras → via limpa e plataforma clara.
+   Sem ratos, goteira, grafites ou luz piscando: a vida da estação é o céu, as plantas, o painel digital e os trens. */
 const PLAT = { wall: 830, pit: 950, PY: 518 };
-/** vento do trem que passa (0–1) — os cartazes balançam */
-function platformWind(tl) { const c = (tl + 9) % 29; return c < 3.2 ? Math.sin(c / 3.2 * Math.PI) : 0; }
-const TILES = makeCanvas(W, PLAT.wall, (g, w, h) => {
-  g.fillStyle = '#1C1612'; g.fillRect(0, 0, w, h);
-  const r = rng(5), tw = 96, th = 48;
-  for (let row = 0; row * th < h; row++) for (let c = -1; c * tw < w + tw; c++) {
-    const x = c * tw + (row % 2 ? tw / 2 : 0), y = row * th, v = r(), base = v < .06 ? '#4A3424' : v < .14 ? '#3A2E26' : v < .5 ? '#2F2620' : '#2A221D';
-    const gr = g.createLinearGradient(x, y, x + tw * .4, y + th); gr.addColorStop(0, mix(base, '#FFE6C8', .1)); gr.addColorStop(1, mix(base, '#000000', .25));
-    rr(g, x + 3, y + 3, tw - 6, th - 6, 7); g.fillStyle = gr; g.fill();
-    g.fillStyle = 'rgba(255,240,220,.08)'; rr(g, x + 7, y + 6, tw * .5, 5, 3); g.fill();
-  }
-  // faixa Mastercard na parede
-  [[C.red, 236], [C.orange, 252], [C.yellow, 268]].forEach(([c, y]) => { g.fillStyle = mix(c, '#000000', .35); g.fillRect(0, y, w, 16); });
-  // manchas de umidade
-  const r2 = rng(9); for (let k = 0; k < 14; k++) { const x = r2() * w, y = 300 + r2() * 480, rad = 40 + r2() * 120, gr = g.createRadialGradient(x, y, 4, x, y, rad); gr.addColorStop(0, 'rgba(10,6,4,.35)'); gr.addColorStop(1, 'rgba(10,6,4,0)'); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
-});
-function platform(ctx, tl, o = {}) {
-  const br = BT.breath == null ? .5 : BT.breath, WALL = PLAT.wall, PIT = PLAT.pit;
-  ctx.fillStyle = '#0E0B09'; ctx.fillRect(-W, -H, W * 3, H * 3);
-  ctx.drawImage(TILES, 0, 0);
-  // teto abobadado
-  const cg = ctx.createLinearGradient(0, 0, 0, 120); cg.addColorStop(0, '#0B0908'); cg.addColorStop(1, '#2A211B'); ctx.fillStyle = cg; ctx.fillRect(0, 0, W, 110);
-  line(ctx, 0, 110, W, 110, INK, 6);
-  // luminárias: a 3ª pisca de tempos em tempos
-  const LAMPS = [200, 620, 1040, 1460, 1840];
-  LAMPS.forEach((x, k) => {
-    let on = .85 + .15 * br; if (k === 2) { const c = tl % 11; if (c < 1.1) on = hash(Math.floor(tl * 16)) > .45 ? 1 : .08; }
-    if (k === 4) { const c = (tl + 5) % 23; if (c < .6) on = hash(Math.floor(tl * 20) + 7) > .5 ? 1 : .1; }
-    rr(ctx, x - 90, 78, 180, 22, 8); ctx.fillStyle = '#2E2620'; ctx.fill(); inkRect(ctx, x - 90, 78, 180, 22, 8, 3, k);
-    rr(ctx, x - 80, 92, 160, 10, 5); ctx.fillStyle = mix('#3A3028', '#FFF1D6', on); ctx.fill();
-    if (on > .3) { glow(ctx, x, 100, 160, '#FFD9A0', .35 * on); lightCone(ctx, x, 100, 160, 620, 860, '#FFD9A0', .5 * on); }
+/** vento do trem que passa (0–1) — mantido para compatibilidade: na estação nova os painéis não balançam */
+function platformWind(tl) { return 0; }
+const STN = (() => {
+  const GREENS = ['#2F6B4A', '#3E8558', '#4F9A66', '#6BB27A', '#8CC58E'];
+  /** folhagem: tufos de folhas elípticas em vários verdes, dentro do retângulo */
+  const foliage = (g, x, y, w, h, seed, dens = 1) => { const r = rng(seed); g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    g.fillStyle = '#24543B'; g.fillRect(x, y, w, h);
+    for (let k = 0; k < w * h / 260 * dens; k++) { const lx = x + r() * w, ly = y + r() * h, s = 9 + r() * 16, a = r() * TAU;
+      g.save(); g.translate(lx, ly); g.rotate(a); g.fillStyle = GREENS[Math.floor(r() * GREENS.length)]; g.beginPath(); g.ellipse(0, 0, s, s * .42, 0, 0, TAU); g.fill();
+      g.strokeStyle = 'rgba(20,50,32,.35)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-s * .8, 0); g.lineTo(s * .8, 0); g.stroke(); g.restore(); }
+    g.restore(); };
+  /** copa de árvore: nuvem de círculos verdes com luz do alto */
+  const crown = (g, cx, cy, rad, seed) => { const r = rng(seed); for (let k = 0; k < 26; k++) { const a = r() * TAU, d = r() * rad * .75, rr0 = rad * (.28 + r() * .3), x = cx + Math.cos(a) * d * 1.15, y = cy + Math.sin(a) * d * .8;
+      const gg = g.createRadialGradient(x - rr0 * .3, y - rr0 * .4, rr0 * .1, x, y, rr0); gg.addColorStop(0, '#8CC58E'); gg.addColorStop(1, GREENS[Math.floor(r() * 3)]); g.fillStyle = gg; g.beginPath(); g.arc(x, y, rr0, 0, TAU); g.fill(); } };
+  // 1) céu claro
+  const SKY = makeCanvas(W, PLAT.wall, (g, w, h) => { const s = g.createLinearGradient(0, 0, 0, h); s.addColorStop(0, '#B9DCE6'); s.addColorStop(.55, '#DDEEEB'); s.addColorStop(1, '#F3EFE4'); g.fillStyle = s; g.fillRect(0, 0, w, h); });
+  // 2) cidade clara, morros verdes e o viaduto distante (atrás do vidro)
+  const MID = makeCanvas(W, PLAT.wall, (g, w) => {
+    const r = rng(41);
+    [[640, '#C9D6D9', 70, 300], [700, '#B4C6CA', 50, 200]].forEach(([base, col, hmin, hvar], L) => { g.fillStyle = col;
+      for (let x = -20; x < w + 40;) { const bw = 50 + r() * 90, bh = hmin + r() * hvar; rr(g, x, base - bh, bw, bh + 200, L ? 4 : 10); g.fill();
+        if (!L && r() < .35) { g.fillRect(x + bw * .45, base - bh - 40, 4, 40); } x += bw + 6 + r() * 26; } });
+    // janelas discretas (dia): faixas horizontais claras
+    g.fillStyle = 'rgba(255,255,255,.35)'; for (let k = 0; k < 160; k++) { const x = r() * w, y = 420 + r() * 260; g.fillRect(x, y, 14 + r() * 20, 3); }
+    // morros e árvores
+    g.fillStyle = '#9CC7A0'; g.beginPath(); g.moveTo(0, 720); for (let x = 0; x <= w; x += 40) g.lineTo(x, 700 - 34 * Math.sin(x / 260) - 18 * Math.sin(x / 97)); g.lineTo(w, 830); g.lineTo(0, 830); g.closePath(); g.fill();
+    for (let x = 10; x < w; x += 46 + r() * 40) crown(g, x, 716 + r() * 30, 26 + r() * 22, 100 + x);
+    // viaduto ao longe: tabuleiro fino e pilares
+    g.fillStyle = '#E6EAE8'; g.fillRect(0, 586, w, 12); g.fillStyle = '#CDD4D3'; g.fillRect(0, 598, w, 5);
+    for (let x = 60; x < w; x += 190) { g.fillStyle = '#D9DFDE'; g.fillRect(x, 603, 10, 110); }
   });
-  // placa esmaltada com o nome da parada
-  if (o.sign) { const sw = measure(ctx, o.sign, 34, 900, false, 4) + 180;
-    paper(ctx, W / 2 - sw / 2, 120, sw, 60, { r: 12, fill: '#F3EBDD', shadow: 7, shadowColor: '#000', lw: 4 });
-    intersection(ctx, W / 2 - sw / 2 + 60, 150, 17, 21);
-    text(ctx, o.sign, W / 2 + 34, 151, { size: 30, weight: 900, color: INK, align: 'center', ls: 4 }); }
-  // painel de LED rolando e relógio de estação
-  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   MANTENHA-SE ATRÁS DA FAIXA AMARELA   ', lx = 40, lw = 330;
-    rr(ctx, lx, 120, lw, 52, 8); ctx.fillStyle = '#080605'; ctx.fill(); inkRect(ctx, lx, 120, lw, 52, 8, 3, 3);
-    ctx.save(); ctx.beginPath(); ctx.rect(lx + 8, 124, lw - 16, 44); ctx.clip(); ctx.font = font(22, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 90) % mw;
-    ctx.shadowColor = C.orange; ctx.shadowBlur = 8; ctx.fillStyle = C.orange; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 8 - off, 147); ctx.restore();
-    ctx.fillStyle = 'rgba(0,0,0,.4)'; for (let k = 0; k < 9; k++) ctx.fillRect(lx + 6, 124 + k * 5, lw - 12, 1.5);
-    const cx = W - 52, cy = 150; circle(ctx, cx + 4, cy + 5, 44, 'rgba(0,0,0,.6)'); vball(ctx, cx, cy, 44, '#F3EBDD', { rim: false, lw: 4 });
-    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; line(ctx, cx + Math.cos(a) * 34, cy + Math.sin(a) * 34, cx + Math.cos(a) * 39, cy + Math.sin(a) * 39, INK, 3); }
-    const sec = tl % 60, mn = 37 + tl / 60; [[mn / 60 * TAU, 30, 4, INK], [((9 + mn / 60) / 12) * TAU, 20, 6, INK], [sec / 60 * TAU, 34, 2, C.red]].forEach(([a, l, w, c]) => line(ctx, cx, cy, cx + Math.sin(a) * l, cy - Math.cos(a) * l, c, w));
-    circle(ctx, cx, cy, 4, C.red); }
-  // rodapé, fosso dos trilhos e trilhos
-  ctx.fillStyle = '#120E0C'; ctx.fillRect(0, WALL, W, PIT - WALL); line(ctx, 0, WALL, W, WALL, INK, 5);
-  for (let x = -40; x < W + 40; x += 70) { ctx.fillStyle = '#2A1F18'; ctx.beginPath(); ctx.moveTo(x, 900); ctx.lineTo(x + 46, 900); ctx.lineTo(x + 56, 940); ctx.lineTo(x - 8, 940); ctx.closePath(); ctx.fill(); }
-  [886, 926].forEach((y, k) => { line(ctx, 0, y, W, y, '#5A5048', 9); line(ctx, 0, y - 3, W, y - 3, rgba('#FFE2BC', .45 + .2 * br), 2); });
-  // poça da goteira
-  ctx.save(); ctx.globalAlpha = .55; ctx.beginPath(); ctx.ellipse(1480, 912, 90, 12, 0, 0, TAU); ctx.fillStyle = '#2A3440'; ctx.fill(); ctx.restore();
-  // plataforma: faixa tátil amarela e piso com reflexo das luminárias
-  ctx.fillStyle = '#17120F'; ctx.fillRect(0, PIT, W, H - PIT + 200);
-  ctx.fillStyle = C.yellow; for (let x = 0; x < W; x += 60) { ctx.save(); ctx.translate(x, PIT + 12); ctx.transform(1, 0, -.5, 1, 0, 0); ctx.fillRect(0, 0, 36, 20); ctx.restore(); }
-  line(ctx, 0, PIT, W, PIT, INK, 6);
-  LAMPS.forEach(x => { const g = ctx.createRadialGradient(x, PIT + 80, 4, x, PIT + 80, 170); g.addColorStop(0, 'rgba(255,214,160,.16)'); g.addColorStop(1, 'rgba(255,214,160,0)'); ctx.fillStyle = g; ctx.fillRect(x - 170, PIT + 30, 340, 120); });
-  // grafites que respiram nas paredes
-  (o.doodles || []).forEach((d, i) => scribble(ctx, d[0], d[1], d[2], d[3], d[4] || C.orange, 300 + i, 1, { rot: d[5] || 0, alpha: .5 + .2 * Math.sin(tl * 1.3 + i), glow: true }));
-  platformLife(ctx, tl, o);
+  // 3) frente: vidro, montantes, jardins, floreiras, cobertura, via e plataforma
+  const FRONT = makeCanvas(W, H, (g, w, h) => {
+    const WALL = PLAT.wall, PIT = PLAT.pit, r = rng(77);
+    // reflexo suave no vidro
+    const gl = g.createLinearGradient(0, 120, w, WALL); gl.addColorStop(0, 'rgba(255,255,255,.18)'); gl.addColorStop(.5, 'rgba(210,235,240,.08)'); gl.addColorStop(1, 'rgba(255,255,255,.14)'); g.fillStyle = gl; g.fillRect(0, 120, w, WALL - 120);
+    for (let k = 0; k < 7; k++) { const x = k * 320 + 60; g.fillStyle = 'rgba(255,255,255,.07)'; g.beginPath(); g.moveTo(x, 120); g.lineTo(x + 90, 120); g.lineTo(x - 140, WALL); g.lineTo(x - 230, WALL); g.closePath(); g.fill(); }
+    // montantes e travessas brancas
+    for (let x = 0; x <= w; x += 240) { g.fillStyle = 'rgba(40,60,64,.12)'; g.fillRect(x + 6, 120, 4, WALL - 120); g.fillStyle = '#FBFBF8'; g.fillRect(x - 4, 120, 10, WALL - 120); }
+    [400, 640].forEach(y => { g.fillStyle = '#FBFBF8'; g.fillRect(0, y - 3, w, 7); g.fillStyle = 'rgba(40,60,64,.1)'; g.fillRect(0, y + 4, w, 3); });
+    // jardins verticais nas laterais e floreiras ao pé do vidro
+    [[0, 96], [w - 96, 96]].forEach(([x, ww], i) => { foliage(g, x, 150, ww, WALL - 150, 11 + i, 1.4); g.fillStyle = '#FBFBF8'; g.fillRect(i ? x - 8 : x + ww, 150, 8, WALL - 150); });
+    rr(g, 0, WALL - 64, w, 64, 0); g.fillStyle = '#E7E4DC'; g.fill(); g.fillStyle = '#CFCAC0'; g.fillRect(0, WALL - 64, w, 6);
+    for (let x = 0; x < w; x += 34) { const hh = 34 + r() * 30; foliage(g, x - 6, WALL - 64 - hh + 10, 48, hh, 300 + x, 1.6); }
+    // árvores esguias nos vãos entre os painéis
+    [660, 1260].forEach((x, i) => { g.fillStyle = '#6B5640'; g.fillRect(x - 5, 420, 10, WALL - 64 - 420); crown(g, x, 380, 92, 500 + i); crown(g, x - 30, 450, 60, 520 + i); crown(g, x + 34, 440, 64, 540 + i);
+      rr(g, x - 46, WALL - 96, 92, 40, 8); g.fillStyle = '#F4F2EC'; g.fill(); g.strokeStyle = '#CFCAC0'; g.lineWidth = 3; g.stroke(); });
+    // cobertura: nervuras brancas convergindo, vidro entre elas e a viga de borda
+    const cg = g.createLinearGradient(0, 0, 0, 132); cg.addColorStop(0, '#E8F2F3'); cg.addColorStop(1, '#F7F8F5'); g.fillStyle = cg; g.fillRect(0, 0, w, 132);
+    for (let k = -8; k <= 8; k++) { const xb = w / 2 + k * 150, xt = w / 2 + k * 60; g.strokeStyle = '#FFFFFF'; g.lineWidth = 12; g.beginPath(); g.moveTo(xt, -10); g.lineTo(xb, 132); g.stroke();
+      g.strokeStyle = 'rgba(40,60,64,.12)'; g.lineWidth = 3; g.beginPath(); g.moveTo(xt + 7, -10); g.lineTo(xb + 9, 132); g.stroke(); }
+    g.fillStyle = '#FFFFFF'; g.fillRect(0, 120, w, 22); g.fillStyle = 'rgba(30,50,55,.16)'; g.fillRect(0, 142, w, 8);
+    // via: laje clara, dois trilhos e a guia de LED verde
+    const tg = g.createLinearGradient(0, WALL, 0, PIT); tg.addColorStop(0, '#D3D0C8'); tg.addColorStop(1, '#C4C0B7'); g.fillStyle = tg; g.fillRect(0, WALL, w, PIT - WALL);
+    g.fillStyle = '#F6F4EE'; g.fillRect(0, WALL, w, 8);
+    [884, 922].forEach(y => { g.fillStyle = '#8E979B'; g.fillRect(0, y - 4, w, 8); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(0, y - 4, w, 2); });
+    g.fillStyle = 'rgba(63,191,160,.75)'; g.fillRect(0, 902, w, 3);
+    // plataforma clara: faixa tátil, borda e juntas em perspectiva
+    const fg = g.createLinearGradient(0, PIT, 0, h); fg.addColorStop(0, '#EEEBE4'); fg.addColorStop(1, '#E1DDD4'); g.fillStyle = fg; g.fillRect(0, PIT, w, h - PIT);
+    g.fillStyle = '#FFFFFF'; g.fillRect(0, PIT, w, 6); g.fillStyle = '#F0C43A'; g.fillRect(0, PIT + 12, w, 16);
+    g.fillStyle = 'rgba(160,120,20,.35)'; for (let x = 6; x < w; x += 16) { g.beginPath(); g.arc(x, PIT + 20, 2.6, 0, TAU); g.fill(); }
+    g.strokeStyle = 'rgba(150,140,125,.35)'; g.lineWidth = 2; for (let k = -14; k <= 14; k++) { g.beginPath(); g.moveTo(w / 2 + k * 70, PIT + 32); g.lineTo(w / 2 + k * 190, h + 10); g.stroke(); }
+    [1000, 1046].forEach(y => { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); });
+  });
+  return { SKY, MID, FRONT };
+})();
+function platform(ctx, tl, o = {}) {
+  ctx.fillStyle = '#EEEBE4'; ctx.fillRect(-W, -H, W * 3, H * 3);
+  ctx.drawImage(STN.SKY, 0, 0);
+  // nuvens passando devagar
+  for (let k = 0; k < 5; k++) { const sp = 6 + k * 2.2, x = ((hash(k * 7) * (W + 600) + tl * sp) % (W + 600)) - 300, y = 190 + hash(k * 3) * 260, s = .7 + hash(k * 5) * .8;
+    ctx.save(); ctx.globalAlpha = .75; ctx.fillStyle = '#FFFFFF'; [[0, 0, 90], [70, 12, 70], [-70, 16, 64], [30, -26, 60]].forEach(([dx, dy, rr0]) => { ctx.beginPath(); ctx.ellipse(x + dx * s, y + dy * s, rr0 * s, rr0 * s * .55, 0, 0, TAU); ctx.fill(); }); ctx.restore(); }
+  ctx.drawImage(STN.MID, 0, 0);
+  // um trem bala cruza o viaduto lá longe a cada 17 s
+  { const c = (tl + 6) % 17, d = 6; if (c < d) { const u = c / d; sideTrain(ctx, lerp(-200, W + 420, E.inOutSine(u)), 586, { s: .07 }); } }
+  ctx.drawImage(STN.FRONT, 0, 0);
+  // placa da parada pendurada na cobertura
+  if (o.sign) { const sw = measure(ctx, o.sign, 24, 900, false, 4) + 150, x0 = W / 2 - sw / 2;
+    rr(ctx, x0 + 4, 154, sw, 40, 10); ctx.fillStyle = 'rgba(20,30,34,.18)'; ctx.fill();
+    rr(ctx, x0, 150, sw, 40, 10); ctx.fillStyle = '#1F2B30'; ctx.fill();
+    intersection(ctx, x0 + 44, 170, 11, 14);
+    text(ctx, o.sign, W / 2 + 26, 171, { size: 22, weight: 900, color: '#FFFFFF', align: 'center', ls: 4 }); }
+  // painel digital de partidas e relógio
+  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   EMBARQUE PELA FAIXA AMARELA   ', lx = 120, lw = 300, ly = 150;
+    rr(ctx, lx, ly, lw, 40, 10); ctx.fillStyle = '#1F2B30'; ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.rect(lx + 10, ly + 3, lw - 20, 34); ctx.clip(); ctx.font = font(18, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 60) % mw;
+    ctx.fillStyle = '#7FE0C4'; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 10 - off, ly + 21); ctx.restore();
+    const cx = W - 160, cy = 172; circle(ctx, cx + 3, cy + 4, 24, 'rgba(20,30,34,.18)'); circle(ctx, cx, cy, 24, '#FFFFFF', '#1F2B30', 4);
+    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; line(ctx, cx + Math.cos(a) * 17, cy + Math.sin(a) * 17, cx + Math.cos(a) * 21, cy + Math.sin(a) * 21, '#1F2B30', k % 3 ? 1.5 : 3); }
+    const sec = tl % 60, mn = 37 + tl / 60; [[mn / 60 * TAU, 16, 3, '#1F2B30'], [((9 + mn / 60) / 12) * TAU, 11, 4, '#1F2B30'], [sec / 60 * TAU, 19, 1.5, C.orange]].forEach(([a, l, w, c]) => line(ctx, cx, cy, cx + Math.sin(a) * l, cy - Math.cos(a) * l, c, w));
+    circle(ctx, cx, cy, 4, C.orange); }
 }
-/** os eventos da estação (desenhados por cima da parede, atrás dos cartazes só o que é de fundo) */
-function platformLife(ctx, tl, o = {}) {
-  const PIT = PLAT.pit;
-  // goteira: a gota cai do teto e abre um anel na poça
-  { const c = tl % 5.3, fall = .9; if (c < fall) { const y = lerp(112, 905, (c / fall) ** 2); ctx.fillStyle = 'rgba(170,210,240,.85)'; ctx.beginPath(); ctx.ellipse(1480, y, 4, 7, 0, 0, TAU); ctx.fill(); }
-    else if (c < fall + .8) { const k = (c - fall) / .8; ctx.save(); ctx.globalAlpha = 1 - k; ctx.strokeStyle = 'rgba(190,220,250,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(1480, 910, 10 + 70 * k, 2 + 8 * k, 0, 0, TAU); ctx.stroke(); ctx.restore(); } }
-  // ratinho atravessando os trilhos (com uma parada para farejar)
-  { const c = (tl + 4) % 17, d = 3.6; if (c < d) { let u = c / d; const stop = u > .42 && u < .58; u = u < .42 ? u : u > .58 ? u - .16 : .42; const x = lerp(-80, W + 80, u / .84);
-      PEOPLE.mouse(ctx, x, 924, .9, 1, stop ? 0 : tl * 30); } }
-  // pombo na plataforma: bica, anda um pouco, bica de novo
-  { const c = tl % 13, walk = c > 8 && c < 10, x = 250 + (c > 10 ? 70 : walk ? (c - 8) * 35 : 0), peck = walk ? 0 : Math.max(0, Math.sin(tl * 6)) ** 3;
-    PEOPLE.pigeon(ctx, x, PIT + 105, 1, 1, peck); }
-  // farol de trem cruzando a estação (luz varre a parede da esquerda para a direita)
-  { const c = (tl + 9) % 29; if (c < 3.2) { const u = c / 3.2, x = lerp(-600, W + 600, u); ctx.save(); ctx.globalCompositeOperation = 'screen';
-      const g = ctx.createRadialGradient(x, 560, 20, x, 560, 700); g.addColorStop(0, 'rgba(255,236,200,.35)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, PIT); ctx.restore();
-      for (let k = 0; k < 14; k++) { const yy = 130 + hash(k * 7) * 760, xx = ((x + hash(k * 3) * 900) % (W + 200)) - 100; line(ctx, xx, yy, xx + 160, yy, 'rgba(255,240,220,.18)', 2); } } }
-  // passageiro passando em primeiro plano (silhueta desfocada)
-  // papéis soltos voando com o vento (objetos flutuando pela estação)
-  { const c = (tl + 2) % 23, d = 6.5; if (c < d && o.people !== false) { const u = c / d;
-      for (let k = 0; k < 4; k++) { const v = clamp(u * 1.25 - k * .08), x = lerp(W + 140, -200, v), y = 780 - k * 80 + Math.sin(v * 9 + k * 2) * 70 - v * 120, sq = Math.cos(v * 14 + k * 1.7);
-        ctx.save(); ctx.translate(x, y); ctx.rotate(v * 6 + k); ctx.scale(Math.max(.12, Math.abs(sq)), 1); paper(ctx, -24, -32, 48, 64, { r: 3, fill: sq > 0 ? '#F6EEDF' : '#E6D9C3', shadow: 3, shadowColor: 'rgba(0,0,0,.5)', lw: 2, volume: false });
-        line(ctx, -14, -14, 14, -14, '#8A8378', 3); line(ctx, -14, -2, 8, -2, '#8A8378', 3); line(ctx, -14, 10, 12, 10, '#8A8378', 3); ctx.restore(); } } }
-}
-/** cartaz colado na parede: moldura de papel, fita, cabeçalho com o número da estação e conteúdo */
+/** compatibilidade: a vida da estação já está em platform() */
+function platformLife() {}
+/** painel da estação (v7.11): caixa de luz branca pendurada na cobertura, cabeçalho com o número da estação e conteúdo */
 const POSTERS = {};  // n → (ctx, w, h, tl) desenha o conteúdo no espaço local do cartaz
 function poster(ctx, x, y, w, h, n, tl, o = {}) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot || 0);
-  paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 60 + n, amp: 3, fill: '#F6EEDF', shadow: 14, shadowColor: '#000', lw: 4, halftone: .05, tape: [[.15, 0, -.4], [.85, 0, .35]] });
-  const st = TX.stations[n - 1];
-  rr(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 74, 8); ctx.fillStyle = n <= 3 ? C.red : n <= 6 ? C.orange : C.yellow; ctx.fill(); inkRect(ctx, -w / 2 + 24, -h / 2 + 26, w - 48, 74, 8, 3, n);
-  retroText(ctx, st.n, -w / 2 + 54, -h / 2 + 63, { size: 46, weight: 900, color: '#FFF', depth: 3, lw: 3 });
-  text(ctx, st.short, -w / 2 + 120, -h / 2 + 63, { size: Math.min(26, (w - 170) / st.short.length * 1.7), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
+  if (o.cables !== false) [-1, 1].forEach(sd => line(ctx, sd * (w / 2 - 70), -h / 2, sd * (w / 2 - 70), -h / 2 - 380, 'rgba(70,82,86,.55)', 3));
+  rr(ctx, -w / 2 + 8, -h / 2 + 14, w, h, 22); ctx.fillStyle = 'rgba(20,30,34,.16)'; ctx.fill();
+  rr(ctx, -w / 2, -h / 2, w, h, 22); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.strokeStyle = '#C9D1D3'; ctx.lineWidth = 3; ctx.stroke();
+  const st = TX.stations[n - 1], col = n <= 3 ? C.red : n <= 6 ? C.orange : C.yellow;
+  rr(ctx, -w / 2 + 22, -h / 2 + 24, w - 44, 74, 14); ctx.fillStyle = col; ctx.fill();
+  text(ctx, st.n, -w / 2 + 62, -h / 2 + 62, { size: 44, weight: 900, color: n <= 6 ? '#FFF' : INK, align: 'center' });
+  text(ctx, st.short, -w / 2 + 112, -h / 2 + 62, { size: Math.min(26, 26 * (w - 160) / measure(ctx, st.short, 26, 900, false, 1)), weight: 900, color: n <= 6 ? '#FFF' : INK, ls: 1 });
   ctx.save(); ctx.translate(0, 40); ctx.beginPath(); ctx.rect(-w / 2 + 20, -h / 2 + 70, w - 40, h - 120); ctx.clip();
   if (POSTERS[n]) POSTERS[n](ctx, w - 40, h - 120, tl); else text(ctx, st.title, 0, 0, { size: 28, weight: 800, color: INK, align: 'center' });
   ctx.restore(); ctx.restore();
@@ -2660,7 +2678,7 @@ const SLIDES = {
     ['insight', 26.8, 'Agentes · avaliar e corrigir', 18.6, 27.4], ['insight', 45.6, 'Agentes · escala', 35.6, 46.5], ['insight', 54.6, 'Agentes · situação', 46.7, 55.4]],
   5: [['s05', 19.5, 'A mesma equipe, mais alcance', 3.8, 19.8]],
   6: [['s06', 24.0, 'Pilares e contribuições', 3.8, 24.3]],
-  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 25.5, 'Disciplinas · Analytics & Advanced Analytics', 0, 26.3]]
+  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 19.5, 'Por trás de tudo · métodos e técnicas', 0, 26.3]]
 };
 /** telas extras das paradas (lupa) que não são cenas do filme: SLIDES com nome '@tela' */
 const SLIDE_SCREENS = {};
@@ -2753,11 +2771,11 @@ function recapScene(o) {
       ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
       const e = E.inOutCubic(p), a = viewOf(Math.min(prevItem, N.length)), b = viewOf(Math.min(item, N.length));
       const vx = lerp(a.x, b.x, e), vy = lerp(a.y, b.y, e), vs = lerp(a.s, b.s, e) * (1 + .004 * Math.sin(tl * .7));
-      ctx.fillStyle = '#17120F'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#EEEBE4'; ctx.fillRect(0, 0, W, H);
       ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(vs, vs); ctx.translate(-vx, -vy);
-      platform(ctx, tl, { sign: o.sign, doodles: o.doodles });
-      const wind = platformWind(tl);
-      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i; poster(ctx, px(i), PLAT.PY - (hov ? 12 : 0), 500, 640, n, tl, { rot: [-.02, .012, -.01][i] + wind * .025 * Math.sin(tl * 9 + i * 2) }); if (hov) glow(ctx, px(i), PLAT.PY, 380, C.orange, .18); });
+      platform(ctx, tl, { sign: o.sign });
+      N.forEach((n, i) => { const hov = !item && ui.hover && ui.hover.poster === i, py = PLAT.PY - (hov ? 12 : 0); poster(ctx, px(i), py, 500, 640, n, tl);
+        if (hov) { rr(ctx, px(i) - 258, py - 328, 516, 656, 28); ctx.strokeStyle = C.orange; ctx.lineWidth = 6; ctx.stroke(); } });
       ctx.restore();
     },
     /** interface por cima da pintura: chamada, passagem, miniaturas, popup e dicas */
@@ -2784,7 +2802,7 @@ function recapScene(o) {
         para(ctx, o.banner, W / 2, H - 134, 1700, { size: 34, weight: 800, color: '#FFF', accent: C.yellow, align: 'center' }); ctx.restore(); }
       if (sn) slideStrip(ctx, sn, sa, ui);
       SLIDE.pump();
-      if (!item) text(ctx, 'clique num cartaz para abrir a estação', W / 2, H - 36, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: (.5 + .2 * Math.sin(tl * 2.4)) * clamp((tl - .9) / .6) });
+      if (!item) uiNote(ctx, 'clique num painel para abrir a estação', W / 2, H - 40, clamp((tl - .9) / .6), tl);
       if (item && sn) slidePopup(ctx, sn, ui);
       hint(ctx, tl, item === N.length ? TX.stop.go : '→', item);
     },
@@ -2806,9 +2824,17 @@ function recapScene(o) {
     key(k, ui, ctl) { const item = __state.item, n = curN(item); if (n && popupKey(n, k, ui, ctl)) return true; if (k === 'Escape' && item) { ctl.setItem(0); return true; } return false; }
   };
 }
-/** dica discreta para quem apresenta (canto inferior direito) */
+/** dica discreta para quem apresenta (canto inferior direito), numa pílula escura: legível na estação clara e no escuro */
 function hint(ctx, tl, label, item) {
-  const a = .35 + .25 * Math.sin(tl * 2.4); text(ctx, label, W - 60, H - 46, { size: 20, weight: 700, mono: true, color: '#FFF', align: 'right', ls: 2, alpha: a });
+  const a = .6 + .2 * Math.sin(tl * 2.4), w = measure(ctx, label, 20, 700, true, 2) + 40;
+  ctx.save(); ctx.globalAlpha *= a; rr(ctx, W - 40 - w, H - 68, w, 44, 22); ctx.fillStyle = 'rgba(20,28,32,.78)'; ctx.fill();
+  text(ctx, label, W - 60, H - 46, { size: 20, weight: 700, mono: true, color: '#FFF', align: 'right', ls: 2 }); ctx.restore();
+}
+/** aviso centralizado numa pílula escura (instruções das paradas) */
+function uiNote(ctx, str, x, y, a = 1, tl = 0) {
+  if (a <= 0) return; const w = measure(ctx, str, 22, 700, true, 2) + 56;
+  ctx.save(); ctx.globalAlpha *= a * (.8 + .2 * Math.sin(tl * 2.4)); rr(ctx, x - w / 2, y - 24, w, 48, 24); ctx.fillStyle = 'rgba(20,28,32,.8)'; ctx.fill();
+  text(ctx, str, x, y + 1, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2 }); ctx.restore();
 }
 
 /* ---------- cases: régua, comprovante ---------- */
@@ -2851,67 +2877,80 @@ function receipt(ctx, x, y, o) {
    as legendas de tela (o vídeo roda sem narrador) e os cartões de conexão
    ========================================================================== */
 
-/** vagão visto de lado. (x, y) = canto superior esquerdo; base de 1000 × 400 em escala s.
- *  o: len (comprimento base), open (0–1 abre as portas), lit (luz interna), seed, label */
+/** v7.11: o trem da linha é um TREM BALA visto de lado. (x, y) = canto superior esquerdo do corpo do vagão; base L × 408 em escala s
+ *  (as rodas, escondidas pela saia, tocam o trilho em y = 408). o: len, open (abre as portas), lit (luz interna), seed, label,
+ *  doors, logoX, nose: 'right' | 'left' | 'both' (o nariz aerodinâmico fica fora de [0, L]), noseLen */
+const NOSE_LEN = 460;
 function trainCar(ctx, x, y, s, o = {}) {
-  const L = o.len || 1000, open = clamp(o.open || 0), lit = o.lit == null ? 1 : o.lit, R = rng(o.seed || 3);
-  const doors = o.doors || [L * .25, L * .75], DW = 150, WY = 60, WH = 116;
+  const L = o.len || 1000, open = clamp(o.open || 0), lit = o.lit == null ? 1 : o.lit, R = rng(o.seed || 3), N = o.noseLen || NOSE_LEN;
+  const doors = o.doors || [L * .25, L * .75], DW = 128, TOP = 22, BOT = 372, WY = 96, WH = 70;
+  const nr = o.nose === 'right' || o.nose === 'both', nl = o.nose === 'left' || o.nose === 'both';
   ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-  // sombra chapada, truques e rodas
-  rr(ctx, 16, 20, L, 360, 46); ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fill();
-  [[L * .08, L * .3], [L * .62, L * .3]].forEach(([bx, bw]) => { rr(ctx, bx, 340, bw, 34, 10); ctx.fillStyle = '#211A15'; ctx.fill(); });
-  [L * .14, L * .32, L * .68, L * .86].forEach(wx => { circle(ctx, wx, 378, 30, '#1A1512', INK, 5); circle(ctx, wx, 378, 9, '#6E665C'); });
-  // corpo: teto, faixa Mastercard, saia
-  ctx.save(); rr(ctx, 0, 0, L, 360, 46); ctx.clip();
-  ctx.fillStyle = '#F3EBDD'; ctx.fillRect(0, 0, L, 360);
-  ctx.fillStyle = '#DCD1C1'; ctx.fillRect(0, 0, L, 30);
-  [[C.red, 232], [C.orange, 250], [C.yellow, 268]].forEach(([c, yy]) => { ctx.fillStyle = c; ctx.fillRect(0, yy, L, 18); });
-  ctx.fillStyle = '#2A221C'; ctx.fillRect(0, 300, L, 60);
-  hatch(ctx, () => rr(ctx, 0, 0, L, 300, 0), L * .78, 0, L * .22, 300, { alpha: .14, gap: 12 });
-  // janelas com a luz quente do vagão e passageiros
-  const slots = [], edges = [30, ...doors.flatMap(d => [d - DW / 2 - 22, d + DW / 2 + 22]), L - 30];
-  for (let k = 0; k < edges.length; k += 2) { const a = edges[k], b = edges[k + 1], n = Math.max(0, Math.floor((b - a + 24) / 146)), w0 = n ? (b - a - (n - 1) * 24) / n : 0;
-    for (let j = 0; j < n; j++) slots.push(a + j * (w0 + 24), w0); }
-  for (let k = 0; k < slots.length; k += 2) {
-    const wx = slots[k], ww = slots[k + 1];
-    rr(ctx, wx, WY, ww, WH, 18); const g = ctx.createLinearGradient(0, WY, 0, WY + WH);
-    g.addColorStop(0, mix('#3A2A1E', '#FFE2B0', lit)); g.addColorStop(1, mix('#2A1E15', '#FF9C45', lit)); ctx.fillStyle = g; ctx.fill();
-    const heads = Math.floor(R() * 3);
-    for (let h = 0; h < heads; h++) { const hx = wx + ww * (.25 + .5 * R()), hy = WY + WH - 30;
-      ctx.fillStyle = 'rgba(40,24,14,.72)'; ctx.beginPath(); ctx.arc(hx, hy - 16, 15, 0, TAU); ctx.fill(); rr(ctx, hx - 26, hy, 52, 40, 18); ctx.fill(); }
-    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.moveTo(wx + 14, WY + 8); ctx.lineTo(wx + 40, WY + 8); ctx.lineTo(wx + 14, WY + 60); ctx.fill();
-    inkRect(ctx, wx, WY, ww, WH, 18, 5, k + 1);
-  }
-  // portas: duas folhas que deslizam; atrás, o interior aceso
+  // contorno: teto reto, nariz em curva longa até a ponta baixa, saia lisa
+  const shell = () => { ctx.beginPath();
+    if (nl) ctx.moveTo(0, TOP); else { ctx.moveTo(56, TOP); }
+    if (nr) { ctx.lineTo(L, TOP); ctx.bezierCurveTo(L + N * .5, TOP, L + N * .95, 190, L + N, 304); ctx.quadraticCurveTo(L + N * 1.01, BOT, L + N * .72, BOT); }
+    else { ctx.lineTo(L - 56, TOP); ctx.arcTo(L, TOP, L, TOP + 56, 56); ctx.lineTo(L, BOT - 24); ctx.arcTo(L, BOT, L - 24, BOT, 24); }
+    if (nl) { ctx.lineTo(-N * .72, BOT); ctx.quadraticCurveTo(-N * 1.01, BOT, -N, 304); ctx.bezierCurveTo(-N * .95, 190, -N * .5, TOP, 0, TOP); }
+    else { ctx.lineTo(24, BOT); ctx.arcTo(0, BOT, 0, BOT - 24, 24); ctx.lineTo(0, TOP + 56); ctx.arcTo(0, TOP, 56, TOP, 56); }
+    ctx.closePath(); };
+  const x0 = nl ? -N : 0, x1 = nr ? L + N : L;
+  // sombra no chão e truques (as rodas ficam escondidas pela saia)
+  ctx.save(); ctx.globalAlpha *= .3; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse((x0 + x1) / 2, 408, (x1 - x0) / 2, 14, 0, 0, TAU); ctx.fill(); ctx.restore();
+  [L * .16, L * .84].forEach(bx => { rr(ctx, bx - 96, BOT - 6, 192, 36, 12); ctx.fillStyle = '#23292C'; ctx.fill(); [-50, 50].forEach(dx => circle(ctx, bx + dx, BOT + 24, 14, '#3A4246')); });
+  // corpo branco com a luz do alto
+  shell(); const g = ctx.createLinearGradient(0, TOP, 0, BOT); g.addColorStop(0, '#FFFFFF'); g.addColorStop(.55, '#EEF1F0'); g.addColorStop(1, '#CBD2D1'); ctx.fillStyle = g; ctx.fill();
+  ctx.save(); shell(); ctx.clip();
+  // saia escura, faixa de painel e a assinatura Mastercard (vermelho, laranja, amarelo) correndo até o nariz
+  ctx.fillStyle = '#2C3437'; ctx.fillRect(x0 - 10, 326, x1 - x0 + 20, 60);
+  line(ctx, x0, 214, x1, 214, 'rgba(120,132,136,.35)', 3);
+  [[C.red, 280], [C.orange, 292], [C.yellow, 304]].forEach(([c, yy]) => { ctx.fillStyle = c; ctx.fillRect(x0 - 10, yy, x1 - x0 + 20, 10); });
+  // faixa contínua de janelas (vidro escuro, interior aceso) e os passageiros
+  rr(ctx, 40, WY, L - 80, WH, 22); const gw = ctx.createLinearGradient(0, WY, 0, WY + WH);
+  gw.addColorStop(0, mix('#1B2830', '#3A2E22', lit * .5)); gw.addColorStop(1, mix('#22343D', '#8A5A2E', lit * .45)); ctx.fillStyle = gw; ctx.fill();
+  for (let k = 0; k < Math.floor(L / 110); k++) { const hx = 70 + k * 110 + R() * 40; if (R() < .45) { ctx.fillStyle = 'rgba(10,14,16,.55)'; circle(ctx, hx, WY + 36, 11, 'rgba(10,14,16,.55)'); rr(ctx, hx - 18, WY + 48, 36, 30, 12); ctx.fill(); } }
+  for (let k = 0; k < Math.ceil(L / 260); k++) { const rx = 80 + k * 260; ctx.fillStyle = 'rgba(255,255,255,.13)'; ctx.beginPath(); ctx.moveTo(rx, WY + 4); ctx.lineTo(rx + 70, WY + 4); ctx.lineTo(rx + 30, WY + WH - 4); ctx.lineTo(rx - 40, WY + WH - 4); ctx.closePath(); ctx.fill(); }
+  // a janela da cabine segue a curva do nariz
+  const cab = (sx, ex) => { ctx.beginPath(); ctx.moveTo(sx, WY); ctx.lineTo(ex(.18), WY); ctx.quadraticCurveTo(ex(.56), WY + 6, ex(.66), WY + WH + 4); ctx.lineTo(sx, WY + WH + 4); ctx.closePath();
+    const gc = ctx.createLinearGradient(0, WY, 0, WY + WH); gc.addColorStop(0, '#16222A'); gc.addColorStop(1, '#2C4450'); ctx.fillStyle = gc; ctx.fill(); };
+  if (nr) cab(L - 60, f => L + N * f); if (nl) cab(60, f => -N * f);
+  // farol na ponta do nariz
+  if (nr) { rr(ctx, L + N * .8, 262, N * .14, 12, 6); ctx.fillStyle = '#FFF4D6'; ctx.fill(); }
+  if (nl) { rr(ctx, -N * .94, 262, N * .14, 12, 6); ctx.fillStyle = '#FFE2C8'; ctx.fill(); }
+  // portas: folhas que deslizam; atrás, o interior aceso
   doors.forEach((d, i) => {
-    const dx = d - DW / 2, gap = open * 66;
-    rr(ctx, dx, 44, DW, 256, 8); ctx.fillStyle = mix('#2A1E15', '#FFC27A', lit * (.4 + .6 * open)); ctx.fill();
-    if (open > 0) glow(ctx, d, 170, 140 * open, '#FFD9A0', .5 * open * lit);
+    const dx = d - DW / 2, gap = open * DW * .52;
+    if (open > 0) { rr(ctx, dx, 58, DW, 262, 10); ctx.fillStyle = mix('#3A2A1E', '#FFDDA6', lit * (.5 + .5 * open)); ctx.fill(); glow(ctx, d, 190, 150 * open, '#FFE2B0', .5 * open * lit); }
     [[-1, dx - gap], [1, d + gap]].forEach(([sd, lx]) => {
-      rr(ctx, lx, 44, DW / 2, 256, 6); ctx.fillStyle = '#E9DFCF'; ctx.fill();
-      rr(ctx, lx + 14, 64, DW / 2 - 28, 104, 10); ctx.fillStyle = mix('#3A2A1E', '#FFD49A', lit); ctx.fill();
-      inkRect(ctx, lx, 44, DW / 2, 256, 6, 4, 20 + i * 2 + (sd > 0));
+      rr(ctx, lx, 58, DW / 2, 262, 8); ctx.fillStyle = open > 0 ? '#F4F6F5' : 'rgba(0,0,0,0)'; ctx.fill();
+      ctx.strokeStyle = '#9AA4A7'; ctx.lineWidth = 3; ctx.stroke();
+      rr(ctx, lx + 12, 80, DW / 2 - 24, 96, 10); ctx.fillStyle = mix('#1B2830', '#B07A40', lit * .5); ctx.fill();
     });
-    rr(ctx, d - 58, 12, 116, 26, 5); ctx.fillStyle = '#120E0B'; ctx.fill();
-    text(ctx, o.label || 'ANALYTICS', d, 26, { size: 15, weight: 900, mono: true, color: C.orange, align: 'center', ls: 2 });
+    rr(ctx, d - 56, 30, 112, 22, 6); ctx.fillStyle = '#141B1E'; ctx.fill();
+    text(ctx, o.label || 'ANALYTICS', d, 41, { size: 13, weight: 900, mono: true, color: C.orange, align: 'center', ls: 2 });
   });
   // logo no costado
   const lx = o.logoX == null ? L * .5 : o.logoX;
-  intersection(ctx, lx - 132, 206, 10, 12);
-  text(ctx, 'PERFORMANCE ANALYTICS', lx - 114, 207, { size: 14, weight: 900, color: INK, ls: 1 });
+  intersection(ctx, lx - 132, 248, 10, 12);
+  text(ctx, 'PERFORMANCE ANALYTICS', lx - 114, 249, { size: 14, weight: 900, color: '#2C3437', ls: 1 });
+  // reflexo do céu no teto
+  const gr = ctx.createLinearGradient(0, TOP, 0, TOP + 60); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = gr; ctx.fillRect(x0, TOP, x1 - x0, 60);
   ctx.restore();
-  inkRect(ctx, 0, 0, L, 360, 46, 6, o.seed || 3);
+  shell(); ctx.strokeStyle = '#1E2427'; ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.stroke();
   ctx.restore();
 }
 
-/** o trem da linha visto de lado (ponte, viaduto dos pilares e 07): n vagões com as rodas sobre o trilho.
- *  xf = frente do trem · ry = topo do trilho · o brilho do farol pulsa com a música */
+/** o trem bala da linha visto de lado (ponte, viaduto dos pilares e 07): dois vagões, nariz na frente e na traseira.
+ *  xf = ponta do nariz da frente · ry = topo do trilho · o farol pulsa com a música */
 function sideTrain(ctx, xf, ry, o = {}) {
-  const S = o.s || .17, L = 1000, GAP = 70, n = o.cars || 2, y = ry - 408 * S, k0 = S / .17;
-  glow(ctx, xf + 30 * k0, y + 150 * S, 160 * k0, C.orange, .22 + .15 * BT.level);
-  for (let k = n - 1; k >= 0; k--) trainCar(ctx, xf - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: (o.seed || 7) + k, lit: 1, doors: [L * .3, L * .7] });
-  glow(ctx, xf - 4 * k0, y + 190 * S, 60 * k0, '#FFF2C8', .8);
+  const S = o.s || .17, L = 1000, GAP = 40, n = o.cars || 2, y = ry - 408 * S, k0 = S / .17, N = NOSE_LEN;
+  glow(ctx, xf - 30 * k0, y + 268 * S, 150 * k0, '#FFE9C0', .22 + .18 * BT.level);
+  for (let k = n - 1; k >= 0; k--) trainCar(ctx, xf - N * S - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: (o.seed || 7) + k, lit: 1, doors: [L * .3, L * .7],
+    nose: n === 1 ? 'both' : k === 0 ? 'right' : k === n - 1 ? 'left' : null });
+  glow(ctx, xf - 40 * k0, y + 268 * S, 40 * k0, '#FFF6DA', .85);
 }
+/** comprimento total do trem bala em escala S (para quem posiciona o trem na tela) */
+const trainLen = (S = .17, n = 2) => (n * 1000 + (n - 1) * 40 + 2 * NOSE_LEN) * S;
 
 /* ---------- o trem passa na frente da câmera na chegada de cada estação (esconde o corte) ---------- */
 const TRAIN_PASS = (() => {
@@ -2924,13 +2963,9 @@ const TRAIN_PASS = (() => {
     draw(ctx, T) {
       list.forEach(p => {
         const u = (T - (p.Ts - HALF)) / (2 * HALF); if (u <= 0 || u >= 1 || (p.fromStop && u < .5)) return;
-        const span = W + LEN * S + 80, x = W + 40 - span * u, y = -40;
-        ctx.save(); ctx.globalAlpha = .28; trainCar(ctx, x + 70, y, S, { len: LEN, seed: 5, lit: .9 }); ctx.restore();
-        trainCar(ctx, x, y, S, { len: LEN, seed: 5, lit: .9 });
-        // rastros de velocidade
-        const r = rng(Math.floor(p.Ts * 10)); ctx.save(); ctx.globalAlpha = .5;
-        for (let k = 0; k < 18; k++) { const ly = r() * H, lx = x + r() * LEN * S, lw = 200 + r() * 600; line(ctx, lx, ly, lx + lw, ly, k % 3 ? 'rgba(255,240,220,.5)' : rgba(C.orange, .6), 2 + r() * 5); }
-        ctx.restore();
+        const span = W + (LEN + NOSE_LEN) * S + 80, x = W + 40 + NOSE_LEN * S - span * u, y = -40;
+        ctx.save(); ctx.globalAlpha = .28; trainCar(ctx, x + 70, y, S, { len: LEN, seed: 5, lit: .9, nose: 'left' }); ctx.restore();
+        trainCar(ctx, x, y, S, { len: LEN, seed: 5, lit: .9, nose: 'left' });
       });
     }
   };
@@ -3305,6 +3340,12 @@ const camScale = ctx => { const m = ctx.getTransform(); return Math.hypot(m.a, m
 /** desenha depois do acabamento, em coordenadas de tela (as do quadro: dentro de uma transição, segue o zoom e o fade dela) */
 function hud(ctx, fn, a = 1) { const b = HUD.base(); HUD.add(ctx, c => { if (b.m) c.setTransform(b.m); else c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = b.a * a; fn(c); }); }
 
+/** barra chapada dos gráficos (v7.11): cantos de cima arredondados, sem volume 3D nem contorno */
+function fbar(ctx, x, y, w, h, col, o = {}) {
+  if (h <= 0 || w <= 0) return; const r = Math.min(o.r == null ? 8 : o.r, w / 2, h);
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h); ctx.closePath();
+  ctx.fillStyle = col; ctx.fill();
+}
 /* ---------- parágrafos com *destaques* (quebra por largura, com cache) ---------- */
 const _wrapCache = new Map();
 function wrapRich(ctx, str, maxW, size, weight = 700) {
@@ -3755,14 +3796,13 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     ctx.save();
     if (dive > 0) { const z = 1 + dive * 5; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -(TY0 + 170 * S)); ctx.translate(0, (TY0 + 170 * S - H / 2) * (1 - dive)); }
     else { ctx.translate(W / 2, TY0 + 170 * S); ctx.scale(push, push); ctx.translate(-W / 2, -(TY0 + 170 * S)); }
-    platform(ctx, t, { doodles: [['star', 140, 330, 70, C.yellow], ['arrow', 1790, 300, 90, C.orange]] });   // sem placa: o painel de partidas e o título ocupam o topo
+    platform(ctx, t, {});   // sem placa: o painel de partidas e o título ocupam o topo
     const ba = 1 - P(t, T_DOOR, .4); if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 232 - 60 * P(t, T_DOOR, .4), [BOARD], [.3], t, { tw: 50, th: 74, hiFrom: [0], header: 'PARTIDA', headerCol: C.red, glowA: P(t, 1.6, .6) }); ctx.restore(); }
-    // o trem chega da esquerda e freia com a porta no centro; o farol varre a plataforma
-    const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(-L * S - 80, W / 2 - DOOR * S, arr), sway = (1 - arr) * Math.sin(t * 30) * 2;
+    // o trem bala chega da esquerda (nariz na frente) e freia com a porta no centro
+    const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(-(L + NOSE_LEN) * S - 80, W / 2 - DOOR * S, arr);
     if (t > T_ARR) {
-      if (arr < .995) { ctx.save(); ctx.globalCompositeOperation = 'screen'; const hx = x + L * S, g = ctx.createRadialGradient(hx, TY0 + 260, 10, hx, TY0 + 260, 520); g.addColorStop(0, 'rgba(255,236,200,.55)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(hx - 40, TY0 - 200, 900, 900); ctx.restore(); }
-      trainCar(ctx, x, TY0 + sway, S, { len: L, doors: [L * .17, DOOR, L * .83], logoX: 520, open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1 });
-      if (arr < .97) { const r = rng(3); ctx.save(); ctx.globalAlpha = .45 * (1 - arr); for (let k = 0; k < 14; k++) { const ly = TY0 + r() * 420 * S, lx = x + r() * L * S; line(ctx, lx, ly, lx - 300 - r() * 400, ly, 'rgba(255,240,220,.6)', 3); } ctx.restore(); }
+      trainCar(ctx, x - (1000 + 40) * S, TY0, S, { len: 1000, doors: [300, 700], seed: 12, lit: 1, nose: 'left' });
+      trainCar(ctx, x, TY0, S, { len: L, doors: [L * .17, DOOR, L * .83], logoX: 520, open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1, nose: 'right' });
       if (t > T_DOOR) glow(ctx, W / 2, TY0 + 200 * S, 300, '#FFE2B0', .4 * P(t, T_DOOR, .6));
     }
     ctx.restore();
@@ -3776,7 +3816,6 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     const a = P(t, T_MAP, .7); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     bgDark(ctx, t, { centerA: .9, center: '#33200F' }); glow(ctx, 960, 590, 900, C.orange, .14);
-    SPACE.field(ctx, t, { alpha: .45, spin: .06, rot: -.4 + (1 - E.outCubic(P(t, T_MAP, 1.6))) * 1.2 });
     const z = lerp(1.6, 1, E.outCubic(P(t, T_MAP, 1.4)));
     mapWorld(ctx, { ...MAPVIEW, s: MAPVIEW.s * z }, () => {
       metroMap(ctx, t, { reveal: E.inOutCubic(P(t, T_MAP, 1.5)), train: 0 });
@@ -4040,7 +4079,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   const CX = [430, 680, 930, 1180], BASE = 820, HH = 500, X0 = 250, BW = 160;
   const CAM = [[0, 960, 560, 1.05], [3.6, 960, 540, 1], [T_BR - .2, 960, 540, 1], [T_BR + 1.3, 3160, 540, 1], [43.7, 3160, 540, 1]];
   const hY = v => BASE - toU(v) / TOP * HH;
-  T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_TREND, 'shimmer', { dur: 1.2 }); cue(id, T_READ, 'chime', { f: 784, up: 7 });
+  T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_READ, 'chime', { f: 784, up: 7 });
   cue(id, T_BR, 'whoosh', { dur: 1, v: .3 }); T_CMP.forEach(t0 => cue(id, t0, 'impact', { size: .5 })); cue(id, T_Q, 'whoosh', { dur: .7, v: .25 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
   const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, o faturamento passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'O faturamento cresceu ano a ano.';
   const qTxt = QS.length ? (QUP === QS.length ? 'O realizado superou o orçamento em *todos os trimestres*.' : `O realizado superou o orçamento em *${QUP} de ${QS.length} trimestres*.`) : '';
@@ -4071,18 +4110,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       if (p <= 0) return;
       ctx.save(); ctx.globalAlpha *= 1 - dim;
       if (f) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, BASE - hgt, BW, hgt, 6); ctx.strokeStyle = C.yellow; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); hatch(ctx, () => rr(ctx, x, BASE - hgt, BW, hgt, 6), x, BASE - hgt, BW, hgt, { color: C.yellow, alpha: .35, gap: 14 }); }
-      else vslab(ctx, x, BASE - hgt, BW, hgt, 30, mix(C.red, C.orange, i / 2), { lw: 4 });
-      if (hi && read > 0) glow(ctx, CX[i], BASE - hgt / 2, 220, C.yellow, .35 * read);
+      else fbar(ctx, x, BASE - hgt, BW, hgt, mix(C.red, C.orange, i / 2));
       ctx.restore();
       const la = clamp(p) * (1 - dim * .6);
       late(ctx, c => { c.globalAlpha *= la; text(c, FMT.usdMM(+v), CX[i] + 10, BASE - hgt - 34, { size: 30, weight: 900, color: '#FFF', align: 'center' });
         text(c, yr(k), CX[i] + 10, BASE + 36, { size: 30, weight: 900, color: f ? C.yellow : '#FFF', align: 'center' });
         if (f) text(c, '(previsão)', CX[i] + 10, BASE + 70, { size: 24, weight: 800, color: C.yellow, align: 'center' }); });
     });
-    // a tendência: um brilho percorre o topo das barras 2023 → 2025 (sem traço por cima dos rótulos)
-    if (t > T_TREND && t < T_TREND + 2.2) ROWS.slice(0, 3).forEach(([k, v], i) => { const u = (t - T_TREND - i * .3) / 1.2; if (u <= 0 || u >= 1) return;
-      const a = Math.sin(u * Math.PI), y = hY(+v), x = CX[i] - BW / 2; glow(ctx, CX[i] + 10, y, 170, '#FFE7C8', .5 * a);
-      ctx.save(); ctx.globalCompositeOperation = 'lighter'; line(ctx, x + 4, y + 2, x + BW - 4, y + 2, rgba('#FFF1DC', .85 * a), 5); ctx.restore(); });
     // a régua: 2023 → 2025
     if (read > 0 && MULT) { const xa = CX[0] + BW / 2 + 40, y0 = hY(VALS[0]), y2 = hY(VALS[2]), xr = CX[2] + BW / 2 + 70, g = E.outCubic(read);
       ctx.save(); ctx.globalAlpha *= g;
@@ -4101,12 +4135,11 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       [[ref, refL, g ? null : '#8A8378', g === 1], [ACT, 'realizado', C.orange, false]].forEach(([v, l, col, dash], j) => {
         const x = cx - 190 + j * 220, hh = hb(v) * Math.min(1, p);
         if (dash) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, B0 - hh, 160, hh, 6); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); }
-        else vslab(ctx, x, B0 - hh, 160, hh, 24, col, { lw: 4 });
+        else fbar(ctx, x, B0 - hh, 160, hh, col);
         late(ctx, c => { c.globalAlpha *= clamp(p); text(c, fu(v), x + 80, B0 - hh - 30, { size: 28, weight: 900, color: '#FFF', align: 'center' }); text(c, l, x + 80, B0 + 36, { size: 28, weight: 800, color: j ? C.orange : '#F3E6D6', align: 'center' }); });
       });
       late(ctx, c => { c.globalAlpha *= clamp(p); c.translate(cx, B0 - HB - 215); const s = lerp(1.6, 1, E.outExpo(clamp(p))); c.scale(s, s);
-        splat(c, 0, -6, 110, g ? C.yellow : C.orange, 60 + g, 1, .9);
-        retroText(c, mult ? FMT.mult(mult) : '—', 0, 0, { size: 96, weight: 900, color: '#FFF', align: 'center', depth: 6, lw: 5 });
+        text(c, mult ? FMT.mult(mult) : '—', 0, 0, { size: 96, weight: 900, color: g ? C.yellow : C.orange, align: 'center' });
         text(c, cap, 0, 82, { size: 32, weight: 900, color: '#FFF', align: 'center' }); });
     });
     late(ctx, c => text(c, 'Fonte: ' + (BR.source || 'dados internos'), 2260, 940, { size: 22, weight: 700, mono: true, color: '#BFB3A3' }));
@@ -4120,7 +4153,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     QS.forEach(([k, q], i) => {
       [[q.actuals_2022, '#8A8378', 0], [q.budget_2023, null, 1], [q.actuals_2023, C.orange, 2]].forEach(([v, col, j]) => {
         const p = E.outCubic(P(t, T_Q + .3 + i * .25 + j * .08, .5)), x = gx(i) + j * 56, hh = v / M * HQ * p;
-        if (col) vslab(ctx, x, B0 - hh, 46, hh, 12, col, { lw: 3 }); else { ctx.save(); ctx.setLineDash([9, 7]); rr(ctx, x, B0 - hh, 46, hh, 4); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); }
+        if (col) fbar(ctx, x, B0 - hh, 46, hh, col, { r: 5 }); else { ctx.save(); ctx.setLineDash([9, 7]); rr(ctx, x, B0 - hh, 46, hh, 4); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); }
       });
       const up = q.actuals_2023 > q.budget_2023, la = P(t, T_Q + .9 + i * .25, .4);
       late(ctx, c => { c.globalAlpha *= la; text(c, qLabel(k), gx(i) + 74, B0 + 36, { size: 30, weight: 900, color: '#FFF', align: 'center' }); if (up) icon(c, 'check', gx(i) + 130, B0 - Math.max(q.actuals_2023, q.budget_2023) / M * HQ - 40, 36, C.yellow, 10); });
@@ -4137,10 +4170,6 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     draw(ctx, t) {
       const cam = camKey(t, CAM);
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0E' });
-      SPACE.field(ctx, t, { alpha: .32, rot: SPACE.camRot(cam, .0004), spin: .04 });
-      SPACE.ribbon(ctx, t, { alpha: .3, rot: .5 + SPACE.camRot(cam, .0004), cy: 470, amp: .42, width: 30, spin: .05 });
-      layer(ctx, cam, .25, () => skyline(ctx, t, { y: 980, h: 360, seed: 14, col: '#1A1216', lit: .4 }));
-      layer(ctx, cam, .6, () => neonGrid(ctx, t, { horizon: 860, alpha: .3, speed: .4 }));
       layer(ctx, cam, 1, () => {
         // chão da galeria com reflexo
         const g = ctx.createLinearGradient(0, 820, 0, H + 80); g.addColorStop(0, 'rgba(60,32,18,.9)'); g.addColorStop(1, 'rgba(12,8,6,.95)'); ctx.fillStyle = g; ctx.fillRect(-400, 822, 4600, 400);
@@ -4292,18 +4321,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     themeAt: () => 'dark', script: SCRIPT,
     peaks: [[T_INT + 2, T_INT + 2.8, .45], [T_PRESC + 3.1, T_PRESC + 3.9, .5], [T_SYN, T_SYN + 1.2, .4]],
     draw(ctx, t) {
-      const cam = camKey(t, CAM), pan = [T_CAP, T_INT, T_PRED, T_PRESC].some(t0 => t > t0 - 1.2 && t < t0);
+      const cam = camKey(t, CAM);
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
-      SPACE.field(ctx, t, { alpha: .3, rot: SPACE.camRot(cam, .00025), cy: 420 });
-      SPACE.floaters(ctx, t, { alpha: .34, rot: SPACE.camRot(cam, .00025), cy: 380, n: 12 });
-      layer(ctx, cam, .2, () => skyline(ctx, t, { y: 900, h: 460, seed: 33, col: '#1E1418', lit: .5 }));
-      layer(ctx, cam, .45, () => skyline(ctx, t, { y: 980, h: 300, seed: 41, col: '#120C0E', lit: .3, x: 1200 }));
       layer(ctx, cam, 1, () => {
         streetSet(ctx);
         LINE.draw(ctx, [[-1200, GY + 60], [11200, GY + 60]], 1, { w: 14, alpha: .55, shadow: false });
         clients(ctx, t); capabilities(ctx, t); integration(ctx, t); predictive(ctx, t); prescriptive(ctx, t); synthesis(ctx, t);
       });
-      if (pan) { const r = rng(Math.floor(t * 3)); ctx.save(); ctx.globalAlpha = .35; for (let k = 0; k < 16; k++) { const y = r() * H, x = r() * W; line(ctx, x, y, x + 400 + r() * 500, y, k % 3 ? 'rgba(255,240,220,.5)' : rgba(C.orange, .6), 2 + r() * 4); } ctx.restore(); }
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
@@ -4322,7 +4346,7 @@ POSTERS[2] = (ctx, w, h, tl) => {
   const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9), BR = sec.brazil_2023_milestone || {};
   const isF = k => /forecast/i.test(k);
   line(ctx, -200, 30, 200, 30, INK, 3);
-  R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else vslab(ctx, x, 30 - hh, 70, hh, 12, mix(C.red, C.orange, i / 2), { lw: 2.5 });
+  R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else fbar(ctx, x, 30 - hh, 70, hh, mix(C.red, C.orange, i / 2), { r: 6 });
     late(ctx, c => { text(c, FMT.usdMM(+v), x + 35, 30 - hh - 18, { size: 17, weight: 900, color: INK, align: 'center' }); text(c, k.replace(/_?forecast/i, '') + (isF(k) ? '*' : ''), x + 35, 50, { size: 18, weight: 900, color: INK, align: 'center' }); }); });
   const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, vp = BR.actuals_2022_usd_millions ? BR.actuals_2023_usd_millions / BR.actuals_2022_usd_millions : null, vb = BR.budget_2023_usd_millions ? BR.actuals_2023_usd_millions / BR.budget_2023_usd_millions : null;
   late(ctx, c => { text(c, 'faturamento anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
@@ -4406,16 +4430,24 @@ const CASEKIT = {
       para(c, label, 0, h * .16, w - 36, { size: 28, weight: 800, color: '#3A332C', align: 'center', lh: 1.1 }); });
     ctx.restore();
   },
-  /** número-manchete com respingo (nítido) */
+  /** número-manchete (v7.11: limpo, sem respingo nem volume — só o número na cor do case e um traço embaixo) */
   headline(ctx, p, x, y, str, label, o = {}) {
     if (p <= 0) return;
-    late(ctx, c => { const s = lerp(2.1, 1, E.outExpo(clamp(p))), size = o.size || 150; c.translate(x, y); c.rotate(o.rot || -.03); c.scale(s, s); c.globalAlpha *= clamp(p * 3);
-      splat(c, 0, -10, size * .85, o.col || C.orange, o.seed || 5, 1, .95);
-      retroText(c, str, 0, 0, { size, weight: 900, color: '#FFF', align: 'center', depth: 8, lw: 6 });
+    late(ctx, c => { const e = E.outCubic(clamp(p)), s = lerp(1.25, 1, e), size = o.size || 150, col = o.col || C.orange; c.translate(x, y); c.scale(s, s); c.globalAlpha *= clamp(p * 3);
+      text(c, str, 0, 0, { size, weight: 900, color: col, align: 'center' });
+      const w = measure(c, str, size, 900) * .5 * e; rr(c, -w / 2, size * .5, w, 8, 4); c.fillStyle = col; c.fill();
       if (label) para(c, label, 0, size * .62, 620, { size: 30, weight: 800, color: '#FFF', align: 'center' }); });
   }
 };
 
+/** maior tamanho de fonte (até `size`) em que `str` cabe em `maxW` */
+const fitSize = (ctx, str, size, maxW, weight = 800) => Math.min(size, size * maxW / Math.max(1, measure(ctx, str, size, weight)));
+/** a imagem do dashboard (case de relatórios): o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque
+ *  pelo real, com o mesmo nome). Usada no popup do case de relatórios e na pilha de painéis do case de agentes. Sem o arquivo: null */
+const DASHIMG = (() => { let src = null, img = null; return () => {
+  const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
+  if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
+DASHIMG();   // começa a carregar a imagem já na abertura da página
 /* ---------- abertura da 04: analytics em ação · os 4 cases ---------- */
 (() => {
   const id = 's04', PATH = [[150, 640], [560, 600], [960, 650], [1360, 600], [1780, 640]], U = [.12, .37, .63, .88];
@@ -4427,9 +4459,6 @@ const CASEKIT = {
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_T - .1, T_T + .9, .6]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .95, center: '#3A2210' });
-      SPACE.field(ctx, t, { alpha: .35, spin: .08 });
-      SPACE.ribbon(ctx, t, { alpha: .5 * P(t, .2, 1.2), cy: 600, amp: .5, width: 34, spin: .1, speed: .6 });
-      skyline(ctx, t, { y: 980, h: 320, seed: 55, col: '#1C1216', lit: .45 });
       const tp = P(t, T_T, .6);
       if (tp > 0) { ctx.save(); ctx.translate(W / 2, 330); const s = lerp(1.6, 1, E.outExpo(tp)); ctx.scale(s, s); paintTitle(ctx, 'ANALYTICS EM AÇÃO', 0, 0, { size: 110, bg: C.orange, seed: 21, p: tp }); ctx.restore(); }
       const lp = E.inOutSine(P(t, T_LINE, 3.4)), run = E.inCubic(P(t, 9.6, 1.6));
@@ -4638,7 +4667,7 @@ const CASEKIT = {
     line(ctx, 250, B0, 1150, B0, '#F3E6D6', 4);
     const y100 = B0 - 100 / max * HMAX; line(ctx, 250, y100, 1150, y100, rgba('#F3E6D6', .5), 3, [12, 10]);
     vals.forEach((v, i) => { const bp = E.outCubic(P(t, T_RES + .2 + i * .35, .7)), h = v / max * HMAX * bp, x = X[i] - 110;
-      vslab(ctx, x, B0 - h, 220, h, 34, i ? C.orange : '#8A8378', { lw: 4 }); if (i) glow(ctx, X[i], B0 - h / 2, 260, C.orange, .25 * bp);
+      fbar(ctx, x, B0 - h, 220, h, i ? C.orange : '#8A8378');
       late(ctx, c => { c.globalAlpha *= clamp(bp * 2); retroText(c, FMT.num(v, 1), X[i] + 10, B0 - h - 50, { size: 64, weight: 900, color: i ? C.yellow : '#FFF', align: 'center', depth: 4, lw: 3 });
         text(c, lab[i], X[i] + 10, B0 + 40, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); });
     late(ctx, c => { text(c, 'base = 100', 1160, y100 - 22, { size: 24, weight: 800, color: '#E9DCC8', align: 'right' });
@@ -4651,8 +4680,6 @@ const CASEKIT = {
     peaks: [[T_DROP - .1, T_DROP + 2, 1], [T_RES - .1, T_RES + 1.4, .7]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1C10' });
-      SPACE.field(ctx, t, { alpha: .28, spin: .05 }); SPACE.floaters(ctx, t, { alpha: .22, n: 10, cy: 420 });
-      skyline(ctx, t, { y: 1000, h: 300, seed: 61, col: '#1A1216', lit: .35, alpha: .8 });
       stores(ctx, t); data(ctx, t); als(ctx, t); solution(ctx, t); result(ctx, t);
       CASEKIT.interstitial(ctx, t, 1, '*Cestas de produtos*', 'Cliente Banana · varejo', C.yellow);
       SAY.draw(ctx, t, SCRIPT, 'dark');
@@ -4664,26 +4691,36 @@ const CASEKIT = {
 (() => {
   const id = 'manga', CS = () => CASE('Cliente Manga'), bt = k => k * 2.2222;
   const T0 = 2.4, T_DATA = 12.6, T_HOW = bt(11), T_KM = T_HOW + 1.8, T_ALS = T_HOW + 4.4, T_EMB = T_HOW + 6.1, T_DROP = bt(16), T_RES = 46.8, T_CONC = 55.6;
-  const CL = 8, R = rng(23), CEN = Array.from({ length: CL }, (_, k) => [Math.cos(k / CL * TAU + .3) * (.55 + .2 * (k % 2)), Math.sin(k / CL * TAU + .3) * (.5 + .15 * (k % 3 === 0))]);
-  const PTS = Array.from({ length: 200 }, (_, i) => { const c = i % CL, g = () => (R() + R() + R() - 1.5) * .18; return { c, sx: R() * 2 - 1, sy: R() * 2 - 1, x: CEN[c][0] + g(), y: CEN[c][1] + g() }; });
-  const C3 = Array.from({ length: CL }, (_, k) => [Math.cos(k / CL * TAU) * .62, (k % 2 ? .38 : -.34) + (k % 3 === 0 ? .12 : 0), Math.sin(k / CL * TAU) * .62]);
-  const P3 = Array.from({ length: 170 }, (_, i) => { const c = i % CL, g = () => (R() + R() + R() - 1.5) * .16; return { c, x: C3[c][0] + g(), y: C3[c][1] + g(), z: C3[c][2] + g() }; });
-  const CCOL = [C.red, C.orange, C.yellow, '#FF8A5C', '#E94F64', '#FFC56E', '#FF6A2A', '#F2B04A'];
+  // v7.11: os clusters em 3D da v5 — cada produto é um vetor; o UMAP leva os vetores para 3D, o K-Means agrupa as famílias,
+  // a distância do cosseno mede a afinidade (alta e baixa) e um associado percorre a trilha até o núcleo de principalidade
+  const T_COS1 = T_ALS, T_COS2 = T_EMB, T_TRAIL = bt(14.5), T_STEP = .3, T_CORE = T_TRAIL + 6 * T_STEP;
   const PROD = ['Cartão de crédito', 'Investimentos', 'Seguro de vida', 'Consórcio', 'Previdência'], ORDER = [2, 0, 4, 1, 3];
-  const PV3 = [[-.25, -.7, .3], [.75, -.2, -.3], [.45, .55, .55], [-.75, .3, -.4], [.05, .7, -.65]];
-  // o associado em destaque fica perto do eixo de giro: continua na tela enquanto os produtos orbitam
-  const HLP = (() => { let best = P3[0], bs = -1e9;
-    P3.forEach(q => { let sc = 0; for (let k = 0; k <= 16; k++) { const t = T_EMB + (T_DROP - .3 - T_EMB) * k / 16, rot = (t - T_ALS) * .42 + .4, tilt = .34 + .05 * Math.sin(t * .4), ca = Math.cos(rot), sa = Math.sin(rot);
-        const x = q.x * 1.7, y = q.y * 1.05, z = q.z * 1.4, X = x * ca + z * sa, Z0 = -x * sa + z * ca, Y = y * Math.cos(tilt) - Z0 * Math.sin(tilt), Z = y * Math.sin(tilt) + Z0 * Math.cos(tilt), f = 2.2 / Math.max(.5, 2.2 + Z);
-        const px = 900 + X * 520 * f, py = 590 + Y * 520 * f; sc += (px > 420 && px < 1160 && py > 300 && py < 780 ? 1 : -2) - Math.hypot(px - 820, py - 540) / 1500; }
-      if (sc > bs) { bs = sc; best = q; } });
-    return best; })();
+  const FAM = [
+    { name: 'Dia a dia', col: C.yellow, ink: true, c: [-1.0, -.25, .25], items: ['Conta digital', 'Conta salário', 'Pix', 'Cartão de débito', 'Cartão de crédito', 'Débito automático', 'Cashback'] },
+    { name: 'Investimentos', col: C.orange, c: [1.0, -.4, -.25], items: ['CDB', 'LCI', 'LCA', 'Tesouro Direto', 'Poupança', 'Fundos', 'Previdência'] },
+    { name: 'Crédito', col: C.red, c: [.25, .85, .55], items: ['Crédito pessoal', 'Consignado', 'Cheque especial', 'Financ. imobiliário', 'Financ. de veículo', 'Consórcio'] },
+    { name: 'Proteção', col: '#E9DCC8', ink: true, c: [-.55, .55, -.95], items: ['Seguro de vida', 'Seguro residencial', 'Seguro cartão', 'Capitalização'] }];
+  // mesmas posições da v5 (semente 606); s0 = posição solta antes do UMAP
+  const EP = (() => { const r = rng(606), g = () => { let s = 0; for (let i = 0; i < 4; i++) s += r(); return (s - 2) / .58; }, out = [];
+    FAM.forEach((f, fi) => f.items.forEach(name => { out.push({ name, fi, col: f.col, p: [f.c[0] + g() * .26, f.c[1] + g() * .22, f.c[2] + g() * .26] }); for (let k = 0; k < 4; k++) r(); }));
+    out.forEach((q, i) => { q.s0 = [(hash(i * 3 + 1) * 2 - 1) * 1.5, (hash(i * 3 + 2) * 2 - 1) * .9, (hash(i * 3 + 3) * 2 - 1) * 1.5]; });
+    return out; })();
+  const byName = n => EP.findIndex(q => q.name === n);
+  const TRAIL = ['Conta digital', 'Pix', 'Cartão de crédito', 'Cashback', 'CDB', 'Previdência'].map(byName), CORE = [.05, -.32, 0];
+  const COS = [[T_COS1, byName('CDB'), byName('LCI'), 'cos θ = 0.94 · alta afinidade'], [T_COS2, byName('Cashback'), byName('Consignado'), 'cos θ = 0.12 · baixa afinidade']];
+  const SX = 830, SY = 575, SS = 420, FX = 1582;
+  /** giro do espaço: mais rápido enquanto os grupos se formam, devagar durante as medidas (fica longe do quadro de texto) */
+  const ang = t => 1.0 + .2 * clamp(t - T_HOW, 0, 4.4) + .07 * Math.max(0, t - T_HOW - 4.4);
+  function proj(p, t) { const a = ang(t), b = .32, x = p[0] * Math.cos(a) - p[2] * Math.sin(a), z = p[0] * Math.sin(a) + p[2] * Math.cos(a);
+    const y = p[1] * Math.cos(b) - z * Math.sin(b), z2 = p[1] * Math.sin(b) + z * Math.cos(b), s = 3.4 / (z2 + 4.4); return { x: SX + x * s * SS, y: SY + y * s * SS, s, z: z2 }; }
   const POPN = FMT.mm(String(dget(CS(), 'analytics_solution.population', '0.092MM')).split(' ')[0]), SUBS = Object.entries(dget(CS(), 'business_results.by_subsegment', {}));
   const HL = FMT.auto(dget(CS(), 'business_results.top3.incremental_gain', '') || '+4 p.p.');
   const HLN = parseFloat(String(HL).replace(',', '.').replace(/[^\d.+-]/g, '')) || 4;
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, T0 - .6, 'whoosh', { dur: .6, v: .3 }); cue(id, T0 + 2.4, 'ding');
   [0, 1, 2, 3].forEach(i => cue(id, T_DATA + 1.6 + i * .8, 'pop', { p: .9 + i * .1, v: .18 })); cue(id, T_HOW, 'chime', { f: 784, up: 7 }); cue(id, T_HOW + .3, 'shimmer', { dur: 2 });
-  for (let k = 0; k < CL; k++) cue(id, T_KM + k * .2, 'ping', { f: 988 * Math.pow(2, (k % 5) * 2 / 12) }); cue(id, T_EMB, 'shimmer', { dur: 2.5 }); cue(id, bt(15), 'riser', { dur: T_DROP - bt(15), v: .25 });
+  cue(id, T_HOW + .5, 'whoosh', { dur: 1.6, v: .35 }); FAM.forEach((_, k) => cue(id, T_KM + .1 + k * .3, 'chime', { f: 1046 + k * 120, up: 4 }));
+  COS.forEach(([t0], k) => cue(id, t0 + .5, 'ping', { f: k ? 988 : 1760 })); TRAIL.forEach((_, k) => cue(id, T_TRAIL + (k + 1) * T_STEP, 'ping', { f: 1046 * Math.pow(2, k * 2 / 12), v: .5 }));
+  cue(id, T_CORE, 'ding'); cue(id, bt(15), 'riser', { dur: T_DROP - bt(15), v: .25 });
   cue(id, T_DROP, 'impact', { size: 1 }); cue(id, T_DROP + .5, 'stab', { i: 2 }); cue(id, T_RES, 'impact', { size: .9 }); cue(id, T_RES + .5, 'ding');
   const SCRIPT = CASEKIT.script(id, 2, 'CASE 2 DE 4 · CLIENTE MANGA · EMISSOR', C.orange, 'Principalidade', [
     [T0, T_DATA, 'OBJETIVO', '*Principalidade* é tornar o banco a *principal escolha* do cliente.', { y: 250 }],
@@ -4719,33 +4756,59 @@ const CASEKIT = {
       late(ctx, c => { c.globalAlpha *= pp; para(c, 'cada associado recebe a *sua* recomendação', x, y + 100, 380, { size: 28, weight: 800, color: '#FFF', align: 'center', lh: 1.15 }); }); }
     ctx.restore();
   }
-  function umap(ctx, t, cx, cy, sc) {
-    const p = E.inOutCubic(P(t, T_HOW + .2, 1.6)), out = P(t, T_ALS - .3, .4); if (t < T_HOW || out >= 1) return;
-    ctx.save(); ctx.globalAlpha *= P(t, T_HOW, .4) * (1 - out);
-    PTS.forEach(q => { const x = cx + lerp(q.sx * 1.3, q.x, p) * sc, y = cy + lerp(q.sy, q.y, p) * sc * .8; if (p > .4) glow(ctx, x, y, 16, CCOL[q.c], .25); circle(ctx, x, y, 6, p > .4 ? CCOL[q.c] : '#BFB3A3'); });
-    const names = dget(CS(), 'analytics_solution.clusters', []) || [];
-    CEN.forEach(([x, y], k) => { const a = P(t, T_KM + k * .2, .3); if (a <= 0) return; const px = cx + x * sc, py = cy + y * sc * .8, s = 13 * E.outBack(a);
-      glow(ctx, px, py, 56, CCOL[k], .5 * a); line(ctx, px - s, py - s, px + s, py + s, '#FFF', 5); line(ctx, px - s, py + s, px + s, py - s, '#FFF', 5);
-      if (k % 2 === 0 && names[k]) late(ctx, c => { c.globalAlpha *= a; c.shadowColor = '#000'; c.shadowBlur = 8; text(c, names[k], px, py + 36, { size: 24, weight: 800, color: '#FFF', align: 'center' }); }); });
-    late(ctx, c => { c.globalAlpha *= p; c.shadowColor = '#000'; c.shadowBlur = 10; text(c, 'UMAP + K-Means: 8 perfis parecidos', cx, cy - sc * .95 + 40, { size: 28, weight: 900, color: C.yellow, align: 'center' }); });
-    ctx.restore();
-  }
-  /** embeddings em 3D, imersivos: clientes e produtos flutuam pela tela toda (sem moldura), com profundidade de campo */
-  function emb3d(ctx, t) {
-    const a = P(t, T_ALS - .2, .7) * (1 - P(t, T_DROP - .3, .4)); if (a <= 0) return;
-    const cx = 900, cy = 590, Rr = 520, rot = (t - T_ALS) * .42 + .4, tilt = .34 + .05 * Math.sin(t * .4), ca = Math.cos(rot), sa = Math.sin(rot), ct = Math.cos(tilt), st = Math.sin(tilt), grow = E.outCubic(P(t, T_ALS - .2, 1.6));
-    const pr = (x, y, z) => { x *= grow * 1.7; y *= grow * 1.05; z *= grow * 1.4; const X = x * ca + z * sa, Z0 = -x * sa + z * ca, Y = y * ct - Z0 * st, Z = y * st + Z0 * ct, f = 2.2 / Math.max(.5, 2.2 + Z); return [cx + X * Rr * f, cy + Y * Rr * f, Z, f]; };
-    ctx.save(); ctx.globalAlpha *= a;
-    const items = P3.map(q => ({ k: 'c', q, p: pr(q.x, q.y, q.z) })).concat(PV3.map((v, i) => ({ k: 'p', i, p: pr(...v) }))); items.sort((A, B) => B.p[2] - A.p[2]);
-    const hl = HLP, hp = pr(hl.x, hl.y, hl.z), near = PV3.map((v, i) => [i, (v[0] - hl.x) ** 2 + (v[1] - hl.y) ** 2 + (v[2] - hl.z) ** 2]).sort((A, B) => A[1] - B[1]).slice(0, 3), la = P(t, T_EMB, .6);
-    if (la > 0) near.forEach(([i], j) => { const q = pr(...PV3[i]); ctx.save(); ctx.globalAlpha *= la; ctx.setLineDash([10, 8]); line(ctx, hp[0], hp[1], q[0], q[1], j ? rgba(C.yellow, .7) : C.yellow, j ? 3 : 5); ctx.restore(); });
-    items.forEach(it => { const [x, y, z, f] = it.p, dof = clamp((f - .6) / 1.1, .1, 1);
-      if (it.k === 'c') { const r = 4.5 * f * f; ctx.globalAlpha = a * (.25 + .75 * dof); if (f > 1.25 && !QUALITY.low) glow(ctx, x, y, r * 6, CCOL[it.q.c], .35 * dof); circle(ctx, x, y, r, CCOL[it.q.c]); }
-      else { ctx.globalAlpha = a; const s = 22 * f; glow(ctx, x, y, s * 3, C.yellow, .35); vslab(ctx, x - s / 2, y - s / 2, s, s, s * .5, C.yellow, { lw: 2.5 }); const nm = PROD[it.i], ty = y - 34 * f, ef = clamp((x - 110) / 150) * clamp((W - 110 - x) / 150) * clamp((ty - 170) / 90) * clamp((H - 80 - ty) / 90) * (x < 1060 ? clamp((850 - ty) / 60) : 1);
-        if (ef > 0) late(ctx, c => { c.globalAlpha *= ef; tag(c, x, ty, nm, { size: 22 }); }); } });
-    ctx.globalAlpha = a; if (la > 0) { circle(ctx, hp[0], hp[1], 16, null, '#FFF', 3); late(ctx, c => { c.globalAlpha *= la; tag(c, hp[0], hp[1] + 42, 'um associado', { size: 22, fill: '#FFF' }); }); }
-    late(ctx, c => { c.globalAlpha *= a; c.shadowColor = '#000'; c.shadowBlur = 12; text(c, 'embeddings = representações numéricas · perto = afinidade', LAY.x, 900, { size: 28, weight: 900, color: C.yellow });
-      text(c, 'projeção ilustrativa em 3D', LAY.x, 942, { size: 24, weight: 700, color: '#E9DCC8' }); });
+  /** o espaço dos embeddings (da v5): pontos soltos → UMAP (3D) → K-Means (famílias) → cos θ → trilha de um associado → núcleo */
+  function space3d(ctx, t) {
+    const A = P(t, T_HOW - .1, .6) * (1 - P(t, T_DROP - .3, .4)); if (A <= 0) return;
+    ctx.save(); ctx.globalAlpha *= A;
+    const o = proj([0, 0, 0], t), ax = P(t, T_HOW + .8, .8);
+    if (ax > 0) { [[1.4, 0, 0, 'dim 1'], [0, -1.1, 0, 'dim 2'], [0, 0, 1.4, 'dim 3']].forEach(([a, b, c, lb]) => { const e = proj([a * ax, b * ax, c * ax], t);
+        line(ctx, o.x, o.y, e.x, e.y, rgba(C.cream, .22), 2); late(ctx, cc => text(cc, lb, e.x + 10, e.y, { size: 20, weight: 700, mono: true, color: '#BFB3A3', alpha: ax })); });
+      late(ctx, cc => text(cc, '… dim 128', W - 80, H - 96, { size: 22, weight: 700, mono: true, color: '#BFB3A3', align: 'right', alpha: ax })); }
+    // K-Means: halo e nome de cada família
+    const cl = P(t, T_KM, 1.2);
+    if (cl > 0) FAM.forEach((f, k) => { const q = proj(f.c, t); glow(ctx, q.x, q.y, 280 * q.s, f.col, .3 * cl);
+      const la = P(t, T_KM + .1 + k * .3, .4); if (la > 0) late(ctx, cc => { cc.globalAlpha *= la; const s = E.outBack(la); cc.translate(q.x, q.y - 140 * q.s); cc.scale(s, s); tag(cc, 0, 0, f.name, { size: 26, fill: f.col, color: f.ink ? INK : '#FFF' }); }); });
+    // produtos: soltos → UMAP → no lugar; nomes com a profundidade (os de trás mais apagados)
+    const hi = EP.map(() => 0); COS.forEach(([t0, a, b]) => { const v = win(t, t0, t0 + 1.95, .45, .4); hi[a] = Math.max(hi[a], v); hi[b] = Math.max(hi[b], v); });
+    const pts = EP.map((q, i) => { const c = E.inOutCubic(P(t, T_HOW + .5 + (i % 7) * .06, 1.5)), pp = [0, 1, 2].map(k => lerp(q.s0[k], q.p[k], c)); return { q, i, c, pr: proj(pp, t), pop: E.outBack(P(t, T_HOW + i * .025, .35)) }; });
+    pts.slice().sort((A2, B2) => B2.pr.z - A2.pr.z).forEach(({ q, i, c, pr, pop }) => { if (pop <= 0) return;
+      const col = c < 1 ? mix('#BFB3A3', q.col, c) : q.col, sz = 11.5 * pr.s * pop, al = clamp(.4 + (pr.s - .55) * 1.4);
+      glow(ctx, pr.x, pr.y, sz * 4, col, .45 * al); circle(ctx, pr.x, pr.y, sz, rgba(col, Math.max(al, .55)));
+      const lx = pr.x + sz + 8, ly = pr.y - sz - 4, lw = measure(ctx, q.name, 18, 700), la = P(t, T_KM + .4 + (i % 7) * .08, .5) * Math.max(al, hi[i]);
+      const ef = clamp((W - 50 - lx - lw) / 60) * clamp((ly - 200) / 60) * clamp((1000 - ly) / 40) * (lx + lw > 1170 && ly < 470 ? 0 : 1);
+      if (la * ef > .01) late(ctx, cc => { const h = hi[i]; cc.globalAlpha *= la * ef;   // o par medido pelo cos θ ganha etiqueta
+        if (h > 0) { cc.save(); cc.globalAlpha *= h; tag(cc, lx + lw / 2 + 6, ly, q.name, { size: 20, fill: '#FFF' }); cc.restore(); }
+        if (h < 1) { cc.globalAlpha *= 1 - h; cc.shadowColor = '#000'; cc.shadowBlur = 6; text(cc, q.name, lx, ly, { size: 18, weight: 700, color: '#F3E6D6' }); } });
+    });
+    // cos θ: alta afinidade (mesma família) e baixa (famílias distantes)
+    COS.forEach(([t0, a, b, label]) => { const v = win(t, t0, t0 + 1.95, .45, .4); if (v <= 0) return; const pa = pts[a].pr, pb = pts[b].pr, k = P(t, t0, .5, E.outCubic);
+      [pa, pb].forEach(pp => line(ctx, o.x, o.y, lerp(o.x, pp.x, k), lerp(o.y, pp.y, k), rgba(C.cream, .85 * v), 3));
+      const a1 = Math.atan2(pa.y - o.y, pa.x - o.x); let d = Math.atan2(pb.y - o.y, pb.x - o.x) - a1; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU;
+      ctx.beginPath(); ctx.arc(o.x, o.y, 70, a1, a1 + d * P(t, t0 + .3, .4), d < 0); ctx.strokeStyle = rgba(C.yellow, v); ctx.lineWidth = 4; ctx.stroke(); circle(ctx, o.x, o.y, 6, rgba(C.cream, v));
+      late(ctx, cc => { cc.globalAlpha *= v; tag(cc, o.x, o.y + 92, label, { size: 24, fill: '#1E1712', stroke: C.yellow, color: C.yellow }); }); });
+    // trilha de um associado pelos produtos → núcleo de principalidade
+    if (t > T_TRAIL) {
+      const nodes = TRAIL.map(i => pts[i].pr).concat([proj(CORE, t)]), prog = (t - T_TRAIL) / T_STEP, seg = Math.floor(prog);
+      ctx.save(); ctx.beginPath(); nodes.forEach((n, k) => { if (k <= prog) ctx.lineTo(n.x, n.y); });
+      if (seg < nodes.length - 1) { const f = prog - seg; ctx.lineTo(lerp(nodes[seg].x, nodes[seg + 1].x, f), lerp(nodes[seg].y, nodes[seg + 1].y, f)); }
+      ctx.strokeStyle = rgba(C.orange, .95); ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore();
+      nodes.forEach((n, k) => { if (k < prog && k < nodes.length - 1) circle(ctx, n.x, n.y, 12, null, C.orange, 3); });
+      const hk = Math.min(prog, nodes.length - 1), hs = Math.floor(hk), hf = hk - hs, hx = hs < nodes.length - 1 ? lerp(nodes[hs].x, nodes[hs + 1].x, hf) : nodes[hs].x, hy = hs < nodes.length - 1 ? lerp(nodes[hs].y, nodes[hs + 1].y, hf) : nodes[hs].y;
+      glow(ctx, hx, hy, 60, '#FFF', .8); circle(ctx, hx, hy, 16, C.cream); icon(ctx, 'user', hx, hy, 20, C.ink, 9);
+      const ua = win(t, T_TRAIL, T_CORE - .2, .3, .3); if (ua > 0) late(ctx, cc => { cc.globalAlpha *= ua; tag(cc, hx, hy - 44, 'um associado', { size: 22, fill: '#FFF' }); });
+    }
+    const cp = P(t, T_CORE, .6);
+    if (cp > 0) { const q = proj(CORE, t), pu = (t * 1.2) % 1; glow(ctx, q.x, q.y, 220 * cp, C.orange, .8); circle(ctx, q.x, q.y, 18 * E.outBack(cp), '#FFF2E0');
+      circle(ctx, q.x, q.y, 30 + pu * 90, null, rgba(C.orange, (1 - pu) * cp), 3);
+      late(ctx, cc => { cc.globalAlpha *= cp; const s = E.outBack(cp); cc.translate(q.x, q.y + 74); cc.scale(s, s); tag(cc, 0, 0, 'núcleo de principalidade', { size: 26, fill: C.orange, color: '#FFF' }); }); }
+    // a coluna técnica (embaixo do quadro de texto): vetor → UMAP → K-Means → distância do cosseno → proximidade = afinidade
+    late(ctx, cc => {
+      formula(cc, 'e = f(produto) ∈ ℝ¹²⁸', FX, 548, { size: 20, rot: .02, seed: 8, scale: E.outBack(P(t, T_HOW + .5, .4)) });
+      formula(cc, 'UMAP · 128D → 3D', FX, 628, { neon: true, size: 20, alpha: P(t, T_HOW + 1.2, .4) });
+      formula(cc, 'K-Means · k = 4', FX, 700, { neon: true, size: 20, alpha: P(t, T_KM + .3, .4) });
+      formula(cc, 'd_cos(a,b) = 1 − a·b / (‖a‖ ‖b‖)', FX, 784, { neon: true, size: 20, color: C.yellow, alpha: P(t, T_COS1 + .3, .4) });
+      if (t > T_KM + .6) kinetic(cc, 'proximidade = *afinidade*', FX, 884, t - T_KM - .6, { size: 46, color: '#FFF', accent: C.orange });
+    });
     ctx.restore();
   }
   /** ANTES (só afinidade) × DEPOIS (critérios combinados): os produtos mudam de posição */
@@ -4778,7 +4841,7 @@ const CASEKIT = {
     line(ctx, X0 - 30, B0, X0 + DX * bars.length, B0, '#F3E6D6', 5); line(ctx, X0 - 30, B0, X0 - 30, y(top), '#F3E6D6', 3);
     for (let v = 0; v <= top; v += 2) { line(ctx, X0 - 42, y(v), X0 - 30, y(v), '#F3E6D6', 3); late(ctx, c => text(c, (v ? '+' : '') + v, X0 - 50, y(v), { size: 26, weight: 800, color: '#F3E6D6', align: 'right' })); }
     bars.forEach(([k, v, main], i) => { const bp = E.outCubic(P(t, T_RES + .2 + i * .2, .6)), x = X0 + i * DX, h = (B0 - y(v)) * bp;
-      vslab(ctx, x, B0 - h, 110, h, 22, main ? C.orange : '#C98A4A', { lw: 3.5 }); if (main) glow(ctx, x + 55, B0 - h / 2, 200, C.orange, .25 * bp);
+      fbar(ctx, x, B0 - h, 110, h, main ? C.orange : '#C98A4A');
       late(ctx, c => { c.globalAlpha *= clamp(bp * 2); text(c, '+' + FMT.num(v, 1), x + 60, B0 - h - 30, { size: 30, weight: 900, color: main ? C.yellow : '#FFF', align: 'center' }); text(c, k, x + 60, B0 + 36, { size: main ? 26 : 26, weight: 900, color: main ? C.yellow : '#FFF', align: 'center' }); }); });
     late(ctx, c => { text(c, 'p.p. de principalidade', X0 - 30, y(top) - 36, { size: 26, weight: 900, mono: true, color: C.yellow });
       text(c, 'controle = 0', X0 + DX * bars.length - 10, B0 - 24, { size: 24, weight: 800, color: '#E9DCC8', align: 'right' }); });
@@ -4791,10 +4854,7 @@ const CASEKIT = {
     peaks: [[T_DROP - .1, T_DROP + 2, 1], [T_RES - .1, T_RES + 1.4, .7]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0E' });
-      const emb = P(t, T_ALS - .4, .6) * (1 - P(t, T_DROP - .3, .5));
-      SPACE.field(ctx, t, { alpha: .28 * (1 - emb), spin: .05 }); SPACE.floaters(ctx, t, { alpha: .2 * (1 - emb), n: 10, cy: 420 });
-      skyline(ctx, t, { y: 1000, h: 300, seed: 71, col: '#1A1216', lit: .35, alpha: .8 * (1 - .7 * emb) });
-      wallet(ctx, t); data(ctx, t); umap(ctx, t, 760, 620, 420); emb3d(ctx, t); rankings(ctx, t); result(ctx, t);
+      wallet(ctx, t); data(ctx, t); space3d(ctx, t); rankings(ctx, t); result(ctx, t);
       CASEKIT.interstitial(ctx, t, 2, '*Principalidade*', 'Cliente Manga · emissor', C.orange);
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
@@ -4995,10 +5055,7 @@ const CASEKIT = {
   }
   /** a imagem do dashboard: o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque pelo real,
    *  com o mesmo nome). Sem o arquivo (ou com o campo vazio), o popup mostra o dashboard desenhado, marcado como ilustrativo */
-  const DASH = (() => { let src = null, img = null; return () => {
-    const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
-    if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
-  DASH();   // começa a carregar a imagem já na abertura da página
+  const DASH = DASHIMG;
   /** com a rotina automatizada, o relatório que vai ao board abre numa janela (popup) que sai do monitor e volta para ele */
   function dashPopup(ctx, t) {
     const op = E.outBack(P(t, T_DASH, .55)), cl = E.inCubic(P(t, T_NEXT - .55, .45)), a = P(t, T_DASH, .25) * (1 - cl); if (a <= 0) return;
@@ -5037,7 +5094,6 @@ const CASEKIT = {
         const fl = ctx.createLinearGradient(0, FLOOR, 0, H + 200); fl.addColorStop(0, '#8A5A3A'); fl.addColorStop(1, '#4A2E1E'); ctx.fillStyle = fl; ctx.fillRect(-400, FLOOR, W + 800, H - FLOOR + 400);
         for (let k = 0; k < 12; k++) line(ctx, -400, FLOOR + 12 + k * 22, W + 400, FLOOR + 12 + k * 22, 'rgba(40,20,10,.35)', 2);
         windowView(ctx, t); clock(ctx, t, 1560, 500);
-        atmos(ctx, t, { alpha: .55 * (1 - dark), from: 120, bokeh: 2, dust: 26 });
         if (t < T_PARTY - .4) chair(ctx, SEAT, FLOOR - 6, 0, 0);
         desk(ctx, t); monitor(ctx, t);
         if (dark > 0) { ctx.save(); ctx.globalAlpha = dark * .96; ctx.fillStyle = '#05060E'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.restore(); glow(ctx, 200, 400, 300, '#5A6AA0', .14 * dark); if (lit > 0) glow(ctx, MON.x, MON.y, 200, '#7FA8FF', .12 * lit); }
@@ -5063,13 +5119,15 @@ const CASEKIT = {
   const T0 = 3.4, T_GEN = 11.8, T_LOOP = 18.6, T_QUAL = 27.6, T_DROP = bt(16), T_SIT = bt(21);   // o crescendo da música começa com a cena
   const PL = dget(CS(), 'business_results.pipeline', {}), N_ACQ = PL.acquirers || 30, N_ACT = PL.active_relationships || 0, N_OPP = PL.to_conquer != null ? PL.to_conquer : Math.max(0, N_ACQ - N_ACT);
   const SOL = dget(CS(), 'analytics_solution.innovation_2', {}), GR = dget(CS(), 'analytics_solution.guardrails', ['Regex', 'BERT']);
-  // exemplos ilustrativos (edite aqui): o mesmo fato em três versões e uma revisão típica
-  const EX = { fact: 'o mesmo fato: queda de share no Sul',
-    versions: [['Analista', 'analista', 'Share caiu 2,1 p.p. no Sul vs. o mês anterior, puxado por débito.'], ['Business', 'business', 'Sul perdeu share em débito: priorizar ação comercial.'], ['C-Level', 'clevel', 'Queda de share no Sul; ação proposta em débito.']],
-    draft: 'Share caiu no Sul.', why: 'falta o período de comparação', fixed: 'Share caiu 2,1 p.p. no Sul vs. o mês anterior.' };
-  const LOOPN = { gen: [330, 600], ev: [740, 600], fix: [740, 850], ok: [1130, 600] };
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, .3, 'impact', { size: .7 }); cue(id, T0 + 1, 'type', { n: 16, gap: .06 });
-  EX.versions.forEach((_, i) => cue(id, T_GEN + 1.2 + i * 1.3, 'type', { n: 10, gap: .04 })); cue(id, T_LOOP, 'chime', { f: 784, up: 7 }); cue(id, T_LOOP + 2.6, 'buzz'); cue(id, T_LOOP + 4.8, 'type', { n: 10, gap: .05 }); cue(id, T_LOOP + 6.6, 'ding');
+  // v7.11: GERAR → AVALIAR E CORRIGIR com a animação da v5 (geradores → Validador reprova → refazer → v2 → aprova → Embalador → destaque)
+  const T_G = [12.4, 12.8, 13.2], T_SCAN = 13.6, T_DR = [14.4, 15.2, 16.0], T_TOVAL = 18.8, T_NO = 19.6, T_BACK = 20.0, T_DR2 = 21.6, T_TOVAL2 = 22.6,
+    T_OK = 23.4, T_TOPACK = 23.8, T_WRAP = 24.5, T_REP = 24.9, T_DSH = 25.8;
+  T_G.forEach((t0, i) => { cue(id, t0 - .25, 'whoosh', { dur: .25, dir: 'down', v: .2 }); cue(id, t0, 'pop', { p: .7 + i * .15, v: .3 }); });
+  [0, 1, 2].forEach(i => cue(id, T_SCAN + i * .35, 'ping', { f: 1400 + i * 200 })); T_DR.forEach(t0 => cue(id, t0, 'type', { n: 10 }));
+  cue(id, T_TOVAL, 'whoosh', { dur: .6, v: .3 }); cue(id, T_NO, 'buzz'); cue(id, T_BACK, 'whoosh', { dur: .6, dir: 'down', v: .25 });
+  cue(id, T_DR2, 'type', { n: 8, gap: .04 }); cue(id, T_TOVAL2, 'whoosh', { dur: .5, v: .3 }); cue(id, T_OK, 'chime', { f: 1175, up: 7 });
+  cue(id, T_WRAP, 'pop', { p: 1.5 }); cue(id, T_REP, 'whoosh', { dur: .7, v: .4 }); cue(id, T_REP + .75, 'ding'); cue(id, T_DSH, 'whoosh', { dur: .7, v: .35 }); cue(id, T_DSH + .75, 'ding', { f: 1568 });
   [0, 1, 2].forEach(i => cue(id, T_QUAL + 1 + i * 1.2, 'pop', { p: 1 + i * .1, v: .2 })); cue(id, T_QUAL + 5.0, 'shimmer', { dur: 1.5 }); cue(id, T_DROP - 5, 'riser', { dur: 5, v: .25 });
   cue(id, T_DROP, 'impact', { size: 1.2 }); for (let k = 0; k < 10; k++) cue(id, T_DROP + .4 + k * .25, 'pop', { p: 1 + k * .05, v: .1 }); cue(id, T_SIT, 'impact', { size: .8 });
   const SCRIPT = CASEKIT.script(id, 4, 'CASE 4 DE 4 · INSIGHT AGENT · ADQUIRENTES', C.red, 'Agentes de IA para insights', [
@@ -5094,40 +5152,96 @@ const CASEKIT = {
     late(ctx, c => { c.shadowColor = '#000'; c.shadowBlur = 10; text(c, `páginas na fila: ${n * 25}`, 1480, 940, { size: 30, weight: 900, color: '#FFF', align: 'center' }); });
     ctx.restore();
   }
-  function generators(ctx, t) {
-    const a = P(t, T_GEN - .2, .5) * (1 - P(t, T_LOOP - .3, .4)); if (a <= 0) return;
-    ctx.save(); ctx.globalAlpha *= a;
-    late(ctx, c => { c.globalAlpha *= P(t, T_GEN + .2, .4); tag(c, 760, 380, EX.fact, { size: 28, fill: C.yellow }); });
-    EX.versions.forEach(([lab, role, txt], i) => { const x = 330 + i * 430, p = E.outBack(P(t, T_GEN + .3 + i * .3, .45)); if (p <= 0) return;
-      line(ctx, 760, 410, x, 500, rgba('#FFE9D6', .35), 3, [8, 8]);
-      agent(ctx, x, 560, 60 * p, { role, t: t + i, seed: i, look: Math.sin(t * 2 + i) });
-      const cp = P(t, T_GEN + 1.2 + i * 1.3, .5); if (cp > 0) { ctx.save(); ctx.translate(x, 790 + (1 - E.outBack(cp)) * 40); ctx.rotate([-.02, .015, -.01][i]); paper(ctx, -195, -96, 390, 192, { r: 12, fill: '#FFFDF8', shadow: 8, shadowColor: '#000', lw: 3 }); ctx.restore(); }
-      late(ctx, c => { c.globalAlpha *= clamp(p); text(c, lab, x, 650, { size: 30, weight: 900, color: '#FFF', align: 'center' });
-        if (cp > 0) { c.globalAlpha *= cp; c.translate(x, 790); tag(c, -80, -96, 'para: ' + lab, { size: 22, fill: [C.yellow, C.red, '#3A3532'][i], color: i ? '#FFF' : INK }); para(c, txt, -170, -54, 340, { size: 26, weight: 800, color: INK, lh: 1.18 }); } }); });
-    late(ctx, c => { c.globalAlpha *= P(t, T_GEN + 5, .5); text(c, 'exemplos ilustrativos', 1290, 940, { size: 22, weight: 700, mono: true, color: '#BFB3A3', align: 'right' }); });
+  // ---- palco da v5: relatório (em cima) e a pilha de painéis gerados pela automação (embaixo, à esquerda) ----
+  const REP = { x: 70, y: 262, w: 470, h: 250 }, DSH = { x: 70, y: 600, w: 470, h: 290 };
+  const GX = 660, GY = [330, 520, 710], CX = 730, CW = 420, CH = 116, VX = 1330, VY = 560, PX = 1650, PY = 690;
+  // exemplos ilustrativos (edite aqui): o primeiro rascunho de cada gerador, a revisão e o título aprovado
+  const AGX = [
+    { role: 'analista', name: 'Analista', v1: 'Fraude subiu no e-commerce.', v2: 'Fraude no e-commerce +18% vs. o mês anterior, em 3 MCCs.' },
+    { role: 'business', name: 'Business', v1: 'E-commerce com mais fraude.', v2: 'E-commerce +18% em 3 MCCs: revisar as regras de fraude.' },
+    { role: 'clevel', name: 'C-Level', v1: 'Atenção à fraude no e-commerce.', v2: 'Fraude +18% no e-commerce: regras de 3 MCCs em revisão.' }];
+  const WHY = 'reprovado: sem período de comparação', SHORT = 'E-commerce +18% em 3 MCCs → revisar regras';
+  /** rascunho de um gerador (v5): papel com a cor do papel do agente, etiqueta e texto sendo digitado */
+  function draft(ctx, x, y, role, txt, p, o = {}) {
+    if (p <= 0) return; const s = o.scale == null ? 1 : o.scale;
+    ctx.save(); ctx.globalAlpha *= (o.alpha == null ? 1 : o.alpha) * clamp(p * 4); ctx.translate(x, y); ctx.scale(s, s);
+    paper(ctx, 0, -CH / 2, CW, CH, { r: 12, fill: '#FFFDF8', shadow: 6, shadowColor: '#000', outline: o.ok ? C.orange : INK, lw: o.ok ? 4 : 2.5 });
+    ctx.save(); rr(ctx, 0, -CH / 2, CW, CH, 12); ctx.clip(); ctx.fillStyle = role === 'validador' ? C.orange : AGENT_STYLE[role].body; ctx.fillRect(0, -CH / 2, 10, CH); ctx.restore();
+    if (s > .5) late(ctx, c => { text(c, (o.tag || AGENT_STYLE[role].label).toUpperCase(), 26, -CH / 2 + 22, { size: 16, weight: 800, mono: true, color: '#6A6056', ls: 1.5 });
+      para(c, txt.slice(0, Math.ceil(txt.length * clamp(p * 1.25))), 26, -CH / 2 + 38, CW - 44, { size: 22, weight: 800, color: INK, lh: 1.16 }); });
     ctx.restore();
   }
-  /** gerar → avaliar → (reprovado) corrigir → avaliar de novo → aprovado */
-  function loop(ctx, t) {
-    const a = P(t, T_LOOP - .2, .5) * (1 - P(t, T_QUAL - .3, .4)); if (a <= 0) return;
-    const lt = t - T_LOOP, N = LOOPN; ctx.save(); ctx.globalAlpha *= a;
-    const seg = (pts, t0, d, col, w) => { const p = E.inOutSine(clamp((lt - t0) / d)); LINE.draw(ctx, pts, p, { w, col, head: p > 0 && p < 1 }); };
-    seg([N.gen, N.ev], .3, 1.2, C.orange, 16);
-    seg([N.ev, [N.ev[0] + 40, 720], N.fix], 2.8, 1, C.red, 12);
-    seg([N.fix, [N.ev[0] - 120, 760], [N.ev[0] - 70, 650], N.ev], 5.4, 1.3, C.yellow, 12);
-    seg([N.ev, N.ok], 7.8, 1, C.orange, 16);
-    [['gerar', N.gen, 'ai', 0], ['avaliar', N.ev, 'check', .9], ['corrigir', N.fix, 'gear', 2.8], ['aprovado', N.ok, 'spark', 6.6]].forEach(([l, [x, y], ic, t0]) => { const p = E.outBack(P(t, T_LOOP + t0, .45)); if (p <= 0) return;
-      ctx.save(); ctx.translate(x, y); ctx.scale(p, p); circle(ctx, 0, 0, 52, l === 'aprovado' ? C.yellow : '#FFF8EE', INK, 6); icon(ctx, ic, 0, 0, 56, INK, 7); ctx.restore();
-      late(ctx, c => { c.globalAlpha *= clamp(p); c.shadowColor = '#000'; c.shadowBlur = 10; text(c, l, x, y - 82, { size: 32, weight: 900, color: '#FFF', align: 'center' }); }); });
-    late(ctx, c => { c.globalAlpha *= P(t, T_LOOP + 2.5, .4); text(c, 'reprovado', N.ev[0] + 70, 730, { size: 26, weight: 900, color: '#FF8A7A' }); c.globalAlpha = a * P(t, T_LOOP + 4.3, .4); text(c, 'avaliar de novo', N.ev[0] - 240, 820, { size: 26, weight: 900, color: C.yellow, align: 'center' }); });
-    // o exemplo da revisão
-    const ex = P(t, T_LOOP + .6, .5); if (ex > 0) hud(ctx, c => { c.translate(1290, 470); panel(c, 0, 0, 540, 470, { dark: true, accent: C.yellow });
-      text(c, 'EXEMPLO DE REVISÃO', 40, 44, { size: 21, weight: 900, mono: true, color: C.yellow, ls: 3 });
-      const s1 = P(t, T_LOOP + 1, .4), s2 = P(t, T_LOOP + 2.6, .4), s3 = P(t, T_LOOP + 4.8, .4), s4 = P(t, T_LOOP + 6.6, .4);
-      c.globalAlpha *= s1; para(c, `“${EX.draft}”`, 40, 76, 460, { size: 30, weight: 800, color: '#FFF' });
-      c.globalAlpha = a * ex * s2; tag(c, 210, 170, 'reprovado: ' + EX.why, { size: 22, fill: C.red, color: '#FFF' });
-      c.globalAlpha = a * ex * s3; para(c, `“${EX.fixed}”`, 40, 222, 460, { size: 30, weight: 800, color: '#FFF', accent: C.yellow });
-      c.globalAlpha = a * ex * s4; tag(c, 150, 410, 'aprovado na reavaliação ✓', { size: 24, fill: C.yellow }); }, a);
+  /** o relatório que vai ao board: o espaço DESTAQUE espera o insight (v5) */
+  function miniReport(ctx, t, head) {
+    const R = REP; paper(ctx, R.x, R.y, R.w, R.h, { r: 12, fill: '#FFFDF8', shadow: 7, shadowColor: '#000', lw: 3 });
+    rr(ctx, R.x + 14, R.y + 14, R.w - 28, 42, 9);
+    if (head > 0) { ctx.fillStyle = C.orange; ctx.fill(); } else { ctx.save(); ctx.setLineDash([7, 6]); ctx.strokeStyle = C.orange; ctx.lineWidth = 2.5; ctx.stroke(); ctx.restore(); }
+    ['0,08%', '−12%', '3 alertas'].forEach((v, i) => { const bx = R.x + 18 + i * (R.w - 36) / 3; rr(ctx, bx, R.y + 104, (R.w - 36) / 3 - 12, 52, 7); ctx.fillStyle = '#F3EEE7'; ctx.fill(); });
+    ctx.beginPath(); for (let k = 0; k < 10; k++) ctx.lineTo(R.x + 26 + k * (R.w - 52) / 9, R.y + R.h - 30 - Math.sin(k * .9) * 16 - (k > 6 ? 24 : 0)); ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.stroke();
+    late(ctx, c => {
+      if (head > 0) text(c, SHORT.slice(0, Math.ceil(SHORT.length * clamp(head * 1.2))), R.x + 28, R.y + 36, { size: fitSize(c, SHORT, 19, R.w - 60), weight: 800, color: '#FFF' });
+      else text(c, 'DESTAQUE: ?', R.x + 28, R.y + 36, { size: 19, weight: 800, mono: true, color: C.orange, alpha: .6 + .4 * Math.sin(t * 7) });
+      text(c, 'REPORT DE FRAUDE · BOARD', R.x + 18, R.y + 80, { size: 16, weight: 800, mono: true, color: '#6A6056', ls: 1.5 });
+      ['0,08%', '−12%', '3 alertas'].forEach((v, i) => { const bx = R.x + 18 + i * (R.w - 36) / 3; text(c, v, bx + 12, R.y + 131, { size: 21, weight: 900, color: INK }); }); });
+  }
+  /** a pilha de painéis gerados automaticamente (a imagem do case de relatórios); a faixa do insight entra no painel da frente */
+  function panels(ctx, t, banner) {
+    const img = DASHIMG(), n = Math.min(5, 1 + Math.floor(Math.max(0, t - T_GEN - .3) / .22)), D = DSH;
+    for (let k = n - 1; k >= 0; k--) { const a = k === 0 ? E.outBack(P(t, T_GEN + .3, .4)) : 1, x = D.x + k * 16, y = D.y - k * 16;
+      ctx.save(); ctx.translate(x + D.w / 2, y + D.h / 2); ctx.scale(a, a); ctx.translate(-D.w / 2, -D.h / 2);
+      paper(ctx, 0, 0, D.w, D.h, { r: 10, fill: '#FFFFFF', shadow: 6, shadowColor: '#000', lw: 2.5 });
+      if (img) { const s = Math.min((D.w - 16) / img.naturalWidth, (D.h - 16) / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s; ctx.drawImage(img, (D.w - w) / 2, (D.h - h) / 2, w, h); }
+      else dashboard(ctx, 8, 8, D.w - 16, D.h - 16, { t, seed: 3 + k, mini: true });
+      if (k === 0 && banner > 0) { rr(ctx, 8, 10, (D.w - 16) * clamp(banner * 1.4), 44, 8); ctx.fillStyle = C.orange; ctx.fill(); }
+      ctx.restore(); }
+    const cnt = Math.floor(clamp((t - T_GEN - .3) / 12) * 240) + n;
+    late(ctx, c => { tag(c, D.x + D.w - 120, D.y + D.h + 30, `painéis gerados: ${cnt}`, { size: 20, fill: C.yellow });
+      if (banner > 0) { c.globalAlpha *= clamp(banner * 2); text(c, SHORT, D.x + 22, D.y + 32, { size: fitSize(c, SHORT, 18, D.w - 44), weight: 800, color: '#FFF' }); } });
+  }
+  function stage(ctx, t) {
+    const a = P(t, T_GEN - .2, .5) * (1 - P(t, T_QUAL - .3, .4)); if (a <= 0) return;
+    ctx.save(); ctx.globalAlpha *= a;
+    const head = P(t, T_REP + .75, .9), banner = P(t, T_DSH + .75, .6);
+    miniReport(ctx, t, head); panels(ctx, t, banner);
+    late(ctx, c => { [[REP, 'relatório', C.red, '#FFF'], [DSH, 'painéis', C.yellow, INK]].forEach(([R, lb, f, col], k) => { c.save(); c.translate(R.x + R.w - 60, R.y - (k ? 70 : 8)); c.rotate(.04); tag(c, 0, 0, lb, { size: 20, fill: f, color: col }); c.restore(); }); });
+    // "refazer": a seta tracejada vermelha volta do Validador para os geradores (por baixo dos rascunhos)
+    const loopP = P(t, T_NO + .2, .6, E.inOutCubic) * (1 - P(t, T_DR2, .4));
+    if (loopP > 0) { ctx.save(); ctx.beginPath(); ctx.moveTo(VX - 30, VY + 86); ctx.bezierCurveTo(VX - 80, 960, GX + 220, 975, GX + 8, GY[2] + 80);
+      ctx.setLineDash([14, 11]); ctx.lineDashOffset = -t * 60; ctx.strokeStyle = rgba(C.red, loopP); ctx.lineWidth = 5; ctx.stroke(); ctx.restore();
+      arrowHead(ctx, GX + 8, GY[2] + 76, -Math.PI * .58, 22, rgba(C.red, loopP));
+      late(ctx, c => { c.globalAlpha *= loopP; c.translate(1010, 942); c.rotate(-.03); tag(c, 0, 0, 'refazer', { size: 28, fill: C.red, color: '#FFF' }); }); }
+    if (t > T_G[2]) { const ca = P(t, T_G[2], .5) * .6; GY.forEach(gy => line(ctx, CX + CW + 8, gy, VX - 66, VY, rgba(C.cream, ca * .4), 2, [4, 8])); line(ctx, VX + 66, VY, PX - 56, PY, rgba(C.orange, ca), 3, [4, 8]); }
+    // os três geradores caem no palco, leem o relatório e os painéis (feixes) e escrevem
+    AGX.forEach((g, i) => { const p = P(t, T_G[i] - .25, .25, E.inQuad); if (p <= 0) return;
+      const land = P(t, T_G[i], .35), sq = land < 1 ? Math.sin(land * Math.PI) * (1 - land) * 1.6 : 0, y = lerp(GY[i] - 380, GY[i], p);
+      const scanning = t > T_SCAN + i * .35 && t < T_TOVAL, think = t > T_BACK + .4 && t < T_DR2;
+      if (scanning) { const tg = [[REP.x + REP.w, REP.y + 120], [DSH.x + DSH.w, DSH.y + 130], [REP.x + REP.w, REP.y + 40]][i], bp = P(t, T_SCAN + i * .35, .3), col = i === 2 ? C.cream : AGENT_STYLE[g.role].body;
+        ctx.save(); const gr = ctx.createLinearGradient(GX, y, tg[0], tg[1]); gr.addColorStop(0, rgba(col, 0)); gr.addColorStop(1, rgba(col, .3 * bp)); ctx.beginPath(); ctx.moveTo(GX - 34, y - 10); ctx.lineTo(tg[0], tg[1] - 34); ctx.lineTo(tg[0], tg[1] + 34); ctx.lineTo(GX - 34, y + 10); ctx.closePath(); ctx.fillStyle = gr; ctx.fill(); ctx.restore(); }
+      agent(ctx, GX, y, 44, { role: g.role, t: t + i, seed: i, squash: sq, look: scanning ? -1 : 0, think, theme: 'dark' });
+      late(ctx, c => { c.globalAlpha *= clamp(p); text(c, g.name, GX, y + 76, { size: 22, weight: 900, color: '#FFF', align: 'center' }); }); });
+    // rascunhos: vão ao Validador; reprovados voltam (pontos vermelhos); saem as versões 2
+    AGX.forEach((g, i) => { const go1 = P(t, T_TOVAL + i * .08, .6, E.inOutCubic), back = P(t, T_BACK + i * .06, .6, E.inOutCubic);
+      if (t < T_BACK) draft(ctx, lerp(CX, VX - 40, go1), lerp(GY[i], VY, go1), g.role, g.v1, P(t, T_DR[i], .9), { scale: lerp(1, .3, go1) });
+      else if (t < T_DR2) circle(ctx, lerp(VX - 40, CX, back) + 20, lerp(VY, GY[i], back), 11, rgba(C.red, 1 - back));
+      else { const go2 = P(t, T_TOVAL2 + i * .06, .55, E.inOutCubic); if (go2 < 1) draft(ctx, lerp(CX, VX - 40, go2), lerp(GY[i], VY, go2), g.role, g.v2, P(t, T_DR2, .5), { scale: lerp(1, .3, go2), tag: g.name + ' · v2', alpha: 1 - P(t, T_TOVAL2 + .45, .15) }); } });
+    // Validador (reprova, depois aprova) e Embalador
+    const vin = E.outBack(P(t, T_G[2] + .3, .4));
+    if (vin > 0) { const verdict = t > T_NO && t < T_BACK + .7 ? 'no' : t > T_OK ? 'ok' : null, shake = t > T_NO && t < T_NO + .45 ? Math.sin(t * 70) * 6 : 0;
+      if (verdict === 'no') glow(ctx, VX, VY, 150, C.red, .5 * (1 - P(t, T_NO, .8))); if (verdict === 'ok') glow(ctx, VX, VY, 150, C.yellow, .55 * (1 - P(t, T_OK, 1.2)));
+      agent(ctx, VX + shake, VY, 56 * vin, { role: 'validador', t: t + 7, seed: 5, verdict, theme: 'dark' });
+      late(ctx, c => { c.globalAlpha *= clamp(vin); text(c, 'Validador', VX, VY + 96, { size: 24, weight: 900, color: '#FFF', align: 'center' });
+        const wa = win(t, T_NO + .1, T_DR2, .3, .3); if (wa > 0) { c.globalAlpha *= wa; tag(c, VX, VY + 146, WHY, { size: 22, fill: C.red, color: '#FFF' }); } }); }
+    const pin = E.outBack(P(t, T_G[2] + .5, .4));
+    if (pin > 0) { agent(ctx, PX, PY, 50 * pin, { role: 'embalador', t: t + 3, seed: 9, theme: 'dark', squash: t > T_WRAP && t < T_WRAP + .4 ? Math.sin(P(t, T_WRAP, .4) * Math.PI) * .5 : 0 });
+      late(ctx, c => { c.globalAlpha *= clamp(pin); text(c, 'Embalador', PX, PY + 88, { size: 24, weight: 900, color: '#FFF', align: 'center' }); }); }
+    // insight aprovado → Embalador → faixas de título no relatório (DESTAQUE) e no painel
+    if (t > T_OK && t < T_WRAP) { const toP = P(t, T_TOPACK, .6, E.inOutCubic); draft(ctx, lerp(VX - 170, PX - 170, toP), lerp(VY + 190, PY + 170, toP), 'validador', SHORT, 1, { tag: 'insight aprovado', ok: true, scale: .82, alpha: P(t, T_OK, .3) }); }
+    [[T_REP, REP.x + 14, REP.y + 35, REP.w - 28, 42], [T_DSH, DSH.x + 8, DSH.y + 32, DSH.w - 16, 44]].forEach(([t0, hx, hy, hw, hh]) => {
+      if (t < T_WRAP || t > t0 + .8) return; const fly = P(t, t0, .75, E.inOutCubic), sw = lerp(300, hw, fly), sh = lerp(60, hh, fly);
+      const sx = lerp(PX - 150, hx, fly), sy = lerp(PY + 160, hy, fly) - Math.sin(fly * Math.PI) * 200;
+      ctx.save(); ctx.globalAlpha *= clamp(P(t, T_WRAP, .3) * 3) * (1 - P(t, t0 + .7, .1)); paper(ctx, sx, sy - sh / 2, sw, sh, { r: sh / 2, fill: C.orange, shadow: 5, shadowColor: '#000', lw: 2.5 });
+      late(ctx, c => text(c, SHORT, sx + 20, sy + 1, { size: fitSize(c, SHORT, 18, sw - 40), weight: 800, color: '#FFF' })); ctx.restore(); });
+    late(ctx, c => { c.globalAlpha *= P(t, T_GEN + 1, .5); text(c, 'exemplo ilustrativo', W - 96, 1000, { size: 20, weight: 700, mono: true, color: '#BFB3A3', align: 'right' }); });
     ctx.restore();
   }
   function quality(ctx, t) {
@@ -5190,8 +5304,7 @@ const CASEKIT = {
     peaks: [[T_DROP - .1, T_DROP + 2.6, 1], [T_SIT - .1, T_SIT + 1, .6]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
-      SPACE.field(ctx, t, { alpha: .28, spin: .05 }); SPACE.floaters(ctx, t, { alpha: .22, n: 12, cy: 420 });
-      problem(ctx, t); generators(ctx, t); loop(ctx, t); quality(ctx, t); wall(ctx, t); situation(ctx, t);
+      problem(ctx, t); stage(ctx, t); quality(ctx, t); wall(ctx, t); situation(ctx, t);
       CASEKIT.interstitial(ctx, t, 4, 'Um case de *agentes de IA*', 'que escrevem, avaliam e corrigem insights em escala', C.yellow, 2.6, { kicker: 'CASE 4 DE 4 · INSIGHT AGENT' });
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
@@ -5227,10 +5340,6 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_ASSET - .1, T_ASSET + .8, .5]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
-      SPACE.field(ctx, t, { alpha: .26, spin: .04, cy: 420 });
-      // a curva 3D cresce junto com o alcance: começa discreta e ganha corpo quando os projetos se ligam ao ativo
-      SPACE.ribbon(ctx, t, { alpha: .14 + .24 * E.inOutSine(P(t, T_PROJ, 3)), cy: 560, amp: .36 + .12 * E.inOutSine(P(t, T_PROJ, 3)), width: 26, spin: .06, speed: .5, rot: .35 });
-      neonGrid(ctx, t, { horizon: 820, alpha: .35, speed: .6 });
       // a equipe (fica na origem)
       const tp = E.outBack(P(t, T_TEAM, .5));
       if (tp > 0) { ctx.save(); ctx.translate(...N.team); ctx.scale(tp, tp); holo(ctx, -150, -120, 300, 240, { color: C.yellow, corners: false });
@@ -5279,8 +5388,6 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_LINE - .1, T_LINE + 1, .4]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1C10' });
-      SPACE.field(ctx, t, { alpha: .24, spin: .035, cy: 300, tilt: .5 });
-      SPACE.floaters(ctx, t, { alpha: .3, n: 12, cy: 260, scale: 900, spin: .03 });
       skyline(ctx, t, { y: 960, h: 320, seed: 88, col: '#1A1216', lit: .4 });
       const g = ctx.createLinearGradient(0, GYp, 0, H); g.addColorStop(0, '#2A1C14'); g.addColorStop(1, '#0E0907'); ctx.fillStyle = g; ctx.fillRect(0, GYp, W, H - GYp); line(ctx, 0, GYp, W, GYp, INK, 6);
       // pilares (colunas de viaduto) sobem
@@ -5293,7 +5400,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
       // o monotrilho: o trem da linha passa em cima do viaduto (um a cada 11 s, 9 s para cruzar a tela)
-      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) % 11) / 9; if (u < 1) sideTrain(ctx, lerp(-60, W + 420, u), TOPY - 50); }
+      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) % 11) / 9; if (u < 1) sideTrain(ctx, lerp(-60, W + trainLen() + 20, u), TOPY - 50); }
       // contribuições: dois grupos, cada descrição fica na tela até o fim
       PILLARS.forEach((p, i) => { const a = P(t, T_CARD[i], .4); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;
@@ -5456,7 +5563,6 @@ const FUTURE_ART = {
       const cam = camKey(t, CAM);
       ctx.drawImage(TEX.dark, 0, 0); const sky = ctx.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#120C1C'); sky.addColorStop(.7, '#3A1E2A'); sky.addColorStop(1, '#120A08'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
       layer(ctx, cam, 0, () => { sun(ctx, W / 2 + 240, 700, 260, t); for (let k = 0; k < 50; k++) circle(ctx, hash(k * 3.3) * W, hash(k * 8.1) * 420, 1.3 + hash(k) * 1.4, rgba('#FFF4DC', .4 + .4 * Math.sin(t * 2 + k))); });
-      SPACE.field(ctx, t, { alpha: .3, cy: 330, tilt: .45, rot: SPACE.camRot(cam, .00018), spin: .03 });
       layer(ctx, cam, .2, () => skyline(ctx, t, { y: 900, h: 520, seed: 101, col: '#1C1220', lit: .55 }));
       layer(ctx, cam, .45, () => { skyline(ctx, t, { y: 980, h: 360, seed: 113, col: '#120C10', lit: .4 }); skyline(ctx, t, { y: 980, h: 360, seed: 113, col: '#120C10', lit: .4, x: 2120 }); });
       layer(ctx, cam, 1, () => {
@@ -5471,52 +5577,71 @@ const FUTURE_ART = {
         // o trem da linha puxa o traço laranja pela cidade e para na próxima estação
         sideTrain(ctx, xt, RAIL - 11);
       });
-      // objetos flutuando à frente da cidade (giram com o passeio da câmera: sensação de profundidade)
-      SPACE.floaters(ctx, t, { alpha: .26, n: 10, cy: 300, rot: SPACE.camRot(cam, .00018), scale: 940, spin: .02 });
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
 })();
 
-/* ---------- clímax: as 8 disciplinas entram e ficam (painel para ler) → Analytics & Advanced Analytics ---------- */
+/* ---------- clímax (v7.11): 5 cases entram nos compassos e viram — frente: case | método; verso: técnicas → Analytics & Advanced Analytics ---------- */
 (() => {
-  const id = 'climax', VZ = ['gaussian', 'lp', 'classification', 'clusters', 'nlp', 'mlp', 'transformer', 'agents'], N = TX.climaxWords.length;
-  // nos tempos fortes da música: a fileira de cima, uma por compasso desde que a batida começa (3,57); a de baixo acelera,
-  // uma a cada 2 tempos (13,17); a frase-chave no grande ataque (20,37)
-  const T_IN = k => k < 4 ? onBeat(id, 3.57 + 2.4 * k, 'bar') : beatsFrom(id, 13.17, 2 * (k - 4)), T_KEY = onBeat(id, 20.37, 'bar'), TW = 410, TH = 330, TX0 = 105, TY0 = 250;
-  for (let k = 0; k < N; k++) cue(id, T_IN(k), 'hit', { size: .3 + k * .04 }); cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
-  const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *disciplinas*']]);
-  SAY.reg(id, TX.climaxWords.map((w, k) => [T_IN(k), T_KEY + .3, 'label', w + ' ' + TX.climaxSub[k]]));   // o rótulo some com o painel (T_KEY → +.6)
+  const id = 'climax', CC = TX.climaxCases, N = CC.length, VZ = ['ab', 'classification', 'clusters', 'forecast', 'lp'], COL = [C.orange, C.red, C.yellow, '#E8822A', C.red];
+  // cada card entra num tempo forte (um por compasso desde que a batida começa, 3,57) e vira 2 tempos depois;
+  // todos ficam virados para leitura até a frase-chave no grande ataque (20,37)
+  const T_IN = k => onBeat(id, 3.57 + 2.4 * k, 'bar'), T_FLIP = k => beatsFrom(id, T_IN(k), 2), T_KEY = onBeat(id, 20.37, 'bar');
+  const TW = 330, TH = 470, GAP = 22, TX0 = (W - (N * TW + (N - 1) * GAP)) / 2, TY0 = 322;
+  for (let k = 0; k < N; k++) { cue(id, T_IN(k), 'hit', { size: .3 + k * .05 }); cue(id, T_FLIP(k), 'whoosh', { dur: .3, v: .18 }); }
+  cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
+  const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *métodos* e *técnicas*']]);
+  SAY.reg(id, CC.map((c, k) => [T_IN(k), T_KEY + .3, 'label', c.name + ' · ' + c.method]));     // o nome do case fica nos dois lados do card
+  SAY.reg(id, CC.map((c, k) => [T_FLIP(k), T_KEY + .3, 'label', c.tech.join(', ')]));
   SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey]]);
+  /** teste A/B: duas distribuições (A e B) e a diferença entre as médias */
+  function abViz(ctx, x, y, w, h, p) {
+    const bell = (m, s, col, fill) => { ctx.beginPath(); for (let i = 0; i <= 60; i++) { const u = i / 60, px = x + u * w, py = y + h - Math.exp(-((u - m) ** 2) / (2 * s * s)) * h * .85 * p; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fillStyle = rgba(col, fill); ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.stroke(); };
+    line(ctx, x, y + h, x + w, y + h, '#8A8378', 2); bell(.38, .12, '#8A8378', .18); bell(.6, .12, C.orange, .22);
+    if (p > .6) { const a = clamp((p - .6) * 3); [[.38, 'A', '#6A6056'], [.6, 'B', C.orange]].forEach(([m, l, col]) => { ctx.save(); ctx.globalAlpha *= a; ctx.setLineDash([5, 5]); line(ctx, x + m * w, y + h * .1, x + m * w, y + h, col, 2); ctx.restore();
+      late(ctx, c => { c.globalAlpha *= a; text(c, l, x + m * w, y + 2, { size: 20, weight: 900, color: col, align: 'center' }); }); }); }
+  }
+  function front(ctx, k, t, c) {
+    paper(ctx, 0, 0, TW, TH, { r: 18, fill: '#FFFDF8', shadow: 10, shadowColor: '#000', lw: 3 });
+    rr(ctx, 0, 0, TW, 12, 6); ctx.fillStyle = COL[k]; ctx.fill();
+    const vp = E.outCubic(clamp((t - T_IN(k)) / 1.2));
+    if (VZ[k] === 'ab') abViz(ctx, 30, 56, TW - 60, 150, vp); else VIZ[VZ[k]](ctx, 26, 40, TW - 52, 180, vp, { t, theme: 'light' });
+    late(ctx, cc => { para(cc, c.name, TW / 2, 248, TW - 44, { size: 30, weight: 900, color: INK, align: 'center', lh: 1.08 });
+      tag(cc, TW / 2, 400, c.method, { size: fitSize(cc, c.method, 24, TW - 70), fill: COL[k], color: COL[k] === C.yellow ? INK : '#FFF' }); });
+  }
+  function back(ctx, k, c) {
+    rr(ctx, 8, 12, TW, TH, 18); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
+    rr(ctx, 0, 0, TW, TH, 18); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = COL[k]; ctx.lineWidth = 4; ctx.stroke();
+    late(ctx, cc => { para(cc, c.name, 26, 30, TW - 52, { size: 24, weight: 900, color: '#FFF', lh: 1.08 });
+      const nh = wrapRich(cc, c.name, TW - 52, 24, 900).lines.length * 24 * 1.08;
+      text(cc, c.method.toUpperCase(), 26, 46 + nh, { size: fitSize(cc, c.method.toUpperCase(), 17, TW - 52, 800), weight: 800, mono: true, color: COL[k] === C.red ? '#FF8A7A' : COL[k], ls: 1 });
+      line(cc, 26, 70 + nh, TW - 26, 70 + nh, 'rgba(243,230,214,.25)', 2);
+      c.tech.forEach((s, i) => { const y = 108 + nh + i * 62; circle(cc, 38, y, 7, COL[k]); para(cc, s, 58, y - 15, TW - 84, { size: 24, weight: 800, color: '#F3E6D6', lh: 1.05 }); });
+      if (c.etc) text(cc, 'e outras técnicas', 58, 108 + nh + c.tech.length * 62, { size: 21, weight: 700, color: '#BFB3A3' }); });
+  }
   SCENES[id] = {
     peaks: [[0, 26.4, .45], [T_KEY - .1, T_KEY + 1.6, 1]], script: SCRIPT,
     themeAt: () => 'dark',
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' });
-      const kp = E.inOutCubic(P(t, T_KEY - .2, 1.2));
-      SPACE.field(ctx, t, { alpha: .3 + .25 * kp, spin: .05 + .12 * kp, n: 200, size: 1 + .4 * kp });
-      SPACE.ribbon(ctx, t, { alpha: .22 + .5 * kp, cy: 540, amp: .42 + .14 * kp, width: 30 + 16 * kp, spin: .07 + .1 * kp, speed: .7 + .6 * kp, rot: .2 });
-      neonGrid(ctx, t, { horizon: 960, alpha: .3, speed: 1 });
-      // na frase-chave os painéis recuam no espaço (encolhem e escurecem): só a frase fica legível
+      // na frase-chave os cards recuam (encolhem e escurecem): só a frase fica legível
       const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - .82 * kd;
       for (let k = 0; k < N; k++) {
-        const p = P(t, T_IN(k), .5); if (p <= 0) continue; const c = k % 4, r = Math.floor(k / 4), x = TX0 + c * (TW + 24), y = TY0 + r * (TH + 30), light = (c + r) % 2 === 1, s = lerp(1.25, 1, E.outExpo(p));
-        ctx.save(); ctx.globalAlpha *= clamp(p * 2) * dim; ctx.translate(lerp(x + TW / 2, W / 2, .06 * kd), lerp(y + TH / 2, H / 2, .06 * kd)); ctx.scale(s * (1 - .08 * kd), s * (1 - .08 * kd)); ctx.translate(-TW / 2, -TH / 2);
-        if (light) paper(ctx, 0, 0, TW, TH, { r: 16, fill: '#FFFDF8', shadow: 10, shadowColor: '#000', lw: 3.5 }); else holo(ctx, 0, 0, TW, TH, { color: [C.orange, C.red, C.yellow][k % 3] });
-        VIZ[VZ[k]](ctx, 24, 20, TW - 48, 180, E.outCubic(clamp((t - T_IN(k)) / 1.4)), { t, theme: light ? 'light' : 'dark' });
-        const nm = TX.climaxWords[k], sub = TX.climaxSub[k], col = light ? INK : '#FFF';
-        late(ctx, cc => { cc.globalAlpha *= 1 - .7 * kd; const fs = Math.min(32, (TW - 30) / Math.max(1, measure(cc, nm, 32, 900)) * 32); text(cc, nm, TW / 2, 238, { size: fs, weight: 900, color: col, align: 'center' });
-          para(cc, sub, TW / 2, 262, TW - 40, { size: 23, weight: 700, color: light ? '#4A4038' : '#F3E6D6', align: 'center', lh: 1.12 }); });
+        const p = P(t, T_IN(k), .5); if (p <= 0) continue;
+        const f = E.inOutCubic(P(t, T_FLIP(k), .5)), sx = Math.max(.02, Math.abs(Math.cos(f * Math.PI))), lift = 1 + .06 * Math.sin(f * Math.PI), s = lerp(1.15, 1, E.outExpo(p)) * lift * (1 - .08 * kd);
+        const x = TX0 + k * (TW + GAP), y = TY0 + (1 - E.outCubic(p)) * 40;
+        ctx.save(); ctx.globalAlpha *= clamp(p * 2) * dim; ctx.translate(lerp(x + TW / 2, W / 2, .06 * kd), lerp(y + TH / 2, H / 2, .06 * kd)); ctx.scale(s * sx, s); ctx.translate(-TW / 2, -TH / 2);
+        if (f < .5) front(ctx, k, t, CC[k]); else back(ctx, k, CC[k]);
         ctx.restore();
-        if (t - T_IN(k) < .08) flash(ctx, (1 - (t - T_IN(k)) / .08) * .25, '#FFF8EE');
       }
       if (t >= T_KEY) { const p = P(t, T_KEY, .5);
-        const band = ctx.createRadialGradient(W / 2, H / 2 - 20, 80, W / 2, H / 2 - 20, 1000); band.addColorStop(0, rgba('#0A0604', .72 * p)); band.addColorStop(1, rgba('#0A0604', 0)); ctx.fillStyle = band; ctx.fillRect(0, 0, W, H);
-        glow(ctx, W / 2, H / 2, 700, C.orange, .35 + .25 * BT.level);
-        [[460, 360, 160, C.red], [1460, 420, 190, C.orange], [960, 780, 140, C.yellow]].forEach(([x, y, r, cc], i) => splat(ctx, x, y, r, cc, 140 + i, E.outBack(P(t, T_KEY + i * .08, .35)), .8));
-        hud(ctx, c => { c.translate(W / 2, H / 2); const s = lerp(1.6, 1, E.outExpo(p)) * (1 + .02 * BT.beat); c.scale(s, s);
-          const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); c.shadowColor = '#000'; c.shadowBlur = 20; text(c, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
-          rich(c, k2 || '', 0, 30, { size: 100, weight: 900, color: '#FFF', retro: true, depth: 7, lw: 5 }); }, P(t, T_KEY + .2, .45)); }
+        const band = ctx.createRadialGradient(W / 2, H / 2 - 20, 80, W / 2, H / 2 - 20, 1000); band.addColorStop(0, rgba('#0A0604', .78 * p)); band.addColorStop(1, rgba('#0A0604', 0)); ctx.fillStyle = band; ctx.fillRect(0, 0, W, H);
+        glow(ctx, W / 2, H / 2, 700, C.orange, .3 + .2 * BT.level);
+        hud(ctx, c => { c.translate(W / 2, H / 2); const s = lerp(1.3, 1, E.outExpo(p)); c.scale(s, s);
+          const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); text(c, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
+          rich(c, k2 || '', 0, 30, { size: 100, weight: 900, color: '#FFF', accent: C.orange }); }, P(t, T_KEY + .2, .45)); }
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };

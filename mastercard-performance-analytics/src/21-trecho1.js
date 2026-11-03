@@ -176,7 +176,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   const CX = [430, 680, 930, 1180], BASE = 820, HH = 500, X0 = 250, BW = 160;
   const CAM = [[0, 960, 560, 1.05], [3.6, 960, 540, 1], [T_BR - .2, 960, 540, 1], [T_BR + 1.3, 3160, 540, 1], [43.7, 3160, 540, 1]];
   const hY = v => BASE - toU(v) / TOP * HH;
-  T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_TREND, 'shimmer', { dur: 1.2 }); cue(id, T_READ, 'chime', { f: 784, up: 7 });
+  T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_READ, 'chime', { f: 784, up: 7 });
   cue(id, T_BR, 'whoosh', { dur: 1, v: .3 }); T_CMP.forEach(t0 => cue(id, t0, 'impact', { size: .5 })); cue(id, T_Q, 'whoosh', { dur: .7, v: .25 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
   const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, o faturamento passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'O faturamento cresceu ano a ano.';
   const qTxt = QS.length ? (QUP === QS.length ? 'O realizado superou o orçamento em *todos os trimestres*.' : `O realizado superou o orçamento em *${QUP} de ${QS.length} trimestres*.`) : '';
@@ -207,18 +207,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       if (p <= 0) return;
       ctx.save(); ctx.globalAlpha *= 1 - dim;
       if (f) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, BASE - hgt, BW, hgt, 6); ctx.strokeStyle = C.yellow; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); hatch(ctx, () => rr(ctx, x, BASE - hgt, BW, hgt, 6), x, BASE - hgt, BW, hgt, { color: C.yellow, alpha: .35, gap: 14 }); }
-      else vslab(ctx, x, BASE - hgt, BW, hgt, 30, mix(C.red, C.orange, i / 2), { lw: 4 });
-      if (hi && read > 0) glow(ctx, CX[i], BASE - hgt / 2, 220, C.yellow, .35 * read);
+      else fbar(ctx, x, BASE - hgt, BW, hgt, mix(C.red, C.orange, i / 2));
       ctx.restore();
       const la = clamp(p) * (1 - dim * .6);
       late(ctx, c => { c.globalAlpha *= la; text(c, FMT.usdMM(+v), CX[i] + 10, BASE - hgt - 34, { size: 30, weight: 900, color: '#FFF', align: 'center' });
         text(c, yr(k), CX[i] + 10, BASE + 36, { size: 30, weight: 900, color: f ? C.yellow : '#FFF', align: 'center' });
         if (f) text(c, '(previsão)', CX[i] + 10, BASE + 70, { size: 24, weight: 800, color: C.yellow, align: 'center' }); });
     });
-    // a tendência: um brilho percorre o topo das barras 2023 → 2025 (sem traço por cima dos rótulos)
-    if (t > T_TREND && t < T_TREND + 2.2) ROWS.slice(0, 3).forEach(([k, v], i) => { const u = (t - T_TREND - i * .3) / 1.2; if (u <= 0 || u >= 1) return;
-      const a = Math.sin(u * Math.PI), y = hY(+v), x = CX[i] - BW / 2; glow(ctx, CX[i] + 10, y, 170, '#FFE7C8', .5 * a);
-      ctx.save(); ctx.globalCompositeOperation = 'lighter'; line(ctx, x + 4, y + 2, x + BW - 4, y + 2, rgba('#FFF1DC', .85 * a), 5); ctx.restore(); });
     // a régua: 2023 → 2025
     if (read > 0 && MULT) { const xa = CX[0] + BW / 2 + 40, y0 = hY(VALS[0]), y2 = hY(VALS[2]), xr = CX[2] + BW / 2 + 70, g = E.outCubic(read);
       ctx.save(); ctx.globalAlpha *= g;
@@ -237,12 +232,11 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       [[ref, refL, g ? null : '#8A8378', g === 1], [ACT, 'realizado', C.orange, false]].forEach(([v, l, col, dash], j) => {
         const x = cx - 190 + j * 220, hh = hb(v) * Math.min(1, p);
         if (dash) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, B0 - hh, 160, hh, 6); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); }
-        else vslab(ctx, x, B0 - hh, 160, hh, 24, col, { lw: 4 });
+        else fbar(ctx, x, B0 - hh, 160, hh, col);
         late(ctx, c => { c.globalAlpha *= clamp(p); text(c, fu(v), x + 80, B0 - hh - 30, { size: 28, weight: 900, color: '#FFF', align: 'center' }); text(c, l, x + 80, B0 + 36, { size: 28, weight: 800, color: j ? C.orange : '#F3E6D6', align: 'center' }); });
       });
       late(ctx, c => { c.globalAlpha *= clamp(p); c.translate(cx, B0 - HB - 215); const s = lerp(1.6, 1, E.outExpo(clamp(p))); c.scale(s, s);
-        splat(c, 0, -6, 110, g ? C.yellow : C.orange, 60 + g, 1, .9);
-        retroText(c, mult ? FMT.mult(mult) : '—', 0, 0, { size: 96, weight: 900, color: '#FFF', align: 'center', depth: 6, lw: 5 });
+        text(c, mult ? FMT.mult(mult) : '—', 0, 0, { size: 96, weight: 900, color: g ? C.yellow : C.orange, align: 'center' });
         text(c, cap, 0, 82, { size: 32, weight: 900, color: '#FFF', align: 'center' }); });
     });
     late(ctx, c => text(c, 'Fonte: ' + (BR.source || 'dados internos'), 2260, 940, { size: 22, weight: 700, mono: true, color: '#BFB3A3' }));
@@ -256,7 +250,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     QS.forEach(([k, q], i) => {
       [[q.actuals_2022, '#8A8378', 0], [q.budget_2023, null, 1], [q.actuals_2023, C.orange, 2]].forEach(([v, col, j]) => {
         const p = E.outCubic(P(t, T_Q + .3 + i * .25 + j * .08, .5)), x = gx(i) + j * 56, hh = v / M * HQ * p;
-        if (col) vslab(ctx, x, B0 - hh, 46, hh, 12, col, { lw: 3 }); else { ctx.save(); ctx.setLineDash([9, 7]); rr(ctx, x, B0 - hh, 46, hh, 4); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); }
+        if (col) fbar(ctx, x, B0 - hh, 46, hh, col, { r: 5 }); else { ctx.save(); ctx.setLineDash([9, 7]); rr(ctx, x, B0 - hh, 46, hh, 4); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); }
       });
       const up = q.actuals_2023 > q.budget_2023, la = P(t, T_Q + .9 + i * .25, .4);
       late(ctx, c => { c.globalAlpha *= la; text(c, qLabel(k), gx(i) + 74, B0 + 36, { size: 30, weight: 900, color: '#FFF', align: 'center' }); if (up) icon(c, 'check', gx(i) + 130, B0 - Math.max(q.actuals_2023, q.budget_2023) / M * HQ - 40, 36, C.yellow, 10); });
@@ -273,10 +267,6 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     draw(ctx, t) {
       const cam = camKey(t, CAM);
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0E' });
-      SPACE.field(ctx, t, { alpha: .32, rot: SPACE.camRot(cam, .0004), spin: .04 });
-      SPACE.ribbon(ctx, t, { alpha: .3, rot: .5 + SPACE.camRot(cam, .0004), cy: 470, amp: .42, width: 30, spin: .05 });
-      layer(ctx, cam, .25, () => skyline(ctx, t, { y: 980, h: 360, seed: 14, col: '#1A1216', lit: .4 }));
-      layer(ctx, cam, .6, () => neonGrid(ctx, t, { horizon: 860, alpha: .3, speed: .4 }));
       layer(ctx, cam, 1, () => {
         // chão da galeria com reflexo
         const g = ctx.createLinearGradient(0, 820, 0, H + 80); g.addColorStop(0, 'rgba(60,32,18,.9)'); g.addColorStop(1, 'rgba(12,8,6,.95)'); ctx.fillStyle = g; ctx.fillRect(-400, 822, 4600, 400);
@@ -428,18 +418,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     themeAt: () => 'dark', script: SCRIPT,
     peaks: [[T_INT + 2, T_INT + 2.8, .45], [T_PRESC + 3.1, T_PRESC + 3.9, .5], [T_SYN, T_SYN + 1.2, .4]],
     draw(ctx, t) {
-      const cam = camKey(t, CAM), pan = [T_CAP, T_INT, T_PRED, T_PRESC].some(t0 => t > t0 - 1.2 && t < t0);
+      const cam = camKey(t, CAM);
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
-      SPACE.field(ctx, t, { alpha: .3, rot: SPACE.camRot(cam, .00025), cy: 420 });
-      SPACE.floaters(ctx, t, { alpha: .34, rot: SPACE.camRot(cam, .00025), cy: 380, n: 12 });
-      layer(ctx, cam, .2, () => skyline(ctx, t, { y: 900, h: 460, seed: 33, col: '#1E1418', lit: .5 }));
-      layer(ctx, cam, .45, () => skyline(ctx, t, { y: 980, h: 300, seed: 41, col: '#120C0E', lit: .3, x: 1200 }));
       layer(ctx, cam, 1, () => {
         streetSet(ctx);
         LINE.draw(ctx, [[-1200, GY + 60], [11200, GY + 60]], 1, { w: 14, alpha: .55, shadow: false });
         clients(ctx, t); capabilities(ctx, t); integration(ctx, t); predictive(ctx, t); prescriptive(ctx, t); synthesis(ctx, t);
       });
-      if (pan) { const r = rng(Math.floor(t * 3)); ctx.save(); ctx.globalAlpha = .35; for (let k = 0; k < 16; k++) { const y = r() * H, x = r() * W; line(ctx, x, y, x + 400 + r() * 500, y, k % 3 ? 'rgba(255,240,220,.5)' : rgba(C.orange, .6), 2 + r() * 4); } ctx.restore(); }
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
@@ -458,7 +443,7 @@ POSTERS[2] = (ctx, w, h, tl) => {
   const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9), BR = sec.brazil_2023_milestone || {};
   const isF = k => /forecast/i.test(k);
   line(ctx, -200, 30, 200, 30, INK, 3);
-  R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else vslab(ctx, x, 30 - hh, 70, hh, 12, mix(C.red, C.orange, i / 2), { lw: 2.5 });
+  R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else fbar(ctx, x, 30 - hh, 70, hh, mix(C.red, C.orange, i / 2), { r: 6 });
     late(ctx, c => { text(c, FMT.usdMM(+v), x + 35, 30 - hh - 18, { size: 17, weight: 900, color: INK, align: 'center' }); text(c, k.replace(/_?forecast/i, '') + (isF(k) ? '*' : ''), x + 35, 50, { size: 18, weight: 900, color: INK, align: 'center' }); }); });
   const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, vp = BR.actuals_2022_usd_millions ? BR.actuals_2023_usd_millions / BR.actuals_2022_usd_millions : null, vb = BR.budget_2023_usd_millions ? BR.actuals_2023_usd_millions / BR.budget_2023_usd_millions : null;
   late(ctx, c => { text(c, 'faturamento anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });

@@ -26,10 +26,6 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_ASSET - .1, T_ASSET + .8, .5]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
-      SPACE.field(ctx, t, { alpha: .26, spin: .04, cy: 420 });
-      // a curva 3D cresce junto com o alcance: começa discreta e ganha corpo quando os projetos se ligam ao ativo
-      SPACE.ribbon(ctx, t, { alpha: .14 + .24 * E.inOutSine(P(t, T_PROJ, 3)), cy: 560, amp: .36 + .12 * E.inOutSine(P(t, T_PROJ, 3)), width: 26, spin: .06, speed: .5, rot: .35 });
-      neonGrid(ctx, t, { horizon: 820, alpha: .35, speed: .6 });
       // a equipe (fica na origem)
       const tp = E.outBack(P(t, T_TEAM, .5));
       if (tp > 0) { ctx.save(); ctx.translate(...N.team); ctx.scale(tp, tp); holo(ctx, -150, -120, 300, 240, { color: C.yellow, corners: false });
@@ -78,8 +74,6 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_LINE - .1, T_LINE + 1, .4]],
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1C10' });
-      SPACE.field(ctx, t, { alpha: .24, spin: .035, cy: 300, tilt: .5 });
-      SPACE.floaters(ctx, t, { alpha: .3, n: 12, cy: 260, scale: 900, spin: .03 });
       skyline(ctx, t, { y: 960, h: 320, seed: 88, col: '#1A1216', lit: .4 });
       const g = ctx.createLinearGradient(0, GYp, 0, H); g.addColorStop(0, '#2A1C14'); g.addColorStop(1, '#0E0907'); ctx.fillStyle = g; ctx.fillRect(0, GYp, W, H - GYp); line(ctx, 0, GYp, W, GYp, INK, 6);
       // pilares (colunas de viaduto) sobem
@@ -92,7 +86,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
       // o monotrilho: o trem da linha passa em cima do viaduto (um a cada 11 s, 9 s para cruzar a tela)
-      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) % 11) / 9; if (u < 1) sideTrain(ctx, lerp(-60, W + 420, u), TOPY - 50); }
+      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) % 11) / 9; if (u < 1) sideTrain(ctx, lerp(-60, W + trainLen() + 20, u), TOPY - 50); }
       // contribuições: dois grupos, cada descrição fica na tela até o fim
       PILLARS.forEach((p, i) => { const a = P(t, T_CARD[i], .4); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;

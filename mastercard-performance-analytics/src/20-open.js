@@ -70,14 +70,13 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     ctx.save();
     if (dive > 0) { const z = 1 + dive * 5; ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -(TY0 + 170 * S)); ctx.translate(0, (TY0 + 170 * S - H / 2) * (1 - dive)); }
     else { ctx.translate(W / 2, TY0 + 170 * S); ctx.scale(push, push); ctx.translate(-W / 2, -(TY0 + 170 * S)); }
-    platform(ctx, t, { doodles: [['star', 140, 330, 70, C.yellow], ['arrow', 1790, 300, 90, C.orange]] });   // sem placa: o painel de partidas e o título ocupam o topo
+    platform(ctx, t, {});   // sem placa: o painel de partidas e o título ocupam o topo
     const ba = 1 - P(t, T_DOOR, .4); if (ba > 0) { ctx.save(); ctx.globalAlpha *= ba; FLAP.board(ctx, W / 2, 232 - 60 * P(t, T_DOOR, .4), [BOARD], [.3], t, { tw: 50, th: 74, hiFrom: [0], header: 'PARTIDA', headerCol: C.red, glowA: P(t, 1.6, .6) }); ctx.restore(); }
-    // o trem chega da esquerda e freia com a porta no centro; o farol varre a plataforma
-    const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(-L * S - 80, W / 2 - DOOR * S, arr), sway = (1 - arr) * Math.sin(t * 30) * 2;
+    // o trem bala chega da esquerda (nariz na frente) e freia com a porta no centro
+    const arr = E.outCubic(P(t, T_ARR, T_STOP - T_ARR)), x = lerp(-(L + NOSE_LEN) * S - 80, W / 2 - DOOR * S, arr);
     if (t > T_ARR) {
-      if (arr < .995) { ctx.save(); ctx.globalCompositeOperation = 'screen'; const hx = x + L * S, g = ctx.createRadialGradient(hx, TY0 + 260, 10, hx, TY0 + 260, 520); g.addColorStop(0, 'rgba(255,236,200,.55)'); g.addColorStop(1, 'rgba(255,236,200,0)'); ctx.fillStyle = g; ctx.fillRect(hx - 40, TY0 - 200, 900, 900); ctx.restore(); }
-      trainCar(ctx, x, TY0 + sway, S, { len: L, doors: [L * .17, DOOR, L * .83], logoX: 520, open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1 });
-      if (arr < .97) { const r = rng(3); ctx.save(); ctx.globalAlpha = .45 * (1 - arr); for (let k = 0; k < 14; k++) { const ly = TY0 + r() * 420 * S, lx = x + r() * L * S; line(ctx, lx, ly, lx - 300 - r() * 400, ly, 'rgba(255,240,220,.6)', 3); } ctx.restore(); }
+      trainCar(ctx, x - (1000 + 40) * S, TY0, S, { len: 1000, doors: [300, 700], seed: 12, lit: 1, nose: 'left' });
+      trainCar(ctx, x, TY0, S, { len: L, doors: [L * .17, DOOR, L * .83], logoX: 520, open: E.inOutCubic(P(t, T_DOOR, .7)), seed: 11, lit: 1, nose: 'right' });
       if (t > T_DOOR) glow(ctx, W / 2, TY0 + 200 * S, 300, '#FFE2B0', .4 * P(t, T_DOOR, .6));
     }
     ctx.restore();
@@ -91,7 +90,6 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
     const a = P(t, T_MAP, .7); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     bgDark(ctx, t, { centerA: .9, center: '#33200F' }); glow(ctx, 960, 590, 900, C.orange, .14);
-    SPACE.field(ctx, t, { alpha: .45, spin: .06, rot: -.4 + (1 - E.outCubic(P(t, T_MAP, 1.6))) * 1.2 });
     const z = lerp(1.6, 1, E.outCubic(P(t, T_MAP, 1.4)));
     mapWorld(ctx, { ...MAPVIEW, s: MAPVIEW.s * z }, () => {
       metroMap(ctx, t, { reveal: E.inOutCubic(P(t, T_MAP, 1.5)), train: 0 });
