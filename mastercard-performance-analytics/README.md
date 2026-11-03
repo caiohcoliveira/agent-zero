@@ -116,8 +116,10 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   2. Procure `id="pa-data"`.
   3. Edite dentro do bloco e salve. Não é preciso rodar build. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
 - **Dashboard real (case de relatórios automatizados):** depois da automação, um popup mostra o dashboard enviado ao board.
-  - No Git ele é **ilustrativo** (o campo `dashboard_image` do case "Lights-off" fica vazio). A imagem real nunca vai para o repositório.
-  - Na cópia local: `python3 tools/dash_image.py minha-copia.html dashboard.png` embute a imagem (PNG, JPG ou WEBP) como data URL, e o HTML continua um arquivo só, offline. `--limpar` volta ao ilustrativo.
+  - A imagem é o arquivo **`dashboard-fraude.png`**, na mesma pasta do HTML. No Git ela é ilustrativa.
+  - Para usar o real, troque esse arquivo pela imagem do dashboard real, **com o mesmo nome** (qualquer tamanho; ela se ajusta à janela). Outra extensão (JPG, WEBP): mude o campo `dashboard_image` do case "Lights-off" no JSON.
+  - Ao enviar o vídeo, mande o HTML e a imagem juntos, na mesma pasta. Sem a imagem, o popup mostra o dashboard desenhado, marcado como ilustrativo.
+  - A imagem real fica só na cópia local: não suba para o Git (o repositório é público).
 - **Aviso de versão mockada:** `presentation_context.disclaimer` aparece no canto inferior esquerdo de todas as telas, inclusive nas conversas ("Este vídeo é a versão mockada, com dados sanitizados."). Na cópia local com os dados reais, deixe o campo vazio (`""`) e o aviso some.
 
 ## Música e batidas

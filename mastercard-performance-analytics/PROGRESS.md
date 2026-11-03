@@ -310,7 +310,7 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 
 - [x] **Ponte (01):** "Implementação" virou "Execução" nos vãos, na lista dos 4 serviços, na descrição da estação e no cartaz da Conversa 1. A abertura ("negócio, analytics e implementação") ficou como estava.
 - [x] **Relatórios automatizados:** no RESULTADO, um popup sai do monitor com o dashboard enviado ao board e volta para ele no fim.
-  - O campo `dashboard_image` do case "Lights-off" fica vazio no Git (dashboard ilustrativo). A imagem real entra só na cópia local, com `tools/dash_image.py`.
+  - A imagem é o arquivo `dashboard-fraude.png`, ao lado do HTML (campo `dashboard_image` do case "Lights-off"). No Git ela é ilustrativa; na cópia local, basta trocar o arquivo pelo real com o mesmo nome (v7.9.1: arquivo de imagem em vez de embutido no HTML, para a troca ser simples).
   - SOLUÇÃO, RESULTADO e PRÓXIMO PASSO foram redistribuídos para o popup ter ~5 s.
 - [x] **Para onde a linha segue (07):** "Automatizar rotinas" vem antes de "Eficiência operacional · e ganho de escala" (que substituiu "Reutilizar ativos"); a grade que cresce virou a arte do ganho de escala.
 - [x] **Trens:** o mesmo trem de dois vagões (`sideTrain`) atravessa a ponte e para do lado dos dados, e passa como monotrilho em cima do viaduto dos pilares.
@@ -318,4 +318,4 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - varredura sem exceções;
   - medidor de leitura: 77 telas, 0 curtas;
   - navegação, clique e console limpos;
-  - fotos dos trens, do popup (ilustrativo e com imagem de teste via `tools/dash_image.py`) e da 07 conferidas.
+  - fotos dos trens, do popup (com o arquivo ilustrativo, com outra imagem no lugar e sem arquivo) e da 07 conferidas.

@@ -287,7 +287,7 @@
         },
         {
           "case_name": "Lights-off Fraud Reporting",
-          "dashboard_image": ""
+          "dashboard_image": "dashboard-fraude.png"
         },
         {
           "case_name": "Insight Agent | AI-powered Market Share & Share of Wallet Insights",
@@ -4943,7 +4943,8 @@ const CASEKIT = {
     ctx.restore();
     late(ctx, c => { c.globalAlpha *= a * P(t, T_NEXT + .8, .5); icon(c, 'ai', IAX - 120, IAY, 60, C.yellow, 7); text(c, 'Insight Agent', IAX - 70, IAY - 18, { size: 32, weight: 900, color: '#FFF' }); text(c, 'integração possível', IAX - 70, IAY + 24, { size: 26, weight: 800, color: C.yellow }); });
   }
-  /** a imagem do dashboard real: dashboard_image no JSON (data:image/… ou um arquivo ao lado do HTML); vazio = ilustrativo */
+  /** a imagem do dashboard: o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque pelo real,
+   *  com o mesmo nome). Sem o arquivo (ou com o campo vazio), o popup mostra o dashboard desenhado, marcado como ilustrativo */
   const DASH = (() => { let src = null, img = null; return () => {
     const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
     if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
