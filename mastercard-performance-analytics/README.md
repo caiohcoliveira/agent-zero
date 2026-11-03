@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.4, experimento)
+# Performance Analytics — "A Linha" (v7.6, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -123,18 +123,18 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - **Parte 1 · estações 01–03 (2:34,5):** funk cinematográfico, 110 BPM.
     - Intro abafada que abre no tema e as viradas de estação no tempo forte.
     - Low só com médios antes da parte B, pausa, riser e drop na estação 03.
-  - **Parte 2 · estação 04, os 4 cases, 05 e 06 (5:04):** uma peça de funk corporativo, 108 BPM, com a mesma banda e o mesmo motivo do começo ao fim, **sem filtros nem efeitos de DJ** (v7.5).
-    - Antes de cada **solução** entra um trecho leve da própria música (sem baixo nem bateria cheia) e a banda volta com tudo: drops naturais, compostos pela própria peça.
-    - Na automação, a música corta seco no interruptor e a banda volta no neon.
-    - A **IA** leva o trecho mais forte da peça.
-    - A 05/06 termina com o final da própria peça.
-    - O mapa de compassos fica em `PARTE2_MAPA`.
+  - **Parte 2 · estação 04, os 4 cases, 05 e 06 (5:04):** uma peça de funk corporativo, 108 BPM, com a mesma banda e o mesmo motivo do começo ao fim, **tocada inteira, do jeito que foi composta** (v7.6): sem cortes, filtros, efeitos de DJ ou silêncios.
+    - A introdução leve cobre a estação 04, e a banda entra no começo do case 1 (17,8 s).
+    - Uma quebra leve fecha a automação (177,8 s), e a banda volta no começo da IA (195,6 s).
+    - O trecho mais forte começa na escala da IA (240 s), o pico da apresentação.
+    - A 05/06 termina com o acorde final da própria peça (302,3 s).
+    - As soluções dos cases caem em começos de compasso, sem drop composto ali; os efeitos de imagem seguem a batida real da música.
   - **Parte 3 · 07, disciplinas e letreiro (1:12):** final orquestral, 100 BPM, **sem o coro**, tocado **inteiro, do jeito que foi composto** (v7.5).
     - Toca a gravação original até pouco antes do coro e, depois, a versão sem coro, alinhada à amostra.
     - A orquestra entra junto com as disciplinas (27,6 s) e o letreiro acende no acento de 59,97 s.
 - **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
   - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
-  - **Parte 2:** só cortes em começo de compasso, entre trechos da própria peça.
+  - **Parte 2:** nada; a peça toca inteira e o filme acompanha (a grade e as seções saem dela).
   - **Parte 3:** nada; o filme se ajusta à música.
 - **Arquivos (fora do Git):**
   - versões brutas em `musica/elevenlabs/`: `parte1-bruta.mp3`, `parte2-bruta.mp3`, `parte3-bruta-A.mp3` e `parte3-sem-coro.wav`;
@@ -144,7 +144,7 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - O build usa `musica/parteN.mp3` quando existe.
   - Sem esses arquivos, cai na trilha Pixabay anterior (`tools/edit_music.py` → `tools/remix.py`, arquivos `<faixa>-mix.mp3`).
   - Os ids internos das faixas (`funk`, `tech`, `piano`) continuam os mesmos.
-- **Volume:** `CONFIG.tracks` (0,81 · 0,70 · 0,66) mantém o mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS), equilibrado com os efeitos.
+- **Volume:** `CONFIG.tracks` (0,81 · 0,68 · 0,66) mantém o mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS), equilibrado com os efeitos.
 - **Uso:** confira os termos do plano da conta ElevenLabs para uso das músicas geradas no evento.
 - **Sincronia:** `tools/music.py` gera `src/07-beats.js`.
   - Para as três faixas, a grade é **exata** (`GRID`: andamento, um tempo forte conhecido e as seções), em vez de detectada.

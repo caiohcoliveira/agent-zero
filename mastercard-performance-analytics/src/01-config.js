@@ -42,7 +42,7 @@ const CONFIG = {
     voice: false,          // narração do navegador: DESLIGADA por padrão (botão "Voz" / tecla V)
     musicVolume: 0.42, sfxVolume: 0.5,
     trackVolume: 1.0,      // volume geral das faixas (funk, technology, piano)
-    tracks: { funk: { gain: .81 }, tech: { gain: .70 }, piano: { gain: .66 } },  // ElevenLabs (v7.4): mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS)
+    tracks: { funk: { gain: .81 }, tech: { gain: .68 }, piano: { gain: .66 } },  // ElevenLabs (v7.4–v7.6): mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS)
     duckDuringVoice: 0.55,
     voiceRate: 1.07, voicePitch: 1.02,
     preferredVoices: ['Francisca', 'Thalita', 'Brenda', 'Giovanna', 'Leila', 'Manuela', 'Yara',
@@ -57,7 +57,7 @@ const CONFIG = {
   plays: [
     { id: 1, track: null },                    // embarque: trilha sintetizada (src/05-audio.js)
     { id: 2, track: 'funk', from: 0 },         // parte 1 · ElevenLabs, funk cinematográfico encaixado (tools/eleven_fit.py, 2:34,5, 110 BPM)
-    { id: 3, track: 'tech', from: 0 },         // parte 2 · ElevenLabs, uma peça só (5:04, 108 BPM) montada com trechos dela: drops naturais nas soluções, pico na IA
+    { id: 3, track: 'tech', from: 0 },         // parte 2 · ElevenLabs, uma peça só (5:04, 108 BPM) tocada inteira, sem edição: a banda entra no case 1, volta no começo da IA e cresce na escala
     { id: 4, track: 'piano', from: 0 }         // parte 3 · ElevenLabs, final orquestral sem coro tocado inteiro (1:12, 100 BPM): a orquestra entra em 27,6
   ],
 
@@ -69,14 +69,14 @@ const CONFIG = {
     { id: 's01',       play: 2, dur: 46.98,  station: 1, theme: 'dark' },   // a ponte entre negócio e dados (frase A de 16 compassos)
     { id: 's02',       play: 2, dur: 43.64,  station: 2, theme: 'dark' },   // a frase A de novo, até o break
     { id: 's03',       play: 2, dur: 63.924, station: 3, theme: 'dark' },   // break → parte B → saída (síntese em 52,4)
-    // estação 04: cada case tem 27 compassos: calma 11 (problema, dados) → construção 5 (como fizemos) → cheia 11 (solução, resultado)
+    // estação 04: cada case tem 27 compassos: problema e dados 11 → como fizemos 5 → solução e resultado 11 (a solução cai num começo de compasso)
     { id: 's04',       play: 3, dur: 11.111, station: 4, theme: 'dark' },   // analytics em ação: os 4 cases
-    { id: 'banana',    play: 3, dur: 60,     station: 4, theme: 'dark' },   // drop na solução: 35,56
-    { id: 'manga',     play: 3, dur: 60,     station: 4, theme: 'dark' },   // drop na reordenação: 35,56
-    { id: 'lightsoff', play: 3, dur: 60.001, station: 4, theme: 'light' },  // interruptor 33,33 · silêncio · drop 35,56
-    { id: 'insight',   play: 3, dur: 68.89,  station: 4, theme: 'dark' },   // construção longa; drop na escala: 48,89
+    { id: 'banana',    play: 3, dur: 60,     station: 4, theme: 'dark' },   // solução: 35,56 (a banda entra em 6,7)
+    { id: 'manga',     play: 3, dur: 60,     station: 4, theme: 'dark' },   // solução (reordenação): 35,56
+    { id: 'lightsoff', play: 3, dur: 60.001, station: 4, theme: 'light' },  // interruptor 33,33 · neon 35,56 · quebra leve da música a partir de 46,7
+    { id: 'insight',   play: 3, dur: 68.89,  station: 4, theme: 'dark' },   // a banda volta em 4,45; escala em 48,89 (o trecho mais forte da música começa aqui)
     { id: 's05',       play: 3, dur: 20.004, station: 5, theme: 'dark' },
-    { id: 's06',       play: 3, dur: 24.444, station: 6, theme: 'dark' },   // a faixa termina em 20 s; silêncio até a parada
+    { id: 's06',       play: 3, dur: 24.444, station: 6, theme: 'dark' },   // a música termina com o acorde final dela em 22,3 s
     { id: 's07',       play: 4, dur: 26.4,   station: 7, theme: 'dark' },   // 11 compassos de piano
     { id: 'climax',    play: 4, dur: 19.2,   theme: 'dark' },                   // as 8 disciplinas, acumulando (8 compassos)
     { id: 'close',     play: 4, dur: 26.378, theme: 'dark' }                // último acorde em 14,06

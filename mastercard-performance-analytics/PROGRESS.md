@@ -253,3 +253,17 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - varredura sem exceções;
   - medidor de leitura: 72 telas, 0 curtas;
   - navegação, clique e console limpos.
+
+### v7.6 — parte 2 tocada inteira
+
+- [x] **Parte 2:** depois do retorno do usuário ("evite ao máximo as edições artificiais"), a versão B toca inteira, do jeito que foi composta.
+  - Sem cortes, repetições, filtros ou silêncios; só o nível (master) e 0,3 s de fade na cauda do acorde final.
+  - A tentativa de gerar a parte em 5 trechos com os drops no lugar parou: os créditos da conta acabaram no meio da geração (voltaram 3 de 14 versões), e a versão do case 1 que voltou pôs o drop em 17 s, não em 47 s.
+  - A grade (108 BPM, fase 0,01 s) e as seções do arquivo de batidas (17,8 · 195,6 · 240 s) saem da própria peça.
+  - O interruptor da automação ficou só com o clique (sem os batimentos do antigo silêncio).
+  - `tools/eleven_fit.py`: sem o `PARTE2_MAPA` e sem as funções que ficaram sem uso.
+- [x] **Partes 1 e 3:** mantidas.
+- [x] **QA:**
+  - varredura sem exceções;
+  - medidor de leitura: 72 telas, 0 curtas;
+  - navegação, clique e console limpos.

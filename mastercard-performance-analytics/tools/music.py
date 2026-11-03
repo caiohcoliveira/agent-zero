@@ -45,7 +45,7 @@ DOWN_REF = {'funk': 11.92, 'tech': 11.111, 'piano': 29.08}
 # grade conhecida (BPM exato, um começo de compasso/batida e as seções): as faixas encaixadas por tools/eleven_fit.py
 # têm andamento fixo, e o detector erraria (introduções filtradas sem batida, contratempos de chimbal fortes)
 GRID = {'funk': (110.0, 105.897, [1.17, 12.079, 90.62, 105.897, 143.0]),      # parte 1: drop da parte B em 105,897
-        'tech': (108.0, 0.0, [46.667, 106.667, 166.667, 240.0]),            # parte 2: grade a partir de 0; drops nas soluções
+        'tech': (108.0, 0.01, [17.788, 195.564, 240.014]),                  # parte 2 tocada inteira: a banda entra, volta da quebra, trecho mais forte
         'piano': (100.0, 27.573, [27.61, 59.97])}                           # parte 3: a entrada da orquestra e o acento do letreiro
 
 

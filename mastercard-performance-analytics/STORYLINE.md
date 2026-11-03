@@ -179,7 +179,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Antes | Cada relatório de fraude para o board era *montado manualmente*. | close na tela: o cursor seleciona a planilha, confere linha a linha, copia e cola e monta o gráfico; cada gesto escrito ao lado: 1 extrair os dados · 2 conferir · 3 copiar e colar · 4 montar o relatório |
 | Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | a câmera abre: cadeira vazia, relógio acelerado, pilhas crescendo, o dia vira noite, "↻ de novo · relatório N" (sem contador de horas inventado) |
 | Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia acende na tela; o código se escreve com a barra "automação %"; faíscas saem da tela e montam o fluxo nomeado: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
-| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; a trilha esvazia; clique seco, escuro e silêncio; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
+| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; clique seco e escuro (a música segue); no começo do compasso seguinte só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
 | Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); a cadeira vazia gira num foco de luz, um equalizador neon pulsa e os relatórios voam como confete |
 | Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; o fluxo se apaga e a câmera mergulha nela |
 
@@ -252,13 +252,13 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - o tema volta maior na estação 02;
   - na estação 03 a música fica só com médios (o "low"), faz uma pausa e o drop entra na parte B (1:45,9) com riser e impacto;
   - as viradas de estação caem no tempo forte.
-- **Parte 2 · os cases, 05 e 06 (uma peça só, 108 BPM):**
-  - a mesma banda e o mesmo motivo do começo ao fim, sem filtros nem efeitos de DJ;
-  - a estação 04 tem a introdução leve da própria música, e a banda entra quando o case 1 começa;
-  - antes de cada solução, um trecho leve da própria peça (sem baixo nem bateria cheia), e a banda volta com tudo na solução;
-  - na automação, o interruptor corta a música seca e a banda volta no neon;
-  - a IA leva o trecho mais forte da peça, o pico da apresentação;
-  - a 05/06 termina com o final da própria peça.
+- **Parte 2 · os cases, 05 e 06 (uma peça só, 108 BPM, tocada inteira):**
+  - a mesma banda e o mesmo motivo do começo ao fim, do jeito que foram compostos: sem cortes, filtros, efeitos de DJ ou silêncios;
+  - a estação 04 tem a introdução leve da própria música, e a banda entra no começo do case 1;
+  - a música segue no groove pelas soluções dos cases, e as soluções caem em começos de compasso;
+  - uma quebra leve da própria peça fecha a automação ("rodando sozinha"), e a banda volta no começo da IA;
+  - o trecho mais forte começa na escala da IA, o pico da apresentação;
+  - a 05/06 termina com o acorde final da própria peça.
 - **Parte 3 · 07, disciplinas e letreiro (final orquestral, 100 BPM, sem coro):**
   - tocado inteiro, do jeito que foi composto;
   - a cidade tem piano e cordas;
