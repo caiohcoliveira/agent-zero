@@ -91,7 +91,8 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       // a linha corre por cima dos pilares
       const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
-      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) * .12) % 1; LINE.head(ctx, lerp(-120, W + 120, u), TOPY - 40, 0, 18); }
+      // o monotrilho: o trem da linha passa em cima do viaduto (um a cada 11 s, 9 s para cruzar a tela)
+      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) % 11) / 9; if (u < 1) sideTrain(ctx, lerp(-60, W + 420, u), TOPY - 50); }
       // contribuições: dois grupos, cada descrição fica na tela até o fim
       PILLARS.forEach((p, i) => { const a = P(t, T_CARD[i], .4); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;

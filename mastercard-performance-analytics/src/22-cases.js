@@ -400,7 +400,7 @@ const CASEKIT = {
 (() => {
   const id = 'lightsoff', bt = k => k * 2.2222;
   const T0 = 2.4, T_COST = 12.0, T_IDEA = 20.4, T_PIPE = 21.3, T_SIG = 31.0, T_OFF = bt(16.5), T_DROP = bt(17);
-  const T_RESULT = 43.6, T_PARTY = 44.6, T_NEXT = 49.6, T_DIVE = 55.4;
+  const T_RESULT = 43.0, T_PARTY = 44.0, T_NEXT = 50.8, T_DIVE = 55.4, T_DASH = T_RESULT + 1.4;   // T_DASH: abre o dashboard
   const NODES = [['Entrada dos dados', 'db'], ['Validação', 'check'], ['Processamento', 'gear'], ['Relatório', 'doc'], ['Envio ao board', 'board']];
   const GEST = [['1', 'extrair os dados', 3.6], ['2', 'conferir', 5.8], ['3', 'copiar e colar', 8.0], ['4', 'montar o relatório', 10.0]];
   const FLOOR = 880, SEAT = 470, SW_X = 1800, SW_Y = 650, nx = i => 520 + i * 180, NY = 306, IAX = 1180, IAY = 570, BOD = { x: 1330, w: 500 };
@@ -412,7 +412,7 @@ const CASEKIT = {
   cue(id, T_IDEA, 'chime', { f: 784, up: 7 }); for (let k = 0; k < 10; k++) cue(id, T_PIPE + k * .55, 'type', { n: 5, gap: .04 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.1, 'pop', { p: .8 + i * .1, v: .18 }));
   // no interruptor a música segue tocando (v7.6): só o clique; sem os batimentos do antigo silêncio
   cue(id, T_SIG, 'whoosh', { dur: 4, v: .15 }); cue(id, T_OFF, 'click', { v: 1 }); cue(id, T_DROP, 'impact', { size: 1.3 }); cue(id, T_DROP + .02, 'shimmer', { dur: 2 });
-  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
+  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_DASH, 'pop', { p: 1.15, v: .22 }); cue(id, T_NEXT - .55, 'whoosh', { dur: .5, v: .15 }); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
   const SCRIPT = CASEKIT.script(id, 3, 'CASE 3 DE 4 · RELATÓRIOS DE FRAUDE', '#F3EBDD', 'Relatórios automatizados', [
     [T0, T_COST, 'ANTES', 'Cada relatório de fraude para o board era *montado manualmente*.', { y: 236, ...BOD }],
     [T_COST, T_IDEA, 'PROBLEMA', 'O trabalho *se repetia* a cada relatório e consumia *tempo da equipe*.', { y: 236, ...BOD }],
@@ -588,6 +588,28 @@ const CASEKIT = {
     ctx.restore();
     late(ctx, c => { c.globalAlpha *= a * P(t, T_NEXT + .8, .5); icon(c, 'ai', IAX - 120, IAY, 60, C.yellow, 7); text(c, 'Insight Agent', IAX - 70, IAY - 18, { size: 32, weight: 900, color: '#FFF' }); text(c, 'integração possível', IAX - 70, IAY + 24, { size: 26, weight: 800, color: C.yellow }); });
   }
+  /** a imagem do dashboard real: dashboard_image no JSON (data:image/… ou um arquivo ao lado do HTML); vazio = ilustrativo */
+  const DASH = (() => { let src = null, img = null; return () => {
+    const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
+    if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
+  DASH();   // começa a carregar a imagem já na abertura da página
+  /** com a rotina automatizada, o relatório que vai ao board abre numa janela (popup) que sai do monitor e volta para ele */
+  function dashPopup(ctx, t) {
+    const op = E.outBack(P(t, T_DASH, .55)), cl = E.inCubic(P(t, T_NEXT - .55, .45)), a = P(t, T_DASH, .25) * (1 - cl); if (a <= 0) return;
+    const WW = 920, WH = 560, k = lerp(.3, 1, op) * (1 - .7 * cl), cx = lerp(MON.x, 760, op * (1 - cl)), cy = lerp(MON.y, 520, op * (1 - cl));
+    hud(ctx, c => {
+      c.fillStyle = 'rgba(4,6,14,.55)'; c.fillRect(0, 0, W, H);                      // o resto da cena escurece
+      c.translate(cx, cy); c.scale(k, k); c.translate(-WW / 2, -WH / 2);
+      panel(c, 0, 0, WW, WH, { dark: true, accent: C.yellow });
+      [C.red, C.yellow, '#9BD27A'].forEach((col, i) => circle(c, 44 + i * 24, 30, 7, col));
+      text(c, 'Dashboard de fraude · board', 124, 38, { size: 22, weight: 800, mono: true, color: '#F3E6D6' });
+      tag(c, WW - 170, 30, 'gerado automaticamente', { size: 20, fill: C.yellow });
+      const img = DASH(), X = 34, Y = 60, IW = WW - 56, IH = WH - 80;
+      if (img) { const s = Math.min(IW / img.naturalWidth, IH / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s;
+        rr(c, X, Y, IW, IH, 10); c.fillStyle = '#FFF'; c.fill(); c.drawImage(img, X + (IW - w) / 2, Y + (IH - h) / 2, w, h); }
+      else { dashboard(c, X, Y, IW, IH, { t: t - T_DASH, seed: 9 }); tag(c, X + IW - 190, Y + 32, 'ilustrativo', { size: 18, fill: '#E9DCC8' }); }
+    }, a);
+  }
   function beforeAfter(ctx, t) {
     const a = P(t, T_RESULT + .3, .5) * (1 - P(t, T_NEXT - .3, .5)); if (a <= 0) return;
     hud(ctx, c => { c.translate(96, 700); const PW = Math.max(980, GEST.reduce((s, [, l]) => s + measure(c, l, 26, 800) + 44, 190) + 26); panel(c, 0, 0, PW, 250, { dark: true });
@@ -621,7 +643,7 @@ const CASEKIT = {
       });
       ctx.restore();
       if (dive > .6) flash(ctx, (dive - .6) / .4, C.yellow);
-      beforeAfter(ctx, t);
+      beforeAfter(ctx, t); dashPopup(ctx, t);
       CASEKIT.interstitial(ctx, t, 3, '*Relatórios* automatizados', 'relatórios de fraude para o board', '#F3EBDD');
       if (dark > 0) scanlines(ctx, .04 * dark);
       SAY.draw(ctx, t, SCRIPT, t < T_OFF ? 'light' : 'dark');

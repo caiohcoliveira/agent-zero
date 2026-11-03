@@ -89,18 +89,11 @@ const FUTURE_ART = {
 
 /* ---------- 07 · O futuro de analytics: uma cidade conectada ---------- */
 (() => {
-  const id = 's07', DIR = TX.future, ART = ['chair', 'merge', 'tiles', 'robots', 'userpay'];
+  const id = 's07', DIR = TX.future, ART = ['chair', 'merge', 'robots', 'tiles', 'userpay'];   // a grade que cresce (tiles) é o ganho de escala
   const POS = [560, 1360, 2600, 3400, 5040], GROUP = [0, 0, 1, 1, 2], T_G = [.6, 9.4, 18.2].map(t => onBeat(id, t)), CAMX = [960, 3000, 5040], RAIL = 900;
   const T_P = DIR.map((d, i) => beatsFrom(id, T_G[GROUP[i]] + .5, i % 2));   // cada painel numa batida (o segundo do grupo, uma batida depois)
   /** posição da frente do trem: anda constante (268 px/s) pela cidade e freia nos últimos 3 s, parando junto da estação "?" (5760) */
   const trainX = t => { const v = 268.1, t1 = 22, d = 3; if (t <= t1) return -600 + v * t; const u = Math.min(t - t1, d); return -600 + v * t1 + v * u - v * u * u / (2 * d); };
-  /** o trem da linha, de lado: dois vagões da Performance Analytics com as rodas no trilho e o farol pulsando com a música */
-  function train(ctx, xf) {
-    const S = .17, L = 1000, GAP = 70, y = RAIL - 11 - 408 * S; if (xf < -400) return;
-    glow(ctx, xf + 30, y + 150 * S, 160, C.orange, .22 + .15 * BT.level);
-    for (let k = 1; k >= 0; k--) trainCar(ctx, xf - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: 7 + k, lit: 1, doors: [L * .3, L * .7] });
-    glow(ctx, xf - 4, y + 190 * S, 60, '#FFF2C8', .8);
-  }
   const CAM = [[0, 960, 540, 1.06], [2.4, 960, 540, 1], [9.0, 960, 540, 1], [9.9, 3000, 540, 1], [17.8, 3000, 540, 1], [18.7, 5040, 540, 1], [23.6, 5040, 540, 1], [26.4, 5560, 540, 1.04]];
   T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_P[i], 'pop', { p: 1 + i * .06, v: .2 }));
   const SCRIPT = SAY.reg(id, [
@@ -137,7 +130,7 @@ const FUTURE_ART = {
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
           pin(ctx, x, RAIL, c => { c.globalAlpha *= op; text(c, '?', 0, 4, { size: 54, weight: 900, color: C.yellow, align: 'center' }); text(c, 'a próxima estação', 0, -90, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); }
         // o trem da linha puxa o traço laranja pela cidade e para na próxima estação
-        train(ctx, xt);
+        sideTrain(ctx, xt, RAIL - 11);
       });
       // objetos flutuando à frente da cidade (giram com o passeio da câmera: sensação de profundidade)
       SPACE.floaters(ctx, t, { alpha: .26, n: 10, cy: 300, rot: SPACE.camRot(cam, .00018), scale: 940, spin: .02 });

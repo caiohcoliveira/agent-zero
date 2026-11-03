@@ -57,6 +57,15 @@ function trainCar(ctx, x, y, s, o = {}) {
   ctx.restore();
 }
 
+/** o trem da linha visto de lado (ponte, viaduto dos pilares e 07): n vagões com as rodas sobre o trilho.
+ *  xf = frente do trem · ry = topo do trilho · o brilho do farol pulsa com a música */
+function sideTrain(ctx, xf, ry, o = {}) {
+  const S = o.s || .17, L = 1000, GAP = 70, n = o.cars || 2, y = ry - 408 * S, k0 = S / .17;
+  glow(ctx, xf + 30 * k0, y + 150 * S, 160 * k0, C.orange, .22 + .15 * BT.level);
+  for (let k = n - 1; k >= 0; k--) trainCar(ctx, xf - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: (o.seed || 7) + k, lit: 1, doors: [L * .3, L * .7] });
+  glow(ctx, xf - 4 * k0, y + 190 * S, 60 * k0, '#FFF2C8', .8);
+}
+
 /* ---------- o trem passa na frente da câmera na chegada de cada estação (esconde o corte) ---------- */
 const TRAIN_PASS = (() => {
   const S = 3.2, LEN = 1000, HALF = .5, list = [];

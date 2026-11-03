@@ -83,8 +83,8 @@
    - "O papel da área": "Conectamos perguntas de negócio aos dados necessários para respondê-las."
    - O cabo da ponte é a linha laranja.
 3. **Os 4 serviços:** os quatro vãos da ponte caem um por um, numerados e rotulados.
-   - A lista "OS 4 SERVIÇOS" cresce junto: *Diagnóstico*: entender o problema · *Estratégia*: definir o caminho · *Implementação*: construir a solução · *Mensuração*: verificar o resultado.
-   - Ela atravessa e o lado dos dados amanhece: as torres acendem.
+   - A lista "OS 4 SERVIÇOS" cresce junto: *Diagnóstico*: entender o problema · *Estratégia*: definir o caminho · *Execução*: construir a solução · *Mensuração*: verificar o resultado.
+   - O trem da linha entra pela margem do negócio, atravessa a ponte e para do lado dos dados, que amanhece: as torres acendem.
 4. **Do diagnóstico à mensuração:** a linha segue pelas estações Dados → Decisão → Ação → Resultado.
    - "Atuamos do diagnóstico à mensuração para gerar valor para o cliente."
 5. **Conclusão:** "Analytics é uma *capacidade estratégica* da consultoria."
@@ -180,7 +180,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | a câmera abre: cadeira vazia, relógio acelerado, pilhas crescendo, o dia vira noite, "↻ de novo · relatório N" (sem contador de horas inventado) |
 | Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia acende na tela; o código se escreve com a barra "automação %"; faíscas saem da tela e montam o fluxo nomeado: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
 | Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; clique seco e escuro na pausa composta da própria música; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
-| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); a cadeira vazia gira num foco de luz, um equalizador neon pulsa e os relatórios voam como confete |
+| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); um popup sai do monitor com o dashboard enviado ao board (ilustrativo no Git, o real na cópia local); a cadeira vazia gira num foco de luz, um equalizador neon pulsa e os relatórios voam como confete |
 | Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; o fluxo se apaga e a câmera mergulha nela |
 
 ### Case 4 · Agentes de IA para insights (Insight Agent · adquirentes, 56 s)
@@ -204,7 +204,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ### 06 · A Prática (24 s) — os pilares viram a infraestrutura da viagem
 
-- **Visual:** os pilares sobem como colunas de viaduto com os nomes, e a linha corre por cima. Objetos 3D flutuam no céu.
+- **Visual:** os pilares sobem como colunas de viaduto com os nomes, e a linha corre por cima, com o trem passando como um monotrilho. Objetos 3D flutuam no céu.
 - **Contribuições:** cada pilar ganha um cartão com uma contribuição curta (campo `contribution` do JSON) e "N entregas", em dois grupos que ficam até o fim.
 - **Conclusão:** "A combinação dessas capacidades permite *executar os projetos*."
 
@@ -222,7 +222,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 1. **07 · Para onde a linha segue (26 s):** uma cidade noturna conectada.
    - Cada direção tem painel ilustrado, título e subtítulo, em três grupos:
      - Apoiar decisões estratégicas · dos clientes (sala do board) e Combinar analytics · com as demais tracks;
-     - Reutilizar ativos · para ampliar o alcance e Automatizar rotinas · para ganhar eficiência (robôs);
+     - Automatizar rotinas · para ganhar eficiência (robôs) e Eficiência operacional · e ganho de escala (uma grade que cresce): a automação das rotinas leva ao ganho de escala;
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
    - As outras linhas chegam à cidade e um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?"; partículas e objetos 3D giram com o passeio.
    - No fim, uma estação tracejada "?": a próxima estação.

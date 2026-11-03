@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.8, experimento)
+# Performance Analytics — "A Linha" (v7.9, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -115,6 +115,9 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   1. Abra uma **cópia local** de `performance-analytics.html` num editor de texto.
   2. Procure `id="pa-data"`.
   3. Edite dentro do bloco e salve. Não é preciso rodar build. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
+- **Dashboard real (case de relatórios automatizados):** depois da automação, um popup mostra o dashboard enviado ao board.
+  - No Git ele é **ilustrativo** (o campo `dashboard_image` do case "Lights-off" fica vazio). A imagem real nunca vai para o repositório.
+  - Na cópia local: `python3 tools/dash_image.py minha-copia.html dashboard.png` embute a imagem (PNG, JPG ou WEBP) como data URL, e o HTML continua um arquivo só, offline. `--limpar` volta ao ilustrativo.
 - **Aviso de versão mockada:** `presentation_context.disclaimer` aparece no canto inferior esquerdo de todas as telas, inclusive nas conversas ("Este vídeo é a versão mockada, com dados sanitizados."). Na cópia local com os dados reais, deixe o campo vazio (`""`) e o aviso some.
 
 ## Música e batidas

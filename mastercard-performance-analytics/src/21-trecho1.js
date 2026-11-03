@@ -120,13 +120,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     RST.slice(0, 3).forEach(([, , u], i) => { const a = P(t, T_RES + .6 + i * .55, .4); if (a <= 0) return; const [x1, y1] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], u + .04), [x2, y2] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], RST[i + 1][2] + .04);
       late(ctx, c => { c.globalAlpha *= a; text(c, '›', (x1 + x2) / 2, (y1 + y2) / 2 - 46, { size: 54, weight: 900, color: C.yellow, align: 'center' }); }); });
   }
-  /** com a ponte pronta, um trem atravessa de Negócio para Dados (e o lado dos dados amanhece) */
+  /** com a ponte pronta, o trem da linha entra pela margem do negócio, atravessa a ponte e para no lado dos dados (que amanhece) */
   function crossing(ctx, t) {
-    const u = P(t, T_CROSS0, T_CROSS1 - T_CROSS0); if (u <= 0 || u >= 1) return;
-    const e = E.inOutSine(u), x = lerp(BX0 - 140, BX1 + 160, e), y = GY - 40;
-    glow(ctx, x, y, 260, '#FFE2B0', .35);
-    ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(x - 520, 0, x, 0); g.addColorStop(0, 'rgba(255,200,140,0)'); g.addColorStop(1, 'rgba(255,214,160,.55)'); ctx.fillStyle = g; ctx.fillRect(x - 520, y - 8, 520, 16); ctx.restore();
-    LINE.head(ctx, x, y, 0, 26);
+    const u = P(t, T_CROSS0, T_CROSS1 - T_CROSS0); if (u <= 0) return;
+    const x = lerp(260, BX1 - 10, E.inOutSine(u)), v = Math.sin(u * Math.PI);          // v: velocidade relativa (rastro de luz)
+    if (v > .02) { const x1 = x - 350, w = 480 * v; ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(x1 - w, 0, x1, 0);
+      g.addColorStop(0, 'rgba(255,200,140,0)'); g.addColorStop(1, rgba('#FFD6A0', .45 * v)); ctx.fillStyle = g; ctx.fillRect(x1 - w, GY - 62, w, 32); ctx.restore(); }
+    sideTrain(ctx, x, GY - 22);
   }
   SCENES[id] = {
     themeAt: () => 'dark', script: SCRIPT,
@@ -448,7 +448,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
 /* ---------- Conversa 1: o que já foi explicado, legível sem fala (cartazes 01, 02, 03 + lupa) ---------- */
 POSTERS[1] = (ctx, w, h, tl) => {
   const SV = TX.engagement.map(e => e[0]), DEF = ['entender o problema', 'definir o caminho', 'construir a solução', 'verificar o resultado'], COL = [C.red, C.orange, C.yellow, '#FFD9A8'];
-  late(ctx, c => para(c, 'Conectamos *perguntas de negócio*, dados, implementação e mensuração.', 0, -246, 420, { size: 26, weight: 900, color: INK, accent: C.red, align: 'center', lh: 1.15 }));
+  late(ctx, c => para(c, 'Conectamos *perguntas de negócio*, dados, execução e mensuração.', 0, -246, 420, { size: 26, weight: 900, color: INK, accent: C.red, align: 'center', lh: 1.15 }));
   SV.forEach((sv, i) => { const y = -90 + i * 86, on = Math.floor(tl / 2) % 4 === i; rr(ctx, -210, y - 36, 420, 72, 10); ctx.fillStyle = on ? COL[i] : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
     late(ctx, c => { circle(c, -178, y, 16, COL[i], INK, 2.5); text(c, String(i + 1), -178, y + 1, { size: 18, weight: 900, color: i === 3 ? INK : '#FFF', align: 'center' });
       text(c, sv, -150, y - 13, { size: 24, weight: 900, color: INK }); text(c, DEF[i], -150, y + 16, { size: 20, weight: 700, color: '#3A332C' }); }); });

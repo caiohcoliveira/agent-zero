@@ -98,7 +98,7 @@ const CONFIG = {
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
       { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'conectamos perguntas de negócio aos dados, do diagnóstico à mensuração',
-        see: ['Decisões difíceis começam com perguntas', 'A ponte entre negócio e dados', 'Diagnóstico, estratégia, implementação e mensuração'] },
+        see: ['Decisões difíceis começam com perguntas', 'A ponte entre negócio e dados', 'Diagnóstico, estratégia, execução e mensuração'] },
       { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'o faturamento da track e o resultado do Brasil',
         see: ['Faturamento anual da track, com base zero', 'Brasil: comparado ao período anterior e ao orçamento', 'Trimestres: anterior × orçamento × realizado'] },
       { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'Onde aplicamos analytics',                             teaser: 'tipos de cliente, capabilities e modelos',
@@ -110,7 +110,7 @@ const CONFIG = {
       { n: '06', short: 'A PRÁTICA',                title: 'A Prática: os pilares que sustentam a linha',          teaser: 'os pilares e o que cada um entrega',
         see: ['Os pilares da prática', 'Uma contribuição por pilar'] },
       { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'para onde a linha segue',
-        see: ['Decisões estratégicas e integração', 'Reuso de ativos e eficiência', 'Projetos User-Pay com Advanced Analytics'] }
+        see: ['Decisões estratégicas e integração', 'Automação de rotinas, eficiência e escala', 'Projetos User-Pay com Advanced Analytics'] }
     ],
     // os 3 capítulos da viagem (mapa da abertura e da Conversa 0)
     chapters: [['Onde atuamos', [1, 2, 3], C_RED], ['Cases e resultados', [4, 5, 6], C_ORANGE], ['O que vem pela frente', [7], C_YELLOW]],
@@ -120,7 +120,7 @@ const CONFIG = {
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
     circleA: 'Negócio', circleB: 'Dados',
     chain: ['Dados', 'Decisões', 'Impacto', 'Valor'],
-    engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Implementação', 'construir'], ['Mensuração', 'provar']],
+    engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Execução', 'construir'], ['Mensuração', 'provar']],
     question: 'Quem pode resolver esse problema?',
     tagline: 'Esse é o nosso *papel estratégico*.',
     caseSteps: ['PROBLEMA', 'DADOS', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'],
@@ -149,8 +149,8 @@ const CONFIG = {
     future: [
       { title: 'Apoiar decisões estratégicas', sub: 'dos clientes', icon: 'chair' },
       { title: 'Combinar analytics', sub: 'com as demais tracks', icon: 'link' },
-      { title: 'Reutilizar ativos', sub: 'para ampliar o alcance', icon: 'grid' },
-      { title: 'Automatizar rotinas', sub: 'para ganhar eficiência', icon: 'robots' },
+      { title: 'Automatizar rotinas', sub: 'para ganhar eficiência', icon: 'robots' },   // a automação das rotinas leva ao ganho de escala
+      { title: 'Eficiência operacional', sub: 'e ganho de escala', icon: 'grid' },
       { title: 'Ampliar projetos User-Pay', sub: 'com Advanced Analytics', icon: 'userpay' }
     ],
     futureKey: 'É esse o papel que queremos ocupar.',

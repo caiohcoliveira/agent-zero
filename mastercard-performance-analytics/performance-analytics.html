@@ -286,7 +286,8 @@
           "executive_message": "A productized engine combining look-alike segmentation, product affinity and principality impact showed +4 p.p. theoretical principality gain for associates who adopted Top 3 recommendations."
         },
         {
-          "case_name": "Lights-off Fraud Reporting"
+          "case_name": "Lights-off Fraud Reporting",
+          "dashboard_image": ""
         },
         {
           "case_name": "Insight Agent | AI-powered Market Share & Share of Wallet Insights",
@@ -736,7 +737,7 @@ const CONFIG = {
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
       { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'conectamos perguntas de negócio aos dados, do diagnóstico à mensuração',
-        see: ['Decisões difíceis começam com perguntas', 'A ponte entre negócio e dados', 'Diagnóstico, estratégia, implementação e mensuração'] },
+        see: ['Decisões difíceis começam com perguntas', 'A ponte entre negócio e dados', 'Diagnóstico, estratégia, execução e mensuração'] },
       { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'o faturamento da track e o resultado do Brasil',
         see: ['Faturamento anual da track, com base zero', 'Brasil: comparado ao período anterior e ao orçamento', 'Trimestres: anterior × orçamento × realizado'] },
       { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'Onde aplicamos analytics',                             teaser: 'tipos de cliente, capabilities e modelos',
@@ -748,7 +749,7 @@ const CONFIG = {
       { n: '06', short: 'A PRÁTICA',                title: 'A Prática: os pilares que sustentam a linha',          teaser: 'os pilares e o que cada um entrega',
         see: ['Os pilares da prática', 'Uma contribuição por pilar'] },
       { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'para onde a linha segue',
-        see: ['Decisões estratégicas e integração', 'Reuso de ativos e eficiência', 'Projetos User-Pay com Advanced Analytics'] }
+        see: ['Decisões estratégicas e integração', 'Automação de rotinas, eficiência e escala', 'Projetos User-Pay com Advanced Analytics'] }
     ],
     // os 3 capítulos da viagem (mapa da abertura e da Conversa 0)
     chapters: [['Onde atuamos', [1, 2, 3], C_RED], ['Cases e resultados', [4, 5, 6], C_ORANGE], ['O que vem pela frente', [7], C_YELLOW]],
@@ -758,7 +759,7 @@ const CONFIG = {
     postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
     circleA: 'Negócio', circleB: 'Dados',
     chain: ['Dados', 'Decisões', 'Impacto', 'Valor'],
-    engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Implementação', 'construir'], ['Mensuração', 'provar']],
+    engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Execução', 'construir'], ['Mensuração', 'provar']],
     question: 'Quem pode resolver esse problema?',
     tagline: 'Esse é o nosso *papel estratégico*.',
     caseSteps: ['PROBLEMA', 'DADOS', 'ESTRATÉGIA', 'SOLUÇÃO', 'IMPACTO'],
@@ -787,8 +788,8 @@ const CONFIG = {
     future: [
       { title: 'Apoiar decisões estratégicas', sub: 'dos clientes', icon: 'chair' },
       { title: 'Combinar analytics', sub: 'com as demais tracks', icon: 'link' },
-      { title: 'Reutilizar ativos', sub: 'para ampliar o alcance', icon: 'grid' },
-      { title: 'Automatizar rotinas', sub: 'para ganhar eficiência', icon: 'robots' },
+      { title: 'Automatizar rotinas', sub: 'para ganhar eficiência', icon: 'robots' },   // a automação das rotinas leva ao ganho de escala
+      { title: 'Eficiência operacional', sub: 'e ganho de escala', icon: 'grid' },
       { title: 'Ampliar projetos User-Pay', sub: 'com Advanced Analytics', icon: 'userpay' }
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
@@ -2655,11 +2656,11 @@ const SLIDES = {
     ['s03', 43.5, 'Modelos preditivos', 34.5, 43.4], ['s03', 51.5, 'Modelos prescritivos', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
   4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 34.0, 'Cestas · como fizemos', 24.5, 35.4], ['banana', 52.5, 'Cestas · solução e resultado', 35.6, 53.1],
     ['manga', 34.5, 'Principalidade · como fizemos', 24.5, 35.4], ['manga', 45.5, 'Principalidade · reordenação', 35.6, 46.6], ['manga', 58.5, 'Principalidade · resultado', 46.8, 59.8],
-    ['lightsoff', 11, 'Relatórios · antes', 2.4, 11.9], ['lightsoff', 35.5, 'Relatórios · como fizemos', 20.4, 36.5], ['lightsoff', 48.8, 'Relatórios · luz apagada e resultado', 36.6, 49.4],
+    ['lightsoff', 11, 'Relatórios · antes', 2.4, 11.9], ['lightsoff', 35.5, 'Relatórios · como fizemos', 20.4, 36.5], ['lightsoff', 49.6, 'Relatórios · luz apagada, resultado e dashboard', 36.6, 50.6],
     ['insight', 26.8, 'Agentes · avaliar e corrigir', 18.6, 27.4], ['insight', 45.6, 'Agentes · escala', 35.6, 46.5], ['insight', 54.6, 'Agentes · situação', 46.7, 55.4]],
   5: [['s05', 19.5, 'A mesma equipe, mais alcance', 3.8, 19.8]],
   6: [['s06', 24.0, 'Pilares e contribuições', 3.8, 24.3]],
-  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Reuso e eficiência', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 25.5, 'Disciplinas · Analytics & Advanced Analytics', 0, 26.3]]
+  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 25.5, 'Disciplinas · Analytics & Advanced Analytics', 0, 26.3]]
 };
 /** telas extras das paradas (lupa) que não são cenas do filme: SLIDES com nome '@tela' */
 const SLIDE_SCREENS = {};
@@ -2901,6 +2902,15 @@ function trainCar(ctx, x, y, s, o = {}) {
   ctx.restore();
   inkRect(ctx, 0, 0, L, 360, 46, 6, o.seed || 3);
   ctx.restore();
+}
+
+/** o trem da linha visto de lado (ponte, viaduto dos pilares e 07): n vagões com as rodas sobre o trilho.
+ *  xf = frente do trem · ry = topo do trilho · o brilho do farol pulsa com a música */
+function sideTrain(ctx, xf, ry, o = {}) {
+  const S = o.s || .17, L = 1000, GAP = 70, n = o.cars || 2, y = ry - 408 * S, k0 = S / .17;
+  glow(ctx, xf + 30 * k0, y + 150 * S, 160 * k0, C.orange, .22 + .15 * BT.level);
+  for (let k = n - 1; k >= 0; k--) trainCar(ctx, xf - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: (o.seed || 7) + k, lit: 1, doors: [L * .3, L * .7] });
+  glow(ctx, xf - 4 * k0, y + 190 * S, 60 * k0, '#FFF2C8', .8);
 }
 
 /* ---------- o trem passa na frente da câmera na chegada de cada estação (esconde o corte) ---------- */
@@ -3974,13 +3984,13 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     RST.slice(0, 3).forEach(([, , u], i) => { const a = P(t, T_RES + .6 + i * .55, .4); if (a <= 0) return; const [x1, y1] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], u + .04), [x2, y2] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], RST[i + 1][2] + .04);
       late(ctx, c => { c.globalAlpha *= a; text(c, '›', (x1 + x2) / 2, (y1 + y2) / 2 - 46, { size: 54, weight: 900, color: C.yellow, align: 'center' }); }); });
   }
-  /** com a ponte pronta, um trem atravessa de Negócio para Dados (e o lado dos dados amanhece) */
+  /** com a ponte pronta, o trem da linha entra pela margem do negócio, atravessa a ponte e para no lado dos dados (que amanhece) */
   function crossing(ctx, t) {
-    const u = P(t, T_CROSS0, T_CROSS1 - T_CROSS0); if (u <= 0 || u >= 1) return;
-    const e = E.inOutSine(u), x = lerp(BX0 - 140, BX1 + 160, e), y = GY - 40;
-    glow(ctx, x, y, 260, '#FFE2B0', .35);
-    ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(x - 520, 0, x, 0); g.addColorStop(0, 'rgba(255,200,140,0)'); g.addColorStop(1, 'rgba(255,214,160,.55)'); ctx.fillStyle = g; ctx.fillRect(x - 520, y - 8, 520, 16); ctx.restore();
-    LINE.head(ctx, x, y, 0, 26);
+    const u = P(t, T_CROSS0, T_CROSS1 - T_CROSS0); if (u <= 0) return;
+    const x = lerp(260, BX1 - 10, E.inOutSine(u)), v = Math.sin(u * Math.PI);          // v: velocidade relativa (rastro de luz)
+    if (v > .02) { const x1 = x - 350, w = 480 * v; ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(x1 - w, 0, x1, 0);
+      g.addColorStop(0, 'rgba(255,200,140,0)'); g.addColorStop(1, rgba('#FFD6A0', .45 * v)); ctx.fillStyle = g; ctx.fillRect(x1 - w, GY - 62, w, 32); ctx.restore(); }
+    sideTrain(ctx, x, GY - 22);
   }
   SCENES[id] = {
     themeAt: () => 'dark', script: SCRIPT,
@@ -4302,7 +4312,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
 /* ---------- Conversa 1: o que já foi explicado, legível sem fala (cartazes 01, 02, 03 + lupa) ---------- */
 POSTERS[1] = (ctx, w, h, tl) => {
   const SV = TX.engagement.map(e => e[0]), DEF = ['entender o problema', 'definir o caminho', 'construir a solução', 'verificar o resultado'], COL = [C.red, C.orange, C.yellow, '#FFD9A8'];
-  late(ctx, c => para(c, 'Conectamos *perguntas de negócio*, dados, implementação e mensuração.', 0, -246, 420, { size: 26, weight: 900, color: INK, accent: C.red, align: 'center', lh: 1.15 }));
+  late(ctx, c => para(c, 'Conectamos *perguntas de negócio*, dados, execução e mensuração.', 0, -246, 420, { size: 26, weight: 900, color: INK, accent: C.red, align: 'center', lh: 1.15 }));
   SV.forEach((sv, i) => { const y = -90 + i * 86, on = Math.floor(tl / 2) % 4 === i; rr(ctx, -210, y - 36, 420, 72, 10); ctx.fillStyle = on ? COL[i] : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
     late(ctx, c => { circle(c, -178, y, 16, COL[i], INK, 2.5); text(c, String(i + 1), -178, y + 1, { size: 18, weight: 900, color: i === 3 ? INK : '#FFF', align: 'center' });
       text(c, sv, -150, y - 13, { size: 24, weight: 900, color: INK }); text(c, DEF[i], -150, y + 16, { size: 20, weight: 700, color: '#3A332C' }); }); });
@@ -4745,7 +4755,7 @@ const CASEKIT = {
 (() => {
   const id = 'lightsoff', bt = k => k * 2.2222;
   const T0 = 2.4, T_COST = 12.0, T_IDEA = 20.4, T_PIPE = 21.3, T_SIG = 31.0, T_OFF = bt(16.5), T_DROP = bt(17);
-  const T_RESULT = 43.6, T_PARTY = 44.6, T_NEXT = 49.6, T_DIVE = 55.4;
+  const T_RESULT = 43.0, T_PARTY = 44.0, T_NEXT = 50.8, T_DIVE = 55.4, T_DASH = T_RESULT + 1.4;   // T_DASH: abre o dashboard
   const NODES = [['Entrada dos dados', 'db'], ['Validação', 'check'], ['Processamento', 'gear'], ['Relatório', 'doc'], ['Envio ao board', 'board']];
   const GEST = [['1', 'extrair os dados', 3.6], ['2', 'conferir', 5.8], ['3', 'copiar e colar', 8.0], ['4', 'montar o relatório', 10.0]];
   const FLOOR = 880, SEAT = 470, SW_X = 1800, SW_Y = 650, nx = i => 520 + i * 180, NY = 306, IAX = 1180, IAY = 570, BOD = { x: 1330, w: 500 };
@@ -4757,7 +4767,7 @@ const CASEKIT = {
   cue(id, T_IDEA, 'chime', { f: 784, up: 7 }); for (let k = 0; k < 10; k++) cue(id, T_PIPE + k * .55, 'type', { n: 5, gap: .04 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.1, 'pop', { p: .8 + i * .1, v: .18 }));
   // no interruptor a música segue tocando (v7.6): só o clique; sem os batimentos do antigo silêncio
   cue(id, T_SIG, 'whoosh', { dur: 4, v: .15 }); cue(id, T_OFF, 'click', { v: 1 }); cue(id, T_DROP, 'impact', { size: 1.3 }); cue(id, T_DROP + .02, 'shimmer', { dur: 2 });
-  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
+  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_DASH, 'pop', { p: 1.15, v: .22 }); cue(id, T_NEXT - .55, 'whoosh', { dur: .5, v: .15 }); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
   const SCRIPT = CASEKIT.script(id, 3, 'CASE 3 DE 4 · RELATÓRIOS DE FRAUDE', '#F3EBDD', 'Relatórios automatizados', [
     [T0, T_COST, 'ANTES', 'Cada relatório de fraude para o board era *montado manualmente*.', { y: 236, ...BOD }],
     [T_COST, T_IDEA, 'PROBLEMA', 'O trabalho *se repetia* a cada relatório e consumia *tempo da equipe*.', { y: 236, ...BOD }],
@@ -4933,6 +4943,28 @@ const CASEKIT = {
     ctx.restore();
     late(ctx, c => { c.globalAlpha *= a * P(t, T_NEXT + .8, .5); icon(c, 'ai', IAX - 120, IAY, 60, C.yellow, 7); text(c, 'Insight Agent', IAX - 70, IAY - 18, { size: 32, weight: 900, color: '#FFF' }); text(c, 'integração possível', IAX - 70, IAY + 24, { size: 26, weight: 800, color: C.yellow }); });
   }
+  /** a imagem do dashboard real: dashboard_image no JSON (data:image/… ou um arquivo ao lado do HTML); vazio = ilustrativo */
+  const DASH = (() => { let src = null, img = null; return () => {
+    const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
+    if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
+  DASH();   // começa a carregar a imagem já na abertura da página
+  /** com a rotina automatizada, o relatório que vai ao board abre numa janela (popup) que sai do monitor e volta para ele */
+  function dashPopup(ctx, t) {
+    const op = E.outBack(P(t, T_DASH, .55)), cl = E.inCubic(P(t, T_NEXT - .55, .45)), a = P(t, T_DASH, .25) * (1 - cl); if (a <= 0) return;
+    const WW = 920, WH = 560, k = lerp(.3, 1, op) * (1 - .7 * cl), cx = lerp(MON.x, 760, op * (1 - cl)), cy = lerp(MON.y, 520, op * (1 - cl));
+    hud(ctx, c => {
+      c.fillStyle = 'rgba(4,6,14,.55)'; c.fillRect(0, 0, W, H);                      // o resto da cena escurece
+      c.translate(cx, cy); c.scale(k, k); c.translate(-WW / 2, -WH / 2);
+      panel(c, 0, 0, WW, WH, { dark: true, accent: C.yellow });
+      [C.red, C.yellow, '#9BD27A'].forEach((col, i) => circle(c, 44 + i * 24, 30, 7, col));
+      text(c, 'Dashboard de fraude · board', 124, 38, { size: 22, weight: 800, mono: true, color: '#F3E6D6' });
+      tag(c, WW - 170, 30, 'gerado automaticamente', { size: 20, fill: C.yellow });
+      const img = DASH(), X = 34, Y = 60, IW = WW - 56, IH = WH - 80;
+      if (img) { const s = Math.min(IW / img.naturalWidth, IH / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s;
+        rr(c, X, Y, IW, IH, 10); c.fillStyle = '#FFF'; c.fill(); c.drawImage(img, X + (IW - w) / 2, Y + (IH - h) / 2, w, h); }
+      else { dashboard(c, X, Y, IW, IH, { t: t - T_DASH, seed: 9 }); tag(c, X + IW - 190, Y + 32, 'ilustrativo', { size: 18, fill: '#E9DCC8' }); }
+    }, a);
+  }
   function beforeAfter(ctx, t) {
     const a = P(t, T_RESULT + .3, .5) * (1 - P(t, T_NEXT - .3, .5)); if (a <= 0) return;
     hud(ctx, c => { c.translate(96, 700); const PW = Math.max(980, GEST.reduce((s, [, l]) => s + measure(c, l, 26, 800) + 44, 190) + 26); panel(c, 0, 0, PW, 250, { dark: true });
@@ -4966,7 +4998,7 @@ const CASEKIT = {
       });
       ctx.restore();
       if (dive > .6) flash(ctx, (dive - .6) / .4, C.yellow);
-      beforeAfter(ctx, t);
+      beforeAfter(ctx, t); dashPopup(ctx, t);
       CASEKIT.interstitial(ctx, t, 3, '*Relatórios* automatizados', 'relatórios de fraude para o board', '#F3EBDD');
       if (dark > 0) scanlines(ctx, .04 * dark);
       SAY.draw(ctx, t, SCRIPT, t < T_OFF ? 'light' : 'dark');
@@ -5209,7 +5241,8 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       // a linha corre por cima dos pilares
       const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
-      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) * .12) % 1; LINE.head(ctx, lerp(-120, W + 120, u), TOPY - 40, 0, 18); }
+      // o monotrilho: o trem da linha passa em cima do viaduto (um a cada 11 s, 9 s para cruzar a tela)
+      if (t > T_LINE + 2.4) { const u = ((t - T_LINE - 2.4) % 11) / 9; if (u < 1) sideTrain(ctx, lerp(-60, W + 420, u), TOPY - 50); }
       // contribuições: dois grupos, cada descrição fica na tela até o fim
       PILLARS.forEach((p, i) => { const a = P(t, T_CARD[i], .4); if (a <= 0) return; const x = X(i), w = Math.min(330, 1700 / N - 18);
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;
@@ -5344,18 +5377,11 @@ const FUTURE_ART = {
 
 /* ---------- 07 · O futuro de analytics: uma cidade conectada ---------- */
 (() => {
-  const id = 's07', DIR = TX.future, ART = ['chair', 'merge', 'tiles', 'robots', 'userpay'];
+  const id = 's07', DIR = TX.future, ART = ['chair', 'merge', 'robots', 'tiles', 'userpay'];   // a grade que cresce (tiles) é o ganho de escala
   const POS = [560, 1360, 2600, 3400, 5040], GROUP = [0, 0, 1, 1, 2], T_G = [.6, 9.4, 18.2].map(t => onBeat(id, t)), CAMX = [960, 3000, 5040], RAIL = 900;
   const T_P = DIR.map((d, i) => beatsFrom(id, T_G[GROUP[i]] + .5, i % 2));   // cada painel numa batida (o segundo do grupo, uma batida depois)
   /** posição da frente do trem: anda constante (268 px/s) pela cidade e freia nos últimos 3 s, parando junto da estação "?" (5760) */
   const trainX = t => { const v = 268.1, t1 = 22, d = 3; if (t <= t1) return -600 + v * t; const u = Math.min(t - t1, d); return -600 + v * t1 + v * u - v * u * u / (2 * d); };
-  /** o trem da linha, de lado: dois vagões da Performance Analytics com as rodas no trilho e o farol pulsando com a música */
-  function train(ctx, xf) {
-    const S = .17, L = 1000, GAP = 70, y = RAIL - 11 - 408 * S; if (xf < -400) return;
-    glow(ctx, xf + 30, y + 150 * S, 160, C.orange, .22 + .15 * BT.level);
-    for (let k = 1; k >= 0; k--) trainCar(ctx, xf - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: 7 + k, lit: 1, doors: [L * .3, L * .7] });
-    glow(ctx, xf - 4, y + 190 * S, 60, '#FFF2C8', .8);
-  }
   const CAM = [[0, 960, 540, 1.06], [2.4, 960, 540, 1], [9.0, 960, 540, 1], [9.9, 3000, 540, 1], [17.8, 3000, 540, 1], [18.7, 5040, 540, 1], [23.6, 5040, 540, 1], [26.4, 5560, 540, 1.04]];
   T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_P[i], 'pop', { p: 1 + i * .06, v: .2 }));
   const SCRIPT = SAY.reg(id, [
@@ -5392,7 +5418,7 @@ const FUTURE_ART = {
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
           pin(ctx, x, RAIL, c => { c.globalAlpha *= op; text(c, '?', 0, 4, { size: 54, weight: 900, color: C.yellow, align: 'center' }); text(c, 'a próxima estação', 0, -90, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); }
         // o trem da linha puxa o traço laranja pela cidade e para na próxima estação
-        train(ctx, xt);
+        sideTrain(ctx, xt, RAIL - 11);
       });
       // objetos flutuando à frente da cidade (giram com o passeio da câmera: sensação de profundidade)
       SPACE.floaters(ctx, t, { alpha: .26, n: 10, cy: 300, rot: SPACE.camRot(cam, .00018), scale: 940, spin: .02 });
