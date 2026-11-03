@@ -392,10 +392,16 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
     // produtos: soltos → UMAP → no lugar; nomes com a profundidade (os de trás mais apagados)
     const hi = EP.map(() => 0); COS.forEach(([t0, a, b]) => { const v = win(t, t0, t0 + 1.95, .45, .4); hi[a] = Math.max(hi[a], v); hi[b] = Math.max(hi[b], v); });
     const pts = EP.map((q, i) => { const c = E.inOutCubic(P(t, T_HOW + .5 + (i % 7) * .06, 1.5)), pp = [0, 1, 2].map(k => lerp(q.s0[k], q.p[k], c)); return { q, i, c, pr: proj(pp, t), pop: E.outBack(P(t, T_HOW + i * .025, .35)) }; });
+    // rótulos sem sobreposição: da frente para trás, cada nome perde opacidade conforme encosta num já colocado
+    const placed = (cl > 0 ? FAM.map(f => { const q = proj(f.c, t), w = measure(ctx, f.name, 26, 800) + 40; return [q.x - w / 2, q.y - 140 * q.s - 24, w, 48]; }) : []).concat([[1340, 500, 500, 420]]), LBL = [];
+    COS.forEach(([t0, , , label]) => { if (win(t, t0, t0 + 1.95, .45, .4) > 0) { const w = measure(ctx, label, 24, 800) + 40; placed.push([o.x - w / 2, o.y + 92 - 24, w, 48]); } });
+    pts.slice().sort((A2, B2) => A2.pr.z - B2.pr.z).forEach(({ q, i, pr, pop }) => { const sz = 11.5 * pr.s * pop, lw = measure(ctx, q.name, 18, 700), r0 = [pr.x + sz + 8, pr.y - sz - 16, lw, 24];
+      let ov = 0; placed.forEach(r1 => { const ix = Math.max(0, Math.min(r0[0] + r0[2], r1[0] + r1[2]) - Math.max(r0[0], r1[0])), iy = Math.max(0, Math.min(r0[1] + r0[3], r1[1] + r1[3]) - Math.max(r0[1], r1[1])); ov = Math.max(ov, ix * iy / (r0[2] * r0[3])); });
+      LBL[i] = clamp(1 - ov * 4); if (LBL[i] > .5) placed.push(r0); });
     pts.slice().sort((A2, B2) => B2.pr.z - A2.pr.z).forEach(({ q, i, c, pr, pop }) => { if (pop <= 0) return;
       const col = c < 1 ? mix('#BFB3A3', q.col, c) : q.col, sz = 11.5 * pr.s * pop, al = clamp(.4 + (pr.s - .55) * 1.4);
       glow(ctx, pr.x, pr.y, sz * 4, col, .45 * al); circle(ctx, pr.x, pr.y, sz, rgba(col, Math.max(al, .55)));
-      const lx = pr.x + sz + 8, ly = pr.y - sz - 4, lw = measure(ctx, q.name, 18, 700), la = P(t, T_KM + .4 + (i % 7) * .08, .5) * Math.max(al, hi[i]);
+      const lx = pr.x + sz + 8, ly = pr.y - sz - 4, lw = measure(ctx, q.name, 18, 700), la = P(t, T_KM + .4 + (i % 7) * .08, .5) * Math.max(al * LBL[i], hi[i]);
       const ef = clamp((W - 50 - lx - lw) / 60) * clamp((ly - 200) / 60) * clamp((1000 - ly) / 40) * (lx + lw > 1170 && ly < 470 ? 0 : 1);
       if (la * ef > .01) late(ctx, cc => { const h = hi[i]; cc.globalAlpha *= la * ef;   // o par medido pelo cos θ ganha etiqueta
         if (h > 0) { cc.save(); cc.globalAlpha *= h; tag(cc, lx + lw / 2 + 6, ly, q.name, { size: 20, fill: '#FFF' }); cc.restore(); }

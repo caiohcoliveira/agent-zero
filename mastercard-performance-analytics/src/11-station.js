@@ -51,7 +51,7 @@ function trainCar(ctx, x, y, s, o = {}) {
     [[-1, dx - gap], [1, d + gap]].forEach(([sd, lx]) => {
       rr(ctx, lx, 58, DW / 2, 262, 8); ctx.fillStyle = open > 0 ? '#F4F6F5' : 'rgba(0,0,0,0)'; ctx.fill();
       ctx.strokeStyle = '#9AA4A7'; ctx.lineWidth = 3; ctx.stroke();
-      rr(ctx, lx + 12, 80, DW / 2 - 24, 96, 10); ctx.fillStyle = mix('#1B2830', '#B07A40', lit * .5); ctx.fill();
+      rr(ctx, lx + 12, 80, DW / 2 - 24, 96, 10); ctx.fillStyle = mix('#1E2C34', '#5A4632', lit * .35); ctx.fill();
     });
     rr(ctx, d - 56, 30, 112, 22, 6); ctx.fillStyle = '#141B1E'; ctx.fill();
     text(ctx, o.label || 'ANALYTICS', d, 41, { size: 13, weight: 900, mono: true, color: C.orange, align: 'center', ls: 2 });
