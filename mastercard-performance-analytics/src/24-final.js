@@ -140,13 +140,14 @@ const FUTURE_ART = {
 /* ---------- clímax: as 8 disciplinas entram e ficam (painel para ler) → Analytics & Advanced Analytics ---------- */
 (() => {
   const id = 'climax', VZ = ['gaussian', 'lp', 'classification', 'clusters', 'nlp', 'mlp', 'transformer', 'agents'], N = TX.climaxWords.length;
-  const T_IN = k => beatsFrom(id, .6, 2 * k), T_KEY = onBeat(id, 14.4), TW = 410, TH = 330, TX0 = 105, TY0 = 250;   // uma disciplina a cada 2 batidas
+  // uma disciplina a cada 2 batidas, em duas frases da orquestra (a entrada, 1,17, e a frase seguinte, 10,77); a frase-chave no grande prato
+  const T_IN = k => beatsFrom(id, k < 4 ? 1.17 : 10.77, 2 * (k % 4)), T_KEY = onBeat(id, 21.57), TW = 410, TH = 330, TX0 = 105, TY0 = 250;
   for (let k = 0; k < N; k++) cue(id, T_IN(k), 'hit', { size: .3 + k * .04 }); cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
   const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *disciplinas*']]);
   SAY.reg(id, TX.climaxWords.map((w, k) => [T_IN(k), T_KEY, 'label', w + ' ' + TX.climaxSub[k]]));
-  SAY.reg(id, [[T_KEY + .2, 19.4, 'big', TX.climaxKey]]);
+  SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey]]);
   SCENES[id] = {
-    peaks: [[0, 19.2, .45], [T_KEY - .1, T_KEY + 1.6, 1]], script: SCRIPT,
+    peaks: [[0, 26.4, .45], [T_KEY - .1, T_KEY + 1.6, 1]], script: SCRIPT,
     themeAt: () => 'dark',
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' });
@@ -181,7 +182,7 @@ const FUTURE_ART = {
 
 /* ---------- letreiro final (split-flap) + encerramento ---------- */
 const CLOSE = (() => {
-  // T_CHORD: o letreiro acende num acento forte da parte 3 (59,97 s do play), logo depois da última troca de placas
+  // T_CHORD: o letreiro acende no prato da cadência final da parte 3 (67,17 s do play); a última placa vira no primeiro tempo dela
   const id = 'close', FL = TX.flap, T_F = [1.2, 5.0, 9.0, 13.2], T_CHORD = 14.37, HI = [11, 11, 11, FL[3].indexOf(' ') + 1];
   T_F.forEach((t0, k) => { cue(id, t0, 'type', { n: 26, gap: .024 }); }); cue(id, T_CHORD, 'combo'); cue(id, T_CHORD, 'shimmer', { dur: 2.5 });
   /** quadro do letreiro; t = tempo desde o início do letreiro (as paradas usam t grande = letreiro pronto) */
@@ -200,7 +201,7 @@ const CLOSE = (() => {
   SCENES[id] = { themeAt: () => 'dark', fx: { chroma: .7 }, draw(ctx, t) { draw(ctx, t); },
     peaks: [[T_CHORD - .1, T_CHORD + 1.8]],
     caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*', 'PRÓXIMA PARADA'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*', 'PRÓXIMA PARADA'],
-      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*', 'PRÓXIMA PARADA'], [T_CHORD + .4, 26.4, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
+      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*', 'PRÓXIMA PARADA'], [T_CHORD + .4, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
   return { draw, T_CHORD };
 })();
 

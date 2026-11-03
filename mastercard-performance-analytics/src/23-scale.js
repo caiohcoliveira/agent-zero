@@ -65,7 +65,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
   const id = 's06', N = Math.max(1, PILLARS.length), GYp = 900, TOPY = 430, X = i => W / 2 + (i - (N - 1) / 2) * Math.min(350, 1700 / N);
   // tudo no tempo da música: um pilar por batida, linha e grupos de cartões em começos de compasso, um cartão por batida
   const T_COL = PILLARS.map((_, i) => beatsFrom(id, .5, i)), T_LINE = onBeat(id, 2.4, 'bar'), G1 = Math.ceil(N / 2) + (N > 4 ? 1 : 0);
-  const T_G1 = onBeat(id, 5.6, 'bar'), T_G2 = onBeat(id, 12.6, 'bar'), T_CONC = onBeat(id, 19.4, 'bar');
+  const T_G1 = onBeat(id, 5.6, 'bar'), T_G2 = onBeat(id, 12.6, 'bar'), T_CONC = onBeat(id, 15.6, 'bar');   // no acorde final da música
   const T_CARD = PILLARS.map((_, i) => beatsFrom(id, i < G1 ? T_G1 : T_G2, i < G1 ? i : i - G1));
   T_COL.forEach((t0, i) => cue(id, t0, 'impact', { size: .3 })); cue(id, T_LINE, 'whoosh', { dur: 1.6, v: .3 }); T_CARD.forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + i * .05, v: .16 })); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
   const SCRIPT = SAY.reg(id, [

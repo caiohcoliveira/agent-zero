@@ -93,7 +93,7 @@ const CASEKIT = {
 /* ---------- case 1 · Cestas de produtos (Cliente Banana) ---------- */
 (() => {
   const id = 'banana', CS = () => CASE('Cliente Banana'), bt = k => k * 2.2222;
-  const T0 = 2.4, T_DATA = 12.6, T_HOW = bt(11), T_BM = T_HOW + 2.2, T_ALS = T_HOW + 3.6, T_COS = bt(15), T_DROP = bt(16), T_RES = 47.6, T_CONC = 56;
+  const T0 = 2.4, T_DATA = 12.6, T_HOW = bt(11), T_BM = T_HOW + 2.2, T_ALS = T_HOW + 3.6, T_COS = bt(15), T_DROP = bt(16), T_RES = 44.4, T_CONC = 48.9;
   const ms = () => dget(CS(), 'analytics_solution.model_scale', {}), STORES = [['Cliente Banana', C.yellow], ['Cliente Maçã', C.red], ['Cliente Pera', C.orange]];
   const BASK = (dget(CS(), 'analytics_solution.baskets', null) || ['Café + chocolate', 'Churrasco', 'Destilados']).slice(0, 3), BICON = [['cup', 'box'], ['can', 'carton'], ['bottle', 'jar']];
   const MONTHS = (String(dget(CS(), 'analytics_solution.lookback', '')).match(/(\d+)\s*meses/) || [])[1] || '24';
@@ -113,8 +113,8 @@ const CASEKIT = {
     [T_DATA, T_HOW, 'DADOS', 'Analisamos o *histórico de compras* para aprender afinidades entre clientes e produtos.', { y: 250 }],
     [T_HOW, T_DROP, 'COMO FIZEMOS', '*BM25* reduz o destaque de itens muito comuns. *ALS* aprende padrões entre clientes e produtos.', { y: 236 }],
     [T_DROP, T_RES, 'SOLUÇÃO', 'Produtos com afinidade formam *cestas*. O modelo prioriza os clientes com maior *potencial de compra*.', { y: 236 }],
-    [T_RES, 60.2, 'RESULTADO', `*${BEST_NAME}* teve conversão *${FMT.rel(LIFT)} maior* que a segunda melhor campanha.`, { y: 250 }]
-  ], [[T_CONC, 60.2, 'concl', 'O histórico de compras orienta *cestas* e *públicos*.']]);
+    [T_RES, 53.5, 'RESULTADO', `*${BEST_NAME}* teve conversão *${FMT.rel(LIFT)} maior* que a segunda melhor campanha.`, { y: 250 }]
+  ], [[T_CONC, 53.5, 'concl', 'O histórico de compras orienta *cestas* e *públicos*.']]);
 
   /** as três empresas do grupo e um cliente que hoje compra só em uma */
   function stores(ctx, t) {
@@ -396,8 +396,8 @@ const CASEKIT = {
 /* ---------- case 3 · Relatórios de fraude automatizados: a automação apaga a luz, o processo continua ---------- */
 (() => {
   const id = 'lightsoff', bt = k => k * 2.2222;
-  const T0 = 2.4, T_COST = 12.0, T_IDEA = 20.4, T_PIPE = 21.3, T_SIG = 29.0, T_OFF = bt(15), T_DROP = bt(16);
-  const T_RESULT = 40.0, T_PARTY = 41.0, T_NEXT = 50.0, T_DIVE = 57.6;
+  const T0 = 2.4, T_COST = 12.0, T_IDEA = 20.4, T_PIPE = 21.3, T_SIG = 31.0, T_OFF = bt(16.5), T_DROP = bt(17);
+  const T_RESULT = 43.6, T_PARTY = 44.6, T_NEXT = 49.6, T_DIVE = 55.4;
   const NODES = [['Entrada dos dados', 'db'], ['Validação', 'check'], ['Processamento', 'gear'], ['Relatório', 'doc'], ['Envio ao board', 'board']];
   const GEST = [['1', 'extrair os dados', 3.6], ['2', 'conferir', 5.8], ['3', 'copiar e colar', 8.0], ['4', 'montar o relatório', 10.0]];
   const FLOOR = 880, SEAT = 470, SW_X = 1800, SW_Y = 650, nx = i => 520 + i * 180, NY = 306, IAX = 1180, IAY = 570, BOD = { x: 1330, w: 500 };
@@ -416,7 +416,7 @@ const CASEKIT = {
     [T_IDEA, T_OFF, 'COMO FIZEMOS', '*Automatizamos* o fluxo de dados até a geração e o envio do relatório.', { y: 236, ...BOD }],
     [T_OFF + .2, T_RESULT, 'SOLUÇÃO', '*Lights Off*: a rotina continua funcionando *sem montagem manual*.', { y: 236, theme: 'dark', ...BOD }],
     [T_RESULT, T_NEXT, 'RESULTADO', 'Relatórios gerados *automaticamente*, no formato do board.', { y: 236, theme: 'dark', ...BOD }],
-    [T_NEXT, 60.2, 'PRÓXIMO PASSO', 'Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*.', { y: 236, theme: 'dark', ...BOD }]
+    [T_NEXT, 57.98, 'PRÓXIMO PASSO', 'Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*.', { y: 236, theme: 'dark', ...BOD }]
   ]);
   /** fase do trabalho manual na tela: uma volta lenta (ANTES) e depois voltas cada vez mais rápidas (PROBLEMA) */
   function manualState(t) {
@@ -629,7 +629,7 @@ const CASEKIT = {
 /* ---------- case 4 · Agentes de IA que escrevem, avaliam e corrigem insights (Insight Agent) ---------- */
 (() => {
   const id = 'insight', CS = () => CASE('Insight Agent'), bt = k => k * 2.2222;
-  const T0 = 2.6, T_GEN = 12.4, T_LOOP = bt(11), T_QUAL = 36.4, T_DROP = bt(22), T_SIT = 60.4;
+  const T0 = 3.4, T_GEN = 11.8, T_LOOP = 18.6, T_QUAL = 27.6, T_DROP = bt(16), T_SIT = bt(21);   // o crescendo da música começa com a cena
   const PL = dget(CS(), 'business_results.pipeline', {}), N_ACQ = PL.acquirers || 30, N_ACT = PL.active_relationships || 0, N_OPP = PL.to_conquer != null ? PL.to_conquer : Math.max(0, N_ACQ - N_ACT);
   const SOL = dget(CS(), 'analytics_solution.innovation_2', {}), GR = dget(CS(), 'analytics_solution.guardrails', ['Regex', 'BERT']);
   // exemplos ilustrativos (edite aqui): o mesmo fato em três versões e uma revisão típica
@@ -638,8 +638,8 @@ const CASEKIT = {
     draft: 'Share caiu no Sul.', why: 'falta o período de comparação', fixed: 'Share caiu 2,1 p.p. no Sul vs. o mês anterior.' };
   const LOOPN = { gen: [330, 600], ev: [740, 600], fix: [740, 850], ok: [1130, 600] };
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, .3, 'impact', { size: .7 }); cue(id, T0 + 1, 'type', { n: 16, gap: .06 });
-  EX.versions.forEach((_, i) => cue(id, T_GEN + 1.2 + i * 1.3, 'type', { n: 10, gap: .04 })); cue(id, T_LOOP, 'chime', { f: 784, up: 7 }); cue(id, T_LOOP + 3.4, 'buzz'); cue(id, T_LOOP + 6.2, 'type', { n: 10, gap: .05 }); cue(id, T_LOOP + 8.6, 'ding');
-  [0, 1, 2].forEach(i => cue(id, T_QUAL + 1 + i * 1.6, 'pop', { p: 1 + i * .1, v: .2 })); cue(id, T_QUAL + 6.4, 'shimmer', { dur: 1.5 }); cue(id, T_DROP - 5, 'riser', { dur: 5, v: .25 });
+  EX.versions.forEach((_, i) => cue(id, T_GEN + 1.2 + i * 1.3, 'type', { n: 10, gap: .04 })); cue(id, T_LOOP, 'chime', { f: 784, up: 7 }); cue(id, T_LOOP + 2.6, 'buzz'); cue(id, T_LOOP + 4.8, 'type', { n: 10, gap: .05 }); cue(id, T_LOOP + 6.6, 'ding');
+  [0, 1, 2].forEach(i => cue(id, T_QUAL + 1 + i * 1.2, 'pop', { p: 1 + i * .1, v: .2 })); cue(id, T_QUAL + 5.0, 'shimmer', { dur: 1.5 }); cue(id, T_DROP - 5, 'riser', { dur: 5, v: .25 });
   cue(id, T_DROP, 'impact', { size: 1.2 }); for (let k = 0; k < 10; k++) cue(id, T_DROP + .4 + k * .25, 'pop', { p: 1 + k * .05, v: .1 }); cue(id, T_SIT, 'impact', { size: .8 });
   const SCRIPT = CASEKIT.script(id, 4, 'CASE 4 DE 4 · INSIGHT AGENT · ADQUIRENTES', C.red, 'Agentes de IA para insights', [
     [T0, T_GEN, 'PROBLEMA', 'A escrita manual de insights *não acompanhava* o volume de páginas e painéis.', { y: 236 }],
@@ -647,7 +647,7 @@ const CASEKIT = {
     [T_LOOP, T_QUAL, 'AVALIAR E CORRIGIR', 'Agentes *avaliam* os textos e encaminham os *reprovados* para correção.', { y: 236 }],
     [T_QUAL, T_DROP, 'QUALIDADE', '*Regras* e *modelos* avaliam critérios de qualidade do texto.', { y: 236 }],
     [T_DROP, T_SIT, 'ESCALA', 'O mesmo processo se repete em *milhares* de páginas e painéis.', { y: 236 }],
-    [T_SIT, 69.1, 'SITUAÇÃO', `*${N_ACT}* adquirentes ativos. *${N_OPP}* oportunidades adicionais. Universo apresentado: *${N_ACQ}*.`, { y: 236 }]
+    [T_SIT, 55.76, 'SITUAÇÃO', `*${N_ACT}* adquirentes ativos. *${N_OPP}* oportunidades adicionais. Universo apresentado: *${N_ACQ}*.`, { y: 236 }]
   ]);
   function problem(ctx, t) {
     const a = P(t, T0, .5) * (1 - P(t, T_GEN - .3, .4)); if (a <= 0) return;
@@ -685,14 +685,14 @@ const CASEKIT = {
     seg([N.ev, [N.ev[0] + 40, 720], N.fix], 2.8, 1, C.red, 12);
     seg([N.fix, [N.ev[0] - 120, 760], [N.ev[0] - 70, 650], N.ev], 5.4, 1.3, C.yellow, 12);
     seg([N.ev, N.ok], 7.8, 1, C.orange, 16);
-    [['gerar', N.gen, 'ai', 0], ['avaliar', N.ev, 'check', .9], ['corrigir', N.fix, 'gear', 3.6], ['aprovado', N.ok, 'spark', 8.6]].forEach(([l, [x, y], ic, t0]) => { const p = E.outBack(P(t, T_LOOP + t0, .45)); if (p <= 0) return;
+    [['gerar', N.gen, 'ai', 0], ['avaliar', N.ev, 'check', .9], ['corrigir', N.fix, 'gear', 2.8], ['aprovado', N.ok, 'spark', 6.6]].forEach(([l, [x, y], ic, t0]) => { const p = E.outBack(P(t, T_LOOP + t0, .45)); if (p <= 0) return;
       ctx.save(); ctx.translate(x, y); ctx.scale(p, p); circle(ctx, 0, 0, 52, l === 'aprovado' ? C.yellow : '#FFF8EE', INK, 6); icon(ctx, ic, 0, 0, 56, INK, 7); ctx.restore();
       late(ctx, c => { c.globalAlpha *= clamp(p); c.shadowColor = '#000'; c.shadowBlur = 10; text(c, l, x, y - 82, { size: 32, weight: 900, color: '#FFF', align: 'center' }); }); });
-    late(ctx, c => { c.globalAlpha *= P(t, T_LOOP + 3.2, .4); text(c, 'reprovado', N.ev[0] + 70, 730, { size: 26, weight: 900, color: '#FF8A7A' }); c.globalAlpha = a * P(t, T_LOOP + 5.6, .4); text(c, 'avaliar de novo', N.ev[0] - 240, 820, { size: 26, weight: 900, color: C.yellow, align: 'center' }); });
+    late(ctx, c => { c.globalAlpha *= P(t, T_LOOP + 2.5, .4); text(c, 'reprovado', N.ev[0] + 70, 730, { size: 26, weight: 900, color: '#FF8A7A' }); c.globalAlpha = a * P(t, T_LOOP + 4.3, .4); text(c, 'avaliar de novo', N.ev[0] - 240, 820, { size: 26, weight: 900, color: C.yellow, align: 'center' }); });
     // o exemplo da revisão
     const ex = P(t, T_LOOP + .6, .5); if (ex > 0) hud(ctx, c => { c.translate(1290, 470); panel(c, 0, 0, 540, 470, { dark: true, accent: C.yellow });
       text(c, 'EXEMPLO DE REVISÃO', 40, 44, { size: 21, weight: 900, mono: true, color: C.yellow, ls: 3 });
-      const s1 = P(t, T_LOOP + 1, .4), s2 = P(t, T_LOOP + 3.4, .4), s3 = P(t, T_LOOP + 6.2, .4), s4 = P(t, T_LOOP + 8.6, .4);
+      const s1 = P(t, T_LOOP + 1, .4), s2 = P(t, T_LOOP + 2.6, .4), s3 = P(t, T_LOOP + 4.8, .4), s4 = P(t, T_LOOP + 6.6, .4);
       c.globalAlpha *= s1; para(c, `“${EX.draft}”`, 40, 76, 460, { size: 30, weight: 800, color: '#FFF' });
       c.globalAlpha = a * ex * s2; tag(c, 210, 170, 'reprovado: ' + EX.why, { size: 22, fill: C.red, color: '#FFF' });
       c.globalAlpha = a * ex * s3; para(c, `“${EX.fixed}”`, 40, 222, 460, { size: 30, weight: 800, color: '#FFF', accent: C.yellow });
@@ -703,12 +703,12 @@ const CASEKIT = {
     const a = P(t, T_QUAL - .2, .5) * (1 - P(t, T_DROP - .3, .4)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     const J = [[GR[0] || 'Regex', 'regras textuais', 'doc'], [GR[1] || 'BERT', 'modelo de linguagem', 'ai'], [SOL.algorithm || 'Random Forest', `nota de qualidade · ${SOL.nlp_features || 164} características do texto`, 'tree']];
-    flowRow(ctx, 160, 560, 1760, J.map(([l, s, ic]) => ({ label: l, sub: s, icon: ic })), E.inOutSine(P(t, T_QUAL + .6, 4)), { bw: 300, bh: 170 });
+    flowRow(ctx, 160, 560, 1760, J.map(([l, s, ic]) => ({ label: l, sub: s, icon: ic })), E.inOutSine(P(t, T_QUAL + .5, 3.2)), { bw: 300, bh: 170 });
     // o rascunho passa pelos avaliadores
-    const u = clamp((t - T_QUAL - .8) / 5.2), x = lerp(160, 1700, E.inOutSine(u));
+    const u = clamp((t - T_QUAL - .7) / 4.2), x = lerp(160, 1700, E.inOutSine(u));
     if (u > 0 && u < 1) { ctx.save(); ctx.translate(x, 430 + Math.sin(t * 6) * 6); paper(ctx, -60, -40, 120, 80, { r: 6, fill: '#FFFDF8', shadow: 5, lw: 2.5 }); for (let l = 0; l < 3; l++) line(ctx, -40, -18 + l * 18, 30 - l * 12, -18 + l * 18, '#8A8378', 4); ctx.restore(); }
     // a nota (avaliação, não garantia)
-    const g = E.outCubic(P(t, T_QUAL + 6.4, 1.4)); if (g > 0) hud(ctx, c => { c.translate(560, 830); panel(c, 0, 0, 800, 150, { dark: true });
+    const g = E.outCubic(P(t, T_QUAL + 5.0, 1.2)); if (g > 0) hud(ctx, c => { c.translate(560, 830); panel(c, 0, 0, 800, 150, { dark: true });
       text(c, 'nota de qualidade do insight', 40, 44, { size: 28, weight: 900, color: '#FFF' });
       rr(c, 40, 78, 560, 28, 14); c.fillStyle = 'rgba(255,255,255,.12)'; c.fill(); rr(c, 40, 78, 560 * .82 * g, 28, 14); c.fillStyle = C.yellow; c.fill();
       text(c, FMT.num(.82 * g * 10, 1) + ' / 10', 630, 92, { size: 30, weight: 900, color: C.yellow });

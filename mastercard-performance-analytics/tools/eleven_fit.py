@@ -2,11 +2,11 @@
 
 A ElevenLabs respeita o estilo e o andamento pedidos, mas não os tempos internos (onde cai o drop, a quebra
 etc.). A parte 1 é encaixada no filme com um deslocamento da peça inteira, a quebra "rádio" e as camadas de
-tools/remix.py (riser, impacto, prato); as partes 2 e 3 tocam inteiras, sem edição.
+tools/remix.py (riser, impacto, prato). Nas partes 2 e 3 a música não é editada: o filme é que se ajusta a ela.
 
 Fontes, fora do Git (musica/elevenlabs/):
   parte1-bruta.mp3     fluxo "A Linha · Parte 1", versão 2 (funk cinematográfico, 111 BPM)
-  parte2-bruta.mp3     fluxo "A Linha · Partes 2 e 3", peça contínua com dinâmica própria, versão B (108 BPM)
+  parte2-A/p2-1-A.mp3 … p2-5-A.mp3   fluxo "A Linha · Partes 2 e 3", as 5 versões por trecho da opção A (108 BPM)
   parte3-sem-coro.wav  fluxo "A Linha · Partes 2 e 3", final épico opção A, sem o coro:
                        python -m demucs --two-stems=vocals -n htdemucs_ft parte3-bruta-A.mp3 → no_vocals.wav
 Saídas (o build embute no HTML): musica/parte1.mp3 · musica/parte2.mp3 · musica/parte3.mp3
@@ -14,12 +14,12 @@ Saídas (o build embute no HTML): musica/parte1.mp3 · musica/parte2.mp3 · musi
 Parte 1 (estações 01–03, 154,544 s): andamento ajustado 0,95% para a grade das cenas (110 BPM); o drop da
   música cai na parte B (as viradas de estação 46,98 · 90,62 · 143,0 ficam em começos de compasso); intro
   abafada até o tema; low só com médios de 90,62 até a pausa; riser, impacto e pratos.
-Parte 2 (04, cases, 05, 06: 304,45 s, 108 BPM): a versão B tocada inteira, do jeito que foi composta (v7.6):
-  sem cortes, repetições, filtros ou silêncios. A introdução leve cobre a estação 04, a banda entra no case 1,
-  uma quebra leve fecha a automação, a banda volta no começo da IA, o trecho mais forte começa na escala (240 s)
-  e a peça termina com o acorde final dela (302,3 s). O filme acompanha a música.
-Parte 3 (07, disciplinas, letreiro: 72,0 s, 100 BPM): a opção A tocada inteira, sem cortes (v7.5): a gravação
-  original até pouco antes do coro e a versão sem coro depois; o filme acerta o letreiro no acento da música.
+Parte 2 (04, cases, 05, 06: 282,222 s, 108 BPM, grade a partir de 0): a opção A (v7.7), uma versão por case, cada uma
+  tocada como foi composta (PARTE2_A): sem filtros, efeitos, compassos repetidos ou silêncios. Cada versão só é
+  deslocada inteira, para os blocos e drops dela caírem nas soluções; o filme foi reajustado às durações delas.
+Parte 3 (07, disciplinas, letreiro: 71,373 s, 100 BPM): a opção A tocada inteira, sem cortes (v7.5): a gravação
+  original até pouco antes do coro e a versão sem coro depois. O filme se ajusta a ela (v7.7): a frase-chave no
+  grande prato (46,77), o letreiro no prato da cadência final (67,17) e o vídeo termina com a cauda do acorde.
 
 Uso: python3 tools/eleven_fit.py [parte1|parte2|parte3|todas] [pasta_de_saida]
 """
@@ -139,29 +139,54 @@ def parte1(src=SRC / 'parte1-bruta.mp3'):
 
 
 # ---------------------------------------------------------------- parte 2 · 04, cases, 05, 06
-def parte2(src=SRC / 'parte2-bruta.mp3', dur=304.45):
-    """a versão B tocada inteira, do jeito que foi composta (v7.6): nenhum corte, repetição, filtro ou silêncio.
-    Só o nível (master) e 0,3 s de fade no fim da parte (a cauda do acorde final). O filme acompanha a música:
-    a grade sai da própria peça e as seções do arquivo de batidas são as mudanças reais dela."""
-    BAR = 4 * 60 / 108.0
-    x = load(src); bpm = bpm_near(x, 108)
-    if abs(bpm / 108 - 1) > .002: raise SystemExit(f'parte2: a versão está em {bpm:.2f} BPM; a grade do filme é 108')
-    d1, r1 = find_rise(x, 12, 24)                    # a banda entra (o grave e a bateria cheia)
-    d2, r2 = find_rise(x, 188, 200)                  # a banda volta depois da quebra leve
-    d3, r3 = find_rise(x, 236, 244)                  # o trecho mais forte
-    ph = (d1 - 8 * BAR) % BAR                        # a peça começa num tempo forte: a banda entra no compasso 8
-    end = music_end(x, 200)
-    y = fit_len(x, dur); k0 = int((dur - .3) * SR); y[k0:] *= np.linspace(1, 0, len(y) - k0)[:, None]
-    info = {'bpm': round(bpm, 2), 'fase': round(ph, 3), 'banda_entra': round(d1, 2), 'banda_volta': round(d2, 2),
-            'trecho_mais_forte': [round(d3, 2), round(r3, 1)], 'acorde_final': round(end, 2), 'grade': [108.0, round(ph, 3)],
-            'secoes': [round(d1, 3), round(d2, 3), round(d3, 3)]}
-    return R.master(y, -11.5), info
+# a opção A (v7.7): (versão, compasso da versão, compasso do filme onde ele cai, nível em dB). Compasso 2,2222 s.
+# Cenas: 04 0–5 · case 1 5–29 · case 2 29–56 · automação 56–82 · IA 82–107 · 05 107–116 · 06 116–127.
+PARTE2_A = [
+    ('p2-1-A.mp3', 3, 0, -1.0),    # 04 + case 1: começa no compasso 3 da versão; os blocos de 8 compassos dela entram no
+                                   #   começo do case 1 (5) e na solução (21). A gravação acaba tocando: some no último compasso
+    ('p2-2-A.mp3', 0, 29, -.5),    # case 2: inteira; a subida dela cai na solução (45) e o acorde final (55) soa até a porta
+    ('p2-3-A.mp3', 0, 56, 0.0),    # automação: inteira; a pausa composta de 2 tempos no interruptor e o drop no neon (73);
+                                   #   o acorde final (81) soa no mergulho, o último compasso da cena
+    ('p2-4-A.mp3', 0, 82, 1.0),    # IA: a cena começa com o crescendo (a anacruse soa no fim da automação); 16 compassos até o maior drop (98),
+                                   #   8 compassos cheios e o acorde final (106), que soa até a 05
+    ('p2-5-A.mp3', 0, 107, -1.5),  # 05 + 06: 16 compassos de groove e o acorde final na conclusão da 06 (123)
+]
+
+
+def beat_phase(x, bpm):
+    """fase da batida: ataques de grave (<150 Hz) dobrados no período da batida (o tempo forte sai da estrutura da versão)"""
+    B = 60 / bpm; m = sosfiltfilt(R.sos('low', 150), x.mean(1)); hop = 256; n = len(m) // hop
+    e = np.sqrt(np.mean(m[:n * hop].reshape(n, hop) ** 2, axis=1)); f = np.maximum(0, np.diff(e, prepend=e[0])); t = np.arange(n) * hop / SR
+    sel = (t > 2) & (t < music_end(x, 5) - 1)
+    return (np.angle(np.sum(f[sel] ** 2 * np.exp(2j * np.pi * t[sel] / B))) / (2 * np.pi) * B) % B
+
+
+def parte2(dur=282.222):
+    """as 5 versões da opção A em sequência, cada uma do jeito que foi composta: só deslocamento da versão inteira,
+    nível por versão (mixagem) e, na primeira, que termina tocando, um fade de 1 compasso no fim da gravação"""
+    BAR = 4 * 60 / 108.0; y = np.zeros((int((dur + 30) * SR), 2), np.float32); info = []; L0 = None
+    for name, sb, fb, gdb in PARTE2_A:
+        x = load(SRC / 'parte2-A' / name); bpm = bpm_near(x, 108)
+        if abs(bpm / 108 - 1) > .002: raise SystemExit(f'parte2: {name} está em {bpm:.2f} BPM; a grade do filme é 108')
+        ph = beat_phase(x, bpm); t0 = ph + sb * BAR                 # instante da versão que cai no compasso fb do filme
+        a = t0 if sb else 0.0                                       # do começo da versão: mantém a anacruse
+        seg_ = x[int(round(a * SR)):].copy(); n = len(seg_)
+        f = int((.01 if sb else .005) * SR); seg_[:f] *= np.linspace(0, 1, f)[:, None]
+        if name == 'p2-1-A.mp3':                                    # a gravação termina tocando: some no último compasso
+            m = int(BAR * SR); seg_[n - m:] *= np.cos(np.linspace(0, np.pi / 2, m))[:, None]
+        L = R.loud_rms(seg_); L0 = L0 or L; seg_ *= L0 / L * 10 ** (gdb / 20)
+        i0 = int(round((fb * BAR - (t0 - a)) * SR)); j = min(n, len(y) - i0); y[i0:i0 + j] += seg_[:j]
+        info.append({'versao': name, 'bpm': round(bpm, 2), 'fase': round(ph, 3), 'compasso_da_versao': sb, 'compasso_do_filme': fb,
+                     'entra_no_filme': round(i0 / SR, 3), 'sai_do_filme': round((i0 + n) / SR, 2), 'fim_da_musica_no_filme': round(i0 / SR + music_end(x, 5) - a, 2)})
+    y = y[:int(dur * SR)]; k0 = int((dur - .3) * SR); y[k0:] *= np.linspace(1, 0, len(y) - k0)[:, None]
+    return R.master(y, -11.5), {'versoes': info, 'grade': [108.0, 0.0], 'secoes': [11.111, 46.667, 100.0, 162.222, 217.778]}
 
 
 # ---------------------------------------------------------------- parte 3 · 07, disciplinas, letreiro
-def parte3(dur=72.0):
+def parte3(dur=71.373):
     """a opção A tocada inteira, do jeito que foi composta (sem cortes, repetições ou cauda): a gravação original
-    até pouco antes do coro e, dali em diante, a versão sem coro (Demucs), alinhada à amostra e cruzada em 1 s"""
+    até pouco antes do coro e, dali em diante, a versão sem coro (Demucs), alinhada à amostra e cruzada em 1 s.
+    O vídeo termina em 71,373 s, quando a cauda do acorde final já se apagou (−50 dB)"""
     import librosa
     o = load(SRC / 'parte3-bruta-A.mp3'); n = load(SRC / 'parte3-sem-coro.wav')
     a, b = o[int(30 * SR):int(44 * SR)].mean(1), n[int(29.9 * SR):int(44.1 * SR)].mean(1)
@@ -173,15 +198,20 @@ def parte3(dur=72.0):
     w = np.sin(np.linspace(0, np.pi / 2, i1 - i0))[:, None]
     y = np.concatenate([o[:i0], o[i0:i1] * w[::-1] + n[i0:i1] * w, n[i1:]])
     y = fit_len(y, dur); k0 = int((dur - .5) * SR); y[k0:] *= np.linspace(1, 0, len(y) - k0)[:, None]
-    # para a sincronia do filme: a entrada da orquestra, a fase da batida e o acento mais forte perto do letreiro
+    # para a sincronia do filme: a entrada da orquestra e a fase da batida
     E, rise = find_rise(y, 22, 34)
     oe = librosa.onset.onset_strength(y=y.mean(1), sr=SR, hop_length=128); to = np.arange(len(oe)) * 128 / SR
     sel = (to > 26) & (to < 45); z = np.sum(oe[sel] ** 2 * np.exp(2j * np.pi * to[sel] / .6)); ph = (np.angle(z) / (2 * np.pi) * .6) % .6
     anchor = ph + round((E - ph) / .6) * .6
-    pk = librosa.util.peak_pick(oe, pre_max=40, post_max=40, pre_avg=150, post_avg=150, delta=oe.std(), wait=60)
-    near = [p for p in pk if 57.5 < to[p] < 62.5]; acc = float(to[max(near, key=lambda p: oe[p])]) if near else 59.68
+    # os dois pratos que o filme usa: o grande (frase-chave do clímax) e o da cadência final (letreiro), na batida mais aguda
+    hi = sosfiltfilt(R.sos('high', 4000), y.mean(1))
+    def crash(lo, hi_):
+        bts = [anchor + k * .6 for k in range(-60, 80) if lo <= anchor + k * .6 < hi_]
+        return max(bts, key=lambda b: float(np.mean(hi[int(b * SR):int((b + .6) * SR)] ** 2)))
+    key, chord = crash(45, 50), crash(64, 69)
     info = {'atraso_do_sem_coro_amostras': lag, 'coro_entra': round(onset, 2), 'troca_para_sem_coro': [round(t0, 2), round(t1, 2)],
-            'entrada_da_orquestra': round(E, 2), 'subida_db': round(rise, 1), 'grade': [100.0, round(anchor, 3)], 'acento_do_letreiro': round(acc, 2)}
+            'entrada_da_orquestra': round(E, 2), 'subida_db': round(rise, 1), 'grade': [100.0, round(anchor, 3)],
+            'prato_da_frase_chave': round(key, 3), 'prato_do_letreiro': round(chord, 3), 'fim_do_video': dur}
     return R.master(y, -11.0), info
 
 

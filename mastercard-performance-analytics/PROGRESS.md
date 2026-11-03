@@ -267,3 +267,25 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - varredura sem exceções;
   - medidor de leitura: 72 telas, 0 curtas;
   - navegação, clique e console limpos.
+
+### v7.7 — parte 2 com a opção A e parte 3 terminando junto com o vídeo
+
+- [x] **Parte 2:** a opção A, como o usuário pediu, sem nada artificial na música.
+  - As 5 versões por trecho tocam como foram compostas (`PARTE2_A` em `tools/eleven_fit.py`). A prévia antiga tinha abafamentos, filtros, pausas inseridas, riser e impacto, compassos repetidos e cortes secos; nada disso ficou.
+  - Na música, só o deslocamento de cada versão inteira e o nível por versão. A versão do case 1 termina tocando e some no último compasso.
+  - O filme foi reajustado à música:
+    - case 1 com 53 s, com a solução no bloco novo da versão;
+    - case 2 igual, com a subida na solução;
+    - automação com 58 s: o interruptor na pausa composta (36,67) e o neon no drop (37,78);
+    - IA com 56 s: a cena começa com o crescendo, o maior drop cai na escala (35,56), e as animações de AVALIAR e QUALIDADE ficaram ~20% mais rápidas;
+    - 06: a conclusão no acorde final.
+  - Parte 2: 4:42 (antes 5:04).
+- [x] **Parte 3:** a música continua inteira; o filme se ajusta a ela.
+  - Clímax com 26,4 s: as disciplinas em duas frases da orquestra e a frase-chave no grande prato (48,0 s).
+  - Letreiro com 18,6 s: acende no prato da cadência final (67,2 s), e o vídeo termina com a cauda do acorde (71,4 s). Antes ficavam ~3 s de silêncio no fim.
+- [x] **QA:**
+  - varredura 0–528 s sem exceções;
+  - medidor de leitura: 74 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - folhas de fotos das cenas reajustadas conferidas;
+  - emendas da parte 2 sem cliques e sem silêncio no meio.

@@ -46,9 +46,9 @@
 | Conversa 0 | fala | — |
 | Play 2 · estações 01–03 | vídeo | 0:20–2:55 |
 | Conversa 1 | fala | — |
-| Play 3 · estação 04 (4 cases), 05, 06 | vídeo | 2:55–7:59 |
+| Play 3 · estação 04 (4 cases), 05, 06 | vídeo | 2:55–7:37 |
 | Conversa 2 | fala | — |
-| Play 4 · 07, disciplinas, letreiro | vídeo | 7:59–9:11 |
+| Play 4 · 07, disciplinas, letreiro | vídeo | 7:37–8:48 |
 | Encerramento | fala | — |
 
 ## Play 1 · embarque (20 s, trilha sintetizada)
@@ -137,7 +137,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 - **Faixa:** "A seguir: *quatro cases*, do problema à solução e ao resultado."
 - **Lupa:** cenas em loop. Na 03, o **catálogo com os 20 modelos** (caso de uso em português · técnica em inglês).
 
-## Play 3 · estações 04–06 ("Technology" remontada, 5:04)
+## Play 3 · estações 04–06 (ElevenLabs, opção A, 4:42)
 
 ### 04 · Analytics em ação (11 s)
 
@@ -148,9 +148,9 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 **Estrutura de cada case:**
 - Respiro: a porta do vagão com "CASE N DE 4".
 - Etiqueta + etapa no topo (PROBLEMA, DADOS, COMO FIZEMOS, SOLUÇÃO, RESULTADO…), título fixo e explicação no painel.
-- O drop da música cai na solução.
+- A virada da música de cada case cai na solução (bloco novo, subida ou drop da própria versão).
 
-### Case 1 · Cestas de produtos (Cliente Banana · varejo, 60 s)
+### Case 1 · Cestas de produtos (Cliente Banana · varejo, 53 s)
 
 | Etapa | Texto | Visual |
 |---|---|---|
@@ -172,18 +172,18 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Resultado | *+4 p.p. de principalidade* versus controle, em backtest. | ganho em p.p. sobre o controle (= 0), geral e por subsegmento (PF I–IV+); "backtest: avaliação retrospectiva · ganho teórico · Top 3"; melhor perfil |
 | Conclusão | O motor prioriza produtos pelo *objetivo de relacionamento* do banco. | — |
 
-### Case 3 · Relatórios automatizados (fraude, 60 s) — a automação apaga a luz, o processo continua
+### Case 3 · Relatórios automatizados (fraude, 58 s) — a automação apaga a luz, o processo continua
 
 | Etapa | Texto | Visual |
 |---|---|---|
 | Antes | Cada relatório de fraude para o board era *montado manualmente*. | close na tela: o cursor seleciona a planilha, confere linha a linha, copia e cola e monta o gráfico; cada gesto escrito ao lado: 1 extrair os dados · 2 conferir · 3 copiar e colar · 4 montar o relatório |
 | Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | a câmera abre: cadeira vazia, relógio acelerado, pilhas crescendo, o dia vira noite, "↻ de novo · relatório N" (sem contador de horas inventado) |
 | Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia acende na tela; o código se escreve com a barra "automação %"; faíscas saem da tela e montam o fluxo nomeado: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
-| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; clique seco e escuro (a música segue); no começo do compasso seguinte só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
+| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; clique seco e escuro na pausa composta da própria música; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
 | Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); a cadeira vazia gira num foco de luz, um equalizador neon pulsa e os relatórios voam como confete |
 | Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; o fluxo se apaga e a câmera mergulha nela |
 
-### Case 4 · Agentes de IA para insights (Insight Agent · adquirentes, 69 s)
+### Case 4 · Agentes de IA para insights (Insight Agent · adquirentes, 56 s)
 
 | Etapa | Texto | Visual |
 |---|---|---|
@@ -217,7 +217,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
   - **06:** os pilares com a contribuição de cada um.
 - **Lupa:** 12 cenas em loop dos cases, mais a 05 e a 06.
 
-## Play 4 · final ("Epic Piano", 1:12)
+## Play 4 · final (ElevenLabs, final orquestral, 1:11)
 
 1. **07 · Para onde a linha segue (26 s):** uma cidade noturna conectada.
    - Cada direção tem painel ilustrado, título e subtítulo, em três grupos:
@@ -226,7 +226,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
    - As outras linhas chegam à cidade e um trem segue pela linha junto com a câmera; partículas e objetos 3D giram com o passeio.
    - No fim, uma estação tracejada "?": a próxima estação.
-2. **Disciplinas (19 s):** "Por trás de tudo, *disciplinas*". As 8 entram uma a uma num painel 4 × 2 e **ficam na tela**, cada uma com visualização, nome e subtítulo:
+2. **Disciplinas (26 s):** "Por trás de tudo, *disciplinas*". As 8 entram uma a uma num painel 4 × 2, uma fileira em cada frase da orquestra, e **ficam na tela**, cada uma com visualização, nome e subtítulo:
    - Estatística · setup de projetos de marketing e estratégia
    - Otimização & PO · modelos para tomada de decisão
    - Supervisionados
@@ -237,13 +237,13 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
    - IA (agentes)
 
    Uma curva 3D corre atrás dos painéis. No fecho, os painéis recuam no espaço e escurecem, a curva e as partículas ganham força e só a frase fica: "Tudo se resume a *Analytics & Advanced Analytics*."
-3. **Letreiro (26 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português; o acorde final acende o letreiro.
+3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português; o prato da cadência final acende o letreiro, e o vídeo termina com a cauda do acorde.
 
 ## Encerramento
 
 O letreiro fica aceso sobre a estação viva. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
 
-## Trilha (v7.4 · ElevenLabs)
+## Trilha (v7.4–v7.7 · ElevenLabs)
 
 As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tempos do filme (`tools/eleven_fit.py`).
 
@@ -252,15 +252,15 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - o tema volta maior na estação 02;
   - na estação 03 a música fica só com médios (o "low"), faz uma pausa e o drop entra na parte B (1:45,9) com riser e impacto;
   - as viradas de estação caem no tempo forte.
-- **Parte 2 · os cases, 05 e 06 (uma peça só, 108 BPM, tocada inteira):**
-  - a mesma banda e o mesmo motivo do começo ao fim, do jeito que foram compostos: sem cortes, filtros, efeitos de DJ ou silêncios;
-  - a estação 04 tem a introdução leve da própria música, e a banda entra no começo do case 1;
-  - a música segue no groove pelas soluções dos cases, e as soluções caem em começos de compasso;
-  - uma quebra leve da própria peça fecha a automação ("rodando sozinha"), e a banda volta no começo da IA;
-  - o trecho mais forte começa na escala da IA, o pico da apresentação;
-  - a 05/06 termina com o acorde final da própria peça.
+- **Parte 2 · os cases, 05 e 06 (opção A, 108 BPM):**
+  - uma versão por case, cada uma do jeito que foi composta (sem filtros, efeitos, compassos repetidos ou silêncios); as cenas seguem a música;
+  - case 1: os blocos novos da música entram no começo do case e na solução;
+  - case 2: a subida da música cai na solução, e o acorde final soa até a porta;
+  - automação: a pausa composta na própria música é o interruptor, e o drop acende o neon;
+  - IA: a cena começa com o crescendo de 16 compassos, e o maior drop cai na escala, o pico da apresentação;
+  - 05/06: o acorde final da música cai na conclusão da 06.
 - **Parte 3 · 07, disciplinas e letreiro (final orquestral, 100 BPM, sem coro):**
-  - tocado inteiro, do jeito que foi composto;
+  - tocado inteiro, do jeito que foi composto; o filme se ajusta à música;
   - a cidade tem piano e cordas;
-  - a orquestra entra junto com as disciplinas;
-  - o letreiro acende num acento forte (59,97 s).
+  - as disciplinas entram em duas frases da orquestra, e a frase-chave aparece no grande prato;
+  - o letreiro acende no prato da cadência final, e o vídeo termina com a cauda desse acorde.
