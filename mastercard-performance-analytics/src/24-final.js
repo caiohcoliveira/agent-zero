@@ -92,6 +92,15 @@ const FUTURE_ART = {
   const id = 's07', DIR = TX.future, ART = ['chair', 'merge', 'tiles', 'robots', 'userpay'];
   const POS = [560, 1360, 2600, 3400, 5040], GROUP = [0, 0, 1, 1, 2], T_G = [.6, 9.4, 18.2].map(t => onBeat(id, t)), CAMX = [960, 3000, 5040], RAIL = 900;
   const T_P = DIR.map((d, i) => beatsFrom(id, T_G[GROUP[i]] + .5, i % 2));   // cada painel numa batida (o segundo do grupo, uma batida depois)
+  /** posição da frente do trem: anda constante (268 px/s) pela cidade e freia nos últimos 3 s, parando junto da estação "?" (5760) */
+  const trainX = t => { const v = 268.1, t1 = 22, d = 3; if (t <= t1) return -600 + v * t; const u = Math.min(t - t1, d); return -600 + v * t1 + v * u - v * u * u / (2 * d); };
+  /** o trem da linha, de lado: dois vagões da Performance Analytics com as rodas no trilho e o farol pulsando com a música */
+  function train(ctx, xf) {
+    const S = .17, L = 1000, GAP = 70, y = RAIL - 11 - 408 * S; if (xf < -400) return;
+    glow(ctx, xf + 30, y + 150 * S, 160, C.orange, .22 + .15 * BT.level);
+    for (let k = 1; k >= 0; k--) trainCar(ctx, xf - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: 7 + k, lit: 1, doors: [L * .3, L * .7] });
+    glow(ctx, xf - 4, y + 190 * S, 60, '#FFF2C8', .8);
+  }
   const CAM = [[0, 960, 540, 1.06], [2.4, 960, 540, 1], [9.0, 960, 540, 1], [9.9, 3000, 540, 1], [17.8, 3000, 540, 1], [18.7, 5040, 540, 1], [23.6, 5040, 540, 1], [26.4, 5560, 540, 1.04]];
   T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_P[i], 'pop', { p: 1 + i * .06, v: .2 }));
   const SCRIPT = SAY.reg(id, [
@@ -120,15 +129,15 @@ const FUTURE_ART = {
       layer(ctx, cam, .45, () => { skyline(ctx, t, { y: 980, h: 360, seed: 113, col: '#120C10', lit: .4 }); skyline(ctx, t, { y: 980, h: 360, seed: 113, col: '#120C10', lit: .4, x: 2120 }); });
       layer(ctx, cam, 1, () => {
         const g = ctx.createLinearGradient(0, RAIL, 0, H); g.addColorStop(0, '#24160E'); g.addColorStop(1, '#0C0806'); ctx.fillStyle = g; ctx.fillRect(-800, RAIL - 10, 7600, 400);
-        const lp = clamp(t / 25.4); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], lp, { w: 22, head: true, glow: 14 });
+        const xt = trainX(t); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], (xt + 600) / 6800, { w: 22, head: false, glow: 14 });
         // as outras linhas (tracks) chegando à cidade, atrás dos painéis
         [[C.red, -300, 160], [C.yellow, 2200, 120], ['#E9DCC8', 4300, 180]].forEach(([col, x0, y0], k) => { const p = E.inOutSine(P(t, T_G[Math.min(k, 2)] + 1.2, 2)); LINE.draw(ctx, [[x0, y0], [x0 + 500, 500], [x0 + 860, RAIL]], p, { w: 10, col, shadow: false, alpha: .45 }); });
         for (let i = 0; i < 5; i++) panelArt(ctx, t, i);
         // uma estação ainda em aberto
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
           pin(ctx, x, RAIL, c => { c.globalAlpha *= op; text(c, '?', 0, 4, { size: 54, weight: 900, color: C.yellow, align: 'center' }); text(c, 'a próxima estação', 0, -90, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); }
-        // um trem segue pela cidade junto com a câmera, de estação em estação
-        const tx = cam.x - 380 + 60 * Math.sin(t * .5); if (t > .8) { glow(ctx, tx, RAIL, 120, C.orange, .25 + .15 * BT.level); LINE.head(ctx, tx, RAIL, 0, 20); }
+        // o trem da linha puxa o traço laranja pela cidade e para na próxima estação
+        train(ctx, xt);
       });
       // objetos flutuando à frente da cidade (giram com o passeio da câmera: sensação de profundidade)
       SPACE.floaters(ctx, t, { alpha: .26, n: 10, cy: 300, rot: SPACE.camRot(cam, .00018), scale: 940, spin: .02 });
@@ -140,11 +149,12 @@ const FUTURE_ART = {
 /* ---------- clímax: as 8 disciplinas entram e ficam (painel para ler) → Analytics & Advanced Analytics ---------- */
 (() => {
   const id = 'climax', VZ = ['gaussian', 'lp', 'classification', 'clusters', 'nlp', 'mlp', 'transformer', 'agents'], N = TX.climaxWords.length;
-  // uma disciplina a cada 2 batidas, em duas frases da orquestra (a entrada, 1,17, e a frase seguinte, 10,77); a frase-chave no grande prato
-  const T_IN = k => beatsFrom(id, k < 4 ? 1.17 : 10.77, 2 * (k % 4)), T_KEY = onBeat(id, 21.57), TW = 410, TH = 330, TX0 = 105, TY0 = 250;
+  // nos tempos fortes da música: a fileira de cima, uma por compasso desde que a batida começa (3,57); a de baixo acelera,
+  // uma a cada 2 tempos (13,17); a frase-chave no grande ataque (20,37)
+  const T_IN = k => k < 4 ? onBeat(id, 3.57 + 2.4 * k, 'bar') : beatsFrom(id, 13.17, 2 * (k - 4)), T_KEY = onBeat(id, 20.37, 'bar'), TW = 410, TH = 330, TX0 = 105, TY0 = 250;
   for (let k = 0; k < N; k++) cue(id, T_IN(k), 'hit', { size: .3 + k * .04 }); cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
   const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *disciplinas*']]);
-  SAY.reg(id, TX.climaxWords.map((w, k) => [T_IN(k), T_KEY, 'label', w + ' ' + TX.climaxSub[k]]));
+  SAY.reg(id, TX.climaxWords.map((w, k) => [T_IN(k), T_KEY + .3, 'label', w + ' ' + TX.climaxSub[k]]));   // o rótulo some com o painel (T_KEY → +.6)
   SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey]]);
   SCENES[id] = {
     peaks: [[0, 26.4, .45], [T_KEY - .1, T_KEY + 1.6, 1]], script: SCRIPT,

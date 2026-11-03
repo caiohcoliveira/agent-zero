@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.7, experimento)
+# Performance Analytics — "A Linha" (v7.8, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -132,8 +132,8 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - **Parte 3 · 07, disciplinas e letreiro (1:11):** final orquestral, 100 BPM, **sem o coro**, tocado **inteiro, do jeito que foi composto** (v7.5).
     - Toca a gravação original até pouco antes do coro e, depois, a versão sem coro, alinhada à amostra.
     - O filme se ajusta à música (v7.7):
-      - as disciplinas entram em duas frases da orquestra (27,6 e 37,2 s);
-      - a frase-chave aparece no grande prato (48,0 s);
+      - as disciplinas entram nos tempos fortes (v7.8): a fileira de cima uma por compasso desde que a batida começa (30,0 s), a de baixo acelerando, uma a cada 2 tempos;
+      - a frase-chave aparece no grande ataque da orquestra (46,8 s);
       - o letreiro acende no prato da cadência final (67,2 s);
       - o vídeo termina com a cauda desse acorde (71,4 s).
 - **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.

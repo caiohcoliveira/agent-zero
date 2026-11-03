@@ -64,16 +64,16 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
 (() => {
   const id = 's06', N = Math.max(1, PILLARS.length), GYp = 900, TOPY = 430, X = i => W / 2 + (i - (N - 1) / 2) * Math.min(350, 1700 / N);
   // tudo no tempo da música: um pilar por batida, linha e grupos de cartões em começos de compasso, um cartão por batida
-  const T_COL = PILLARS.map((_, i) => beatsFrom(id, .5, i)), T_LINE = onBeat(id, 2.4, 'bar'), G1 = Math.ceil(N / 2) + (N > 4 ? 1 : 0);
-  const T_G1 = onBeat(id, 5.6, 'bar'), T_G2 = onBeat(id, 12.6, 'bar'), T_CONC = onBeat(id, 15.6, 'bar');   // no acorde final da música
-  const T_CARD = PILLARS.map((_, i) => beatsFrom(id, i < G1 ? T_G1 : T_G2, i < G1 ? i : i - G1));
+  const T_COL = PILLARS.map((_, i) => beatsFrom(id, .5, i)), T_LINE = onBeat(id, 2.4, 'bar');
+  const T_G1 = onBeat(id, 5.6, 'bar'), T_CONC = onBeat(id, 15.6, 'bar');   // a conclusão no acorde final da música
+  const T_CARD = PILLARS.map((_, i) => beatsFrom(id, T_G1, 2 * i));   // um cartão a cada 2 tempos, todos no mesmo ritmo
   T_COL.forEach((t0, i) => cue(id, t0, 'impact', { size: .3 })); cue(id, T_LINE, 'whoosh', { dur: 1.6, v: .3 }); T_CARD.forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + i * .05, v: .16 })); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
   const SCRIPT = SAY.reg(id, [
     [3.8, 24.6, 'title', `Os *${NUMW[N] || N} pilares* da prática`],
     [4.0, T_G1 + 3, 'note', 'Capacidades complementares sustentam nossas entregas.', { x: LAY.x, y: 214, align: 'left', size: 30, weight: 800 }],
     [T_CONC, 24.6, 'concl', 'A combinação dessas capacidades permite *executar os projetos*.']
   ]);
-  SAY.reg(id, PILLARS.map((p, i) => [i < G1 ? T_G1 : T_G2, 24.4, 'body', p.name + ': ' + p.contrib]));
+  SAY.reg(id, PILLARS.map((p, i) => [T_CARD[i], 24.4, 'body', p.name + ': ' + p.contrib]));
   SCENES[id] = {
     themeAt: () => 'dark', script: SCRIPT, peaks: [[T_LINE - .1, T_LINE + 1, .4]],
     draw(ctx, t) {

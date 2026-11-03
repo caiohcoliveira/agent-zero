@@ -293,9 +293,12 @@ const CASEKIT = {
     const a = P(t, T0, .5) * (1 - P(t, T_DATA - .3, .5)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a; ctx.translate(700, 790); ctx.rotate(-.04);
     const up = E.outBack(P(t, T0 + 1.4, .7));
-    [[C.red, -.5, -70, 'outro banco'], [C.yellow, -.15, -30, 'outro banco'], [C.orange, .2, 10, 'o banco']].forEach(([c, r, dx, l], i) => { ctx.save(); ctx.rotate(r * .3); ctx.translate(dx, -130 - i * 8 - (i === 2 ? up * 120 : 0));
+    const MC = [];   // transformação de cada cartão: o rótulo de um cartão de trás não aparece por cima dos da frente
+    [[C.red, -.5, -70, 'outro banco'], [C.yellow, -.15, -30, 'outro banco'], [C.orange, .2, 10, 'o banco']].forEach(([c, r, dx, l], i) => { ctx.save(); ctx.rotate(r * .3); ctx.translate(dx, -130 - i * 8 - (i === 2 ? up * 120 : 0)); MC[i] = ctx.getTransform();
       vslab(ctx, -170, -105, 340, 210, 16, c, { lw: 4 }); rr(ctx, -120, -50, 64, 48, 6); ctx.fillStyle = '#F3D9A0'; ctx.fill();
-      late(ctx, cc => text(cc, l, 0, 50, { size: 28, weight: 900, color: i === 1 ? INK : '#FFF', align: 'center' })); ctx.restore(); });
+      late(ctx, cc => { cc.save(); const mi = cc.getTransform();
+        for (let j = i + 1; j < 3; j++) { cc.beginPath(); cc.setTransform(1, 0, 0, 1, 0, 0); cc.rect(-1e5, -1e5, 2e5, 2e5); cc.setTransform(MC[j]); cc.rect(-170, -105, 340, 210); cc.clip('evenodd'); }
+        cc.setTransform(mi); text(cc, l, 0, 50, { size: 28, weight: 900, color: i === 1 ? INK : '#FFF', align: 'center' }); cc.restore(); }); ctx.restore(); });
     vslab(ctx, -260, -40, 520, 240, 28, '#5A3A22', { lw: 5 });
     late(ctx, c => text(c, 'a carteira do cliente', 0, 100, { size: 30, weight: 800, color: '#F3E6D6', align: 'center' }));
     const cp = P(t, T0 + 2.0, .5); if (cp > 0) { scribble(ctx, 'crown', 40, -420, 120, C.yellow, 4, cp, { glow: true }); late(ctx, c => { c.globalAlpha *= cp; tag(c, 230, -420, 'o banco principal', { size: 30, fill: C.yellow }); }); }
@@ -587,7 +590,7 @@ const CASEKIT = {
   }
   function beforeAfter(ctx, t) {
     const a = P(t, T_RESULT + .3, .5) * (1 - P(t, T_NEXT - .3, .5)); if (a <= 0) return;
-    hud(ctx, c => { c.translate(96, 700); panel(c, 0, 0, 980, 250, { dark: true });
+    hud(ctx, c => { c.translate(96, 700); const PW = Math.max(980, GEST.reduce((s, [, l]) => s + measure(c, l, 26, 800) + 44, 190) + 26); panel(c, 0, 0, PW, 250, { dark: true });
       text(c, 'ANTES', 40, 60, { size: 26, weight: 900, mono: true, color: C.red, ls: 3 });
       let x = 190; GEST.forEach(([n, l]) => { const w = measure(c, l, 26, 800) + 30; rr(c, x, 38, w, 46, 23); c.fillStyle = '#3A1A16'; c.fill(); c.strokeStyle = C.red; c.lineWidth = 2.5; c.stroke(); text(c, l, x + 15, 62, { size: 26, weight: 800, color: '#FFD9CF' }); x += w + 14; });
       text(c, 'DEPOIS', 40, 170, { size: 26, weight: 900, mono: true, color: C.yellow, ls: 3 });

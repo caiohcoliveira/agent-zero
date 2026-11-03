@@ -46,7 +46,7 @@ DOWN_REF = {'funk': 11.92, 'tech': 11.111, 'piano': 29.08}
 # têm andamento fixo, e o detector erraria (introduções filtradas sem batida, contratempos de chimbal fortes)
 GRID = {'funk': (110.0, 105.897, [1.17, 12.079, 90.62, 105.897, 143.0]),      # parte 1: drop da parte B em 105,897
         'tech': (108.0, 0.0, [11.111, 46.667, 100.0, 162.222, 217.778]),    # parte 2 (opção A): blocos, subida e drops das versões
-        'piano': (100.0, 27.573, [27.61, 47.973, 67.173])}                  # parte 3: a orquestra entra, o grande prato e o prato do letreiro
+        'piano': (100.0, 27.573, [27.61, 46.773, 67.173])}                  # parte 3: a orquestra entra, o grande ataque e o prato do letreiro
 
 
 def analyze(path, down_ref=None, grid=None):

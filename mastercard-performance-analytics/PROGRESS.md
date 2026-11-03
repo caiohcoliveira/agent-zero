@@ -289,3 +289,19 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - navegação, clique e console limpos;
   - folhas de fotos das cenas reajustadas conferidas;
   - emendas da parte 2 sem cliques e sem silêncio no meio.
+
+### v7.8 — tempos da música e correções visuais
+
+- [x] **Disciplinas (clímax):** entram nos tempos fortes da parte 3, sem mudar a música.
+  - Antes, as duas primeiras caíam no crescendo de entrada da orquestra, que não tem ataque.
+  - Agora a fileira de cima entra uma por compasso a partir do compasso em que a batida começa (30,0 s), e a de baixo acelera, uma a cada 2 tempos.
+  - A frase-chave entra no grande ataque (46,77 s, 1º tempo); antes caía 2 tempos depois, no prato sustentado.
+- [x] **Pilares (06):** um cartão a cada 2 tempos (1º e 3º tempos do compasso), os 5 no mesmo ritmo; antes o 5º vinha depois de uma pausa.
+- [x] **Principalidade:** o rótulo de um cartão de trás ("outro banco") é recortado pelos cartões da frente; antes aparecia por cima deles.
+- [x] **Relatórios automatizados:** a caixa ANTES/DEPOIS mede as etiquetas e cresce para caber "montar o relatório".
+- [x] **Para onde a linha segue (07):** o ponto que acompanhava a câmera e parecia preso virou um trem de dois vagões, que puxa a linha laranja pela cidade e freia na estação "?".
+- [x] **QA:**
+  - varredura sem exceções;
+  - medidor de leitura: 77 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - folhas de fotos dos pontos corrigidos conferidas.

@@ -20,7 +20,7 @@
   - na ponte da 01, um trem atravessa os vãos;
   - na 05, a equipe vira três ícones planos;
   - nos relatórios de fraude, a tela, o cursor e o interruptor contam a história;
-  - na 07, um trem segue pela cidade junto com a câmera.
+  - na 07, um trem de dois vagões puxa a linha pela cidade e para na próxima estação.
 - **Espaço 3D (v7.2):** atrás do conteúdo há partículas com constelações, curvas 3D em fita e objetos flutuando (cubos e octaedros em arame, anéis, orbes), em perspectiva e girando com a câmera. Eles ficam perto da câmera com brilho e longe apagados (profundidade de campo).
 
 **Dados e qualificadores**
@@ -224,9 +224,9 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
      - Apoiar decisões estratégicas · dos clientes (sala do board) e Combinar analytics · com as demais tracks;
      - Reutilizar ativos · para ampliar o alcance e Automatizar rotinas · para ganhar eficiência (robôs);
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
-   - As outras linhas chegam à cidade e um trem segue pela linha junto com a câmera; partículas e objetos 3D giram com o passeio.
+   - As outras linhas chegam à cidade e um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?"; partículas e objetos 3D giram com o passeio.
    - No fim, uma estação tracejada "?": a próxima estação.
-2. **Disciplinas (26 s):** "Por trás de tudo, *disciplinas*". As 8 entram uma a uma num painel 4 × 2, uma fileira em cada frase da orquestra, e **ficam na tela**, cada uma com visualização, nome e subtítulo:
+2. **Disciplinas (26 s):** "Por trás de tudo, *disciplinas*". As 8 entram uma a uma num painel 4 × 2, nos tempos fortes da música (a fileira de cima uma por compasso, a de baixo a cada 2 tempos), e **ficam na tela**, cada uma com visualização, nome e subtítulo:
    - Estatística · setup de projetos de marketing e estratégia
    - Otimização & PO · modelos para tomada de decisão
    - Supervisionados
@@ -262,5 +262,5 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
 - **Parte 3 · 07, disciplinas e letreiro (final orquestral, 100 BPM, sem coro):**
   - tocado inteiro, do jeito que foi composto; o filme se ajusta à música;
   - a cidade tem piano e cordas;
-  - as disciplinas entram em duas frases da orquestra, e a frase-chave aparece no grande prato;
+  - as disciplinas entram nos tempos fortes (a fileira de cima uma por compasso, a de baixo a cada 2 tempos), e a frase-chave aparece no grande ataque;
   - o letreiro acende no prato da cadência final, e o vídeo termina com a cauda desse acorde.

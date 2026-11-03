@@ -18,8 +18,9 @@ Parte 2 (04, cases, 05, 06: 282,222 s, 108 BPM, grade a partir de 0): a opção 
   tocada como foi composta (PARTE2_A): sem filtros, efeitos, compassos repetidos ou silêncios. Cada versão só é
   deslocada inteira, para os blocos e drops dela caírem nas soluções; o filme foi reajustado às durações delas.
 Parte 3 (07, disciplinas, letreiro: 71,373 s, 100 BPM): a opção A tocada inteira, sem cortes (v7.5): a gravação
-  original até pouco antes do coro e a versão sem coro depois. O filme se ajusta a ela (v7.7): a frase-chave no
-  grande prato (46,77), o letreiro no prato da cadência final (67,17) e o vídeo termina com a cauda do acorde.
+  original até pouco antes do coro e a versão sem coro depois. O filme se ajusta a ela (v7.7–v7.8): as disciplinas
+  nos tempos fortes, a frase-chave no grande ataque (46,77), o letreiro no prato da cadência final (67,17) e o vídeo termina
+  com a cauda do acorde.
 
 Uso: python3 tools/eleven_fit.py [parte1|parte2|parte3|todas] [pasta_de_saida]
 """
@@ -203,15 +204,19 @@ def parte3(dur=71.373):
     oe = librosa.onset.onset_strength(y=y.mean(1), sr=SR, hop_length=128); to = np.arange(len(oe)) * 128 / SR
     sel = (to > 26) & (to < 45); z = np.sum(oe[sel] ** 2 * np.exp(2j * np.pi * to[sel] / .6)); ph = (np.angle(z) / (2 * np.pi) * .6) % .6
     anchor = ph + round((E - ph) / .6) * .6
-    # os dois pratos que o filme usa: o grande (frase-chave do clímax) e o da cadência final (letreiro), na batida mais aguda
+    # os dois momentos que o filme usa: o grande ataque (frase-chave do clímax), a batida de ataque mais forte, e o prato da
+    # cadência final (letreiro), a batida mais aguda
     hi = sosfiltfilt(R.sos('high', 4000), y.mean(1))
     def crash(lo, hi_):
         bts = [anchor + k * .6 for k in range(-60, 80) if lo <= anchor + k * .6 < hi_]
         return max(bts, key=lambda b: float(np.mean(hi[int(b * SR):int((b + .6) * SR)] ** 2)))
-    key, chord = crash(45, 50), crash(64, 69)
+    def attack(lo, hi_):
+        bts = [anchor + k * .6 for k in range(-60, 80) if lo <= anchor + k * .6 < hi_]
+        return max(bts, key=lambda b: float(oe[(to > b - .06) & (to < b + .1)].max()))
+    key, chord = attack(45, 50), crash(64, 69)
     info = {'atraso_do_sem_coro_amostras': lag, 'coro_entra': round(onset, 2), 'troca_para_sem_coro': [round(t0, 2), round(t1, 2)],
             'entrada_da_orquestra': round(E, 2), 'subida_db': round(rise, 1), 'grade': [100.0, round(anchor, 3)],
-            'prato_da_frase_chave': round(key, 3), 'prato_do_letreiro': round(chord, 3), 'fim_do_video': dur}
+            'ataque_da_frase_chave': round(key, 3), 'prato_do_letreiro': round(chord, 3), 'fim_do_video': dur}
     return R.master(y, -11.0), info
 
 
