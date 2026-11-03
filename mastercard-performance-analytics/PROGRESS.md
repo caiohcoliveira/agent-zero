@@ -319,3 +319,26 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - medidor de leitura: 77 telas, 0 curtas;
   - navegação, clique e console limpos;
   - fotos dos trens, do popup (com o arquivo ilustrativo, com outra imagem no lugar e sem arquivo) e da 07 conferidas.
+
+### v7.10 — perguntas da ponte e a recomendação passo a passo
+
+- [x] **Ponte (01):** as perguntas dos cartões viraram "Como recomendar melhor?", "Como medir principalidade?" e "Como ganhar eficiência?" (uma para cada case), em até duas linhas.
+- [x] **Cestas de produtos (case 1):** volta a explicação da recomendação da v5 (`src/legacy/13-scene-als.js`, na branch da v5.4), sem mudar nenhum tempo do case.
+  - **DADOS:**
+    - a matriz clientes × produtos (SKU), esparsa, com ícones;
+    - as compras do histórico acendem;
+    - a linha de um cliente e a coluna de um produto mostram o que é cada eixo;
+    - nas células vazias aparecem "?": sem compra, o sinal é desconhecido;
+    - as fichas com os números do histórico ficam ao lado.
+  - **COMO FIZEMOS:**
+    - R ≈ U · Vᵀ, com os fatores latentes;
+    - o BM25 tira peso dos dois produtos mais comprados;
+    - o ALS alterna "fixa V → resolve U" e "fixa U → resolve V", com a fórmula e o erro caindo até convergir;
+    - resolvida, a matriz inicial volta completa ("lacunas → propensões").
+  - **SOLUÇÃO:** no drop, as estrelas das recomendações; em seguida, as cestas e os públicos (entram ~1,6 s depois).
+  - Saíram os recibos, a matriz anterior e a similaridade de cosseno.
+- [x] **QA:**
+  - varredura sem exceções;
+  - medidor de leitura: 77 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - fotos de cada passo conferidas.

@@ -79,7 +79,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       ctx.save(); ctx.translate(x - 120, 410); ctx.rotate(sw); ctx.scale(s, s);
       line(ctx, -80, -30, -80, 36, '#C9B79C', 3); line(ctx, 80, -30, 80, 36, '#C9B79C', 3);
       paper(ctx, -160, 36, 320, 130, { torn: true, seed: 90 + i, fill: [C.yellow, '#FFE9A8', '#FFD9C0'][i], shadow: 8, shadowColor: '#000', lw: 3.5, halftone: .05 });
-      late(ctx, c => text(c, QS[i], 0, 102, { size: 40, weight: 900, color: INK, align: 'center' }));
+      late(ctx, c => { const n = wrapRich(c, QS[i], 304, 32, 900).lines.length; para(c, QS[i], 0, 101 - n * 32 * 1.08 / 2, 304, { size: 32, weight: 900, color: INK, align: 'center', lh: 1.08 }); });
       ctx.restore();
     });
   }

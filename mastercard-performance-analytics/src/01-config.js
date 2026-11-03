@@ -117,7 +117,7 @@ const CONFIG = {
     mission: 'Transformamos dados em decisões e soluções de negócio.',
     stopInfo: { p1: ['Conversa 1', 'perguntas sobre as estações 01, 02 e 03'], p2: ['Conversa 2', 'aplicações e aprofundamento dos cases'] },
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },
-    postits: ['Por que caiu?', 'Quem priorizar?', 'Onde investir?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
+    postits: ['Como recomendar melhor?', 'Como medir principalidade?', 'Como ganhar eficiência?', 'Qual o risco?', 'E se…?', 'Vale a pena?', 'O que mudou?', 'Qual canal?'],
     circleA: 'Negócio', circleB: 'Dados',
     chain: ['Dados', 'Decisões', 'Impacto', 'Valor'],
     engagement: [['Diagnóstico', 'dimensionar'], ['Estratégia', 'explicar'], ['Execução', 'construir'], ['Mensuração', 'provar']],

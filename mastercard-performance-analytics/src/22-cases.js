@@ -102,12 +102,33 @@ const CASEKIT = {
   const LIFT = (() => { const h = String(dget(CS(), 'business_results.headline', '')); const m = h.match(/([+-]?\d+(?:\.\d+)?)\s*relative/i); return m ? parseFloat(m[1]) : (BEST[1] && SECOND[1] ? BEST[1] / SECOND[1] - 1 : .1875); })();
   const IDX = 100 * (1 + LIFT), BEST_NAME = BEST[0].replace(/\s*\(cesta\)/i, '');
   const SPARSE = (() => { const m = ms(), c = parseFloat(m.customers_modeled) * 1e6, s = +m.sku_subgroups, it = parseFloat(m.interactions) * 1e6; return c && s && it ? 1 - it / (c * s) : .95; })();
-  const R = rng(5), ROWS = 10, COLS = 18, CELLS = Array.from({ length: ROWS * COLS }, () => R());
-  const PR = Array.from({ length: 36 }, (_, i) => ({ b: i % 3, sx: R() * 2 - 1, sy: R() * 2 - 1, ox: (R() - .5) * .5, oy: (R() - .5) * .5 }));
+  // recomendação (v5): matriz cliente × produto com fatores latentes de verdade (3 "gostos") e o passo a passo dentro das fases
+  const NR = 8, NC = 12, K = 3, PITCH = 56, CELL = 48, X0 = 210, Y0 = 470, FC = [C.red, C.orange, C.yellow];
+  const SKU = ['bottle', 'box', 'can', 'cup', 'bag', 'jar', 'carton', 'tube', 'bottle', 'box', 'can', 'cup'];
+  const RA = rng(505), grp = i => (i < 3 ? 0 : i < 6 ? 1 : 2), pgrp = j => Math.floor(j / 4);
+  const Uf = Array.from({ length: NR }, (_, i) => Array.from({ length: K }, (_, k) => clamp((k === grp(i) ? .82 : .12) + (RA() - .5) * .3, .02, 1)));
+  const Vf = Array.from({ length: NC }, (_, j) => Array.from({ length: K }, (_, k) => clamp((k === pgrp(j) ? .85 : .1) + (RA() - .5) * .3, .02, 1)));
+  const U0 = Uf.map(row => row.map(() => RA())), V0 = Vf.map(row => row.map(() => RA()));
+  const SS = Uf.map(u => Vf.map(v => u.reduce((acc, x, k) => acc + x * v[k], 0))), smax = Math.max(...SS.flat()), SN = SS.map(row => row.map(v => v / smax));
+  const OBS = SN.map((row, i) => row.map((v, j) => (v > .5 && hash(i * 31 + j * 7) < .5) || hash(i * 13 + j * 17 + 3) < .06));
+  const OBS_LIST = []; OBS.forEach((row, i) => row.forEach((o, j) => { if (o) OBS_LIST.push([i, j]); })); OBS_LIST.sort((q, w) => hash(q[0] * 12 + q[1]) - hash(w[0] * 12 + w[1]));
+  const STARS = SN.map((row, i) => row.map((v, j) => [v, j]).filter(([, j]) => !OBS[i][j]).sort((q, w) => w[0] - q[0]).slice(0, 2).map(q => q[1]));
+  const COMMON = Array.from({ length: NC }, (_, j) => [OBS.reduce((n, row) => n + (row[j] ? 1 : 0), 0), j]).sort((q, w) => w[0] - q[0]).slice(0, 2).map(q => q[1]);   // os 2 mais comprados (BM25)
+  // DADOS: a grade, as compras, a linha (cliente), a coluna (produto) e as lacunas · COMO FIZEMOS: R ≈ U·Vᵀ, BM25, ALS em 8 meias-rodadas,
+  // a volta da matriz e as propensões · no drop (SOLUÇÃO): as estrelas das recomendações; depois a matriz sai para as cestas
+  const T_GRID = T_DATA + 1.3, T_BUY = T_DATA + 2.3, T_ROW = T_DATA + 5.8, T_COL = T_DATA + 7.2, T_Q = T_DATA + 8.6, T_SPLIT = T_HOW;
+  const T_BACK = T_COS, T_SWEEP = T_COS + .5, T_STAR = T_DROP, T_OUT = T_DROP + 1.6;
+  const HALF = [.9, .9, .7, .7, .5, .5, .4, .4], HT = HALF.reduce((acc, d, n) => (acc.push(n ? acc[n - 1] + HALF[n - 1] : T_ALS), acc), []);
+  const win = (t, a0, a1, fi = .3, fo = .3) => P(t, a0, fi) * (1 - P(t, a1 - fo, fo));
+  const cellRect = (i, j, Rr) => ({ x: Rr.x + j * PITCH * Rr.s + (PITCH - CELL) / 2 * Rr.s, y: Rr.y + i * PITCH * Rr.s + (PITCH - CELL) / 2 * Rr.s, w: CELL * Rr.s, h: CELL * Rr.s });
+  /** valores de U/V durante a alternância: convergem a cada meia-rodada em que são ajustados */
+  function factorVals(t, isU) { let k = 0; HT.forEach((ht, h) => { if (t >= ht + HALF[h] * .5 && (h % 2 === 0) === isU) k++; });
+    const conv = 1 - Math.pow(.42, k), A0 = isU ? U0 : V0, B0 = isU ? Uf : Vf; return A0.map((row, i) => row.map((v, q) => lerp(v, B0[i][q], conv))); }
   cue(id, .05, 'chime', { f: 987.8, up: -4 }); cue(id, T0 - .6, 'whoosh', { dur: .6, v: .3 });
-  for (let k = 0; k < 10; k++) cue(id, T_DATA + .4 + k * .32, 'tick', {}); [0, 1, 2, 3].forEach(i => cue(id, T_DATA + 2.4 + i * .9, 'pop', { p: .9 + i * .1, v: .18 }));
-  cue(id, T_HOW, 'chime', { f: 784, up: 7 }); cue(id, T_HOW + .4, 'shimmer', { dur: 1.5 }); for (let k = 0; k < 8; k++) cue(id, T_ALS + .3 + k * .55, 'tick', {});
-  cue(id, T_COS, 'shimmer', { dur: 1.5 }); cue(id, T_COS + .2, 'riser', { dur: T_DROP - T_COS - .2, v: .25 }); cue(id, T_DROP, 'impact', { size: 1.1 }); cue(id, T_RES, 'impact', { size: .8 }); cue(id, T_RES + .6, 'ding');
+  OBS_LIST.forEach((_, k) => { if (k % 2 === 0) cue(id, T_BUY + k * .1, 'tick', { f: 2400 + (k % 5) * 160, v: .12 }); }); [0, 1, 2, 3].forEach(i => cue(id, T_DATA + 1.0 + i * .7, 'pop', { p: .9 + i * .1, v: .18 }));
+  cue(id, T_ROW, 'whoosh', { dur: .4, v: .2 }); cue(id, T_COL, 'whoosh', { dur: .4, v: .2 }); cue(id, T_Q + .2, 'glitch');
+  cue(id, T_HOW, 'chime', { f: 784, up: 7 }); cue(id, T_SPLIT + .1, 'whoosh', { dur: 1.2, v: .4 }); HT.forEach((ht, h) => cue(id, ht, 'tick', { f: h % 2 ? 1500 : 2100, v: .25 }));
+  cue(id, T_COS, 'shimmer', { dur: 1.5 }); cue(id, T_COS + .2, 'riser', { dur: T_DROP - T_COS - .2, v: .25 }); cue(id, T_DROP, 'impact', { size: 1.1 }); STARS.forEach((_, i) => cue(id, T_STAR + i * .1, 'pop', { p: 1 + i * .1, v: .18 })); cue(id, T_RES, 'impact', { size: .8 }); cue(id, T_RES + .6, 'ding');
   const SCRIPT = CASEKIT.script(id, 1, 'CASE 1 DE 4 · CLIENTE BANANA · VAREJO', C.yellow, 'Cestas de produtos', [
     [T0, T_DATA, 'PROBLEMA', 'Como incentivar clientes a comprar em *outras empresas do mesmo grupo*?', { y: 250 }],
     [T_DATA, T_HOW, 'DADOS', 'Analisamos o *histórico de compras* para aprender afinidades entre clientes e produtos.', { y: 250 }],
@@ -118,7 +139,7 @@ const CASEKIT = {
 
   /** as três empresas do grupo e um cliente que hoje compra só em uma */
   function stores(ctx, t) {
-    const a = P(t, T0, .5) * (1 - P(t, T_DATA + 1.4, .6)); if (a <= 0) return;
+    const a = P(t, T0, .5) * (1 - P(t, T_DATA + .8, .5)); if (a <= 0) return;
     const sl = E.inOutCubic(P(t, T_DATA - .2, 1.2)), GYs = 820;
     ctx.save(); ctx.globalAlpha *= a; ctx.translate(-260 * sl, 60 * sl); ctx.scale(1 - .25 * sl, 1 - .25 * sl);
     line(ctx, 0, GYs, 1200, GYs, INK, 6);
@@ -139,75 +160,104 @@ const CASEKIT = {
       late(ctx, c => { c.globalAlpha *= cp; text(c, 'hoje: compra em uma empresa só', 580, GYs + 150, { size: 28, weight: 800, color: '#F6EEDF', align: 'center' }); }); }
     ctx.restore();
   }
-  /** os dados: recibos viram fichas com os números do JSON */
+  /** os números do histórico de compras, ao lado da matriz */
   function data(ctx, t) {
     const a = P(t, T_DATA, .5) * (1 - P(t, T_HOW - .3, .5)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
-    // recibos voando para o "scanner"
-    for (let k = 0; k < 10; k++) { const d = clamp((t - T_DATA - k * .32) / 1.1); if (d <= 0 || d >= 1) continue; const x = lerp(60, 470, E.inOutSine(d)), y = lerp(900, 640, d) - Math.sin(d * Math.PI) * 160;
-      ctx.save(); ctx.translate(x, y); ctx.rotate(d * 4 + k); paper(ctx, -18, -24, 36, 48, { r: 3, fill: '#FFFDF8', shadow: 2, lw: 1.5, volume: false }); line(ctx, -10, -10, 10, -10, '#8A8378', 2); line(ctx, -10, 0, 6, 0, '#8A8378', 2); ctx.restore(); }
-    vslab(ctx, 420, 600, 150, 110, 26, '#3A3640', { lw: 4 }); glow(ctx, 495, 600, 90, C.orange, .4 + .3 * Math.sin(t * 8)); line(ctx, 430, 600 + 50 * ((t * 2) % 1), 560, 600 + 50 * ((t * 2) % 1), C.orange, 3);
     const m = ms(), TL = [[`${MONTHS} meses`, 'de compras por cliente e produto', 'clock'], [FMT.mm(m.customers_modeled), 'clientes', 'user'], [FMT.num(m.sku_subgroups || 0, 0), 'subgrupos de produtos', 'grid'], [FMT.mm(m.interactions), 'interações (compras)', 'basket']];
-    TL.forEach(([big, l, ic], i) => CASEKIT.tile(ctx, 790 + (i % 2) * 380, 560 + Math.floor(i / 2) * 260, 350, 230, big, l, P(t, T_DATA + 2.4 + i * .9, .5), { seed: 10 + i, rot: [-.02, .015, .01, -.015][i], icon: ic }));
+    TL.forEach(([big, l, ic], i) => CASEKIT.tile(ctx, 1190 + (i % 2) * 380, 560 + Math.floor(i / 2) * 250, 350, 220, big, l, P(t, T_DATA + 1.0 + i * .7, .5), { seed: 10 + i, rot: [-.02, .015, .01, -.015][i], icon: ic }));
     ctx.restore();
   }
-  /** matriz cliente × produto: compras observadas × scores estimados; BM25; ALS com o erro caindo */
-  function matrix(ctx, t) {
-    const a = P(t, T_HOW, .6) * (1 - P(t, T_COS - .3, .45)); if (a <= 0) return;
-    const cs = 34, K = 3, RX = 300, RY = 520, rw = COLS * cs, rh = ROWS * cs, UX = RX - 26 - K * cs, VY = RY - 22 - K * cs;
-    const mp = P(t, T_HOW, 1.4), bm = P(t, T_BM, .8), ap = P(t, T_ALS, .5), it = clamp((t - T_ALS - .3) / (T_COS - .6 - T_ALS)) * 4, ph = Math.floor(it * 2) % 2;
-    ctx.save(); ctx.globalAlpha *= a;
-    paper(ctx, RX - 16, RY - 16, rw + 32, rh + 32, { r: 10, fill: 'rgba(20,16,13,.92)', outline: '#F3EBDD', lw: 2, shadow: 8, shadowColor: '#000', volume: false });
-    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-      const v = CELLS[r * COLS + c], known = v < .16 || (c < 2 && v < .85), low = c < 2, x = RX + c * cs, y = RY + r * cs, appear = clamp(mp * 1.6 - (c + r) / 30);
-      if (appear <= 0) continue;
-      if (known) { circle(ctx, x + cs / 2, y + cs / 2, 9, rgba(low ? '#8A8378' : C.orange, appear * (low ? 1 - .7 * bm : 1))); continue; }
-      ctx.strokeStyle = rgba('#FFFFFF', .08 * appear); ctx.lineWidth = 1; ctx.strokeRect(x + 3, y + 3, cs - 6, cs - 6);
-      const f = clamp(it / 4 * 1.35 - hash(r * 31 + c * 7) * .35); if (f > 0) { const pv = hash(r * 7 + c * 13); rr(ctx, x + 6, y + 6, cs - 12, cs - 12, 4); ctx.fillStyle = rgba(mix('#5A3A22', C.yellow, pv), .85 * f); ctx.fill(); }
+  /** a recomendação passo a passo (da v5): a matriz cliente × produto esparsa, com ícones; o que é cada eixo; as lacunas
+   *  (sem compra, o sinal é desconhecido); R ≈ U·Vᵀ; o BM25; o ALS alternando (fixa V → resolve U, fixa U → resolve V) com o
+   *  erro caindo; resolvida, a matriz volta completa: as lacunas viram propensões e as estrelas são as recomendações (no drop) */
+  function als(ctx, t) {
+    if (t < T_GRID || t > T_OUT + .7) return;
+    const out = P(t, T_OUT, .6), split = P(t, T_SPLIT, 1.4, E.inOutCubic), back = P(t, T_BACK, .8, E.inOutCubic), mergeK = split * (1 - back);
+    const RS = { x: lerp(X0, 90, mergeK), y: lerp(Y0, 590 - NR * PITCH * .55 / 2, mergeK), s: lerp(1, .55, mergeK) };
+    const UP = { x: 590, y: 590 - NR * 46 / 2, p: 46 }, VP = { x: 830, y: 590 - K * 46 / 2, p: 46 }, dimJ = j => COMMON.includes(j) ? 1 - .6 * win(t, T_BM, T_BACK, .5, .5) : 1;
+    ctx.save(); ctx.globalAlpha *= 1 - out;
+    // ---------- matriz R: células, compras observadas, propensões e recomendações ----------
+    for (let i = 0; i < NR; i++) for (let j = 0; j < NC; j++) {
+      const ap = P(t, T_GRID + (i + j) * .035, .3); if (ap <= 0) continue; const c = cellRect(i, j, RS);
+      const sweep = clamp((t - T_SWEEP) * 1.6 - (i + j) / (NR + NC) * 1.4);
+      ctx.save(); ctx.globalAlpha *= (1 - mergeK * .45) * ap;
+      rr(ctx, c.x, c.y, c.w, c.h, 8 * RS.s); ctx.fillStyle = sweep > 0 ? heat(SN[i][j] * E.outCubic(sweep)) : '#262220'; ctx.fill();
+      const k = OBS_LIST.findIndex(q => q[0] === i && q[1] === j), b0 = T_BUY + k * .1;
+      if (OBS[i][j] && t > b0) { const bp = E.outBack(P(t, b0, .3)); ctx.save(); ctx.globalAlpha *= dimJ(j);
+        circle(ctx, c.x + c.w / 2, c.y + c.h / 2, c.w * .22 * bp, sweep > 0 ? null : C.yellow, sweep > 0 ? '#FFF' : null, 3); if (sweep <= 0) glow(ctx, c.x + c.w / 2, c.y + c.h / 2, c.w * .7, C.yellow, .35 * (1 - P(t, b0, 1))); ctx.restore(); }
+      if (STARS[i].includes(j) && t > T_STAR) { const sp = E.outBack(P(t, T_STAR + i * .1, .4)); glow(ctx, c.x + c.w / 2, c.y + c.h / 2, c.w, '#FFF', .4 * sp); icon(ctx, 'spark', c.x + c.w / 2, c.y + c.h / 2, c.w * .6 * sp, '#FFF'); }
+      ctx.restore();
     }
-    late(ctx, c => { c.globalAlpha *= mp; text(c, 'clientes × produtos', RX + rw / 2, RY + rh + 44, { size: 28, weight: 900, color: '#F3EBDD', align: 'center' });
-      // legenda: o que é dado observado e o que é estimativa
-      const ly = RY + rh + 96; circle(c, RX + 10, ly, 10, C.orange); text(c, 'compra observada', RX + 30, ly, { size: 26, weight: 800, color: '#FFF' });
-      rr(c, RX + 290, ly - 11, 22, 22, 4); c.fillStyle = C.yellow; c.fill(); text(c, 'score estimado pelo modelo', RX + 324, ly, { size: 26, weight: 800, color: '#FFF', alpha: clamp(it) });
-      c.globalAlpha *= 1; text(c, `${FMT.num(SPARSE * 100, 1)}% das combinações sem compra`, RX, RY - 34 - (ap > 0 ? K * cs + 24 : 0), { size: 26, weight: 800, color: '#FFB0A0', alpha: 1 - clamp(it / 2) }); });
-    if (bm > 0) { ctx.save(); ctx.globalAlpha *= bm * (1 - ap * .6); rr(ctx, RX - 6, RY - 8, cs * 2 + 12, rh + 16, 8); ctx.strokeStyle = C.red; ctx.lineWidth = 4; ctx.stroke(); ctx.restore();
-      late(ctx, c => { c.globalAlpha *= bm * (1 - P(t, T_ALS + 1.4, .5)); tag(c, RX + 170, RY - 40, 'itens muito comuns (sacola, pão): peso menor', { size: 24, fill: C.red, color: '#FFF' }); line(c, RX + cs, RY - 18, RX + cs, RY - 6, C.red, 4); }); }
-    if (ap > 0) { ctx.save(); ctx.globalAlpha *= ap;
-      const cell = (x, y, seed, hot) => { const v = hash(seed + Math.floor(it * 2) * 3.1), col = mix('#7A3A12', C.orange, v); rr(ctx, x + 4, y + 4, cs - 8, cs - 8, 4); ctx.fillStyle = hot ? mix(col, '#FFF1D6', .25 + .25 * Math.sin(t * 12 + seed)) : col; ctx.fill(); };
-      for (let r = 0; r < ROWS; r++) for (let k = 0; k < K; k++) cell(UX + k * cs, RY + r * cs, r * 9 + k, ph === 0);
-      for (let c = 0; c < COLS; c++) for (let k = 0; k < K; k++) cell(RX + c * cs, VY + k * cs, c * 5 + k + 300, ph === 1);
-      inkRect(ctx, UX - 2, RY - 2, K * cs + 4, rh + 4, 6, ph === 0 ? 5 : 3, 4, ph === 0 ? C.yellow : '#F3EBDD'); inkRect(ctx, RX - 2, VY - 2, rw + 4, K * cs + 4, 6, ph === 1 ? 5 : 3, 5, ph === 1 ? C.yellow : '#F3EBDD');
-      late(ctx, c => { text(c, 'clientes', UX + K * cs / 2, RY + rh + 44, { size: 24, weight: 800, color: '#F3EBDD', align: 'center' }); text(c, 'produtos', RX + rw + 14, VY + K * cs / 2, { size: 24, weight: 800, color: '#F3EBDD' }); });
-      // painel do erro de reconstrução (ilustrativo)
-      const ex = 1110, ey = 560, ew = 600, eh = 220, err = i => .85 * Math.exp(-1.15 * i) + .1;
-      holo(ctx, ex - 50, ey - 80, ew + 100, eh + 200, { color: C.orange });
-      line(ctx, ex, ey + eh, ex + ew, ey + eh, rgba('#FFFFFF', .35), 2); line(ctx, ex, ey, ex, ey + eh, rgba('#FFFFFF', .35), 2);
-      ctx.beginPath(); for (let s = 0; s <= 60; s++) { const i = s / 60 * it, x = ex + i / 4 * ew, y = ey + eh - err(i) / .95 * eh; s ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.strokeStyle = C.yellow; ctx.lineWidth = 5; ctx.stroke();
-      for (let i = 0; i <= Math.floor(it); i++) circle(ctx, ex + i / 4 * ew, ey + eh - err(i) / .95 * eh, 8, C.orange, INK, 2.5);
-      late(ctx, c => { text(c, 'erro de reconstrução', ex, ey - 40, { size: 28, weight: 900, color: '#FFF' }); text(c, '(ilustrativo)', ex + 300, ey - 40, { size: 24, weight: 700, color: '#E9DCC8' });
-        text(c, 'iterações →', ex + ew, ey + eh + 34, { size: 24, weight: 700, color: '#E9DCC8', align: 'right' });
-        text(c, it >= 4 ? 'convergiu ✓' : ph === 0 ? 'ajusta clientes' : 'ajusta produtos', ex + ew / 2, ey + eh + 84, { size: 32, weight: 900, color: it >= 4 ? C.yellow : C.orange, align: 'center' }); });
-      ctx.restore(); }
-    ctx.restore();
-  }
-  /** cosseno: produtos parecidos se aproximam e formam as 3 cestas */
-  function cosine(ctx, t) {
-    const p = P(t, T_COS, .5), g = E.inOutCubic(P(t, T_COS + .2, 1.6)), out = P(t, T_DROP - .2, .3); if (p <= 0 || out >= 1) return;
-    const cx = W / 2, cy = 640, CEN = [[-.62, .1], [0, -.2], [.62, .1]], col = [C.yellow, C.orange, C.red];
-    ctx.save(); ctx.globalAlpha *= p * (1 - out);
-    holo(ctx, cx - 660, cy - 250, 1320, 500, { color: C.orange });
-    PR.forEach(q => { const tx = CEN[q.b][0] + q.ox * .5, ty = CEN[q.b][1] + q.oy * .6, x = cx + lerp(q.sx, tx, g) * 560, y = cy + lerp(q.sy * .7, ty, g) * 360; vball(ctx, x, y, 11, g > .5 ? col[q.b] : '#BFB3A3', { lw: 2, rim: false }); });
-    late(ctx, c => { c.globalAlpha *= p; text(c, 'similaridade de cosseno: produtos parecidos se aproximam', cx, cy - 210, { size: 28, weight: 900, color: '#FFF', align: 'center' }); });
+    // clientes (linhas) e produtos (colunas)
+    for (let i = 0; i < NR; i++) { const ap = E.outBack(P(t, T_GRID + .2 + i * .06, .35)); if (ap <= 0) continue; const x = RS.x - 34 * RS.s - 8, y = RS.y + (i + .5) * PITCH * RS.s, rad = 20 * RS.s * ap;
+      circle(ctx, x, y, rad, '#3A3532', rgba(C.cream, .5), 2); icon(ctx, 'user', x, y, rad * 1.3, C.cream, 9); }
+    for (let j = 0; j < NC; j++) { const ap = E.outBack(P(t, T_GRID + .3 + j * .05, .35)); if (ap <= 0) continue;
+      ctx.save(); ctx.globalAlpha *= dimJ(j); icon(ctx, SKU[j], RS.x + (j + .5) * PITCH * RS.s, RS.y - 30 * RS.s - 6, 34 * RS.s * ap, C.sand, 8); ctx.restore(); }
+    // o que é cada eixo: uma linha (cliente) e uma coluna (produto)
+    const rowA = win(t, T_ROW, T_COL + .4, .3, .4), colA = win(t, T_COL, T_Q + .2, .3, .4), qa = win(t, T_Q, T_SPLIT + .4, .4, .4), ba = win(t, T_BUY, T_ROW + .2, .4, .4);
+    if (rowA > 0) { rr(ctx, RS.x - 6, RS.y + 2 * PITCH * RS.s - 2, NC * PITCH * RS.s + 6, PITCH * RS.s, 12); ctx.strokeStyle = rgba(C.orange, rowA); ctx.lineWidth = 4; ctx.stroke(); }
+    if (colA > 0) { rr(ctx, RS.x + 5 * PITCH * RS.s + 2, RS.y - 6, PITCH * RS.s - 4, NR * PITCH * RS.s + 6, 12); ctx.strokeStyle = rgba(C.yellow, colA); ctx.lineWidth = 4; ctx.stroke(); }
+    late(ctx, c => { const by = RS.y + NR * PITCH * RS.s + 40, cx = RS.x + NC * PITCH * RS.s / 2;
+      if (ba > 0) { circle(c, cx - 150, by, 10, C.yellow); text(c, 'compra no histórico', cx - 128, by, { size: 28, weight: 800, color: '#FFF', alpha: ba }); }
+      if (rowA > 0) text(c, 'cliente', RS.x + NC * PITCH * RS.s + 20, RS.y + 2.5 * PITCH * RS.s, { size: 32, weight: 900, color: C.orange, alpha: rowA });
+      if (colA > 0) text(c, 'produto (SKU)', RS.x + 5.5 * PITCH * RS.s, by, { size: 32, weight: 900, color: C.yellow, align: 'center', alpha: colA });
+      if (qa > 0) { for (let i = 0; i < NR; i++) for (let j = 0; j < NC; j++) { if (OBS[i][j]) continue; const r = cellRect(i, j, RS), fl = .3 + .35 * (hash(i * 12 + j + Math.floor(t * 4)) > .5);
+          text(c, '?', r.x + r.w / 2, r.y + r.h / 2 + 2, { size: 28 * RS.s, weight: 800, color: C.sand, align: 'center', alpha: fl * qa }); }
+        text(c, `sem compra, o sinal é desconhecido · ${FMT.num(SPARSE * 100, 1)}% das combinações`, cx, by, { size: 28, weight: 800, color: '#FFB0A0', align: 'center', alpha: qa * (1 - mergeK) }); } });
+    // ---------- R ≈ U · Vᵀ e o ALS ----------
+    if (mergeK > 0) {
+      const Uv = factorVals(t, true), Vv = factorVals(t, false), fa = clamp(split * 1.6) * (1 - back);
+      const h = HT.findIndex((ht, n) => t >= ht && t < ht + HALF[n]), active = t >= T_ALS && h >= 0 ? (h % 2 === 0 ? 'U' : 'V') : null, done = t >= HT[7] + HALF[7];
+      ctx.save(); ctx.globalAlpha *= fa;
+      for (let i = 0; i < NR; i++) for (let k = 0; k < K; k++) { const from = cellRect(i, k * 4 + 1.5, { x: X0, y: Y0, s: 1 }), x = lerp(from.x, UP.x + k * UP.p, split), y = lerp(from.y, UP.y + i * UP.p, split), sz = lerp(CELL, UP.p - 6, split);
+        rr(ctx, x, y, sz, sz, 7); ctx.fillStyle = mix('#262220', FC[k], clamp(Uv[i][k])); ctx.fill(); }
+      for (let k = 0; k < K; k++) for (let j = 0; j < NC; j++) { const from = cellRect(k * 2.5 + 1.5, j, { x: X0, y: Y0, s: 1 }), x = lerp(from.x, VP.x + j * VP.p, split), y = lerp(from.y, VP.y + k * VP.p, split), sz = lerp(CELL, VP.p - 6, split);
+        rr(ctx, x, y, sz, sz, 7); ctx.fillStyle = mix('#262220', FC[k], clamp(Vv[j][k])); ctx.fill(); }
+      if (active) { const isU = active === 'U', bx = isU ? UP.x - 10 : VP.x - 10, by = isU ? UP.y - 10 : VP.y - 10, bw = isU ? K * UP.p + 14 : NC * VP.p + 14, bh = isU ? NR * UP.p + 14 : K * VP.p + 14;
+        glow(ctx, bx + bw / 2, by + bh / 2, Math.max(bw, bh) * .8, C.orange, .25 * (1 - P(t, HT[h], HALF[h]))); rr(ctx, bx, by, bw, bh, 14); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.stroke(); }
+      if (t >= T_ALS) { const lx = 1500, ly = 770, lw = 300, lh = 150, n = HT.filter(ht => t >= ht).length;   // o erro cai a cada meia-rodada
+        line(ctx, lx, ly + lh, lx + lw, ly + lh, rgba(C.cream, .25), 2); line(ctx, lx, ly, lx, ly + lh, rgba(C.cream, .25), 2);
+        ctx.beginPath(); for (let q = 0; q <= n; q++) ctx.lineTo(lx + q / HALF.length * lw, ly + lh - lh * Math.pow(.62, q) * .95); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.stroke();
+        circle(ctx, lx + n / HALF.length * lw, ly + lh - lh * Math.pow(.62, n) * .95, 7, C.yellow); }
+      ctx.restore();
+      const bm = win(t, T_BM, T_ALS + 1.4, .4, .4);
+      late(ctx, c => { c.globalAlpha *= fa;
+        if (bm > 0) tag(c, 290, 815, 'BM25: itens muito comuns pesam menos', { size: 24, fill: C.red, color: '#FFF', alpha: bm });
+        c.save(); c.globalAlpha *= P(t, T_SPLIT + 1, .5);
+        text(c, '≈', 528, 590, { size: 80, weight: 300, color: C.cream, align: 'center' }); text(c, '×', 790, 590, { size: 64, weight: 300, color: C.cream, align: 'center' });
+        text(c, 'R', 90 + NC * PITCH * .55 / 2, 590 + NR * PITCH * .55 / 2 + 46, { size: 32, weight: 900, mono: true, color: C.sand, align: 'center' });
+        text(c, 'U', UP.x + K * UP.p / 2, UP.y + NR * UP.p + 34, { size: 32, weight: 900, mono: true, color: active === 'U' ? C.orange : C.sand, align: 'center' });
+        text(c, 'clientes × fatores', UP.x + K * UP.p / 2, UP.y + NR * UP.p + 70, { size: 24, weight: 700, color: C.stone, align: 'center' });
+        text(c, 'Vᵀ', VP.x + NC * VP.p / 2, VP.y - 34, { size: 32, weight: 900, mono: true, color: active === 'V' ? C.orange : C.sand, align: 'center' });
+        text(c, 'fatores × produtos', VP.x + NC * VP.p / 2, VP.y + K * VP.p + 36, { size: 24, weight: 700, color: C.stone, align: 'center' });
+        text(c, 'fatores latentes · "gostos ocultos"', UP.x - 6, UP.y - 40, { size: 26, weight: 800, color: C.yellow });
+        if (t >= T_ALS) text(c, 'erro', 1500, 748, { size: 22, weight: 800, mono: true, color: C.stone });
+        formula(c, 'R ≈ U · Vᵀ', 1085, 296, { size: 30, rot: .03, seed: 5, scale: E.outBack(P(t, T_SPLIT + .8, .4)) });
+        formula(c, 'c = 1 + α·r  · implicit feedback', 330, 880, { size: 22, rot: -.03, seed: 7, scale: E.outBack(P(t, T_SPLIT + 1.5, .4)) });
+        formula(c, 'rank k = 64', 260, 950, { size: 22, rot: .03, seed: 9, scale: E.outBack(P(t, T_SPLIT + 1.8, .4)) });
+        c.restore();
+        const pl = done ? 'convergiu ✓' : active === 'U' ? 'fixa V  →  resolve U' : active === 'V' ? 'fixa U  →  resolve V' : null;
+        if (pl) pill(c, 1130, 830, pl, { size: 28, fill: done ? C.yellow : C.orange, color: done ? INK : '#FFF' });
+        if (active) formula(c, active === 'U' ? 'uᵢ = (VᵀV + λI)⁻¹ Vᵀ rᵢ' : 'vⱼ = (UᵀU + λI)⁻¹ Uᵀ rⱼ', 1130, 915, { neon: true, size: 24 }); });
+    }
+    // ---------- resolvida: a matriz inicial, completa ----------
+    const sa = win(t, T_SWEEP, T_OUT + .6, .4, .6);
+    if (sa > 0) late(ctx, c => { c.globalAlpha *= sa;
+      text(c, 'lacunas → propensões', X0 + NC * PITCH / 2, Y0 + NR * PITCH + 46, { size: 34, weight: 900, color: C.orange, align: 'center' });
+      formula(c, 'r̂ᵢⱼ = uᵢᵀ vⱼ', X0 + NC * PITCH + 150, Y0 + 70, { size: 26, rot: .04, seed: 12, scale: E.outBack(P(t, T_SWEEP, .4)) });
+      const st = P(t, T_STAR, .4); if (st > 0) { c.globalAlpha *= st; icon(c, 'spark', X0 + NC * PITCH + 70, Y0 + 300, 34, C.yellow); text(c, 'recomendação: maior propensão', X0 + NC * PITCH + 100, Y0 + 290, { size: 26, weight: 800, color: '#FFF' });
+        text(c, 'entre o que o cliente ainda não comprou', X0 + NC * PITCH + 100, Y0 + 326, { size: 24, weight: 700, color: C.sand }); } });
     ctx.restore();
   }
   /** a solução: afinidades → cestas → públicos → campanhas; cada cesta encontra o seu público */
   function solution(ctx, t) {
     const p0 = P(t, T_DROP, .4), out = P(t, T_RES - .3, .4); if (p0 <= 0 || out >= 1) return;
     ctx.save(); ctx.globalAlpha *= 1 - out;
-    flowRow(ctx, 110, 300, 1130, [{ label: 'afinidades', icon: 'nodes' }, { label: 'cestas', icon: 'basket' }, { label: 'públicos', icon: 'user' }, { label: 'campanhas', icon: 'spark' }], E.inOutSine(P(t, T_DROP + .2, 2.2)), { bw: 210, bh: 130 });
+    flowRow(ctx, 110, 300, 1130, [{ label: 'afinidades', icon: 'nodes' }, { label: 'cestas', icon: 'basket' }, { label: 'públicos', icon: 'user' }, { label: 'campanhas', icon: 'spark' }], E.inOutSine(P(t, T_DROP + 1.8, 2.2)), { bw: 210, bh: 130 });
     const tgt = ms().target_customers_mechanic_b;
     BASK.forEach((name, i) => {
-      const p = E.outBack(P(t, T_DROP + 1.2 + i * .35, .45)); if (p <= 0) return;
+      const p = E.outBack(P(t, T_DROP + 2.6 + i * .35, .45)); if (p <= 0) return;
       const x = 230 + i * 400, y = 600 + Math.sin(t * 2 + i) * 4;
       ctx.save(); ctx.translate(x, y); ctx.scale(p, p); ctx.rotate([-.04, .03, -.02][i]);
       paper(ctx, -140, -100, 280, 220, { r: 18, fill: [C.yellow, C.orange, C.red][i], shadow: 10, shadowColor: '#000', lw: 4, halftone: .16 });
@@ -215,11 +265,11 @@ const CASEKIT = {
       BICON[i].forEach((ic, j) => { vball(ctx, -52 + j * 104, -10, 44, '#FFF8EE', { lw: 3 }); icon(ctx, ic, -52 + j * 104, -10, 52, INK, 9); });
       late(ctx, c => text(c, name, 0, 76, { size: 30, weight: 900, color: i === 0 ? INK : '#FFF', align: 'center' }));
       ctx.restore();
-      const cp = P(t, T_DROP + 2.4 + i * .3, .5); if (cp > 0) { ctx.save(); ctx.globalAlpha *= cp;
+      const cp = P(t, T_DROP + 3.8 + i * .3, .5); if (cp > 0) { ctx.save(); ctx.globalAlpha *= cp;
         for (let k = 0; k < 5; k++) { const ux = x - 112 + k * 56, uy = 800; vball(ctx, ux, uy, 24, k < 3 ? '#F6EEDF' : '#8A8378', { lw: 3, rim: false }); icon(ctx, 'user', ux, uy + 2, 28, INK, 7); }
         ctx.restore(); late(ctx, c => { c.globalAlpha *= cp; text(c, 'público com maior potencial', x, 856, { size: 24, weight: 800, color: '#F6EEDF', align: 'center' }); }); }
     });
-    const dp = P(t, T_DROP + 4.2, .5); if (dp > 0) hud(ctx, c => { c.globalAlpha *= dp; c.translate(1560, 740); c.rotate(-.015);
+    const dp = P(t, T_DROP + 4.8, .5); if (dp > 0) hud(ctx, c => { c.globalAlpha *= dp; c.translate(1560, 740); c.rotate(-.015);
       paper(c, -300, -100, 600, 200, { torn: true, seed: 33, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5, tape: [[.5, 0, .05]] });
       tag(c, -170, -64, 'DECISÃO', { size: 22, fill: C.red, color: '#FFF' });
       para(c, `As cestas viraram *mecânicas de campanha* nos testes do cliente${tgt ? ` (mecânica B: ${FMT.num(tgt, 0)} clientes)` : ''}.`, -270, -30, 540, { size: 28, weight: 800, color: INK, accent: C.red }); });
@@ -248,7 +298,7 @@ const CASEKIT = {
       bgDark(ctx, t, { centerA: .9, center: '#2E1C10' });
       SPACE.field(ctx, t, { alpha: .28, spin: .05 }); SPACE.floaters(ctx, t, { alpha: .22, n: 10, cy: 420 });
       skyline(ctx, t, { y: 1000, h: 300, seed: 61, col: '#1A1216', lit: .35, alpha: .8 });
-      stores(ctx, t); data(ctx, t); matrix(ctx, t); cosine(ctx, t); solution(ctx, t); result(ctx, t);
+      stores(ctx, t); data(ctx, t); als(ctx, t); solution(ctx, t); result(ctx, t);
       CASEKIT.interstitial(ctx, t, 1, '*Cestas de produtos*', 'Cliente Banana · varejo', C.yellow);
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }

@@ -77,7 +77,7 @@
 
 ### 01 · Papel estratégico (47 s) — o mundo das perguntas encontra uma ponte
 
-1. **Perguntas:** a câmera atravessa o corredor das perguntas, com pontos de interrogação flutuando em 3D. Há postes com cartões pendurados ("Por que caiu?", "Quem priorizar?", "Onde investir?") e a cidade das perguntas ao fundo.
+1. **Perguntas:** a câmera atravessa o corredor das perguntas, com pontos de interrogação flutuando em 3D. Há postes com cartões pendurados ("Como recomendar melhor?", "Como medir principalidade?", "Como ganhar eficiência?", uma pergunta para cada case) e a cidade das perguntas ao fundo.
    - Título "Decisões difíceis começam com perguntas".
 2. **A ponte:** a câmera recua e mostra dois penhascos com etiquetas **NEGÓCIO** e **DADOS**.
    - "O papel da área": "Conectamos perguntas de negócio aos dados necessários para respondê-las."
@@ -155,9 +155,9 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Etapa | Texto | Visual |
 |---|---|---|
 | Problema | Como incentivar clientes a comprar em *outras empresas do mesmo grupo*? | as três empresas e um cliente que hoje compra em uma só |
-| Dados | Analisamos o histórico de compras para aprender afinidades… | recibos entram no scanner e viram fichas: 24 meses · 101 mil clientes · 894 subgrupos · 3,8 mi interações |
-| Como fizemos | *BM25* reduz o destaque de itens muito comuns. *ALS* aprende padrões… | matriz clientes × produtos com legenda **compra observada × score estimado**; sacola e pão com peso menor; o ALS ajusta clientes e produtos em turnos e o **erro de reconstrução (ilustrativo)** cai; similaridade de cosseno junta os produtos |
-| Solução (drop) | Produtos com afinidade formam *cestas*… | afinidades → cestas → públicos → campanhas; as 3 cestas e o público de cada uma; DECISÃO: mecânicas de campanha |
+| Dados | Analisamos o histórico de compras para aprender afinidades… | a matriz clientes × produtos (SKU), esparsa, com ícones: as compras do histórico acendem; uma linha é um cliente, uma coluna é um produto; nas células vazias aparecem "?" (sem compra, o sinal é desconhecido · % das combinações sem compra); ao lado, as fichas: 24 meses · 101 mil clientes · 894 subgrupos · 3,8 mi interações |
+| Como fizemos | *BM25* reduz o destaque de itens muito comuns. *ALS* aprende padrões… | a matriz vira **R ≈ U · Vᵀ**: U (clientes × fatores) e Vᵀ (fatores × produtos), os fatores latentes ("gostos ocultos"), c = 1 + α·r e rank k = 64; os dois produtos mais comprados perdem peso (BM25); o ALS alterna **fixa V → resolve U** e **fixa U → resolve V**, com a fórmula de cada passo, e o erro cai até **convergir**; resolvida, a matriz inicial volta completa: **lacunas → propensões** (r̂ᵢⱼ = uᵢᵀ vⱼ) |
+| Solução (drop) | Produtos com afinidade formam *cestas*… | no drop, as estrelas marcam as recomendações (maior propensão entre o que o cliente ainda não comprou); depois, afinidades → cestas → públicos → campanhas; as 3 cestas e o público de cada uma; DECISÃO: mecânicas de campanha |
 | Resultado | Destilados teve conversão *+18,8% maior* que a 2ª melhor campanha. | índice: 2ª melhor = 100, Destilados = 118,8 ("não é taxa absoluta") |
 | Conclusão | O histórico de compras orienta *cestas* e *públicos*. | — |
 

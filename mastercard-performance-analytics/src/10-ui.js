@@ -297,7 +297,7 @@ const SLIDES = {
   2: [['s02', 19.5, 'Faturamento da track', 3.9, 20.2], ['s02', 29.5, 'Brasil: anterior e orçamento', 20.6, 30.3], ['s02', 38.0, 'Brasil por trimestre', 30.8, 43.4]],
   3: [['s03', 15.0, 'Onde aplicamos', 3.8, 15.2], ['s03', 25.0, 'O que entregamos', 16.1, 25.2], ['s03', 33.5, 'Junto com as outras tracks', 26.1, 33.4],
     ['s03', 43.5, 'Modelos preditivos', 34.5, 43.4], ['s03', 51.5, 'Modelos prescritivos', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
-  4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 34.0, 'Cestas · como fizemos', 24.5, 35.4], ['banana', 52.5, 'Cestas · solução e resultado', 35.6, 53.1],
+  4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 31.5, 'Cestas · como fizemos (ALS)', 24.5, 35.4], ['banana', 52.5, 'Cestas · solução e resultado', 35.6, 53.1],
     ['manga', 34.5, 'Principalidade · como fizemos', 24.5, 35.4], ['manga', 45.5, 'Principalidade · reordenação', 35.6, 46.6], ['manga', 58.5, 'Principalidade · resultado', 46.8, 59.8],
     ['lightsoff', 11, 'Relatórios · antes', 2.4, 11.9], ['lightsoff', 35.5, 'Relatórios · como fizemos', 20.4, 36.5], ['lightsoff', 49.6, 'Relatórios · luz apagada, resultado e dashboard', 36.6, 50.6],
     ['insight', 26.8, 'Agentes · avaliar e corrigir', 18.6, 27.4], ['insight', 45.6, 'Agentes · escala', 35.6, 46.5], ['insight', 54.6, 'Agentes · situação', 46.7, 55.4]],
