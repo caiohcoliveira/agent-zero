@@ -238,3 +238,18 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
    - Os MP3 não estão no Git (`musica/`). Se não estiverem na máquina, peça os arquivos ao usuário ou extraia-os do HTML publicado.
    - As remontagens saem de `tools/edit_music.py`.
 5. Faça commit e push, e marque o item aqui.
+
+### v7.5 — drops naturais
+
+- [x] **Parte 2:** depois do retorno do usuário ("várias vezes esse tipo de interferência"), refeita sem filtros.
+  - Nova peça com dinâmica própria: introdução leve, quebra e volta da banda.
+  - Montada só com trechos dela (`PARTE2_MAPA`): antes de cada solução, um trecho leve e a banda voltando.
+  - Emendas em começo de compasso, sem cliques; trechos contíguos não têm emenda.
+- [x] **Parte 3:** "sem fazer o DJ".
+  - A opção A toca inteira: original até o coro e, depois, a versão sem coro.
+  - Sem cortes, repetições ou cauda; o letreiro acende no acento de 59,97 s.
+- [x] **Parte 1:** mantida (a quebra "rádio" antes da parte B funcionou).
+- [x] **QA:**
+  - varredura sem exceções;
+  - medidor de leitura: 72 telas, 0 curtas;
+  - navegação, clique e console limpos.

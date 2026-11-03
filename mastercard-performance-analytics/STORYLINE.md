@@ -252,14 +252,15 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - o tema volta maior na estação 02;
   - na estação 03 a música fica só com médios (o "low"), faz uma pausa e o drop entra na parte B (1:45,9) com riser e impacto;
   - as viradas de estação caem no tempo forte.
-- **Parte 2 · os cases, 05 e 06 (uma peça contínua, 108 BPM):**
-  - a mesma banda e o mesmo motivo do começo ao fim; a tecnologia aparece em texturas discretas, sem EDM, porque é um evento corporativo;
-  - em cada case: parte calma no problema e nos dados, construção em "como fizemos" e impacto na solução;
-  - na automação a música esvazia, corta seco no interruptor e volta no neon;
-  - na IA vem o clímax da apresentação;
-  - na 05/06 a música volta ao groove de abertura da própria peça (transição de 1 compasso) e termina na cadência dela.
+- **Parte 2 · os cases, 05 e 06 (uma peça só, 108 BPM):**
+  - a mesma banda e o mesmo motivo do começo ao fim, sem filtros nem efeitos de DJ;
+  - a estação 04 tem a introdução leve da própria música, e a banda entra quando o case 1 começa;
+  - antes de cada solução, um trecho leve da própria peça (sem baixo nem bateria cheia), e a banda volta com tudo na solução;
+  - na automação, o interruptor corta a música seca e a banda volta no neon;
+  - a IA leva o trecho mais forte da peça, o pico da apresentação;
+  - a 05/06 termina com o final da própria peça.
 - **Parte 3 · 07, disciplinas e letreiro (final orquestral, 100 BPM, sem coro):**
-  - a cidade com piano e cordas;
-  - as disciplinas entram nas batidas;
-  - a entrada da orquestra cai em "Tudo se resume a…";
-  - o letreiro acende no acento de 59,81 s e o acorde soa até o fim.
+  - tocado inteiro, do jeito que foi composto;
+  - a cidade tem piano e cordas;
+  - a orquestra entra junto com as disciplinas;
+  - o letreiro acende num acento forte (59,97 s).

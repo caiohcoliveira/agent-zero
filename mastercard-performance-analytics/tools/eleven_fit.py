@@ -14,13 +14,12 @@ Saídas (o build embute no HTML): musica/parte1.mp3 · musica/parte2.mp3 · musi
 Parte 1 (estações 01–03, 154,544 s): andamento ajustado 0,95% para a grade das cenas (110 BPM); o drop da
   música cai na parte B (as viradas de estação 46,98 · 90,62 · 143,0 ficam em começos de compasso); intro
   abafada até o tema; low só com médios de 90,62 até a pausa; riser, impacto e pratos.
-Parte 2 (04, cases, 05, 06: 304,45 s, 108 BPM, grade a partir de 0): uma peça só. O trecho mais intenso vai
-  para o drop da IA (240,0); cada case tem parte calma, construção e impacto na solução; a automação para
-  seco no interruptor (164,444 → 166,667); 05/06 voltam ao groove de abertura da própria peça (transição de
-  1 compasso) e terminam na cadência dela.
-Parte 3 (07, disciplinas, letreiro: 72,0 s, 100 BPM): a entrada da orquestra cai na frase-chave (40,78)
-  repetindo compassos da introdução; compassos tirados do meio levam o acorde final para perto do letreiro;
-  o acorde soa até o fim com uma cauda de reverberação.
+Parte 2 (04, cases, 05, 06: 304,45 s, 108 BPM, grade a partir de 0): uma peça só, montada com trechos dela mesma
+  (PARTE2_MAPA, v7.5): antes de cada solução, um trecho leve da própria música e a banda voltando (drops naturais,
+  sem filtros); a automação para seco no interruptor (164,444 → 166,667); a IA leva o trecho mais forte; 05/06
+  terminam com o final da própria peça.
+Parte 3 (07, disciplinas, letreiro: 72,0 s, 100 BPM): a opção A tocada inteira, sem cortes (v7.5): a gravação
+  original até pouco antes do coro e a versão sem coro depois; o filme acerta o letreiro no acento da música.
 
 Uso: python3 tools/eleven_fit.py [parte1|parte2|parte3|todas] [pasta_de_saida]
 """
@@ -167,83 +166,89 @@ def parte1(src=SRC / 'parte1-bruta.mp3'):
 
 
 # ---------------------------------------------------------------- parte 2 · 04, cases, 05, 06
+# (compasso do filme → compassos da versão): só trechos da própria música, cortes em começos de compasso
+# (quase sempre de frase) e nenhum filtro. Leve = sem baixo nem bateria cheia; D1/D2 = onde a banda volta.
+#   versão: compassos 0–8 introdução leve → D1 no 8 · 8–80 groove · 80–88 quebra leve → D2 no 88 · 88–136 groove
+#   (o trecho mais forte começa no 108) e o final da própria peça no 136
+PARTE2_MAPA = [            # (início no filme, fim no filme, início na versão), em compassos
+    (0, 5, 3),             # estação 04: fim da introdução leve, crescendo…
+    (5, 13, 8),            # case 1 começa com a banda entrando (D1)
+    (13, 21, 80),          # a quebra leve da própria música (como fizemos)…
+    (21, 41, 88),          # …e a banda volta na SOLUÇÃO do case 1 (D2)
+    (41, 48, 1),           # case 2: textura leve da introdução…
+    (48, 52, 8),           # …a banda volta na SOLUÇÃO (D1)
+    (52, 68, 28),          # automação: groove
+    (68, 75, 1),           # textura leve; o último compasso vira silêncio (o interruptor)
+    (75, 79, 8),           # a banda volta no neon (D1)
+    (79, 103, 44),         # IA: groove
+    (103, 108, 83),        # a quebra leve…
+    (108, 112, 88),        # …a banda volta na ESCALA (D2)…
+    (112, 117, 108),       # …e o trecho mais forte da peça (o pico da apresentação)
+    (117, 137, 116),       # 05/06: os últimos 20 compassos, com o final da própria peça (transição de 1 compasso)
+]
+
+
 def parte2(src=SRC / 'parte2-bruta.mp3'):
-    BAR = 4 * 60 / 108.0; PHR = 4 * BAR; DUR = 304.45
-    CASES = [(11.111, 46.667, 71.111), (71.111, 106.667, 131.111), (131.111, 166.667, 191.112), (191.112, 240.0, 260.001)]
+    BAR = 4 * 60 / 108.0; DUR = 304.45
     x = load(src); bpm = bpm_near(x, 108); info = {'bpm': round(bpm, 2)}
     if abs(bpm / 108 - 1) > .002: x = load(src, 108 / bpm); info['ajuste_de_andamento'] = round(108 / bpm, 4)
-    ph = bar_phase(x, BAR); x = x[int(ph * SR):]; end = music_end(x, 60); B0, end0 = x.copy(), end
-    # clímax: o trecho de 20 s mais intenso (energia + brilho) depois de 150 s, se for claramente mais intenso
-    t, db = env(x, .1); hp = sosfiltfilt(R.sos('high', 2500), x.mean(1)); _, dh = env(hp, .1)
-    nwin = int(20 / .1); s = np.convolve(db + .5 * dh[:len(db)], np.ones(nwin) / nwin, 'valid'); t = t[:len(s)]
-    ok = (t > 150) & (t < end - 25); c = round(float(t[ok][np.argmax(s[ok])]) / BAR) * BAR
-    contrast = float(s[ok].max() - np.median(s[(t > 5) & (t < end - 25)]))
-    d_bars = int(round((240.0 - c) / BAR)) if contrast >= 1.5 else 0
-    if d_bars > 0:                                    # clímax cedo: repete compassos antes dele
-        a = c - 2 * PHR; x = xcat([seg(x, 0, a), seg(x, a - d_bars * BAR, a), seg(x, a, len(x) / SR)], .04)
-    elif d_bars < 0:                                  # clímax tarde: tira compassos antes dele
-        a = c - 2 * PHR + d_bars * BAR; x = xcat([seg(x, 0, a), seg(x, a - d_bars * BAR, len(x) / SR)], .04)
-    info.update(climax_na_versao=round(c, 2), contraste_db=round(contrast, 2), compassos_movidos=d_bars)
-    # 05/06: 2 compassos depois do clímax, 1 compasso de transição de volta ao groove de abertura da peça, cadência final dela
-    a = 118 * BAR; head = x[:int((a + BAR) * SR)]
-    last = np.floor(end0 / BAR) * BAR; tail_ = seg(B0, last - 2 * BAR, min(end0, last + 1.6))
-    n = int(round((DUR - a - 2 * BAR - 1.6) / BAR)); rep = seg(B0, 5 * BAR, (5 + n) * BAR)
-    k = int(BAR * SR); w = np.sin(np.linspace(0, np.pi / 2, k))[:, None]
-    x = xcat([np.concatenate([head[:-k], head[-k:] * w[::-1] + rep[:k] * w, rep[k:]]), tail_], .05)
-    x = fit_len(x, DUR); info['reprise_compassos'] = n
-    # dinâmica do filme dentro da mesma música
-    lowpass_open(x, 0, 11.111)
-    for i, (s0, drop, e) in enumerate(CASES):
-        soften(x, s0 + .2, drop - 11.1, fc=3200, gain_db=-3.5)
-        R.hp_sweep(x, drop - 7.0 if i != 2 else s0 + 24.444, drop - .1 if i != 2 else 164.444, .6)
-    R.gap(x, 166.667, 2.222)                          # automação: o interruptor corta seco
-    R.gap(x, 240.0, .27)                              # IA: respiro curto antes do clímax
-    i0, i1 = int(258.0 * SR), int(DUR * SR); s_ = x[i0:i1]   # 05/06 assentam (2 compassos de transição)
-    lp = sosfiltfilt(R.sos('low', 5000), s_, axis=0) * 10 ** (-2.5 / 20)
-    w = np.clip((np.arange(len(s_)) / SR) / (2 * BAR), 0, 1)[:, None]; x[i0:i1] = s_ * (1 - w) + lp * w
-    g = np.ones(len(x)); P = [(0, -1.2), (71.111, -.6), (131.111, 0), (191.112, .8), (260.001, -1.0)]   # sobe até a IA e assenta
+    d1, r1 = find_rise(x, 12, 24); d2, r2 = find_rise(x, 188, 200)
+    ph = d1 - 8 * BAR                                     # a peça começa num tempo forte: D1 é o compasso 8
+    info.update(fase=round(ph, 3), D1=round(d1, 3), D2=round(d2, 3), D2_no_compasso=round((d2 - ph) / BAR, 2))
+    S = lambda b: ph + b * BAR                            # compasso da versão → segundos
+    # trechos contíguos na versão viram um trecho só (sem emenda onde a música já é contínua)
+    mapa = []
+    for f0, f1, s0 in PARTE2_MAPA:
+        if mapa and mapa[-1][2] + (mapa[-1][1] - mapa[-1][0]) == s0: mapa[-1] = (mapa[-1][0], f1, mapa[-1][2])
+        else: mapa.append((f0, f1, s0))
+    info['emendas'] = [f0 for f0, _, _ in mapa[1:]]
+    y = np.zeros((int(DUR * SR) + SR, 2), np.float32)
+    for k, (f0, f1, s0) in enumerate(mapa):
+        # emenda curta: cruzamento linear de 30 ms (soma 1, sem salto); para a 05/06, 1 compasso de potência igual
+        xi = (BAR if f0 == 117 else .03) if k else 0.0
+        xo = (BAR if k + 1 < len(mapa) and mapa[k + 1][0] == 117 else .03) if k < len(mapa) - 1 else 0.0
+        a, b = S(s0) - xi / 2, S(s0 + f1 - f0) + xo / 2
+        seg_ = seg(x, a, b).copy(); n = len(seg_)
+        if xi: m = int(xi * SR); u = np.linspace(0, 1, m); seg_[:m] *= (np.sin(u * np.pi / 2) if xi > .1 else u)[:, None]
+        if xo: m = int(xo * SR); u = np.linspace(0, 1, m); seg_[n - m:] *= (np.cos(u * np.pi / 2) if xo > .1 else 1 - u)[:, None]
+        i0 = int((f0 * BAR - xi / 2) * SR); y[i0:i0 + n] += seg_[:len(y) - i0]
+    y = y[:int(DUR * SR)]
+    # o interruptor: corta seco no compasso 74 e a banda volta no 75 (a música da automação)
+    i0, i1 = int(74 * BAR * SR), int(75 * BAR * SR); f = int(.012 * SR)
+    y[i0:i0 + f] *= np.linspace(1, 0, f)[:, None]; y[i0 + f:i1] = 0
+    # um pouco mais de presença no pico (IA) e menos no fim, em rampas lentas (mixagem, não efeito)
+    g = np.ones(len(y)); P = [(0, 0.0), (108 * BAR, 1.0), (117 * BAR, -.5)]
     for (ta, ga), (tb, _) in zip(P, P[1:] + [(DUR, 0)]): g[int(ta * SR):int(tb * SR)] = 10 ** (ga / 20)
-    g = np.convolve(g, np.ones(int(.8 * SR)) / int(.8 * SR), 'same'); x *= g[:, None]
-    L = R.loud_rms(x); fx = np.zeros_like(x)
-    for i, (s0, drop, e) in enumerate(CASES):
-        R.place(fx, R.riser(4.4), (164.444 if i == 2 else drop) - 4.4, L * (1.1 if i < 3 else 1.3))
-        R.place(fx, R.boom(), drop, L * (1.6 if i < 3 else 2.0)); R.place(fx, R.crash(), drop, L * .8)
-        if i: R.place(fx, R.crash(2.2), s0, L * .45)
-    y = R.presence(R.low_boost(x, 1.5), .8) + fx
-    tt, dd = env(x, .1); fade = 1.0 if dd[tt > DUR - 3].mean() < np.median(dd[tt > 5]) - 8 else 4.0
-    k0 = int((DUR - fade) * SR); y[k0:] *= (np.linspace(1, 0, len(y) - k0) ** 1.5)[:, None]
+    g = np.convolve(g, np.ones(int(2 * SR)) / int(2 * SR), 'same'); y *= g[:, None]
+    k0 = int((DUR - .3) * SR); y[k0:] *= np.linspace(1, 0, len(y) - k0)[:, None]
     info['grade'] = [108.0, 0.0]
     return R.master(y, -11.5), info
 
 
 # ---------------------------------------------------------------- parte 3 · 07, disciplinas, letreiro
-def parte3(src=SRC / 'parte3-sem-coro.wav', dur=72.0, hit=40.78, chord=59.68):
+def parte3(dur=72.0):
+    """a opção A tocada inteira, do jeito que foi composta (sem cortes, repetições ou cauda): a gravação original
+    até pouco antes do coro e, dali em diante, a versão sem coro (Demucs), alinhada à amostra e cruzada em 1 s"""
     import librosa
-    BAR = 4 * 60 / 100.0; x = load(src)
-    E, rise = find_rise(x, 22, 34); end = music_end(x, 40)
-    oe = librosa.onset.onset_strength(y=x.mean(1), sr=SR, hop_length=441); to = np.arange(len(oe)) * .01
-    pk = [p for p in librosa.util.peak_pick(oe, pre_max=10, post_max=10, pre_avg=50, post_avg=50, delta=oe.std(), wait=30) if end - 8 < to[p] < end]
-    C = float(to[max(pk, key=lambda p: oe[p])]) if pk else end - 4
-    # a entrada da orquestra na frase-chave: repete compassos da introdução e apara o início
-    n_in = int(np.ceil((hit - E) / BAR)); j = E % BAR + 2 * BAR
-    x = xcat([seg(x, 0, j + n_in * BAR), seg(x, j, len(x) / SR)]); trim = E + n_in * BAR - hit
-    x = x[int(trim * SR):]; Cx, endx = C + n_in * BAR - trim, end + n_in * BAR - trim
-    # o acorde final perto do letreiro: tira compassos inteiros do meio (cai no alvo ou até 1 compasso depois)
-    n_cut = max(0, int(np.floor((Cx - chord) / BAR)))
-    if n_cut:
-        a = hit + 4 * BAR; x = xcat([seg(x, 0, a), seg(x, a + n_cut * BAR, len(x) / SR)], .08); Cx -= n_cut * BAR; endx -= n_cut * BAR
-    # o acorde soa até o fim: reverberação longa do próprio acorde, no nível dele
-    x = x[:int(min(endx, dur - .5) * SR)]
-    n_ir = int(10.0 * SR); ir = np.random.default_rng(7).standard_normal(n_ir) * np.exp(-np.arange(n_ir) / SR * .5)
-    src_c = seg(x, Cx, min(Cx + 1.6, len(x) / SR))
-    wet = np.stack([fftconvolve(src_c[:, c], ir)[:int((dur - Cx) * SR)] for c in (0, 1)], 1)
-    i0, a1, b1 = int(Cx * SR), int(1.2 * SR), int(1.8 * SR)
-    lvl = np.sqrt(np.mean(x[i0 + a1:i0 + b1] ** 2)) + 1e-9; wet *= .8 * lvl / (np.sqrt(np.mean(wet[a1:b1] ** 2)) + 1e-9)
-    y = fit_len(x, dur); m = min(len(wet), len(y) - i0); ramp = np.clip((np.arange(m) - a1) / (1.5 * SR), 0, 1)[:, None]
-    y[i0:i0 + m] = y[i0:i0 + m] * (1 - .5 * ramp) + wet[:m] * ramp
-    k0 = int((dur - 2.0) * SR); y[k0:] *= np.linspace(1, 0, len(y) - k0)[:, None] ** 1.5
-    info = {'entrada_da_orquestra_na_versao': round(E, 2), 'subida_db': round(rise, 1), 'compassos_repetidos_na_intro': n_in,
-            'apara_inicio': round(trim, 2), 'compassos_tirados_do_meio': n_cut, 'acorde_final': round(Cx, 2), 'grade': [100.0, hit]}
+    o = load(SRC / 'parte3-bruta-A.mp3'); n = load(SRC / 'parte3-sem-coro.wav')
+    a, b = o[int(30 * SR):int(44 * SR)].mean(1), n[int(29.9 * SR):int(44.1 * SR)].mean(1)
+    lag = int(np.argmax(fftconvolve(b, a[::-1], 'valid'))) - int(.1 * SR)          # o Demucs devolve ~23 ms atrasado
+    n = n[lag:]; m = min(len(o), len(n)); o, n = o[:m], n[:m]
+    # onde o coro entra: a diferença entre original e sem coro passa de −12 dB do sinal
+    t, do = env(o, .5); _, dd = env(o - n, .5); onset = float(t[np.where((t > 20) & (dd - do > -12))[0][0]])
+    t1 = onset - .5; t0 = t1 - 1.0; i0, i1 = int(t0 * SR), int(t1 * SR)
+    w = np.sin(np.linspace(0, np.pi / 2, i1 - i0))[:, None]
+    y = np.concatenate([o[:i0], o[i0:i1] * w[::-1] + n[i0:i1] * w, n[i1:]])
+    y = fit_len(y, dur); k0 = int((dur - .5) * SR); y[k0:] *= np.linspace(1, 0, len(y) - k0)[:, None]
+    # para a sincronia do filme: a entrada da orquestra, a fase da batida e o acento mais forte perto do letreiro
+    E, rise = find_rise(y, 22, 34)
+    oe = librosa.onset.onset_strength(y=y.mean(1), sr=SR, hop_length=128); to = np.arange(len(oe)) * 128 / SR
+    sel = (to > 26) & (to < 45); z = np.sum(oe[sel] ** 2 * np.exp(2j * np.pi * to[sel] / .6)); ph = (np.angle(z) / (2 * np.pi) * .6) % .6
+    anchor = ph + round((E - ph) / .6) * .6
+    pk = librosa.util.peak_pick(oe, pre_max=40, post_max=40, pre_avg=150, post_avg=150, delta=oe.std(), wait=60)
+    near = [p for p in pk if 57.5 < to[p] < 62.5]; acc = float(to[max(near, key=lambda p: oe[p])]) if near else 59.68
+    info = {'atraso_do_sem_coro_amostras': lag, 'coro_entra': round(onset, 2), 'troca_para_sem_coro': [round(t0, 2), round(t1, 2)],
+            'entrada_da_orquestra': round(E, 2), 'subida_db': round(rise, 1), 'grade': [100.0, round(anchor, 3)], 'acento_do_letreiro': round(acc, 2)}
     return R.master(y, -11.0), info
 
 

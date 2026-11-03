@@ -123,19 +123,19 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - **Parte 1 · estações 01–03 (2:34,5):** funk cinematográfico, 110 BPM.
     - Intro abafada que abre no tema e as viradas de estação no tempo forte.
     - Low só com médios antes da parte B, pausa, riser e drop na estação 03.
-  - **Parte 2 · estação 04, os 4 cases, 05 e 06 (5:04):** uma peça contínua de funk corporativo com toques eletrônicos discretos, 108 BPM. Mantém a mesma banda e o mesmo motivo do começo ao fim, sem EDM.
-    - Cada case tem parte calma, construção e impacto na **solução**.
-    - Na automação, a música corta seco no interruptor e fica em silêncio até o drop.
-    - O clímax é a **IA**.
-    - A 05/06 volta ao groove de abertura da própria peça, com uma transição de 1 compasso.
-  - **Parte 3 · 07, disciplinas e letreiro (1:12):** final orquestral, 100 BPM, **sem o coro**.
-    - A entrada da orquestra cai na frase-chave e o letreiro acende no acento de 59,81 s.
-    - O acorde soa até o fim.
-- **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos. O encaixe faz:
-  - cortes e repetições de compassos;
-  - filtros (intro abafada, parte calma, quebra só com médios);
-  - camadas de `tools/remix.py`: riser, impacto, prato e o silêncio do interruptor.
-  - Só a parte 1 tem andamento ajustado (0,95%, rubberband), para a grade de 110 BPM das cenas.
+  - **Parte 2 · estação 04, os 4 cases, 05 e 06 (5:04):** uma peça de funk corporativo, 108 BPM, com a mesma banda e o mesmo motivo do começo ao fim, **sem filtros nem efeitos de DJ** (v7.5).
+    - Antes de cada **solução** entra um trecho leve da própria música (sem baixo nem bateria cheia) e a banda volta com tudo: drops naturais, compostos pela própria peça.
+    - Na automação, a música corta seco no interruptor e a banda volta no neon.
+    - A **IA** leva o trecho mais forte da peça.
+    - A 05/06 termina com o final da própria peça.
+    - O mapa de compassos fica em `PARTE2_MAPA`.
+  - **Parte 3 · 07, disciplinas e letreiro (1:12):** final orquestral, 100 BPM, **sem o coro**, tocado **inteiro, do jeito que foi composto** (v7.5).
+    - Toca a gravação original até pouco antes do coro e, depois, a versão sem coro, alinhada à amostra.
+    - A orquestra entra junto com as disciplinas (27,6 s) e o letreiro acende no acento de 59,97 s.
+- **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
+  - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
+  - **Parte 2:** só cortes em começo de compasso, entre trechos da própria peça.
+  - **Parte 3:** nada; o filme se ajusta à música.
 - **Arquivos (fora do Git):**
   - versões brutas em `musica/elevenlabs/`: `parte1-bruta.mp3`, `parte2-bruta.mp3`, `parte3-bruta-A.mp3` e `parte3-sem-coro.wav`;
   - mixes finais em `musica/parte1.mp3`, `musica/parte2.mp3` e `musica/parte3.mp3`.
@@ -144,7 +144,7 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - O build usa `musica/parteN.mp3` quando existe.
   - Sem esses arquivos, cai na trilha Pixabay anterior (`tools/edit_music.py` → `tools/remix.py`, arquivos `<faixa>-mix.mp3`).
   - Os ids internos das faixas (`funk`, `tech`, `piano`) continuam os mesmos.
-- **Volume:** `CONFIG.tracks` (0,81 · 0,77 · 0,72) mantém o mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS), equilibrado com os efeitos.
+- **Volume:** `CONFIG.tracks` (0,81 · 0,70 · 0,66) mantém o mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS), equilibrado com os efeitos.
 - **Uso:** confira os termos do plano da conta ElevenLabs para uso das músicas geradas no evento.
 - **Sincronia:** `tools/music.py` gera `src/07-beats.js`.
   - Para as três faixas, a grade é **exata** (`GRID`: andamento, um tempo forte conhecido e as seções), em vez de detectada.
