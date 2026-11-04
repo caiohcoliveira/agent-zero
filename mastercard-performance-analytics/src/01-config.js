@@ -44,6 +44,10 @@ const CONFIG = {
     musicVolume: 0.42, sfxVolume: 0.5,
     trackVolume: 1.0,      // volume geral das faixas (funk, technology, piano)
     tracks: { funk: { gain: .81 }, tech: { gain: .75 }, piano: { gain: .66 } },  // ElevenLabs (v7.4–v7.7): mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS)
+    // v7.16: música das conversas (ElevenLabs, balada com violino): toca em loop sem fim enquanto a parada está na tela, por baixo da fala.
+    //   stops = as paradas com música · gain = volume (fundo, ≈ 10 dB abaixo do filme) · fadeIn/fadeOut em s
+    //   loop = [início, fim] do trecho que se repete (s): 192 tempos a 106,7 BPM, com as duas pontas parecidas (tools/pausa.py) · xfade = transição entre as voltas (s)
+    pause: { track: 'pausa', stops: ['stop0', 'stop1', 'stop2'], gain: .4, fadeIn: 2.5, fadeOut: 1.5, loop: [30.809, 138.777], xfade: .3 },
     duckDuringVoice: 0.55,
     voiceRate: 1.07, voicePitch: 1.02,
     preferredVoices: ['Francisca', 'Thalita', 'Brenda', 'Giovanna', 'Leila', 'Manuela', 'Yara',

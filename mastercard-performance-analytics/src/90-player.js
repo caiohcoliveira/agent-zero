@@ -93,6 +93,7 @@ const PLAYER = (() => {
   function now() { return st.playing ? st.startT + (performance.now() - st.startPerf) / 1000 : st.T; }
   function play() {
     if (st.T >= DUR - .05) st.T = 0;
+    PAUSE.stop();   // v7.16: a música das conversas sai em fade enquanto o vídeo volta
     st.mode = 'play'; st.playing = true; st.ended = false; st.startT = st.T; st.startPerf = performance.now(); st.next = nextStop(st.T);
     if (CONFIG.audio.music || CONFIG.audio.sfx) AUDIO.start(st.T); else AUDIO.init();
     VOICE.reset(st.T); intro.classList.add('hidden'); syncUI(); poke();
@@ -100,7 +101,7 @@ const PLAYER = (() => {
   function pause() { st.T = now(); st.playing = false; AUDIO.stop(); VOICE.pause(); syncUI(); poke(); }
   function seek(T) {
     const was = st.playing && st.mode === 'play'; if (was) pause();
-    st.mode = 'play'; st.T = clamp(T, 0, DUR); st.next = nextStop(st.T);
+    PAUSE.stop(); st.mode = 'play'; st.T = clamp(T, 0, DUR); st.next = nextStop(st.T);
     if (was) play(); else { VOICE.reset(st.T); syncUI(); }
   }
   function toggle() { if (st.mode === 'stop') return next(); st.playing ? pause() : play(); }
@@ -111,6 +112,7 @@ const PLAYER = (() => {
     if (st.mode === 'play') { SNAP.cv = SNAP.cv || makeCanvas(W, H, () => {}); const g = SNAP.cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.drawImage(cv, 0, 0); SNAP.T = STOPS[i].T; }
     if (st.playing) { st.playing = false; AUDIO.stop(); VOICE.pause(); }
     st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
+    PAUSE.start(STOPS[i].id);   // v7.16: a música das conversas (só nas paradas de CONFIG.audio.pause.stops)
     syncUI(); poke();
   }
   function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); UI.pop = UI.prevPop = null; poke(); }

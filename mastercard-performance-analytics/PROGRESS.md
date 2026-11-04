@@ -464,3 +464,20 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - medidor de leitura: 76 telas, 0 curtas (os cards prescritivos entram 1 tempo depois do título, para a leitura não somar);
   - navegação, clique e console limpos; as três faixas carregam;
   - músicas das partes 1 e 2 idênticas; parte 3 = a prévia A aprovada.
+
+### v7.16 — música de fundo nas conversas, em loop
+
+- [x] **Música das conversas (ElevenLabs):** uma balada pop original com violino no lugar da voz (piano, cordas, violão e batida suave), em 4 gerações de 2:30 no fluxo "A Linha · Música das conversas".
+  - O pedido era uma versão instrumental de uma música existente. Isso não foi feito: a melodia é protegida e a ElevenLabs não gera a partir de nomes de músicas. A geração descreve só o clima.
+  - A geração escolhida é a 4: a de dinâmica mais estável (LRA 2,8 LU) e com o trecho de repetição mais longo.
+- [x] **Loop sem fim** na Conversa 0 (mapa da linha) e nas duas baldeações (`CONFIG.audio.pause.stops`).
+  - A introdução toca uma vez. Depois o trecho de 30,809 s a 138,777 s (192 tempos, as duas pontas na mesma posição da frase) se repete com 0,3 s de transição linear.
+  - O nível fica a ±1 dB da música seguindo, e o laço não depende do atraso do decodificador de MP3.
+  - Entra em fade de 2,5 s quando a parada abre e sai em fade de 1,5 s quando o vídeo segue. Continua tocando entre os itens da parada.
+  - Fica cerca de 10 dB abaixo do filme (`gain` 0,4), e M silencia. O pré-show e o encerramento seguem sem música: o navegador só libera som depois do primeiro clique, e o encerramento não estava na lista.
+  - `tools/pausa.py` escolhe o trecho e instala a geração em `musica/pausa.mp3` (fora do Git). O build embute a faixa como `music-pausa`.
+- [x] **QA:**
+  - no navegador: entrada, voltas (testadas com um laço curto), saída em fade, M e encerramento sem música, com o console limpo;
+  - simulação da emenda: o nível fica a ±1 dB e nenhum ataque novo aparece na transição;
+  - as músicas do filme ficam idênticas.
+

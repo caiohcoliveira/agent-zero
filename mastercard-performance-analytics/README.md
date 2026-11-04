@@ -1,10 +1,14 @@
-# Performance Analytics — "A Linha" (v7.15, experimento)
+# Performance Analytics — "A Linha" (v7.16, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
 > - os métodos e as técnicas por trás dos cases (v7.11 no clímax; desde a v7.15, em cards na estação 03);
 > - o letreiro WELCOME TO… no final;
 > - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.16:**
+> - **música das conversas:** uma balada pop original com violino no lugar da voz, gerada na ElevenLabs, toca em loop sem fim na Conversa 0 (mapa da linha) e nas duas baldeações (Conversas 1 e 2), por baixo da fala de quem apresenta. Ela entra em fade quando a parada abre e sai em fade quando o vídeo segue. Fica cerca de 10 dB abaixo do filme, e a tecla M silencia;
+> - não é uma versão de música existente: a melodia da música pedida como referência é protegida, e a ElevenLabs não gera a partir de nomes de músicas. A geração descreve só o clima (balada pop calorosa, violino cantando a melodia, piano, cordas e uma batida suave).
 >
 > **v7.15:**
 > - **sem o clímax "Por trás de tudo":** os 5 cases com métodos e técnicas foram para a estação 03, no lugar de "Modelos preditivos antecipam resultados" e "Modelos prescritivos ajudam a escolher ações": 3 cards preditivos (supervisionado, não supervisionado, séries temporais) e 2 prescritivos (otimização, teste A/B), com o desenho do método, um exemplo e as técnicas. A estação 03 manteve a duração, e a música da parte 1 não mudou;
@@ -67,11 +71,11 @@ O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito d
 |---|---|---|
 | Pré-show | loop de espera, com a missão escrita | até a primeira tecla |
 | Play 1 · embarque | identidade → propósito (o bilhete "DE dados → PARA valor" carimbado) → percurso (mapa com 3 capítulos) | 0:20 |
-| **Conversa 0** · mapa | missão + mapa; **clique numa estação** para ver o detalhe; → embarca | fala |
+| **Conversa 0** · mapa | missão + mapa; **clique numa estação** para ver o detalhe; → embarca | fala, com a música das conversas em loop (v7.16) |
 | Play 2 · estações 01–03 | funk cinematográfico (ElevenLabs), encaixado | 2:35 |
-| **Conversa 1** | cartazes 01, 02, 03 legíveis, chamada "Onde isso encontra o seu cliente?", "A seguir: quatro cases…" | fala |
+| **Conversa 1** | cartazes 01, 02, 03 legíveis, chamada "Onde isso encontra o seu cliente?", "A seguir: quatro cases…" | fala, com a música das conversas |
 | Play 3 · estações 04–06 | opção A (ElevenLabs): uma versão por case, como foi composta; as cenas seguem a música | 4:42 |
-| **Conversa 2** | cartazes 04, 05, 06, chamada "Qual desafio pode virar o próximo case?" | fala |
+| **Conversa 2** | cartazes 04, 05, 06, chamada "Qual desafio pode virar o próximo case?" | fala, com a música das conversas |
 | Play 4 · 07 e letreiro | final orquestral (ElevenLabs) com 11 compassos a menos (v7.15); termina com o vídeo | 0:45 |
 | **Encerramento** | letreiro vivo; clique ou → abre o cartaz 07 | fala |
 
@@ -176,12 +180,18 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
       - o letreiro e "Tudo se resume a *Analytics*." acendem no prato da cadência final (40,8 s);
       - o vídeo termina com a cauda desse acorde (44,97 s).
     - A versão inteira fica em `musica/parte3-inteira.mp3` (fora do Git).
+  - **Música das conversas (v7.16, 2:30, 106,7 BPM):** balada pop original com violino no lugar da voz, gerada na ElevenLabs (fluxo "A Linha · Música das conversas", 4 gerações; a escolhida é a 4, a de dinâmica mais estável).
+    - A faixa não é editada. O player toca a introdução uma vez e repete sem fim o trecho de 30,809 s a 138,777 s, 192 tempos.
+    - As duas pontas do trecho caem na mesma posição da frase (semelhança 0,95, mesmo nível), e as voltas se emendam com 0,3 s de transição linear.
+    - O nível fica a ±1 dB da música seguindo, e o laço não depende do atraso do decodificador de MP3.
+    - `tools/pausa.py` escolhe o trecho e copia a geração para `musica/pausa.mp3`. O config fica em `CONFIG.audio.pause`: paradas, volume, fades, loop e transição.
 - **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
   - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
   - **Partes 2 e 3:** nada além do nível; cada versão só é deslocada inteira (`PARTE2_A`), e o filme acompanha (a grade e as seções saem delas).
 - **Arquivos (fora do Git):**
   - versões brutas em `musica/elevenlabs/`: `parte1-bruta.mp3`, `parte2-A/p2-1-A.mp3` … `p2-5-A.mp3` (opção A da parte 2), `parte3-bruta-A.mp3` e `parte3-sem-coro.wav`;
-  - mixes finais em `musica/parte1.mp3`, `musica/parte2.mp3` e `musica/parte3.mp3`.
+  - mixes finais em `musica/parte1.mp3`, `musica/parte2.mp3` e `musica/parte3.mp3`;
+  - música das conversas: as 4 gerações em `musica/elevenlabs/pausa/take1.mp3` … `take4.mp3`, e a escolhida em `musica/pausa.mp3`.
   - **Sem coro:** `parte3-sem-coro.wav` sai do Demucs: `python -m demucs --two-stems=vocals -n htdemucs_ft parte3-bruta-A.mp3`, arquivo `no_vocals.wav`. Precisa de torch e demucs num ambiente à parte.
 - **Ordem:** `python3 tools/eleven_fit.py todas` → `python3 tools/music.py` → `./build.sh`.
   - O build usa `musica/parteN.mp3` quando existe.

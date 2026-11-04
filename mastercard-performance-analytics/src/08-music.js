@@ -47,6 +47,56 @@ const TRACK = {
   onReady() { if (AUDIO.playing && AUDIO.ctx) this.schedule(AUDIO.t0v + (AUDIO.ctx.currentTime - AUDIO.t0c)); }
 };
 
+/* ---------------------------------------------------------------------------
+   PAUSE (v7.16) — a música das conversas: entra em fade quando a parada abre, repete sem fim o trecho
+   CONFIG.audio.pause.loop (frases inteiras, escolhidas pela semelhança das duas pontas) com uma transição curta
+   entre as voltas, e sai em fade quando o vídeo segue.
+   Continua tocando entre os itens da parada e entre paradas seguidas; M (som) silencia.
+   --------------------------------------------------------------------------- */
+const PAUSE = {
+  buf: null, g: null, on: false, voices: [], next: 0, off: 0, timer: null,
+  cfg() { return CONFIG.audio.pause || {}; },
+  wants(stopId) { const c = this.cfg(); return !!(c.track && (c.stops || []).includes(stopId)); },
+  level() { const a = CONFIG.audio; return a.music ? (this.cfg().gain == null ? .4 : this.cfg().gain) * a.trackVolume : 0; },
+  /** o trecho que se repete [início, fim) e a transição entre as voltas (s) */
+  span() { const c = this.cfg(), d = this.buf.duration, L = c.loop && c.loop[1] > c.loop[0] ? [c.loop[0], Math.min(c.loop[1], d)] : [0, d]; return { s: L[0], e: L[1], x: Math.min(c.xfade || .3, (L[1] - L[0]) / 4) }; },
+  start(stopId) {
+    if (!this.wants(stopId)) { this.stop(); return; }
+    if (this.on || !this.buf) return;
+    AUDIO.init(); if (!AUDIO.ready) return;
+    const ctx = AUDIO.ctx, c = this.cfg(), n = ctx.currentTime + .05; ctx.resume();
+    this.g = ctx.createGain(); this.g.gain.setValueAtTime(0, n); this.g.gain.linearRampToValueAtTime(this.level(), n + (c.fadeIn || 2)); this.g.connect(AUDIO.master);
+    this.on = true; this.voices = []; this.next = n; this.off = 0;
+    this.pump(); clearInterval(this.timer); this.timer = setInterval(() => this.pump(), 400);
+  },
+  /** agenda as voltas com antecedência: cada volta nova entra x s antes do fim da anterior, com fade cruzado linear
+   *  (as duas pontas tocam a mesma posição da frase, então o nível fica a ±1 dB da música seguindo; e, como as duas vozes
+   *  saem do mesmo buffer, o laço não depende do atraso do decodificador de MP3) */
+  pump() {
+    if (!this.on) return; const ctx = AUDIO.ctx, { s, e, x } = this.span();
+    while (this.next < ctx.currentTime + 3) {
+      const t0 = this.next, o = this.off, first = o === 0 && !this.voices.length, src = ctx.createBufferSource(), vg = ctx.createGain();
+      src.buffer = this.buf; src.connect(vg); vg.connect(this.g);
+      if (first) vg.gain.setValueAtTime(1, t0); else { vg.gain.setValueAtTime(0, t0); vg.gain.linearRampToValueAtTime(1, t0 + x); }
+      const tx = t0 + (e - x - o); vg.gain.setValueAtTime(1, tx); vg.gain.linearRampToValueAtTime(0, tx + x);
+      src.start(t0, o); src.stop(tx + x + .02);
+      this.voices.push(src); src.onended = () => { this.voices = this.voices.filter(v => v !== src); };
+      this.next = tx; this.off = s - x;
+    }
+  },
+  apply() { if (this.g && AUDIO.ctx) { const n = AUDIO.ctx.currentTime; this.g.gain.cancelScheduledValues(n); this.g.gain.setTargetAtTime(this.level(), n, .15); } },
+  stop() {
+    if (!this.on) return; this.on = false; clearInterval(this.timer);
+    const ctx = AUDIO.ctx, g = this.g, f = this.cfg().fadeOut || 1.2, vs = this.voices; this.g = null; this.voices = [];
+    if (!ctx || !g) return; const n = ctx.currentTime;
+    g.gain.cancelScheduledValues(n); g.gain.setValueAtTime(g.gain.value, n); g.gain.linearRampToValueAtTime(0, n + f);
+    vs.forEach(v => { try { v.stop(n + f + .05); } catch (err) {} });
+    setTimeout(() => { try { g.disconnect(); } catch (err) {} }, (f + .3) * 1000);
+  },
+  /** quando a faixa termina de decodificar com uma parada já na tela */
+  onReady() { const st = window.__state; if (st && st.mode === 'stop' && CONFIG.stops[st.stop]) this.start(CONFIG.stops[st.stop].id); }
+};
+
 /* decodifica as faixas logo no carregamento (contexto offline: não precisa de gesto do usuário) */
 (function decodeTracks() {
   const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OAC) return;
@@ -58,6 +108,10 @@ const TRACK = {
     oac.decodeAudioData(buf.buffer).then(b => { tr.buf = b; TRACK.onReady(); })
       .catch(e => console.warn('[música] não deu para decodificar', tr.id, e));
   });
+  // v7.16: a música das conversas (não tem grade de batidas: não mexe nas cenas)
+  const pc = CONFIG.audio.pause, pel = pc && document.getElementById('music-' + pc.track);
+  if (pel) { const raw = atob(pel.textContent.trim()), buf = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
+    oac.decodeAudioData(buf.buffer).then(b => { PAUSE.buf = b; PAUSE.onReady(); }).catch(e => console.warn('[música] não deu para decodificar', pc.track, e)); }
 })();
 
 /* ---------------------------------------------------------------------------

@@ -76,6 +76,8 @@
 
 ## Conversa 0
 
+- **Música (v7.16):** a música das conversas entra em fade quando o mapa aparece e toca em loop enquanto quem apresenta fala. É uma balada pop original com violino no lugar da voz, cerca de 10 dB abaixo do filme. Ela sai em fade quando o vídeo segue; o mesmo vale para as duas baldeações.
+
 - **Tela:** a estação futurista ao fundo, a missão escrita no topo e o mapa com os 3 capítulos.
 - **Interação:** clique numa estação para aproximar e ver o cartão (título, o que mostra, tópicos); → embarca.
 
@@ -138,6 +140,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
    - "A escolha do modelo depende do *problema* e da *decisão de negócio*."
 
 ## Conversa 1
+
+- **Música (v7.16):** a música das conversas em loop, por baixo da fala.
 
 - **Entrada (v7.2):** o último quadro do vídeo some em zoom, um véu escuro com o rastro de luz de um trem cobre a tela e só depois a estação aparece. Os textos das duas telas nunca ficam juntos.
 - **Tela:** a estação futurista e a chamada no topo, "ONDE ISSO ENCONTRA O SEU CLIENTE?".
@@ -221,6 +225,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ## Conversa 2
 
+- **Música (v7.16):** a música das conversas em loop, por baixo da fala.
+
 - **Tela:** a estação futurista e a chamada "QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?".
 - **Cartazes:**
   - **04:** as quatro provas lado a lado (+18,8% · +4 p.p. · automáticos · 8 + 22);
@@ -253,7 +259,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 O letreiro fica aceso sobre a estação futurista. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
 
-## Trilha (v7.4–v7.7 · ElevenLabs)
+## Trilha (v7.4–v7.7 · ElevenLabs; conversas na v7.16)
 
 As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tempos do filme (`tools/eleven_fit.py`).
 
@@ -273,3 +279,7 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - v7.15: 11 compassos a menos (1:11 → 0:45), num corte só, escolhido pelo usuário: o piano segue até 22,8 s e emenda, no tempo forte, na volta da orquestra (mesmo tom, 80 ms de transição, sem filtros);
   - a cidade tem piano e cordas, e a orquestra volta junto com a estação "?";
   - o letreiro e a frase-chave acendem no prato da cadência final, e o vídeo termina com a cauda desse acorde.
+- **Música das conversas (v7.16):** balada pop original (ElevenLabs), com violino cantando a melodia no lugar da voz, piano, cordas, violão e uma batida suave, a 106,7 BPM.
+  - Toca na Conversa 0 e nas duas baldeações, em loop sem fim: introdução uma vez, depois um trecho de 192 tempos que se repete com 0,3 s de transição.
+  - Entra e sai em fade, cerca de 10 dB abaixo do filme.
+  - Não é uma versão de música existente: a geração descreve só o clima.

@@ -16,8 +16,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'performance-analytics.html'
-MUSIC_IDS = ['funk', 'tech', 'piano']
-ELEVEN = {'funk': 'parte1.mp3', 'tech': 'parte2.mp3', 'piano': 'parte3.mp3'}   # v7.4: músicas geradas na ElevenLabs
+MUSIC_IDS = ['funk', 'tech', 'piano', 'pausa']
+ELEVEN = {'funk': 'parte1.mp3', 'tech': 'parte2.mp3', 'piano': 'parte3.mp3',   # v7.4: músicas geradas na ElevenLabs
+          'pausa': 'pausa.mp3'}                                              # v7.16: música das conversas (loop nas paradas)
 
 
 def data_block(path):
@@ -37,7 +38,7 @@ def music_blocks(prev):
         else:
             m = re.search(rf'<script type="text/plain" id="music-{mid}">([A-Za-z0-9+/=]*)</script>', prev)
             if not m:
-                print(f'aviso: sem musica/{mid}.mp3 e sem música no HTML anterior; o trecho usa a trilha sintetizada')
+                print(f'aviso: sem musica/{ELEVEN.get(mid, mid + ".mp3")} e sem música no HTML anterior; ' + ('as conversas ficam sem música' if mid == 'pausa' else 'o trecho usa a trilha sintetizada'))
                 continue
             b64 = m.group(1)
         out.append(f'<script type="text/plain" id="music-{mid}">{b64}</script>')

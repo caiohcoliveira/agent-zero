@@ -61,7 +61,7 @@ const AUDIO = {
     if (!this.ready) return; const n = this.ctx.currentTime;
     this.music.gain.setTargetAtTime(CONFIG.audio.music ? CONFIG.audio.musicVolume * this.duck : 0, n, .08);
     this.sfx.gain.setTargetAtTime(CONFIG.audio.sfx ? CONFIG.audio.sfxVolume : 0, n, .05);
-    TRACK.apply();
+    TRACK.apply(); PAUSE.apply();
   },
   setDuck(on) { this.duck = on ? CONFIG.audio.duckDuringVoice : 1; this.applyToggles(); },
 
