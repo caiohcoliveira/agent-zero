@@ -4,58 +4,80 @@
    as legendas de tela (o vídeo roda sem narrador) e os cartões de conexão
    ========================================================================== */
 
-/** vagão visto de lado. (x, y) = canto superior esquerdo; base de 1000 × 400 em escala s.
- *  o: len (comprimento base), open (0–1 abre as portas), lit (luz interna), seed, label */
+/** v7.11: o trem da linha é um TREM BALA visto de lado. (x, y) = canto superior esquerdo do corpo do vagão; base L × 408 em escala s
+ *  (as rodas, escondidas pela saia, tocam o trilho em y = 408). o: len, open (abre as portas), lit (luz interna), seed, label,
+ *  doors, logoX, nose: 'right' | 'left' | 'both' (o nariz aerodinâmico fica fora de [0, L]), noseLen */
+const NOSE_LEN = 460;
 function trainCar(ctx, x, y, s, o = {}) {
-  const L = o.len || 1000, open = clamp(o.open || 0), lit = o.lit == null ? 1 : o.lit, R = rng(o.seed || 3);
-  const doors = o.doors || [L * .25, L * .75], DW = 150, WY = 60, WH = 116;
+  const L = o.len || 1000, open = clamp(o.open || 0), lit = o.lit == null ? 1 : o.lit, R = rng(o.seed || 3), N = o.noseLen || NOSE_LEN;
+  const doors = o.doors || [L * .25, L * .75], DW = 128, TOP = 22, BOT = 372, WY = 96, WH = 70;
+  const nr = o.nose === 'right' || o.nose === 'both', nl = o.nose === 'left' || o.nose === 'both';
   ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-  // sombra chapada, truques e rodas
-  rr(ctx, 16, 20, L, 360, 46); ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fill();
-  [[L * .08, L * .3], [L * .62, L * .3]].forEach(([bx, bw]) => { rr(ctx, bx, 340, bw, 34, 10); ctx.fillStyle = '#211A15'; ctx.fill(); });
-  [L * .14, L * .32, L * .68, L * .86].forEach(wx => { circle(ctx, wx, 378, 30, '#1A1512', INK, 5); circle(ctx, wx, 378, 9, '#6E665C'); });
-  // corpo: teto, faixa Mastercard, saia
-  ctx.save(); rr(ctx, 0, 0, L, 360, 46); ctx.clip();
-  ctx.fillStyle = '#F3EBDD'; ctx.fillRect(0, 0, L, 360);
-  ctx.fillStyle = '#DCD1C1'; ctx.fillRect(0, 0, L, 30);
-  [[C.red, 232], [C.orange, 250], [C.yellow, 268]].forEach(([c, yy]) => { ctx.fillStyle = c; ctx.fillRect(0, yy, L, 18); });
-  ctx.fillStyle = '#2A221C'; ctx.fillRect(0, 300, L, 60);
-  hatch(ctx, () => rr(ctx, 0, 0, L, 300, 0), L * .78, 0, L * .22, 300, { alpha: .14, gap: 12 });
-  // janelas com a luz quente do vagão e passageiros
-  const slots = [], edges = [30, ...doors.flatMap(d => [d - DW / 2 - 22, d + DW / 2 + 22]), L - 30];
-  for (let k = 0; k < edges.length; k += 2) { const a = edges[k], b = edges[k + 1], n = Math.max(0, Math.floor((b - a + 24) / 146)), w0 = n ? (b - a - (n - 1) * 24) / n : 0;
-    for (let j = 0; j < n; j++) slots.push(a + j * (w0 + 24), w0); }
-  for (let k = 0; k < slots.length; k += 2) {
-    const wx = slots[k], ww = slots[k + 1];
-    rr(ctx, wx, WY, ww, WH, 18); const g = ctx.createLinearGradient(0, WY, 0, WY + WH);
-    g.addColorStop(0, mix('#3A2A1E', '#FFE2B0', lit)); g.addColorStop(1, mix('#2A1E15', '#FF9C45', lit)); ctx.fillStyle = g; ctx.fill();
-    const heads = Math.floor(R() * 3);
-    for (let h = 0; h < heads; h++) { const hx = wx + ww * (.25 + .5 * R()), hy = WY + WH - 30;
-      ctx.fillStyle = 'rgba(40,24,14,.72)'; ctx.beginPath(); ctx.arc(hx, hy - 16, 15, 0, TAU); ctx.fill(); rr(ctx, hx - 26, hy, 52, 40, 18); ctx.fill(); }
-    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.moveTo(wx + 14, WY + 8); ctx.lineTo(wx + 40, WY + 8); ctx.lineTo(wx + 14, WY + 60); ctx.fill();
-    inkRect(ctx, wx, WY, ww, WH, 18, 5, k + 1);
-  }
-  // portas: duas folhas que deslizam; atrás, o interior aceso
+  // contorno: teto reto, nariz em curva longa até a ponta baixa, saia lisa
+  const shell = () => { ctx.beginPath();
+    if (nl) ctx.moveTo(0, TOP); else { ctx.moveTo(56, TOP); }
+    if (nr) { ctx.lineTo(L, TOP); ctx.bezierCurveTo(L + N * .5, TOP, L + N * .95, 190, L + N, 304); ctx.quadraticCurveTo(L + N * 1.01, BOT, L + N * .72, BOT); }
+    else { ctx.lineTo(L - 56, TOP); ctx.arcTo(L, TOP, L, TOP + 56, 56); ctx.lineTo(L, BOT - 24); ctx.arcTo(L, BOT, L - 24, BOT, 24); }
+    if (nl) { ctx.lineTo(-N * .72, BOT); ctx.quadraticCurveTo(-N * 1.01, BOT, -N, 304); ctx.bezierCurveTo(-N * .95, 190, -N * .5, TOP, 0, TOP); }
+    else { ctx.lineTo(24, BOT); ctx.arcTo(0, BOT, 0, BOT - 24, 24); ctx.lineTo(0, TOP + 56); ctx.arcTo(0, TOP, 56, TOP, 56); }
+    ctx.closePath(); };
+  const x0 = nl ? -N : 0, x1 = nr ? L + N : L;
+  // sombra no chão e truques (as rodas ficam escondidas pela saia)
+  ctx.save(); ctx.globalAlpha *= .3; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse((x0 + x1) / 2, 408, (x1 - x0) / 2, 14, 0, 0, TAU); ctx.fill(); ctx.restore();
+  [L * .16, L * .84].forEach(bx => { rr(ctx, bx - 96, BOT - 6, 192, 36, 12); ctx.fillStyle = '#23292C'; ctx.fill(); [-50, 50].forEach(dx => circle(ctx, bx + dx, BOT + 24, 14, '#3A4246')); });
+  // corpo branco com a luz do alto
+  shell(); const g = ctx.createLinearGradient(0, TOP, 0, BOT); g.addColorStop(0, '#FFFFFF'); g.addColorStop(.55, '#EEF1F0'); g.addColorStop(1, '#CBD2D1'); ctx.fillStyle = g; ctx.fill();
+  ctx.save(); shell(); ctx.clip();
+  // saia escura, faixa de painel e a assinatura Mastercard (vermelho, laranja, amarelo) correndo até o nariz
+  ctx.fillStyle = '#2C3437'; ctx.fillRect(x0 - 10, 326, x1 - x0 + 20, 60);
+  line(ctx, x0, 214, x1, 214, 'rgba(120,132,136,.35)', 3);
+  [[C.red, 280], [C.orange, 292], [C.yellow, 304]].forEach(([c, yy]) => { ctx.fillStyle = c; ctx.fillRect(x0 - 10, yy, x1 - x0 + 20, 10); });
+  // faixa contínua de janelas (vidro escuro, interior aceso) e os passageiros
+  rr(ctx, 40, WY, L - 80, WH, 22); const gw = ctx.createLinearGradient(0, WY, 0, WY + WH);
+  gw.addColorStop(0, mix('#1B2830', '#3A2E22', lit * .5)); gw.addColorStop(1, mix('#22343D', '#8A5A2E', lit * .45)); ctx.fillStyle = gw; ctx.fill();
+  for (let k = 0; k < Math.floor(L / 110); k++) { const hx = 70 + k * 110 + R() * 40; if (R() < .45) { ctx.fillStyle = 'rgba(10,14,16,.55)'; circle(ctx, hx, WY + 36, 11, 'rgba(10,14,16,.55)'); rr(ctx, hx - 18, WY + 48, 36, 30, 12); ctx.fill(); } }
+  for (let k = 0; k < Math.ceil(L / 260); k++) { const rx = 80 + k * 260; ctx.fillStyle = 'rgba(255,255,255,.13)'; ctx.beginPath(); ctx.moveTo(rx, WY + 4); ctx.lineTo(rx + 70, WY + 4); ctx.lineTo(rx + 30, WY + WH - 4); ctx.lineTo(rx - 40, WY + WH - 4); ctx.closePath(); ctx.fill(); }
+  // a janela da cabine segue a curva do nariz
+  const cab = (sx, ex) => { ctx.beginPath(); ctx.moveTo(sx, WY); ctx.lineTo(ex(.18), WY); ctx.quadraticCurveTo(ex(.56), WY + 6, ex(.66), WY + WH + 4); ctx.lineTo(sx, WY + WH + 4); ctx.closePath();
+    const gc = ctx.createLinearGradient(0, WY, 0, WY + WH); gc.addColorStop(0, '#16222A'); gc.addColorStop(1, '#2C4450'); ctx.fillStyle = gc; ctx.fill(); };
+  if (nr) cab(L - 60, f => L + N * f); if (nl) cab(60, f => -N * f);
+  // farol na ponta do nariz
+  if (nr) { rr(ctx, L + N * .8, 262, N * .14, 12, 6); ctx.fillStyle = '#FFF4D6'; ctx.fill(); }
+  if (nl) { rr(ctx, -N * .94, 262, N * .14, 12, 6); ctx.fillStyle = '#FFE2C8'; ctx.fill(); }
+  // portas: folhas que deslizam; atrás, o interior aceso
   doors.forEach((d, i) => {
-    const dx = d - DW / 2, gap = open * 66;
-    rr(ctx, dx, 44, DW, 256, 8); ctx.fillStyle = mix('#2A1E15', '#FFC27A', lit * (.4 + .6 * open)); ctx.fill();
-    if (open > 0) glow(ctx, d, 170, 140 * open, '#FFD9A0', .5 * open * lit);
+    const dx = d - DW / 2, gap = open * DW * .52;
+    if (open > 0) { rr(ctx, dx, 58, DW, 262, 10); ctx.fillStyle = mix('#3A2A1E', '#FFDDA6', lit * (.5 + .5 * open)); ctx.fill(); glow(ctx, d, 190, 150 * open, '#FFE2B0', .5 * open * lit); }
     [[-1, dx - gap], [1, d + gap]].forEach(([sd, lx]) => {
-      rr(ctx, lx, 44, DW / 2, 256, 6); ctx.fillStyle = '#E9DFCF'; ctx.fill();
-      rr(ctx, lx + 14, 64, DW / 2 - 28, 104, 10); ctx.fillStyle = mix('#3A2A1E', '#FFD49A', lit); ctx.fill();
-      inkRect(ctx, lx, 44, DW / 2, 256, 6, 4, 20 + i * 2 + (sd > 0));
+      rr(ctx, lx, 58, DW / 2, 262, 8); ctx.fillStyle = open > 0 ? '#F4F6F5' : 'rgba(0,0,0,0)'; ctx.fill();
+      ctx.strokeStyle = '#9AA4A7'; ctx.lineWidth = 3; ctx.stroke();
+      rr(ctx, lx + 12, 80, DW / 2 - 24, 96, 10); ctx.fillStyle = mix('#1E2C34', '#5A4632', lit * .35); ctx.fill();
     });
-    rr(ctx, d - 58, 12, 116, 26, 5); ctx.fillStyle = '#120E0B'; ctx.fill();
-    text(ctx, o.label || 'ANALYTICS', d, 26, { size: 15, weight: 900, mono: true, color: C.orange, align: 'center', ls: 2 });
+    rr(ctx, d - 56, 30, 112, 22, 6); ctx.fillStyle = '#141B1E'; ctx.fill();
+    text(ctx, o.label || 'ANALYTICS', d, 41, { size: 13, weight: 900, mono: true, color: C.orange, align: 'center', ls: 2 });
   });
   // logo no costado
   const lx = o.logoX == null ? L * .5 : o.logoX;
-  intersection(ctx, lx - 132, 206, 10, 12);
-  text(ctx, 'PERFORMANCE ANALYTICS', lx - 114, 207, { size: 14, weight: 900, color: INK, ls: 1 });
+  intersection(ctx, lx - 132, 248, 10, 12);
+  text(ctx, 'PERFORMANCE ANALYTICS', lx - 114, 249, { size: 14, weight: 900, color: '#2C3437', ls: 1 });
+  // reflexo do céu no teto
+  const gr = ctx.createLinearGradient(0, TOP, 0, TOP + 60); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = gr; ctx.fillRect(x0, TOP, x1 - x0, 60);
   ctx.restore();
-  inkRect(ctx, 0, 0, L, 360, 46, 6, o.seed || 3);
+  shell(); ctx.strokeStyle = '#1E2427'; ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.stroke();
   ctx.restore();
 }
+
+/** o trem bala da linha visto de lado (ponte, viaduto dos pilares e 07): dois vagões, nariz na frente e na traseira.
+ *  xf = ponta do nariz da frente · ry = topo do trilho · o farol pulsa com a música */
+function sideTrain(ctx, xf, ry, o = {}) {
+  const S = o.s || .17, L = 1000, GAP = 40, n = o.cars || 2, y = ry - 408 * S, k0 = S / .17, N = NOSE_LEN;
+  glow(ctx, xf - 30 * k0, y + 268 * S, 150 * k0, '#FFE9C0', .22 + .18 * BT.level);
+  for (let k = n - 1; k >= 0; k--) trainCar(ctx, xf - N * S - (k + 1) * L * S - k * GAP * S, y, S, { len: L, seed: (o.seed || 7) + k, lit: 1, doors: [L * .3, L * .7],
+    nose: n === 1 ? 'both' : k === 0 ? 'right' : k === n - 1 ? 'left' : null });
+  glow(ctx, xf - 40 * k0, y + 268 * S, 40 * k0, '#FFF6DA', .85);
+}
+/** comprimento total do trem bala em escala S (para quem posiciona o trem na tela) */
+const trainLen = (S = .17, n = 2) => (n * 1000 + (n - 1) * 40 + 2 * NOSE_LEN) * S;
 
 /* ---------- o trem passa na frente da câmera na chegada de cada estação (esconde o corte) ---------- */
 const TRAIN_PASS = (() => {
@@ -68,13 +90,9 @@ const TRAIN_PASS = (() => {
     draw(ctx, T) {
       list.forEach(p => {
         const u = (T - (p.Ts - HALF)) / (2 * HALF); if (u <= 0 || u >= 1 || (p.fromStop && u < .5)) return;
-        const span = W + LEN * S + 80, x = W + 40 - span * u, y = -40;
-        ctx.save(); ctx.globalAlpha = .28; trainCar(ctx, x + 70, y, S, { len: LEN, seed: 5, lit: .9 }); ctx.restore();
-        trainCar(ctx, x, y, S, { len: LEN, seed: 5, lit: .9 });
-        // rastros de velocidade
-        const r = rng(Math.floor(p.Ts * 10)); ctx.save(); ctx.globalAlpha = .5;
-        for (let k = 0; k < 18; k++) { const ly = r() * H, lx = x + r() * LEN * S, lw = 200 + r() * 600; line(ctx, lx, ly, lx + lw, ly, k % 3 ? 'rgba(255,240,220,.5)' : rgba(C.orange, .6), 2 + r() * 5); }
-        ctx.restore();
+        const span = W + (LEN + NOSE_LEN) * S + 80, x = W + 40 + NOSE_LEN * S - span * u, y = -40;
+        ctx.save(); ctx.globalAlpha = .28; trainCar(ctx, x + 70, y, S, { len: LEN, seed: 5, lit: .9, nose: 'left' }); ctx.restore();
+        trainCar(ctx, x, y, S, { len: LEN, seed: 5, lit: .9, nose: 'left' });
       });
     }
   };
@@ -85,10 +103,11 @@ function nextStationLED(ctx, T) {
   let nk = 0, Tn = 0;
   for (let k = 1; k <= 7; k++) { const Ts = CONFIG.stationStart[k]; if (Ts != null && Ts > T) { nk = k; Tn = Ts; break; } }
   const stop = CONFIG.mode !== 'reel' ? CONFIG.stops.find(st => st.after && st.T > T && (!nk || st.T <= Tn)) : null;
-  const target = stop ? stop.T : Tn; if (!target || target - T > 4.5) return;
+  if (stop) return;   // v7.12: sem o aviso "próxima parada"
+  const target = Tn; if (!target || target - T > 4.5) return;
   const a = clamp((4.5 - (target - T)) / .3) * clamp((target - T - .1) / .3); if (a <= 0) return;
   const label = stop ? `PRÓXIMA PARADA  ›  ${stop.id === 'end' ? 'ENCERRAMENTO' : 'CONVERSA COM AS APRESENTADORAS'}` : `PRÓXIMA ESTAÇÃO  ›  ${TX.stations[nk - 1].n} ${TX.stations[nk - 1].short}`;
-  const w = measure(ctx, label, 20, 800, true, 3) + 64, x = 562, y = 62, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;
+  const w = measure(ctx, label, 20, 800, true, 3) + 64, x = W - 64 - w, y = 214, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;   // v7: abaixo do mini-mapa
   ctx.save(); ctx.globalAlpha *= a;
   rr(ctx, x, y - 26, w, 52, 10); ctx.fillStyle = '#0A0807'; ctx.fill(); ctx.strokeStyle = '#3A2A1E'; ctx.lineWidth = 3; ctx.stroke();
   ctx.save(); ctx.shadowColor = C.orange; ctx.shadowBlur = 10; text(ctx, label, x + 32, y + 1, { size: 20, weight: 800, mono: true, color: C.orange, ls: 3, alpha: blink }); ctx.restore();
@@ -105,7 +124,7 @@ function ticket(ctx, x, y, s, o = {}) {
   intersection(ctx, -255, -40, 30, 38);
   text(ctx, 'BILHETE', -255, 50, { size: 22, weight: 900, mono: true, color: '#FFF', align: 'center', ls: 3 });
   ctx.save(); ctx.setLineDash([8, 8]); line(ctx, -170, -110, -170, 110, INK, 3); ctx.restore();
-  text(ctx, 'LINHA PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
+  text(ctx, 'PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
   text(ctx, 'DE  dados', -140, -22, { size: 30, weight: 800, mono: true, color: '#4A4038' });
   text(ctx, 'PARA  valor', -140, 22, { size: 30, weight: 800, mono: true, color: C.red });
   text(ctx, '7 estações · 2 baldeações', -140, 72, { size: 20, weight: 700, mono: true, color: '#6A6056' });
@@ -146,7 +165,7 @@ function bridgeCard(ctx, a, kicker, str, o = {}) {
   if (kicker) { const kw = measure(ctx, kicker, 26, 800, true, 6) + 70; ctx.save(); ctx.translate(W / 2, H / 2 - 150); ctx.rotate(-.02);
     paper(ctx, -kw / 2, -28, kw, 56, { r: 6, fill: C.red, shadow: 6, shadowColor: '#000', lw: 3 }); text(ctx, kicker, 0, 2, { size: 26, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
   ctx.save(); ctx.translate(W / 2, H / 2 - 20); ctx.scale(lerp(1.25, 1, e), lerp(1.25, 1, e));
-  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; brush(ctx, -pw / 2, -size * .62, pw, size * 1.24, '#2A1E15', o.seed || 9, E.outCubic(clamp(a * 1.6)));
+  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; rr(ctx, -pw / 2, -size * .62, pw, size * 1.24, size * .2); ctx.fillStyle = '#2A1E15'; ctx.fill();   // v7.12: faixa lisa, sem pincelada
   rich(ctx, str, 0, 0, { size, weight: 900, color: '#FFF', accent: C.orange, retro: true, depth: 6, lw: 5 });
   ctx.restore();
   if (o.sub) text(ctx, o.sub, W / 2, H / 2 + 100, { size: 34, weight: 700, color: '#E9DDCC', align: 'center', alpha: clamp(a * 2 - .8) });

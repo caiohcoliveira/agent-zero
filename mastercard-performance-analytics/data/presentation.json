@@ -3,6 +3,7 @@
     "title": "Performance Analytics | Analytics as a Strategic Consulting Capability",
     "organization": "Mastercard Advisors",
     "track": "Performance Analytics",
+    "disclaimer": "Este vídeo é a versão mockada, com dados sanitizados.",
     "objective": "Narrativa executiva sobre a evolução de Performance Analytics: relevância estratégica, crescimento, portfolio, cases com impacto mensurável, inovação e visão de futuro.",
     "case_structure": "Business Problem -> Analytics Solution -> Insight/Decision -> Business Impact"
   },
@@ -26,6 +27,119 @@
         "2023_to_2024": "+0.4 relative",
         "2024_to_2025": "+0.285714 relative",
         "2023_to_2025": "+0.8 relative"
+      },
+      "business_scale_2026": {
+        "revenue_usd_millions_approx": 0.0036,
+        "projects_delivered": 28,
+        "projects_delivered_display": "28",
+        "projects_with_other_tracks_approx": "45%",
+        "projects_with_other_tracks_revenue_share": "54%",
+        "executive_message": "Lorem ipsum dolor sit amet: 28 projetos fictícios, cerca de metade com outras tracks."
+      },
+      "revenue_contribution_by_project_type_2026": [
+        {
+          "project_type": "Figo",
+          "revenue_share": "22%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Caqui",
+          "revenue_share": "18%",
+          "delivery_model": "Performance Analytics + Cenoura"
+        },
+        {
+          "project_type": "Pitanga",
+          "revenue_share": "15%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Amora",
+          "revenue_share": "13%",
+          "delivery_model": "Performance Analytics + Brócolis"
+        },
+        {
+          "project_type": "Carambola",
+          "revenue_share": "11%",
+          "delivery_model": "Performance Analytics + Abobrinha"
+        },
+        {
+          "project_type": "Lichia",
+          "revenue_share": "8%",
+          "delivery_model": "Performance Analytics + Cenoura"
+        },
+        {
+          "project_type": "Mirtilo",
+          "revenue_share": "6%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Framboesa",
+          "revenue_share": "4%",
+          "delivery_model": "Performance Analytics + Abobrinha"
+        },
+        {
+          "project_type": "Cereja",
+          "revenue_share": "3%",
+          "delivery_model": "Not specified"
+        }
+      ],
+      "revenue_contribution_summary_2026": {
+        "pa_only_revenue_share": "43%",
+        "cross_track_revenue_share": "54%",
+        "unspecified_delivery_model_revenue_share": "3%",
+        "cross_track_revenue_breakdown": {
+          "Performance Analytics + Cenoura": "26%",
+          "Performance Analytics + Brócolis": "13%",
+          "Performance Analytics + Abobrinha": "15%"
+        }
+      },
+      "project_mix_2026": {
+        "projects_with_other_tracks_approx": "45%",
+        "measurement_basis": "Share of projects",
+        "note": "Project-count shares and revenue shares use different measurement bases and should be presented separately."
+      },
+      "team_structure_2026": {
+        "current_internal_positions": 53,
+        "current_contractors": 5,
+        "current_total_including_contractors": 58,
+        "levels": [
+          {
+            "level": "K2",
+            "current_internal_positions": 1,
+            "current_contractors": 0,
+            "current_total": 1
+          },
+          {
+            "level": "K3",
+            "current_internal_positions": 4,
+            "current_contractors": 0,
+            "current_total": 4
+          },
+          {
+            "level": "K4",
+            "current_internal_positions": 9,
+            "current_contractors": 0,
+            "current_total": 9
+          },
+          {
+            "level": "K5",
+            "current_internal_positions": 13,
+            "current_contractors": 3,
+            "current_total": 16
+          },
+          {
+            "level": "K6",
+            "current_internal_positions": 14,
+            "current_contractors": 2,
+            "current_total": 16
+          },
+          {
+            "level": "K7",
+            "current_internal_positions": 12,
+            "current_contractors": 0,
+            "current_total": 12
+          }
+        ]
       },
       "brazil_2023_milestone": {
         "headline": "Performance Analytics Brazil estimated to close the reference period at USD 1220, approximately 1.648649x budget and 1.742857x prior-period revenue",
@@ -57,10 +171,10 @@
           }
         },
         "drivers": [
-          "2022 growth was in large part due to correct assignation of product",
-          "2023 was heavily steered by the partnership with the MS team"
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+          "Sed do eiusmod tempor incididunt ut labore et dolore"
         ],
-        "source": "PSA financials"
+        "source": "fonte interna (lorem ipsum)"
       },
       "scale_proof_points": {
         "cliente_banana_product_baskets": {
@@ -84,7 +198,7 @@
       "section": 3,
       "title": "What We Bring to the Market",
       "objective": "Portfolio de capabilities, produtos e tipos de projetos, mostrando como Analytics complementa e potencializa as demais tracks.",
-      "source": "Guia Comercial de PA (1).htm",
+      "source": "documento interno (lorem ipsum)",
       "client_types": [
         "Emissores",
         "Adquirentes",
@@ -158,7 +272,7 @@
         {
           "case_name": "Cliente Banana | Product Baskets",
           "client": "Cliente Banana",
-          "business_problem": "Aumentar transversalidade entre Cliente Banana, Cliente Maçã e Cliente Pera nos testes da Mesa de Performance: identificar cestas de SKUs estratégicos, clientes com maior propensão a cada cesta e produtos de alto valor que motivam a visita.",
+          "business_problem": "Aumentar transversalidade entre Cliente Banana, Cliente Maçã e Cliente Pera nos testes de campanha: identificar cestas de SKUs estratégicos, clientes com maior propensão a cada cesta e produtos de alto valor que motivam a visita.",
           "data_challenges": [
             "Apenas compras registradas, sem preferência declarada",
             "Itens onipresentes de baixo valor (sacola, pão) dominavam o sinal",
@@ -189,11 +303,11 @@
             "conversion_by_mechanic": {
               "Destilados (cesta)": "1.52%",
               "Churrasco (cesta)": "1.28%",
-              "Ganhe e Use I": "1.28%",
-              "Membership": "1.2%",
+              "Mecânica Lorem": "1.28%",
+              "Mecânica Ipsum": "1.2%",
               "Café + chocolate (cesta)": "1.12%",
-              "Raspou, Ganhou": "0.56%",
-              "Presente Surpreenda": "0.16%"
+              "Mecânica Dolor": "0.56%",
+              "Mecânica Sit": "0.16%"
             },
             "incremental_revenue_cafe": "R$ 218",
             "cafe_revenue_growth_non_primary_bu": "+0.245 relative"
@@ -260,17 +374,18 @@
               "Daily recommendation adjustment"
             ],
             "assets": [
-              "GitLab code",
-              "Scheduled jobs",
-              "MLflow metrics",
-              "Technical documentation"
+              "Lorem ipsum (código versionado)",
+              "Rotinas agendadas",
+              "Lorem ipsum (métricas dos modelos)",
+              "Documentação técnica"
             ]
           },
           "future_vision": "Unified engine combining affinity, conversion, principality and profitability, extendable to PJ.",
           "executive_message": "A productized engine combining look-alike segmentation, product affinity and principality impact showed +4 p.p. theoretical principality gain for associates who adopted Top 3 recommendations."
         },
         {
-          "case_name": "Lights-off Fraud Reporting"
+          "case_name": "Lights-off Fraud Reporting",
+          "dashboard_image": "dashboard-fraude.png"
         },
         {
           "case_name": "Insight Agent | AI-powered Market Share & Share of Wallet Insights",
@@ -361,53 +476,58 @@
     {
       "section": 6,
       "title": "Practice",
-      "objective": "Pilares da prática, entregas relevantes e evoluções.",
+      "objective": "Lorem ipsum: pilares da prática, entregas e evoluções (conteúdo mockado).",
       "pillars": [
         {
           "pillar": "Cenoura",
+          "contribution": "Lorem ipsum dolor sit amet, consectetur adipiscing",
           "highlights": [
-            "10 specific training sessions in collaboration with OC Training",
-            "AI & AA Practice offered 10 different training sessions for all A&CS Team",
-            "12 Round Tables for PA Team",
-            "Coffee Table knowledge-sharing initiative",
-            "Round Table under new management with junior team engagement"
+            "Lorem ipsum dolor sit amet",
+            "Consectetur adipiscing elit sed",
+            "Do eiusmod tempor incididunt",
+            "Ut labore et dolore magna",
+            "Aliqua ut enim ad minim"
           ]
         },
         {
           "pillar": "Brócolis",
+          "contribution": "Sed do eiusmod tempor, incididunt ut labore",
           "highlights": [
-            "AI & AA Newsletter introduced in Brazil, with 6 editions since the reference period",
-            "Newsletter built using Copilot and sent through an automated Power Automate process",
-            "Automation Hub with Tools: Dispatch and Benchmark",
-            "Onboarding Kit with PA project context and validated access steps for Mastercard Data Environment"
+            "Veniam quis nostrud exercitation",
+            "Ullamco laboris nisi ut aliquip",
+            "Ex ea commodo consequat",
+            "Duis aute irure dolor"
           ]
         },
         {
           "pillar": "Abobrinha",
+          "contribution": "Ut enim ad minim veniam, quis nostrud",
           "highlights": [
-            "AI Contributor Learning Program as the first step toward AI Greenbelt Certification",
-            "AI Greenbelt Certification launched in the reference period",
-            "Program structured around Learn, Contribute, Collaborate, Exposure and Apply"
+            "In reprehenderit in voluptate",
+            "Velit esse cillum dolore",
+            "Eu fugiat nulla pariatur"
           ]
         },
         {
           "pillar": "Beterraba",
+          "contribution": "Duis aute irure dolor in reprehenderit",
           "highlights": [
-            "Cliente Goiaba Agentic Commerce client project",
-            "Cliente Caju AI for Cards client project",
-            "AI-driven efficiency activities with Efficiency OC",
-            "Automations with Staffing OC",
-            "AI Office Hours in the reference quarter",
-            "Internal AI agents and apps: PO Requisition App, Storytelling Agent and HTML Layout Agent"
+            "Excepteur sint occaecat",
+            "Cupidatat non proident",
+            "Sunt in culpa qui officia",
+            "Deserunt mollit anim",
+            "Id est laborum lorem",
+            "Ipsum dolor sit amet"
           ]
         },
         {
           "pillar": "Couve",
+          "contribution": "Excepteur sint occaecat cupidatat non proident",
           "highlights": [
-            "More than 60 Performance Analytics projects mapped in a centralized repository",
-            "10 structured dimensions",
-            "10 reference one-pagers",
-            "Standardized one-pagers covering context and application, key steps, approaches used and reference deliverables"
+            "Lorem ipsum dolor sit",
+            "Amet consectetur adipiscing",
+            "Elit sed do eiusmod",
+            "Tempor incididunt ut labore"
           ]
         }
       ]

@@ -1,346 +1,521 @@
 /* ============================================================================
-   21. TRECHO 1 ("Vintage Film Funk") — estações 01, 02, 03 + Parada 1
-   Tudo marcado nos compassos da faixa: grid('s01').bars[n]
+   21. PLAY 2 ("Vintage Film Funk" remontada) — estações 01, 02 e 03 + Conversa 1
+   ----------------------------------------------------------------------------
+   v7: cada estação tem contexto, explicação, visual com rótulos e conclusão.
+   01 · o mundo das perguntas encontra uma ponte (os 4 serviços são os vãos da ponte)
+   02 · o crescimento ganha forma e uma régua (gráficos com eixo, unidade e base)
+   03 · capabilities: onde aplicamos, o que entregamos, antecipar × escolher
    ========================================================================== */
+const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] != null ? B[k] : (B[B.length - 1] || 0) + (k - B.length + 1) * per); };
 
-/* ---------- 01 · Analytics as a Strategic Consulting Capability ---------- */
+/* ---------- 01 · Papel estratégico: o mundo das perguntas encontra uma ponte ---------- */
 (() => {
-  const id = 's01', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
-  const T_Q = bt(4) - .2, T_CIRC = bt(5), T_ENG = bt(7), T_CHAIN = bt(11), T_TAG = bt(13), T_INK = bt(14) + 1.2;
-  const POST = TX.postits.map((q, i) => ({ q, x: 330 + (i % 4) * 420 + (i > 3 ? 160 : 0), y: i < 4 ? 330 : 640, rot: (hash(i * 3) - .5) * .16, col: [C.yellow, '#FFE9A8', C.orange, '#F6EEDF'][i % 4], at: bt(0) + i * (60 / BEATS.funk.bpm) }));
-  const CHAIN_T = [T_CHAIN, T_CHAIN + (bt(12) - bt(11)) / 2, bt(12), bt(12) + (bt(13) - bt(12)) / 2];
-  POST.forEach((p, i) => cue(id, p.at, 'pop', { p: .9 + i * .05, v: .14 }));
-  cue(id, T_CIRC - .5, 'whoosh', { dur: .5, v: .35 }); cue(id, T_CIRC, 'impact', { size: .9 });
-  TX.engagement.forEach((_, i) => cue(id, bt(7 + i), 'stab', { i }));
-  CHAIN_T.forEach((t0, i) => cue(id, t0, 'hit', { size: .35 + i * .1 })); cue(id, T_TAG, 'chime', { f: 784, up: 7 });
+  const id = 's01', bt = barsOf(id);
+  // compassos: bt(5) = 11,92 (entra a frase A) … bt(20) = 44,78
+  const T_Q = [4.3, 5.5, 6.7], T_REV = bt(5) + .2, T_CABLE = bt(5) + 1.1, T_SEG = [bt(9), bt(10) + 1.1, bt(12), bt(13) + 1.1];
+  const T_CROSS0 = bt(14) - .3, T_CROSS1 = bt(16) + .7, T_RES = bt(16) - .1, T_CONC = bt(19) - .2, T_RUN = bt(20) - .6;
+  const QS = TX.postits.slice(0, 3), SVC = TX.engagement.map(e => e[0]), SCOL = [C.red, C.orange, C.yellow, '#FFD9A8'];
+  const DEF = ['entender o problema', 'definir o caminho', 'construir a solução', 'verificar o resultado'];
+  const GY = 760, BX0 = 1150, BX1 = 2050, SEGW = (BX1 - BX0) / 4, POSTS = [400, 740, 1080];
+  const RPATH = [[2120, 700], [2330, 640], [2600, 600], [2860, 640], [3120, 600], [3400, 640], [3900, 610]];
+  const RST = [['Dados', 'db', .04], ['Decisão', 'tree', .21], ['Ação', 'bolt', .38], ['Resultado', 'trend', .55]];
+  const CAM = [[0, 800, 560, 1.25], [11.6, 900, 560, 1.25], [T_REV + 1.7, 1600, 590, .78], [T_CROSS0, 1600, 590, .78], [T_CROSS1 - 1.2, 2120, 600, .9],
+    [T_RES + 1.4, 2660, 590, 1.0], [T_RUN, 2660, 590, 1.0], [T_RUN + 3.4, 2980, 590, 1.0]];
+  T_Q.forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + i * .1, v: .2 })); cue(id, T_REV, 'whoosh', { dur: 1.2, v: .3 }); cue(id, T_CABLE, 'whoosh', { dur: .5, v: .25 });
+  T_SEG.forEach((t0, i) => { cue(id, t0, 'impact', { size: .35 }); cue(id, t0 + .05, 'ping', { f: 659 * Math.pow(2, i * 3 / 12) }); });
+  RST.forEach((r, i) => cue(id, T_RES + .3 + i * .55, 'pop', { p: 1 + i * .08, v: .18 })); cue(id, T_CONC, 'chime', { f: 784, up: 7 });
 
-  function cork(ctx, a) {
-    if (a <= 0) return; ctx.save(); ctx.globalAlpha *= a;
-    paper(ctx, 120, 190, W - 240, 760, { r: 18, fill: '#C49A6C', shadow: 14, lw: 5, halftone: .22 });
-    const r = rng(9); ctx.fillStyle = 'rgba(70,40,15,.35)'; for (let k = 0; k < 900; k++) ctx.fillRect(130 + r() * (W - 260), 200 + r() * 740, 2, 2);
-    inkRect(ctx, 120, 190, W - 240, 760, 18, 5, 4); ctx.restore();
+  const SCRIPT = SAY.reg(id, [
+    [3.9, 12.4, 'title', 'Decisões difíceis começam com *perguntas*', { visual: true }],
+    [12.6, 37.5, 'title', 'O papel da área'],
+    [12.8, 20.4, 'body', 'Conectamos *perguntas de negócio* aos *dados* necessários para respondê-las.', { visual: true }],
+    [T_SEG[0] - .1, 37.5, 'list', SVC.map((s, i) => `*${s}*: ${DEF[i]}.`), { at: T_SEG.map(x => x - .1), label: 'OS 4 SERVIÇOS', cols: SCOL, visual: true }],
+    [37.4, 47, 'title', 'Do diagnóstico à mensuração'],
+    [37.6, 47, 'body', 'Atuamos do *diagnóstico* à *mensuração* para gerar *valor* para o cliente.', { visual: true }],
+    [T_CONC, 47.2, 'concl', 'Analytics é uma *capacidade estratégica* da consultoria.']
+  ]);
+  const dawnAt = t => E.inOutSine(P(t, T_CROSS0, 6.5));
+  function sky(ctx, t) {
+    const d = dawnAt(t), g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, mix('#1C1230', '#3E2350', d)); g.addColorStop(.55, mix('#7A2E3A', '#E07A3A', d)); g.addColorStop(.72, mix('#C8552A', '#FFC266', d)); g.addColorStop(1, '#24120C');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    glow(ctx, 1180, 690, 520, mix('#FF8A3D', '#FFE2A0', d), .55 + .2 * d);
+    vball(ctx, 1180, 700 - 40 * d, 120, mix('#FF9A50', '#FFE7B0', d), { ink: false, rim: false });
+    for (let k = 0; k < 40; k++) { const x = hash(k * 3.1) * W, y = hash(k * 7.7) * 380; circle(ctx, x, y, 1.4 + hash(k) * 1.6, rgba('#FFF4DC', (.6 - .5 * d) * (.5 + .5 * Math.sin(t * 2 + k)))); }
   }
-  function postit(ctx, p, i, t, blow) {
-    const a = E.outBack(P(t, p.at, .35)); if (a <= 0) return;
-    const bx = p.x + blow * (p.x - W / 2) * 1.6, by = p.y + blow * (p.y - H / 2) * 1.8 - blow * 200, rot = p.rot + blow * (i % 2 ? 2 : -2.4) + .03 * BT.snare * Math.sin(i + t * 8);
-    ctx.save(); ctx.globalAlpha *= 1 - clamp(blow * 1.4); ctx.translate(bx, by); ctx.rotate(rot); ctx.scale(a, a);
-    paper(ctx, -150, -95, 300, 190, { fill: p.col, shadow: 8, lw: 3, halftone: .08 });
-    text(ctx, p.q, 0, 8, { size: 38, weight: 900, color: INK, align: 'center' });
-    circle(ctx, 0, -78, 13, C.red); inkCircle(ctx, 0, -78, 13, 3, i); circle(ctx, -4, -82, 4, '#FFB4A8');
-    ctx.restore();
+  function mountains(ctx) {
+    [['#3A1A2C', 640, 11], ['#2A1422', 700, 23]].forEach(([col, base, seed]) => { const r = rng(seed); ctx.beginPath(); ctx.moveTo(-600, H + 200); let x = -600;
+      while (x < 4200) { ctx.lineTo(x, base - 80 - r() * 200); x += 120 + r() * 200; } ctx.lineTo(4200, H + 200); ctx.closePath(); ctx.fillStyle = col; ctx.fill(); });
   }
-  function thread(ctx, t, blow) {
-    const p = P(t, bt(2), bt(4) - bt(2)); if (p <= 0 || blow > .5) return;
-    ctx.save(); ctx.globalAlpha *= 1 - blow * 2; ctx.strokeStyle = C.red; ctx.lineWidth = 4; ctx.lineCap = 'round';
-    const pts = [0, 1, 2, 3, 7, 6, 5, 4].map(i => [POST[i].x, POST[i].y - 78]), n = (pts.length - 1) * p;
-    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
-    for (let k = 1; k <= Math.ceil(n); k++) { const f = Math.min(1, n - (k - 1)), [x0, y0] = pts[k - 1], [x1, y1] = pts[k], mx = lerp(x0, x1, f), my = lerp(y0, y1, f);
-      ctx.quadraticCurveTo((x0 + mx) / 2, Math.max(y0, my) + 60 * f, mx, my); }
-    ctx.stroke(); ctx.restore();
+  function cliffs(ctx, t) {
+    const edge = (x0, dir, seed) => { const r = rng(seed), pts = []; for (let y = GY; y <= H + 500; y += 40) pts.push([x0 + dir * (r() * 40 + (y - GY) * .06), y]); return pts; };
+    // margem esquerda (Negócio) e direita (Dados)
+    [[-800, BX0, 1, '#6A3426', '#3A1C14', 31], [BX1, 4400, -1, '#2C3448', '#151A26', 47]].forEach(([xa, xb, dir, c1, c2, seed]) => {
+      const e = edge(dir > 0 ? xb : xa, dir, seed); ctx.beginPath(); ctx.moveTo(xa, GY); ctx.lineTo(xb, GY); if (dir > 0) e.forEach(p => ctx.lineTo(p[0], p[1])); ctx.lineTo(dir > 0 ? xa : xb, H + 500); if (dir < 0) e.slice().reverse().forEach(p => ctx.lineTo(p[0], p[1])); ctx.closePath();
+      const g = ctx.createLinearGradient(0, GY, 0, H + 300); g.addColorStop(0, c1); g.addColorStop(1, c2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 6; ctx.stroke();
+      line(ctx, xa, GY + 4, xb, GY + 4, rgba('#FFE2C0', .35), 6);
+      ctx.save(); ctx.clip(); hatch(ctx, () => { ctx.rect(xa, GY + 40, xb - xa, 800); }, xa, GY + 40, xb - xa, 800, { alpha: .18, gap: 14, color: '#000' }); ctx.restore();
+    });
+    // capim e pedras na borda
+    const r = rng(5); for (let k = 0; k < 90; k++) { const x = r() < .5 ? -600 + r() * (BX0 + 560) : BX1 + r() * 2200, h = 10 + r() * 22; line(ctx, x, GY, x + (r() - .5) * 10 + Math.sin(t * 1.5 + k) * 3, GY - h, k % 3 ? '#3C5A2A' : '#5E7A34', 3); }
   }
-  function engagement(ctx, t, cy) {
-    const n = TX.engagement.length, x0 = 330, dx = (W - 660) / (n - 1);
-    const lp = P(t, T_ENG, bt(10) - T_ENG + 1.6); if (lp <= 0) return;
-    const out = E.inCubic(P(t, T_CHAIN - .4, .6)); if (out >= 1) return;
-    ctx.save(); ctx.globalAlpha *= 1 - out;
-    // fio vermelho atravessando as fases
-    ctx.save(); ctx.strokeStyle = C.red; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x0 - 120, cy + 40);
-    for (let x = x0 - 120; x <= lerp(x0 - 120, x0 + dx * (n - 1) + 120, lp); x += 12) ctx.lineTo(x, cy + 40 + Math.sin(x * .02 + t * 3) * 10);
-    ctx.stroke(); ctx.restore();
-    TX.engagement.forEach(([ph, verb], i) => {
-      const a = E.outBack(P(t, bt(7 + i), .4)); if (a <= 0) return;
-      const x = x0 + i * dx, s = a * (1 + .05 * BT.beat * (BT.i % 4 === i ? 1 : 0));
-      ctx.save(); ctx.translate(x, cy); ctx.rotate([-.03, .02, -.015, .025][i]); ctx.scale(s, s);
-      paper(ctx, -170, -80, 340, 160, { torn: true, seed: 20 + i, fill: '#F6EEDF', shadow: 10, lw: 3.5, tape: [[.5, 0, .1]] });
-      text(ctx, ph, 0, -22, { size: 38, weight: 900, color: INK, align: 'center' });
-      pill(ctx, 0, 36, verb, { size: 26, fill: [C.red, C.orange, C.yellow, C.red][i], color: i === 2 ? INK : '#FFF', weight: 800 });
+  function fog(ctx, t) {
+    for (let k = 0; k < 6; k++) { const y = GY + 60 + k * 50, x = BX0 - 200 + ((t * (14 + k * 4) + k * 300) % 1200), g = ctx.createRadialGradient(x, y, 20, x, y, 420);
+      g.addColorStop(0, 'rgba(255,214,180,.16)'); g.addColorStop(1, 'rgba(255,214,180,0)'); ctx.fillStyle = g; ctx.fillRect(x - 420, y - 200, 840, 400); }
+  }
+  /** a cidade das perguntas (margem do negócio) */
+  function cityOfQuestions(ctx, t) {
+    const r = rng(77); for (let k = 0; k < 9; k++) { const x = -420 + k * 170 + r() * 40, w = 110 + r() * 50, h = 120 + r() * 180, col = ['#7A3A2A', '#8A4A30', '#6A2E22'][k % 3];
+      vslab(ctx, x, GY - h, w, h, 22, col, { lw: 3 });
+      for (let wy = GY - h + 20; wy < GY - 30; wy += 42) for (let wx = x + 16; wx < x + w - 20; wx += 34) { rr(ctx, wx, wy, 20, 26, 3); ctx.fillStyle = hash(wx + wy) > .55 ? rgba('#FFD08A', .85) : '#3A1C14'; ctx.fill(); }
+      if (k % 2 === 0) text(ctx, '?', x + w / 2, GY - h - 30, { size: 46, weight: 900, color: C.yellow, align: 'center', alpha: .8 + .2 * Math.sin(t * 2 + k) }); }
+  }
+  /** postes com os cartões de pergunta pendurados */
+  function questionPosts(ctx, t) {
+    POSTS.forEach((x, i) => {
+      line(ctx, x + 6, GY, x + 6, 380, '#000', 14); line(ctx, x, GY, x, 380, '#2A1E18', 14); line(ctx, x, 380, x + 60, 380, '#2A1E18', 10);
+      vball(ctx, x + 64, 392, 16, '#FFE6B0', { lw: 3, rim: false }); lightCone(ctx, x + 64, 398, 30, 260, GY - 398, '#FFC98A', .55);
+      const p = P(t, T_Q[i], .5); if (p <= 0) return; const sw = Math.sin(t * 1.6 + i) * .04 * (1 - P(t, T_REV, 1)), s = E.outBack(p);
+      ctx.save(); ctx.translate(x - 120, 410); ctx.rotate(sw); ctx.scale(s, s);
+      line(ctx, -80, -30, -80, 36, '#C9B79C', 3); line(ctx, 80, -30, 80, 36, '#C9B79C', 3);
+      paper(ctx, -160, 36, 320, 130, { torn: true, seed: 90 + i, fill: [C.yellow, '#FFE9A8', '#FFD9C0'][i], shadow: 8, shadowColor: '#000', lw: 3.5, halftone: .05 });
+      late(ctx, c => { const n = wrapRich(c, QS[i], 304, 32, 900).lines.length; para(c, QS[i], 0, 101 - n * 32 * 1.08 / 2, 304, { size: 32, weight: 900, color: INK, align: 'center', lh: 1.08 }); });
       ctx.restore();
     });
-    ctx.restore();
   }
-  function chain(ctx, t) {
-    const out = P(t, T_INK, .9); if (t < T_CHAIN) return;
-    const words = TX.chain, x0 = 300, dx = (W - 600) / (words.length - 1), y = 560;
-    words.forEach((w, i) => {
-      const p = P(t, CHAIN_T[i], .3); if (p <= 0) return;
-      const x = x0 + i * dx, s = lerp(1.8, 1, E.outExpo(p)) * (1 + .06 * BT.beat);
-      if (i) { const ap = P(t, CHAIN_T[i] - .15, .3); line(ctx, x - dx + 150, y, lerp(x - dx + 150, x - 150, ap), y, INK, 8); if (ap > .9) arrowHead(ctx, x - 150, y, 0, 26, INK); }
-      ctx.save(); ctx.translate(x, y); ctx.rotate([-.04, .03, -.02, .04][i]); ctx.scale(s, s);
-      splat(ctx, 0, 0, 120, [C.red, C.orange, '#D98A00', C.red][i], 30 + i, E.outBack(p), .9);
-      retroText(ctx, w, 0, 0, { size: 64, weight: 900, color: '#FFF', align: 'center', depth: 4, lw: 4 });
+  /** a ponte: cabo (a linha laranja) + 4 vãos, um por serviço */
+  function bridge(ctx, t) {
+    const cp = E.inOutCubic(P(t, T_CABLE, 1.1)); if (cp <= 0) return;
+    const sag = u => GY - 150 + Math.sin(u * Math.PI) * 70;
+    const cable = Array.from({ length: 9 }, (_, i) => [BX0 - 20 + i / 8 * (BX1 - BX0 + 40), sag(i / 8)]);
+    // pilares das cabeceiras
+    [BX0 - 20, BX1 + 20].forEach(x => { vslab(ctx, x - 16, GY - 190, 32, 190, 10, '#3A2A22', { lw: 3 }); circle(ctx, x, GY - 196, 14, C.orange, INK, 3); });
+    T_SEG.forEach((t0, i) => {
+      const p = P(t, t0 - .25, .45), x = BX0 + i * SEGW; if (p <= 0) return;
+      const drop = (1 - E.outBack(p)) * -260, lit = P(t, t0 + .1, .4);
+      ctx.save(); ctx.translate(0, drop);
+      // tirantes até o cabo
+      for (let k = 0; k <= 3; k++) { const xx = x + k * SEGW / 3, u = (xx - BX0 + 20) / (BX1 - BX0 + 40); line(ctx, xx, GY - 8, xx, sag(u), rgba('#E9DCC8', .8), 3); }
+      vslab(ctx, x + 2, GY - 22, SEGW - 4, 26, 12, lit > 0 ? mix('#7A5A40', SCOL[i], .55 * lit) : '#7A5A40', { lw: 3 });
+      for (let k = 1; k < 6; k++) line(ctx, x + k * SEGW / 6, GY - 20, x + k * SEGW / 6, GY + 2, 'rgba(0,0,0,.35)', 2);
+      if (lit > 0) { glow(ctx, x + SEGW / 2, GY - 10, 160, SCOL[i], .4 * lit); line(ctx, x + 8, GY - 30, x + SEGW - 8, GY - 30, SCOL[i], 6); }
       ctx.restore();
+      if (lit > 0) { pin(ctx, x + SEGW / 2, GY + 40, c => { c.globalAlpha *= lit; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 10; const yy = i % 2 ? 66 : 22; line(c, 0, 0, 0, yy - 18, rgba(SCOL[i], .9), 3); text(c, SVC[i], 0, yy, { size: 28, weight: 900, color: '#FFF', align: 'center' }); });
+        pin(ctx, x + SEGW / 2, GY - 60, c => { c.globalAlpha *= lit; circle(c, 0, 0, 20, SCOL[i], INK, 3); text(c, `${i + 1}`, 0, 1, { size: 24, weight: 900, color: i === 3 ? INK : '#FFF', align: 'center' }); }); }
     });
-    const tp = P(t, T_TAG, .6);
-    if (tp > 0) { ctx.save(); ctx.translate(W / 2, 820); ctx.rotate(-.015); ctx.scale(lerp(1.3, 1, E.outExpo(tp)), lerp(1.3, 1, E.outExpo(tp))); brush(ctx, -720, -64, 1440, 128, INK, 61, E.outCubic(clamp(tp * 1.5)));
-      rich(ctx, TX.tagline, 0, 2, { size: 76, weight: 900, color: '#FFF', accent: C.orange, alpha: clamp(tp * 2 - .3) }); ctx.restore(); }
-    if (out > 0) { ctx.save(); ctx.fillStyle = '#120E0B'; ctx.beginPath(); ctx.arc(x0 + 3 * dx, y, E.inCubic(out) * 2400, 0, TAU); ctx.fill(); ctx.restore(); }
+    LINE.draw(ctx, cable, cp, { w: 14, head: cp < .99 });
   }
-
+  function dataTowers(ctx, t) {
+    const d = dawnAt(t), r = rng(91);
+    for (let k = 0; k < 7; k++) { const x = 2230 + k * 190 + r() * 30, h = 200 + r() * 200, on = clamp(d * 8 - k);
+      vslab(ctx, x, GY - h, 120, h, 26, mix('#26304A', '#3A4A6A', on), { lw: 3 });
+      for (let wy = GY - h + 18; wy < GY - 20; wy += 22) for (let wx = x + 14; wx < x + 106; wx += 18) { const v = hash(wx * 1.3 + wy * .7); circle(ctx, wx, wy, 4, v < .45 * (.25 + on) ? rgba(C.yellow, .5 + .5 * Math.sin(t * 6 + v * 40)) : 'rgba(0,0,0,.4)'); }
+      if (on > 0) { const u = (t * .8 + k * .3) % 1; circle(ctx, x + 60, GY - u * h, 5, rgba('#FFE7B0', on)); } }
+  }
+  function resultLine(ctx, t) {
+    const p = E.inOutSine(P(t, T_RES, 2.6)), run = E.inCubic(P(t, T_RUN, 3.4)); if (p <= 0) return;
+    const u1 = lerp(.0, .66, p) + run * .34;
+    LINE.draw(ctx, [[BX1 + 20, GY - 150], ...RPATH], u1, { w: 20, head: true, glow: 12 });
+    LINE.stations(ctx, [[BX1 + 20, GY - 150], ...RPATH], RST.map(([l, ic, u], i) => ({ u: u + .04, label: l, icon: ic, side: 1, r: 30, fill: i === 3 ? C.yellow : '#FFF8EE' })), u1);
+    RST.slice(0, 3).forEach(([, , u], i) => { const a = P(t, T_RES + .6 + i * .55, .4); if (a <= 0) return; const [x1, y1] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], u + .04), [x2, y2] = LINE.at([[BX1 + 20, GY - 150], ...RPATH], RST[i + 1][2] + .04);
+      late(ctx, c => { c.globalAlpha *= a; text(c, '›', (x1 + x2) / 2, (y1 + y2) / 2 - 46, { size: 54, weight: 900, color: C.yellow, align: 'center' }); }); });
+  }
+  /** com a ponte pronta, o trem da linha entra pela margem do negócio, atravessa a ponte e para no lado dos dados (que amanhece) */
+  function crossing(ctx, t) {
+    const u = P(t, T_CROSS0, T_CROSS1 - T_CROSS0); if (u <= 0) return;
+    const x = lerp(260, BX1 - 10, E.inOutSine(u)), v = Math.sin(u * Math.PI);          // v: velocidade relativa (rastro de luz)
+    if (v > .02) { const x1 = x - 350, w = 480 * v; ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createLinearGradient(x1 - w, 0, x1, 0);
+      g.addColorStop(0, 'rgba(255,200,140,0)'); g.addColorStop(1, rgba('#FFD6A0', .45 * v)); ctx.fillStyle = g; ctx.fillRect(x1 - w, GY - 62, w, 32); ctx.restore(); }
+    sideTrain(ctx, x, GY - 22);
+  }
   SCENES[id] = {
-    themeAt: t => t > T_INK + .5 ? 'dark' : 'light', fx: { invert: true },
-    peaks: [[T_CIRC - .2, T_CIRC + 1.6], [T_TAG - .1, T_TAG + 1.4]],
-    caps: [[1.2, T_Q - .2, 'Todo dia, nossos clientes chegam com *perguntas de negócio* como estas', 'O PONTO DE PARTIDA'],
-      [T_CIRC + .4, T_ENG - .3, 'A resposta: quem une o *negócio* aos *dados* — Performance Analytics', 'A RESPOSTA'],
-      [T_ENG + .2, T_CHAIN - .5, 'Nossos serviços cobrem o ciclo todo: *diagnóstico, estratégia, implementação e mensuração*', 'NOSSOS SERVIÇOS'],
-      [T_CHAIN + .2, T_TAG - .2, 'O caminho até o valor: *dados* viram decisões, decisões viram impacto, impacto vira *valor*', 'O CAMINHO DO VALOR']],
+    themeAt: () => 'dark', script: SCRIPT,
+    peaks: [[T_SEG[0] - .1, T_SEG[0] + .6, .4], [T_SEG[3] - .1, T_SEG[3] + .8, .5], [T_CONC - .1, T_CONC + 1, .5]],
     draw(ctx, t) {
-      bgLight(ctx, t);
-      collage(ctx, t, { seed: 41, n: 7, theme: 'light', alpha: .8 });
-      const blow = E.inCubic(P(t, T_CIRC - .1, .7));
-      cork(ctx, 1 - blow);
-      thread(ctx, t, blow);
-      POST.forEach((p, i) => postit(ctx, p, i, t, blow));
-      // a pergunta que fecha o mural
-      const qa = P(t, T_Q, .5) * (1 - P(t, T_CIRC - .25, .2));
-      if (qa > 0) { ctx.save(); ctx.fillStyle = rgba('#120E0B', .45 * qa); ctx.fillRect(0, 0, W, H); ctx.translate(W / 2, H / 2 - 10); ctx.rotate(-.02); const s = lerp(1.4, 1, E.outExpo(qa)); ctx.scale(s, s);
-        paintTitle(ctx, TX.question, 0, 0, { size: 92, bg: C.red, seed: 19, p: qa }); ctx.restore(); }
-      // círculos Negócio × Dados batem no drop e sobem para virar o selo
-      const cp = P(t, T_CIRC - .45, .45, E.inQuad);
-      if (cp > 0) {
-        const up = E.inOutCubic(P(t, T_ENG - .6, .9)), R = lerp(250, 110, up), cy = lerp(H / 2 + 20, 200, up), d = lerp(2400, R * 1.25, cp) * (1 + .03 * BT.beat);
-        if (t > T_CIRC) [[W / 2 - 360, cy + 80, 150, C.red], [W / 2 + 380, cy - 60, 170, C.yellow], [W / 2, cy + 220, 110, C.orange]]
-          .forEach(([x, y, r, c], i) => splat(ctx, x, y, r * lerp(1, .5, up), c, 70 + i, E.outBack(P(t, T_CIRC + i * .05, .3)), .85 * (1 - P(t, T_CHAIN, .5))));
-        const ca = 1 - P(t, T_CHAIN - .4, .5);
-        intersection(ctx, W / 2, cy, R, d, { hot: Math.exp(-Math.max(0, t - T_CIRC) * 2.2) * (t > T_CIRC), labels: [TX.circleA, TX.circleB], labelA: P(t, T_CIRC + .3, .4) * (1 - up), alpha: ca });
-        const la = P(t, T_CIRC + .5, .4) * (1 - up) * ca;
-        if (la > 0) paintTitle(ctx, 'PERFORMANCE ANALYTICS', W / 2, cy + R + 90, { size: 64, p: la, seed: 12 });
-      }
-      engagement(ctx, t, 560);
-      chain(ctx, t);
-      scanlines(ctx, .03);
+      const cam = camKey(t, CAM);
+      layer(ctx, cam, 0, () => sky(ctx, t));
+      layer(ctx, cam, .25, () => mountains(ctx));
+      // perguntas flutuando no céu, em 3D (giram com a câmera)
+      SPACE.floaters(ctx, t, { glyph: '?', alpha: .32 * (1 - P(t, T_REV + 2, 3)) + .12, n: 12, rot: SPACE.camRot(cam, .0006), cy: 300, scale: 820, col: '#F79E1B', size: .9 });
+      layer(ctx, cam, .55, () => fog(ctx, t));
+      layer(ctx, cam, .8, () => cityOfQuestions(ctx, t));
+      layer(ctx, cam, 1, () => {
+        cliffs(ctx, t); fog(ctx, t * 1.3 + 7);
+        dataTowers(ctx, t);
+        // rótulos das margens
+        const ma = P(t, T_REV + .8, .5);
+        if (ma > 0) [['NEGÓCIO', 760, C.red], ['DADOS', 2460, C.yellow]].forEach(([l, x, c]) => pin(ctx, x, GY + 120, cc => { cc.globalAlpha *= ma; cc.rotate(-.02);
+          const w = measure(cc, l, 44, 900, false, 6) + 60; rr(cc, -w / 2, -36, w, 72, 10); cc.fillStyle = c; cc.fill(); cc.strokeStyle = INK; cc.lineWidth = 4; cc.stroke();
+          text(cc, l, 0, 2, { size: 44, weight: 900, color: c === C.yellow ? INK : '#FFF', align: 'center', ls: 6 }); }));
+        questionPosts(ctx, t);
+        bridge(ctx, t);
+        crossing(ctx, t);
+        resultLine(ctx, t);
+      });
+      layer(ctx, cam, 1.35, () => { const r = rng(12); ctx.beginPath(); ctx.moveTo(-900, H + 300); for (let x = -900; x <= 4800; x += 70) ctx.lineTo(x, H + 30 - r() * 70 - (Math.sin(x * .004) + 1) * 30); ctx.lineTo(4800, H + 300); ctx.closePath(); ctx.fillStyle = '#100906'; ctx.fill();
+        for (let k = 0; k < 60; k++) { const x = -900 + k * 95, h = 30 + r() * 50; line(ctx, x, H + 10, x + (r() - .5) * 26 + Math.sin(t * 1.3 + k) * 6, H - h, '#1E140C', 5); } });
+      SAY.draw(ctx, t, SCRIPT, 'dark');
     }
-  };
-  POSTERS[1] = (ctx, w, h, tl) => {
-    intersection(ctx, 0, -h / 2 + 90, 54, 70, { hot: .3 + .3 * Math.sin(tl * 2) });
-    text(ctx, 'Da pergunta de negócio\nao valor medido.', 0, -h / 2 + 210, { size: 38, weight: 900, color: INK, align: 'center', lh: 1.15 });
-    TX.chain.forEach((w, i) => { const y = -h / 2 + 310 + i * 64, on = Math.floor(tl * 1.2) % 4 === i;
-      pill(ctx, 0, y, w, { size: 28, fill: on ? C.orange : '#FFF8EE', color: on ? '#FFF' : INK, weight: 900, scale: on ? 1.1 : 1 });
-      if (i < 3) arrowHead(ctx, 0, y + 38, Math.PI / 2, 14, INK); });
   };
 })();
 
-/* ---------- 02 · Nossa evolução e o impacto no negócio ---------- */
+/* ---------- 02 · Evolução e impacto (v7.13): RECEITA da track → PROJETOS (receita por tipo e parceria com outras tracks) → CAPACIDADE do time ----------
+   Dados (seção 2 do JSON): revenue_performance_analytics_usd_millions · business_scale_AAAA · revenue_contribution_by_project_type_AAAA ·
+   revenue_contribution_summary_AAAA · project_mix_AAAA · team_structure_AAAA (AAAA = o ano mais recente que aparecer nessas chaves) */
 (() => {
-  const id = 's02', G = grid(id), B = G.bars, bt = k => B[Math.min(k, B.length - 1)];
-  const sec = () => SEC(2), REV = () => Object.entries(sec().revenue_performance_analytics_usd_millions || {});
-  const T_BAR = [bt(1), bt(3), bt(5), bt(7)], T_HEAD = bt(8), T_BR = bt(10), T_BR2 = bt(11), T_Q = bt(12), T_CONC = bt(13) + .2, T_BRIDGE = bt(15) - .4;
-  T_BAR.forEach((t0, i) => { cue(id, t0, 'pop', { p: .8 + i * .15, v: .2 }); cue(id, t0, 'riser', { dur: .4, v: .12 }); });
-  cue(id, T_HEAD, 'impact', { size: .8 }); cue(id, T_BR, 'hit', { size: .8 }); cue(id, T_BR2, 'hit', { size: .8 });
-  cue(id, T_CONC, 'chime', { f: 784, up: 7 }); cue(id, T_BRIDGE, 'whoosh', { dur: .8, v: .3 });
-  // números de tela tirados do JSON (as legendas acompanham o que estiver lá)
-  const rows0 = REV(), MULT = rows0.length > 2 ? rows0[2][1] / rows0[0][1] : null, BR = sec().brazil_2023_milestone || {};
-  const VS_PREV = BR.actuals_2022_usd_millions ? BR.actuals_2023_usd_millions / BR.actuals_2022_usd_millions : null, VS_BUD = BR.budget_2023_usd_millions ? BR.actuals_2023_usd_millions / BR.budget_2023_usd_millions : null;
-  const QS = Object.values(BR.quarterly_usd_millions || {}), QUP = QS.filter(q => q.actuals_2023 > q.budget_2023).length;
-  const yr = k => /forecast/i.test(k) ? k.replace(/_forecast/i, '') + ' (previsão)' : k;
-
-  function revenueChart(ctx, t, x, y, w, h, o = {}) {
-    const rows = REV(); if (!rows.length) return;
-    const max = Math.max(...rows.map(r => r[1])) * 1.15, bw = w / rows.length * .56, gap = w / rows.length;
-    const growth = Object.values(sec().revenue_growth || {});
-    rows.forEach(([k, v], i) => {
-      const p = o.static ? 1 : E.outBack(P(t, T_BAR[i] || T_BAR[3], .5)); if (p <= 0) return;
-      const fc = /forecast/i.test(k), bh = h * (v / max) * p, bx = x + i * gap + (gap - bw) / 2, by = y + h - bh;
-      if (fc) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, bx, by, bw, bh, 6); ctx.strokeStyle = C.yellow; ctx.lineWidth = 4; ctx.stroke(); ctx.restore();
-        hatch(ctx, () => rr(ctx, bx, by, bw, bh, 6), bx, by, bw, bh, { color: C.yellow, alpha: .35, gap: 14 }); }
-      else { brush(ctx, bx, by, bw, bh, i === rows.length - 2 ? C.orange : mix(C.red, C.orange, i / 3), 80 + i, 1); inkRect(ctx, bx, by, bw, bh, 4, 4, i); }
-      text(ctx, FMT.usdMM(v), bx + bw / 2, by - (o.small ? 20 : 30), { size: o.small ? 15 : 34, weight: 900, color: o.small ? INK : '#FFF', align: 'center' });
-      text(ctx, o.small ? k.replace(/_forecast/i, '*') : yr(k), bx + bw / 2, y + h + (o.small ? 24 : 34), { size: o.small ? 16 : 26, weight: 800, mono: true, color: fc ? (o.small ? '#B07A00' : C.yellow) : (o.small ? '#4A4038' : '#E9DDCC'), align: 'center' });
-      if (i && growth[i - 1] && !fc && !o.small) { const gp = P(t, T_BAR[i] + .3, .4); if (gp > 0) pill(ctx, bx - gap / 2 + bw / 2, by - 90, FMT.rel(growth[i - 1]) + ' no ano', { size: 22, fill: C.yellow, weight: 900, alpha: gp, scale: E.outBack(gp), rot: -.04 }); }
-    });
-    line(ctx, x - 20, y + h, x + w + 20, y + h, o.small ? INK : '#FFF', 4);
-  }
-  function chartTitle(ctx, t) {
-    const p = P(t, .3, .6); if (p <= 0) return;
-    ctx.save(); ctx.globalAlpha *= p; ctx.translate(W / 2, 175 + (1 - E.outBack(p)) * -30);
-    paintTitle(ctx, 'Evolução do faturamento da track', 0, 0, { size: 62, bg: C.red, seed: 31, p, splat: false });
-    text(ctx, 'Performance Analytics · receita anual em US$', 0, 70, { size: 28, weight: 800, mono: true, color: '#F3E6D6', align: 'center', ls: 2 });
-    ctx.restore();
-  }
-  function brazil(ctx, t, x, y) {
-    const a = P(t, T_BR - .2, .4); if (a <= 0 || !VS_PREV) return;
+  const id = 's02', sec = () => SEC(2);
+  const ROWS = Object.entries(sec().revenue_performance_analytics_usd_millions || {}), VALS = ROWS.map(r => +r[1] || 0), MAXV = Math.max(...VALS, 1e-9);
+  const isF = k => /forecast|previs/i.test(k), yr = k => k.replace(/_?forecast/i, '');
+  const MULT = VALS.length > 2 && VALS[0] ? VALS[2] / VALS[0] : null;
+  const UNIT = (() => { const m = MAXV * 1e6; return m >= 1e6 ? ['US$ mi', 1e6] : m >= 1e3 ? ['US$ mil', 1e3] : ['US$', 1]; })(), toU = v => v * 1e6 / UNIT[1];
+  const niceStep = mx => { const raw = mx / 4, p = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; };
+  const STEP = niceStep(toU(MAXV)), TOP = Math.ceil(toU(MAXV) * 1.08 / STEP) * STEP;
+  // ---- projetos e capacidade: as chaves terminam no ano (ex.: business_scale_2026); vale o ano mais recente que existir ----
+  const YR = String(Object.keys(sec()).map(k => (k.match(/^(?:business_scale|team_structure|revenue_contribution_by_project_type)_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
+  const B26 = sec()['business_scale_' + YR] || {}, MIX = sec()['project_mix_' + YR] || {}, SUMR = sec()['revenue_contribution_summary_' + YR] || {}, TEAM = sec()['team_structure_' + YR] || {};
+  const pct = v => { const x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(x) ? x : null; };
+  const TYPES = (sec()['revenue_contribution_by_project_type_' + YR] || []).map(r => ({ name: String(r.project_type || '—'), share: pct(r.revenue_share) || 0, model: String(r.delivery_model || '') }))
+    .sort((a, b) => b.share - a.share).slice(0, 9);
+  /** modelo de entrega: x = com outras tracks ("Track + Outra") · n = não especificado · p = só a track */
+  const kindOf = m => /\+/.test(m) ? 'x' : (!m || /not specified|n[ãa]o especificado/i.test(m)) ? 'n' : 'p', KCOL = { p: C.orange, x: C.yellow, n: '#8A8378' };
+  const NPROJ = +B26.projects_delivered || 0, DISP = String(B26.projects_delivered_display || '').trim();
+  const PROJ_TXT = /^[+~]?\d[\d.,]*$/.test(DISP) ? DISP : (NPROJ ? FMT.num(NPROJ, 0) : '—');   // "display" curto (ex.: "+30") tem prioridade
+  const XT_PROJ = pct(MIX.projects_with_other_tracks_approx != null ? MIX.projects_with_other_tracks_approx : B26.projects_with_other_tracks_approx);
+  const XT_REV = pct(SUMR.cross_track_revenue_share != null ? SUMR.cross_track_revenue_share : B26.projects_with_other_tracks_revenue_share);
+  const PA_REV = pct(SUMR.pa_only_revenue_share), NA_REV = pct(SUMR.unspecified_delivery_model_revenue_share);
+  const PARTNERS = Object.entries(SUMR.cross_track_revenue_breakdown || {}).map(([k, v]) => ['+ ' + String(k).replace(/^.*?\+\s*/, ''), pct(v)]).filter(q => q[1] != null);
+  // v7.14: a capacidade mostra só as posições internas (sem contractors)
+  const LV = (TEAM.levels || []).map(l => ({ lv: String(l.level || ''), tot: +l.current_internal_positions || 0 }));
+  const T_TOT = +TEAM.current_internal_positions || LV.reduce((a, l) => a + l.tot, 0), MXL = Math.max(1, ...LV.map(l => l.tot));
+  // a frente em destaque: a do campo highlight_project_type (em business_scale_AAAA) ou a de maior receita; o valor = participação × receita do ano
+  const HL_NAME = String(B26.highlight_project_type || '').trim(), HLT = TYPES.find(q => q.name === HL_NAME) || TYPES[0] || null;
+  const REV_Y = +B26.revenue_usd_millions_approx || +((ROWS.find(([k]) => k.startsWith(YR)) || [])[1]) || 0, HLT_USD = HLT && REV_Y ? REV_Y * HLT.share / 100 : 0;
+  const TOP3 = LV.slice().sort((a, b) => b.tot - a.tot).slice(0, 3).map(l => l.lv).sort(), list = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1] : a.join('');
+  const OX = 2200;   // a câmera passa para x = 3160 no mundo: o que vem depois da receita é desenhado com x de tela + OX
+  const T_BAR = ROWS.map((_, i) => beatsFrom(id, 1.0, 2 * i)), T_TREND = 5.6, T_READ = 12.2, T_BR = 20.4, T_CMP = [21.9, 23.3], T_Q = 30.6, T_CONC = 38.4;
+  const T_TY = TYPES.map((_, i) => T_CMP[0] + .2 + i * .14), T_LV = LV.map((_, i) => beatsFrom(id, T_Q + .8, i));
+  const CX = [430, 680, 930, 1180], BASE = 820, HH = 500, X0 = 250, BW = 160;
+  const CAM = [[0, 960, 560, 1.05], [3.6, 960, 540, 1], [T_BR - .2, 960, 540, 1], [T_BR + 1.3, 3160, 540, 1], [43.7, 3160, 540, 1]];
+  const hY = v => BASE - toU(v) / TOP * HH;
+  T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_READ, 'chime', { f: 784, up: 7 });
+  cue(id, T_BR, 'whoosh', { dur: 1, v: .3 }); T_CMP.forEach(t0 => cue(id, t0, 'impact', { size: .5 })); cue(id, T_Q, 'whoosh', { dur: .7, v: .25 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
+  T_LV.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .08, v: .16 }));
+  const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, a receita passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'A receita cresceu ano a ano.';
+  const xtTxt = XT_PROJ != null ? `Cerca de *${FMT.num(XT_PROJ, 0)}%* dos projetos são feitos *com outras tracks*` + (XT_REV != null ? ` (*${FMT.num(XT_REV, 0)}%* da receita).` : '.') : 'Parte dos projetos é feita *com outras tracks*.';
+  const teamTxt = TOP3.length ? `A maior parte do time está em *${list(TOP3)}*.` : '';
+  // a frente em destaque, em duas partes: o valor grande (~US$) e a frase ao lado; sem a receita do ano, o valor grande é a participação (%)
+  const HL_V = HLT ? (HLT_USD ? '~' + FMT.usdMM(HLT_USD) : FMT.num(HLT.share, 0) + '%') : '';
+  const HL_R = HLT ? (HLT_USD ? `em receita de *${HLT.name}* em ${YR} (*${FMT.num(HLT.share, 0)}%*\u00A0do\u00A0total)` : `da receita de ${YR} veio de *${HLT.name}*`) : '';
+  const hlTxt = HLT ? HL_V + ' ' + HL_R : '';
+  const SCRIPT = SAY.reg(id, [
+    [3.9, T_BR - .1, 'title', 'Evolução da receita da track'],
+    [4.1, T_BR - .1, 'note', `receita anual, em ${UNIT[0]} · base zero`, { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_READ, T_BR - .1, 'body', growTxt, { x: 1380, y: 300, w: 470 }],
+    [T_BR + .9, T_Q - .1, 'title', `*${PROJ_TXT} projetos* em ${YR}`],
+    [T_BR + 1.0, T_Q - .1, 'note', 'receita por tipo de projeto · parceria com outras tracks', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_BR + 2.0, T_Q - .1, 'body', xtTxt, { x: 1380, y: 300, w: 470 }],
+    [T_CMP[1] + 1.4, T_Q - .1, 'label', hlTxt],
+    [T_Q + .3, 43.8, 'title', 'Capacidade do *time*'],
+    [T_Q + .4, 43.8, 'note', 'pessoas por nível · posições internas', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_Q + 2.4, 43.8, 'body', teamTxt, { x: 1380, y: 300, w: 470 }],
+    [T_CONC, 43.9, 'concl', 'Crescimento com *integração* e um *time* para escalar.']
+  ]);
+  function axis(ctx, a) {
     ctx.save(); ctx.globalAlpha *= a;
-    paintTitle(ctx, 'BRASIL', x, y - 220, { size: 76, bg: C.red, seed: 21, p: P(t, T_BR - .2, .6) });
-    text(ctx, 'faturamento do período de referência', x, y - 150, { size: 24, weight: 800, mono: true, color: '#F3E6D6', align: 'center' });
-    [[VS_PREV, 'o período anterior', T_BR], [VS_BUD, 'o orçamento', T_BR2]].forEach(([v, l, t0], i) => {
-      const p = P(t, t0, .3); if (p <= 0 || !v) return; const s = lerp(1.8, 1, E.outExpo(p));
-      ctx.save(); ctx.translate(x + (i ? 250 : -250), y - 20); ctx.scale(s, s); ctx.rotate(i ? .03 : -.03);
-      splat(ctx, 0, -10, 120, i ? C.yellow : C.orange, 90 + i, 1, .9);
-      retroText(ctx, FMT.mult(v), 0, -12, { size: 110, weight: 900, color: '#FFF', align: 'center', depth: 6, lw: 5 });
-      text(ctx, l, 0, 74, { size: 28, weight: 800, color: '#FFF', align: 'center' }); ctx.restore();
-    });
-    // trimestres: realizado anterior × orçamento × realizado
-    const q = BR.quarterly_usd_millions || {}, qp = P(t, T_Q, 1.2); if (qp > 0) {
-      const keys = Object.keys(q), mx = Math.max(...keys.flatMap(k => Object.values(q[k]))), qw = 140, qx = x - keys.length * qw / 2, qy = y + 300;
-      keys.forEach((k, i) => { const v = q[k], vals = [['actuals_2022', '#8A8378'], ['budget_2023', null], ['actuals_2023', C.orange]];
-        vals.forEach(([kk, col], j) => { const hh = 150 * (v[kk] / mx) * E.outCubic(clamp(qp * 2 - i * .2)), bx = qx + i * qw + j * 34 + 18, by = qy - hh;
-          if (col) { rr(ctx, bx, by, 28, hh, 3); ctx.fillStyle = col; ctx.fill(); } else { ctx.save(); ctx.setLineDash([5, 5]); rr(ctx, bx, by, 28, hh, 3); ctx.strokeStyle = '#FFF'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore(); } });
-        text(ctx, k.replace('_preliminary', '*'), qx + i * qw + 70, qy + 26, { size: 20, weight: 800, mono: true, color: '#E9DDCC', align: 'center' }); });
-      text(ctx, '■ realizado anterior   ▢ orçamento   ■ realizado', x, qy + 62, { size: 18, weight: 700, mono: true, color: '#BFB3A3', align: 'center', alpha: qp });
-    }
+    line(ctx, X0, BASE, CX[CX.length - 1] + 150, BASE, '#F3E6D6', 4); line(ctx, X0, BASE, X0, BASE - HH - 30, '#F3E6D6', 4);
+    for (let v = 0; v <= TOP + 1e-9; v += STEP) { const y = BASE - v / TOP * HH; line(ctx, X0, y, CX[CX.length - 1] + 150, y, 'rgba(243,230,214,.14)', 2, [8, 10]); line(ctx, X0 - 12, y, X0, y, '#F3E6D6', 3);
+      late(ctx, c => text(c, FMT.num(v, 1), X0 - 20, y, { size: 26, weight: 800, color: '#F3E6D6', align: 'right' })); }
+    late(ctx, c => text(c, UNIT[0], X0, BASE - HH - 60, { size: 26, weight: 900, mono: true, color: C.yellow, align: 'center' }));
+    const src = 'Fonte: ' + (sec().source || 'dados internos da track');
+    late(ctx, c => text(c, src, X0, BASE + 110, { size: 22, weight: 700, mono: true, color: '#BFB3A3' }));
     ctx.restore();
   }
-
-  SCENES[id] = {
-    themeAt: () => 'dark',
-    peaks: [[T_HEAD - .1, T_HEAD + 1.2], [T_BR - .1, T_BR2 + 1.4]],
-    caps: [[.8, T_HEAD - .2, 'Cada barra é o *faturamento anual* da track Performance Analytics, em US$', 'O GRÁFICO'],
-      [T_HEAD + .2, T_BR - .8, MULT ? `De ${rows0[0][0]} a ${rows0[2][0]} o faturamento *cresceu ${FMT.mult(MULT)}* · ${yr(rows0[rows0.length - 1][0])}` : 'O faturamento da track cresceu ano a ano', 'CRESCIMENTO'],
-      [T_BR + .1, T_Q - .1, VS_PREV ? `Brasil: *${FMT.mult(VS_PREV)}* o período anterior e *${FMT.mult(VS_BUD)}* o orçamento` : 'Brasil: acima do período anterior e do orçamento', 'MARCO DO BRASIL'],
-      [T_Q + .1, T_CONC - .2, QS.length ? (QUP === QS.length ? 'Em *todos os trimestres* o realizado superou o orçamento' : `Em *${QUP} de ${QS.length} trimestres* o realizado superou o orçamento`) : 'Trimestre a trimestre', 'TRIMESTRES']],
-    draw(ctx, t) {
-      bgDark(ctx, t, { centerA: .85, center: '#2B1A10' });
-      const toBR = E.inOutCubic(P(t, T_BR - .7, .8)), conc = P(t, T_CONC, .6), bridge = P(t, T_BRIDGE, .7);
-      neonGrid(ctx, t, { horizon: 860, alpha: .5, speed: .5 + .5 * BT.level });
-      collage(ctx, t, { seed: 47, n: 6, theme: 'dark', alpha: .55 });
-      // receita: visual dominante com título; depois encolhe para a esquerda e o Brasil entra
-      ctx.save(); ctx.translate(lerp(0, -560, toBR), lerp(0, 60, toBR)); ctx.translate(W / 2, H / 2); ctx.scale(lerp(1, .62, toBR), lerp(1, .62, toBR)); ctx.translate(-W / 2, -H / 2);
-      chartTitle(ctx, t);
-      revenueChart(ctx, t, 420, 330, 1080, 520);
-      const hp = P(t, T_HEAD, .4);
-      if (hp > 0 && MULT) { ctx.save(); ctx.globalAlpha *= 1 - toBR; ctx.translate(250, 470); ctx.rotate(-.05); const s = lerp(2, 1, E.outExpo(hp)); ctx.scale(s, s);
-        splat(ctx, 0, -6, 105, C.yellow, 33, 1, .95); retroText(ctx, FMT.mult(MULT), 0, -10, { size: 100, weight: 900, color: '#FFF', align: 'center', depth: 6, lw: 5 });
-        text(ctx, 'em 2 anos', 0, 66, { size: 28, weight: 800, color: '#FFF', align: 'center' }); text(ctx, `${rows0[0][0]} → ${rows0[2][0]}`, 0, 100, { size: 22, weight: 800, mono: true, color: '#FFE9D6', align: 'center' }); ctx.restore(); }
+  function bars(ctx, t) {
+    const read = P(t, T_READ, .6);
+    ROWS.forEach(([k, v], i) => {
+      const p = E.outBack(P(t, T_BAR[i], .7)), x = CX[i] - BW / 2, y = hY(+v), hgt = (BASE - y) * Math.min(1, p), f = isF(k);
+      const hi = i === 0 || i === 2, dim = read * (hi ? 0 : .55);
+      if (p <= 0) return;
+      ctx.save(); ctx.globalAlpha *= 1 - dim;
+      if (f) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, BASE - hgt, BW, hgt, 6); ctx.strokeStyle = C.yellow; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); hatch(ctx, () => rr(ctx, x, BASE - hgt, BW, hgt, 6), x, BASE - hgt, BW, hgt, { color: C.yellow, alpha: .35, gap: 14 }); }
+      else fbar(ctx, x, BASE - hgt, BW, hgt, mix(C.red, C.orange, i / 2));
       ctx.restore();
-      brazil(ctx, t, 1290, 440);
-      // conclusão da estação
-      if (conc > 0) { ctx.save(); ctx.fillStyle = rgba('#120E0B', .72 * conc); ctx.fillRect(0, 0, W, H); ctx.globalAlpha *= conc; ctx.translate(W / 2, H / 2); ctx.rotate(-.015);
-        const s = lerp(1.3, 1, E.outExpo(conc)); ctx.scale(s, s); brush(ctx, -820, -150, 1640, 300, '#2A1E15', 77, E.outCubic(clamp(conc * 1.5)));
-        rich(ctx, 'Crescimento *consistente*,', 0, -50, { size: 84, weight: 900, color: '#FFF', accent: C.orange, retro: true, depth: 5, lw: 4 });
-        rich(ctx, 'acima do *planejado*.', 0, 60, { size: 84, weight: 900, color: '#FFF', accent: C.yellow, retro: true, depth: 5, lw: 4 }); ctx.restore(); }
-      // conexão com a estação 03
-      bridgeCard(ctx, bridge, 'PRÓXIMA ESTAÇÃO · 03', 'E o que levamos para o *mercado*?', { t, sub: 'projetos, capabilities e modelos para nossos clientes' });
-      scanlines(ctx, .05);
-    }
-  };
-  POSTERS[2] = (ctx, w, h, tl) => {
-    text(ctx, 'Faturamento anual da track (US$)', 0, -h / 2 + 50, { size: 22, weight: 900, color: INK, align: 'center' });
-    revenueChart(ctx, 99, -w / 2 + 40, -h / 2 + 110, w - 80, 200, { static: true, small: true });
-    if (VS_PREV) { text(ctx, 'BRASIL', 0, 130, { size: 30, weight: 900, color: C.red, align: 'center', ls: 6 });
-      [[VS_PREV, 'vs. anterior'], [VS_BUD, 'vs. orçamento']].forEach(([v, l], i) => {
-        const x = i ? 110 : -110, s = 1 + .05 * Math.sin(tl * 2.4 + i * 1.5);
-        ctx.save(); ctx.translate(x, 200); ctx.scale(s, s); retroText(ctx, FMT.mult(v), 0, 0, { size: 62, weight: 900, color: C.orange, align: 'center', depth: 3, lw: 3 }); ctx.restore();
-        text(ctx, l, x, 252, { size: 20, weight: 700, color: '#4A4038', align: 'center' }); }); }
-  };
-})();
-
-/* ---------- 03 · O que levamos ao mercado ---------- */
-(() => {
-  const id = 's03', G = grid(id), B = G.bars, beats = G.beats, bt = k => B[Math.min(k, B.length - 1)], BEAT_S = beats[1] - beats[0];
-  const T_CAP = bt(1), T_HEAD = 4.3, T_TIX = bt(6), T_TRK = bt(9), T_WAVE = bt(10), T_INF = bt(17), T_FLAP = bt(17) + 1.6;
-  const COLS = ['Emissores', 'Adquirentes', 'Varejo'], COL_X = [400, 960, 1520];
-  const CASE_OF = ex => /Manga/i.test(ex) ? 'Cliente Manga' : /Banana/i.test(ex) ? 'Cliente Banana' : /Insight/i.test(ex) ? 'Insight Agent' : /Lights/i.test(ex) ? 'Lights-off' : ex;
-  const TICK = [['Cliente Banana', 'BANANA', C.yellow], ['Cliente Manga', 'MANGA', C.orange], ['Lights-off', 'RELATÓRIO DE FRAUDE', '#F3EBDD'], ['Insight Agent', 'INSIGHT AGENT', C.red]];
-  const colOf = cname => { const c = CASE(cname === 'Lights-off' ? 'Lights-off' : cname); const ct = (c.client_type || '').toLowerCase();
-    if (ct) { const j = COLS.findIndex(x => x.toLowerCase().startsWith(ct.slice(0, 4))); if (j >= 0) return j; if (/merch|varej/.test(ct)) return 2; }
-    return { 'Cliente Manga': 0, 'Insight Agent': 1, 'Cliente Banana': 2 }[cname] ?? -1; };
-  const ML = TX.ml, ML_ALL = [...ML.pred.map((r, i) => [r, 0, i]), ...ML.presc.map((r, i) => [r, 1, i])].sort((a, b) => a[2] - b[2] || a[1] - b[1]);
-  cue(id, 0, 'impact', { size: .7 });
-  for (let k = 0; k < 7; k++) cue(id, T_CAP + k * BEAT_S, 'pop', { p: .9 + k * .06, v: .16 });
-  cue(id, T_TIX, 'chime', { f: 1046, up: 5 }); cue(id, T_WAVE, 'riser', { dur: 3, v: .18 }); ML_ALL.forEach((_, k) => { if (k % 2 === 0) cue(id, T_WAVE + .3 + k * BEAT_S / 2, 'tick', {}); });
-  cue(id, T_INF, 'chime', { f: 784, up: 12 }); cue(id, T_FLAP, 'type', { n: 24, gap: .025 }); cue(id, T_FLAP + 4.2, 'type', { n: 24, gap: .025 });
-
-  function capLayout() {
-    const caps = (SEC(3).capabilities_demonstrated_in_cases || []), per = [[], [], []], band = [];
-    caps.forEach(c => { const cn = CASE_OF(c.example || ''), col = colOf(cn); (col >= 0 ? per[col] : band).push({ ...c, cn }); });
-    return { per, band };
+      const la = clamp(p) * (1 - dim * .6);
+      late(ctx, c => { c.globalAlpha *= la; text(c, FMT.usdMM(+v), CX[i] + 10, BASE - hgt - 34, { size: 30, weight: 900, color: '#FFF', align: 'center' });
+        text(c, yr(k), CX[i] + 10, BASE + 36, { size: 30, weight: 900, color: f ? C.yellow : '#FFF', align: 'center' });
+        if (f) text(c, '(previsão)', CX[i] + 10, BASE + 70, { size: 24, weight: 800, color: C.yellow, align: 'center' }); });
+    });
+    // a régua: 2023 → 2025
+    if (read > 0 && MULT) { const xa = CX[0] + BW / 2 + 40, y0 = hY(VALS[0]), y2 = hY(VALS[2]), xr = CX[2] + BW / 2 + 70, g = E.outCubic(read);
+      ctx.save(); ctx.globalAlpha *= g;
+      line(ctx, CX[0] - BW / 2, y0, xr + 30, y0, rgba(C.yellow, .8), 3, [10, 8]);
+      line(ctx, xr, y0, xr, lerp(y0, y2, g), C.yellow, 8); for (let k = 0; k <= 6; k++) line(ctx, xr - 14, lerp(y0, y2, k / 6), xr, lerp(y0, y2, k / 6), C.yellow, 4);
+      arrowHead(ctx, xr, lerp(y0, y2, g) - 6, -Math.PI / 2, 22, C.yellow); ctx.restore();
+      late(ctx, c => { c.globalAlpha *= g; retroText(c, '×' + FMT.num(MULT, 1), xr + 34, (y0 + y2) / 2, { size: 64, weight: 900, color: C.yellow, depth: 4, lw: 3 }); }); }
   }
-  const capName = c => TX.capPT[c.capability] || c.capability, meth = c => (c.methods || []).map(m => TX.methodPT[m] || m).join(' · ');
-  function signBoard(ctx, x, y, label, a) {
-    if (a <= 0) return; const w = 400;
-    ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y + (1 - E.outBack(a)) * -80);
-    paper(ctx, -w / 2, -40, w, 80, { r: 14, fill: '#F3EBDD', shadow: 8, shadowColor: '#000', lw: 4 });
-    intersection(ctx, -w / 2 + 50, 0, 18, 22); text(ctx, label.toUpperCase(), 24, 2, { size: 34, weight: 900, color: INK, align: 'center', ls: 4 });
+  /** PROJETOS: o número de projetos, a receita por tipo de projeto (cor = modelo de entrega) e a parceria com outras tracks
+   *  (em projetos, ~%, e em receita, %, mostrados separados: as bases de medida são diferentes) */
+  function projects(ctx, t) {
+    const a = P(t, T_BR + .6, .6) * (1 - P(t, T_Q - .3, .5)); if (a <= 0) return;
+    ctx.save(); ctx.globalAlpha *= a;
+    const hp = P(t, T_CMP[1] + 1.4, .5);   // a frente em destaque acende
+    // ESQUERDA · a receita por tipo de projeto (cor = modelo de entrega)
+    if (TYPES.length) { const X1 = OX + 96, BX = OX + 360, MW = 420, mx = Math.max(...TYPES.map(q => q.share), 1), DY = Math.min(62, 560 / TYPES.length);
+      late(ctx, c => { text(c, `receita ${YR} por tipo de projeto`, X1, 300, { size: 24, weight: 900, mono: true, color: C.yellow });
+        [['p', 'só a track'], ['x', 'com outras tracks']].forEach(([k, l], i) => { const lx = X1 + i * 230; rr(c, lx, 330, 26, 18, 4); c.fillStyle = KCOL[k]; c.fill(); text(c, l, lx + 36, 340, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
+      TYPES.forEach((q, i) => { const p = E.outCubic(P(t, T_TY[i], .5)), y = 400 + i * DY, w = Math.max(4, q.share / mx * MW) * p, hot = q === HLT && hp > 0; if (p <= 0) return;
+        if (hot) { rr(ctx, BX - 6, y - 22, w + 12, 44, 9); ctx.strokeStyle = rgba('#FFFFFF', hp); ctx.lineWidth = 3; ctx.stroke(); }
+        fbar(ctx, BX, y - 16, w, 32, KCOL[kindOf(q.model)], { r: 6 });
+        late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, q.name, BX - 16, y, { size: fitSize(c, q.name, 24, 250), weight: 800, color: hot ? '#FFF' : '#F3E6D6', align: 'right' });
+          text(c, FMT.num(q.share, 0) + '%', BX + w + 12, y + 1, { size: 24, weight: 900, color: kindOf(q.model) === 'x' ? C.yellow : '#FFF' }); }); }); }
+    // DIREITA · o número de projetos (conta até o valor e pousa no acento da música)
+    const np = P(t, T_BR + 1.0, T_CMP[0] - T_BR - 1.0, E.outCubic), shown = np >= 1 ? PROJ_TXT : (PROJ_TXT[0] === '+' ? '+' : '') + FMT.num(Math.round(NPROJ * np), 0);
+    late(ctx, c => { text(c, shown, OX + 1150, 360, { size: 130, weight: 900, color: C.orange, align: 'center' });
+      text(c, `projetos entregues em ${YR}`, OX + 1150, 440, { size: 28, weight: 800, color: '#F3E6D6', align: 'center' }); });
+    // DIREITA · a parceria em projetos (rosca, base: projetos)
+    if (XT_PROJ != null) { const dp = E.inOutCubic(P(t, T_CMP[1], .9)), cx = OX + 1080, cy = 640, r = 88;
+      ctx.lineCap = 'butt'; ctx.lineWidth = 30; ctx.strokeStyle = 'rgba(243,230,214,.16)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+      ctx.strokeStyle = C.yellow; ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + TAU * XT_PROJ / 100 * dp); ctx.stroke();
+      late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1], .4); text(c, '~' + FMT.num(XT_PROJ * dp, 0) + '%', cx, cy + 2, { size: 42, weight: 900, color: '#FFF', align: 'center' });
+        para(c, 'dos projetos com outras tracks', cx, cy + 116, 230, { size: 21, weight: 800, color: C.yellow, align: 'center', lh: 1.1 }); }); }
+    // DIREITA · a receita por modelo de entrega (barra empilhada, base: receita)
+    const segs = [[PA_REV, 'p', 'só a track'], [XT_REV, 'x', 'com outras tracks'], [NA_REV, 'n', 'n/e']].filter(q => q[0] != null && q[0] > 0), tot = segs.reduce((a2, q) => a2 + q[0], 0);
+    if (segs.length) { const sp = E.inOutCubic(P(t, T_CMP[1] + .6, .9)), X = OX + 1250, Y = 596, Wb = 600; let x = X;
+      late(ctx, c => { c.globalAlpha *= clamp(sp * 3); text(c, `receita ${YR} por modelo de entrega`, X, Y - 36, { size: 21, weight: 900, mono: true, color: '#E9DCC8' }); });
+      segs.forEach(([v, k, l]) => { const w = Wb * v / tot * sp, x0 = x; if (w > 0) { fbar(ctx, x0, Y, w - 3, 44, KCOL[k], { r: 4 });
+          if (v >= 8) late(ctx, c => { c.globalAlpha *= clamp(sp * 2); text(c, FMT.num(v, 0) + '%', x0 + w / 2, Y + 23, { size: 22, weight: 900, color: k === 'x' ? INK : '#FFF', align: 'center' }); text(c, l, x0 + w / 2, Y + 70, { size: 19, weight: 800, color: '#E9DCC8', align: 'center' }); }); }
+        x += Wb * v / tot; });
+      if (PARTNERS.length) late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1] + 1.2, .5); const s2 = PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '); text(c, s2, X, Y + 118, { size: fitSize(c, s2, 22, Wb), weight: 800, color: C.yellow }); }); }
+    // DIREITA · a frente em destaque: quanto ela trouxe de receita
+    if (HLT && hp > 0) late(ctx, c => { c.globalAlpha *= hp; const X = OX + 980, Y = 826, Wc = 870, Hc = 120; panel(c, X, Y, Wc, Hc, { dark: true, accent: C.orange });
+      const vs = fitSize(c, HL_V, 60, 330, 900), vw = measure(c, HL_V, vs, 900), rx = X + 44 + vw + 28, rw = X + Wc - 34 - rx, L = wrapRich(c, HL_R, rw, 27, 800);
+      text(c, HL_V, X + 44, Y + Hc / 2 + 2, { size: vs, weight: 900, color: C.orange });
+      para(c, HL_R, rx, Y + Hc / 2 - L.lines.length * 27 * 1.2 / 2, rw, { size: 27, weight: 800, color: '#F3E6D6', accent: C.yellow, lh: 1.2 }); });
     ctx.restore();
   }
-  function capCard(ctx, c, x, y, a, i, wide, hot) {
-    if (a <= 0) return; const w = wide ? 1500 : 520, h = wide ? 92 : 150, tk = TICK.find(k => k[0] === c.cn) || TICK[0];
-    ctx.save(); ctx.translate(x, y); ctx.rotate(wide ? .004 : [-.02, .015, -.01, .02][i % 4]); const s = E.outBack(a); ctx.scale(s, s);
-    paper(ctx, -w / 2, -h / 2, w, h, { torn: true, seed: 140 + i, fill: wide ? '#2A221C' : '#F6EEDF', shadow: 9, shadowColor: '#000', lw: 3 });
-    const col = wide ? '#FFF' : INK, nm = capName(c), name = wide ? nm : (measure(ctx, nm, 26, 900) > w - 40 ? twoLines(nm) : nm), two = name.includes('\n');
-    text(ctx, name, wide ? -w / 2 + 40 : 0, wide ? -10 : (two ? -32 : -22), { size: wide ? 30 : 26, weight: 900, color: col, align: wide ? 'left' : 'center', lh: 1.08 });
-    const mt = meth(c); if (mt) { const ms = Math.min(17, (w - 40) / mt.length * 1.75); text(ctx, mt, wide ? -w / 2 + 40 : 0, wide ? 24 : 22, { size: wide ? 18 : ms, weight: 600, mono: true, color: wide ? '#D8C9B6' : '#5A4F45', align: wide ? 'left' : 'center' }); }
-    const hs = 1 + (hot ? .18 * Math.max(0, Math.sin(NOW * 5)) : 0); if (hot) glow(ctx, wide ? w / 2 - 150 : 0, wide ? 0 : 52, 80, tk[2], .5);
-    pill(ctx, wide ? w / 2 - 150 : 0, wide ? 0 : 52, 'case · ' + tk[1], { size: 17, fill: tk[2], color: tk[2] === C.red ? '#FFF' : INK, weight: 900, scale: hs });
+  /** CAPACIDADE: pessoas por nível (posições internas), o total e onde está a maior parte do time */
+  function team(ctx, t) {
+    const a = P(t, T_Q, .6); if (a <= 0) return;
+    ctx.save(); ctx.globalAlpha *= a;
+    const CXp = OX + 700, Y0 = 330, DY = Math.min(92, 520 / Math.max(1, LV.length)), BH = DY * .64, U = 620 / MXL, LBX = CXp - MXL * U / 2 - 28;
+    LV.forEach((l, i) => { const p = E.outCubic(P(t, T_LV[i], .55)), y = Y0 + i * DY, w = l.tot * U * p, x0 = CXp - w / 2, hot = TOP3.includes(l.lv); if (p <= 0) return;
+      if (w > 0) fbar(ctx, x0, y, w, BH, hot ? C.orange : '#C98A4A', { r: 6 });
+      late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, l.lv, LBX, y + BH / 2, { size: 28, weight: 900, mono: true, color: hot ? C.yellow : '#F3E6D6', align: 'right' });
+        text(c, FMT.num(l.tot, 0), x0 + w + 16, y + BH / 2, { size: 26, weight: 900, color: '#FFF' }); }); });
+    // o total do time
+    const tp = P(t, T_Q + 3.6, .6); if (tp > 0 && T_TOT) hud(ctx, c => { c.translate(1380, 600); c.globalAlpha *= tp; panel(c, 0, 0, 470, 230, { dark: true });
+      text(c, FMT.num(T_TOT, 0), 44, 92, { size: 96, weight: 900, color: C.orange }); text(c, 'pessoas hoje', 44 + measure(c, FMT.num(T_TOT, 0), 96, 900) + 20, 104, { size: 30, weight: 800, color: '#FFF' });
+      text(c, 'em posições internas', 44, 178, { size: 26, weight: 800, color: '#E9DCC8' }); });
     ctx.restore();
   }
-  /** grade de casos de ML: preditivos × prescritivos (bancos e fintechs) */
-  function mlGrid(ctx, t) {
-    const conv = E.inCubic(P(t, T_INF - 1.2, 1.2)); if (t < T_WAVE - .3 || conv >= 1) return;
-    const head = P(t, T_WAVE - .3, .5);
-    ctx.save(); ctx.globalAlpha *= 1 - conv;
-    ctx.save(); ctx.globalAlpha *= head; ctx.translate(W / 2, 150); ctx.rotate(-.01); brush(ctx, -700, -50, 1400, 100, '#2A1E15', 88, E.outCubic(head));
-    rich(ctx, 'Modelos que levamos a *bancos e fintechs*', 0, 2, { size: 56, weight: 900, color: '#FFF', accent: C.orange }); ctx.restore();
-    [[0, 'PREDITIVOS', 'antecipam o que vai acontecer', C.red], [1, 'PRESCRITIVOS', 'recomendam o que fazer', C.orange]].forEach(([k, lab, sub, col]) => {
-      const x0 = k ? 990 : 110, pa = P(t, T_WAVE + k * .2, .5); if (pa <= 0) return;
-      ctx.save(); ctx.globalAlpha *= pa; ctx.translate(lerp(W / 2, x0, E.outCubic(pa)) - x0, 0);
-      paper(ctx, x0, 225, 820, 70, { r: 10, fill: col, shadow: 6, shadowColor: '#000', lw: 3 });
-      text(ctx, lab, x0 + 30, 261, { size: 34, weight: 900, color: '#FFF', ls: 3 }); text(ctx, sub, x0 + 790, 262, { size: 24, weight: 700, color: '#FFF', align: 'right' });
-      ctx.restore(); });
-    ML_ALL.forEach(([r, k, i], n) => {
-      const p = P(t, T_WAVE + .3 + n * BEAT_S / 2, .3); if (p <= 0) return;
-      const x0 = k ? 990 : 110, y = 335 + i * 61, ix = lerp(W / 2, x0 + 410, E.outBack(p)) - (x0 + 410), cx = W / 2 + Math.cos(n) * 60, cy = H / 2 + Math.sin(n) * 40;
-      ctx.save(); ctx.translate(lerp(x0 + 410 + ix, cx, conv), lerp(y, cy, conv)); ctx.scale(1 - conv * .8, 1 - conv * .8); ctx.rotate((hash(n * 3) - .5) * .02);
-      paper(ctx, -410, -26, 820, 52, { r: 8, fill: '#F6EEDF', shadow: 5, shadowColor: '#000', lw: 2.5 });
-      text(ctx, r[0], -385, 1, { size: 25, weight: 800, color: INK });
-      const tw = measure(ctx, r[1], 16, 700, true) + 24; rr(ctx, 395 - tw, -15, tw, 30, 15); ctx.fillStyle = k ? rgba(C.orange, .2) : rgba(C.red, .16); ctx.fill();
-      text(ctx, r[1], 395 - tw / 2, 1, { size: 16, weight: 700, mono: true, color: k ? '#9A4A10' : '#9A1020', align: 'center' });
-      ctx.restore(); });
-    ctx.restore();
-  }
-
   SCENES[id] = {
-    themeAt: () => 'dark',
-    peaks: [[T_WAVE - .1, T_WAVE + 1, .6], [T_INF - .1, T_INF + 1.8]],
-    caps: [[T_HEAD + .1, T_TIX - .2, 'Alguns de nossos *últimos projetos*, por tipo de cliente: emissores, adquirentes e varejo', 'PROJETOS RECENTES'],
-      [T_TIX + .1, T_TRK - .2, 'Cada projeto prova uma *capability* — os 4 em destaque são os cases da estação 04', 'CAPABILITIES'],
-      [T_TRK + .1, T_WAVE - .2, 'Analytics *complementa e potencializa* as demais tracks', 'COM AS OUTRAS TRACKS'],
-      [T_WAVE + .4, T_WAVE + 7.4, '*Preditivos* antecipam o que vai acontecer · *prescritivos* recomendam o que fazer', 'MACHINE LEARNING'],
-      [T_WAVE + 7.6, T_INF - .3, ML.frontier, 'FRONTEIRA'],
-      [T_INF + .2, T_FLAP - .3, 'Com dados, as possibilidades são *infinitas*', 'POSSIBILIDADES'],
-      [T_FLAP + .4, 48.6, 'Primeira parada: conversa sobre as estações *01, 02 e 03*', 'PARADA 1']],
+    themeAt: () => 'dark', script: SCRIPT,
+    peaks: [[T_CMP[0] - .1, T_CMP[0] + .7, .45], [T_CMP[1] - .1, T_CMP[1] + .7, .45], [T_CONC - .1, T_CONC + 1, .4]],
     draw(ctx, t) {
-      const neon = P(t, T_WAVE - .3, 1.2, E.inOutCubic), wave = P(t, T_WAVE - .3, .6), inf = P(t, T_INF, .9, E.outCubic), flap = P(t, T_FLAP - .6, .8, E.inOutCubic);
-      bgDark(ctx, t, { centerA: .85, center: '#2A1A10' });
-      neonGrid(ctx, t, { horizon: 640, sun: 210, alpha: neon * (1 - flap) * .6, speed: .5 + BT.level });
-      collage(ctx, t, { seed: 53, n: 6, theme: 'dark', alpha: .5 * (1 - neon) });
-      // mapa de projetos por tipo de cliente
-      const mapA = 1 - E.inCubic(wave);
-      if (mapA > 0) {
-        ctx.save(); ctx.globalAlpha *= mapA;
-        const hp = P(t, T_HEAD, .6); if (hp > 0) paintTitle(ctx, 'Alguns de nossos últimos projetos', W / 2, 150, { size: 60, bg: C.red, seed: 61, p: hp });
-        const L = capLayout(); let k = 0, hot = t > T_TIX;
-        COLS.forEach((c, i) => { signBoard(ctx, COL_X[i], 270, c, P(t, .2 + i * .25, .5)); line(ctx, COL_X[i], 312, COL_X[i], 840, rgba('#FFFFFF', .12), 4, [8, 10]); });
-        L.per.forEach((list, ci) => list.forEach((c, j) => { const at = T_CAP + (k++) * BEAT_S; capCard(ctx, c, COL_X[ci], 400 + j * 168, P(t, at, .35), k, false, hot); }));
-        L.band.forEach((c, j) => { const at = T_CAP + (k++) * BEAT_S; capCard(ctx, c, W / 2, 893 - j * 100, P(t, at, .35), k, true, hot); });
-        const tr = P(t, T_TRK, .5), others = SEC(3).other_tracks || [];
-        if (tr > 0) { ctx.save(); ctx.globalAlpha *= tr; ctx.fillStyle = rgba('#120E0B', .55); ctx.fillRect(0, 0, W, H); ctx.translate(W / 2, H / 2); ctx.rotate(-.01); const label = others.length ? 'Analytics × ' + others.join(' · ') : 'Analytics complementa e potencializa as demais tracks';
-          const s = lerp(1.3, 1, E.outExpo(tr)); ctx.scale(s, s); const w = measure(ctx, label, 46, 900) + 160; brush(ctx, -w / 2, -48, w, 96, C.red, 300, E.outCubic(tr)); intersection(ctx, -w / 2 + 60, 0, 22, 26); text(ctx, label, 34, 2, { size: 46, weight: 900, color: '#FFF', align: 'center' }); ctx.restore(); }
-        ctx.restore();
-      }
-      mlGrid(ctx, t);
-      // ∞ neon na saída da música → vira a baldeação e o letreiro da parada
-      if (inf > 0) { const sh = E.inOutCubic(P(t, T_FLAP - .8, 1)), cy = lerp(H / 2, 300, sh), sz = lerp(lerp(160, 320, inf), 150, sh);
-        ctx.save(); ctx.globalAlpha *= inf; glow(ctx, W / 2, cy, 520, C.orange, .5 + .2 * BT.level);
-        if (sh < .6) neonText(ctx, '∞', W / 2, cy - 10, { size: sz, weight: 300, align: 'center', blur: 30 }); else intersection(ctx, W / 2, cy, 70, 90, { hot: .5 });
-        ctx.restore(); }
-      if (flap > 0) { ctx.save(); ctx.globalAlpha *= flap; FLAP.board(ctx, W / 2, 640, ['PARADA 1 · BALDEAÇÃO', 'HORA DA CONVERSA      '], [T_FLAP, T_FLAP + 4.2], t, { tw: 52, th: 76, hiFrom: [10, 0], header: TX.stop.label, headerCol: C.orange }); ctx.restore(); }
-      scanlines(ctx, .05 + .05 * neon);
+      const cam = camKey(t, CAM);
+      bgDark(ctx, t, { centerA: .9, center: '#2E1A0E' });
+      layer(ctx, cam, 1, () => {
+        // chão da galeria com reflexo
+        const g = ctx.createLinearGradient(0, 820, 0, H + 80); g.addColorStop(0, 'rgba(60,32,18,.9)'); g.addColorStop(1, 'rgba(12,8,6,.95)'); ctx.fillStyle = g; ctx.fillRect(-400, 822, 4600, 400);
+        axis(ctx, P(t, .3, .6) * (1 - P(t, T_BR + .4, .6))); bars(ctx, t);
+        projects(ctx, t); team(ctx, t);
+        // a linha segue para a próxima estação
+        const run = E.inCubic(P(t, T_CONC + 1.6, 3)); if (run > 0) LINE.draw(ctx, [[2200, 960], [3400, 960], [4300, 960]], run, { w: 16, head: true });
+      });
+      SAY.draw(ctx, t, SCRIPT, 'dark');
     }
-  };
-  POSTERS[3] = (ctx, w, h, tl) => {
-    const L = capLayout();
-    text(ctx, 'Projetos recentes por cliente', 0, -h / 2 + 40, { size: 22, weight: 900, color: INK, align: 'center' });
-    COLS.forEach((c, i) => { const x = -w / 2 + 75 + i * (w - 150) / 2, n = L.per[i].length;
-      text(ctx, c, x, -h / 2 + 90, { size: 22, weight: 900, color: INK, align: 'center' });
-      const s = 1 + .08 * Math.sin(tl * 2 + i); ctx.save(); ctx.translate(x, -h / 2 + 165); ctx.scale(s, s); splat(ctx, 0, 0, 44, [C.red, C.orange, C.yellow][i], 9 + i, 1, .9);
-      retroText(ctx, String(n), 0, 0, { size: 58, weight: 900, color: '#FFF', align: 'center', depth: 3, lw: 3 }); ctx.restore();
-      text(ctx, n === 1 ? 'capability' : 'capabilities', x, -h / 2 + 230, { size: 16, weight: 700, color: '#4A4038', align: 'center' }); });
-    text(ctx, 'Machine learning para bancos e fintechs', 0, -h / 2 + 300, { size: 20, weight: 900, color: INK, align: 'center' });
-    [['PREDITIVOS', ML.pred.length, C.red], ['PRESCRITIVOS', ML.presc.length, C.orange]].forEach(([l, n, col], i) => { const x = i ? 110 : -110;
-      pill(ctx, x, -h / 2 + 350, l, { size: 16, fill: col, color: '#FFF', weight: 900 }); retroText(ctx, String(n), x, -h / 2 + 410, { size: 50, weight: 900, color: col, align: 'center', depth: 3, lw: 3 }); text(ctx, 'casos de uso', x, -h / 2 + 452, { size: 15, weight: 700, color: '#4A4038', align: 'center' }); });
   };
 })();
 
-/* ---------- Parada 1: retomada do trecho 1 ---------- */
-STOPSCN.stop1 = recapScene({ posters: [1, 2, 3], sign: 'PARADA 1 · BALDEAÇÃO', from: CONFIG.sceneById.s03.end,
-  doodles: [['star', 120, 300, 70, C.yellow], ['arrow', 1800, 280, 90, C.orange], ['crown', 1810, 820, 80, C.yellow], ['spiral', 110, 820, 70, C.red]] });
+/* ---------- 03 · O que levamos ao mercado: capabilities explicadas no próprio filme ---------- */
+(() => {
+  const id = 's03';
+  // música: break 0–15,4 · parte B 15,4–52,36 · saída 52,36 → síntese
+  const T_CLI = [0, 1, 2].map(i => beatsFrom(id, 4.4, 2 * i)), T_CAP = 16.0, T_INT = 25.6, T_PRED = 34.4, T_PRESC = 44.2, T_SYN = 52.3;
+  const ctype = SEC(3).client_types || ['Emissores', 'Adquirentes', 'Merchants'], nm = s => /merchant/i.test(s) ? 'Varejo' : s;
+  const TYPES = [[nm(ctype[0] || 'Emissores'), 'bank', 'Principalidade', 'decidir qual produto oferecer', C.red], [nm(ctype[1] || 'Adquirentes'), 'card', 'Market share', 'decidir onde crescer', C.orange],
+    [nm(ctype[2] || 'Varejo'), 'basket', 'Cestas de produtos', 'decidir o que promover', C.yellow]];
+  const CAPS = [['Segmentação', 'identificar públicos', 'nodes'], ['Recomendação', 'priorizar ofertas', 'chart'], ['Automação', 'executar rotinas', 'gear']];
+  // v7.15: os métodos e as técnicas (vieram do antigo clímax, TX.methods): 3 cards preditivos na zona 4 e 2 prescritivos na zona 5,
+  // um a cada 2 tempos da música; os exemplos (fraude, saída, gastos…) seguem nos cartões da síntese
+  const MG = g => (TX.methods || []).filter(m => m.group === g), MPRED = MG('pred'), MPRESC = MG('presc');
+  const T_MP = MPRED.map((_, i) => beatsFrom(id, T_PRED + .8, 2 * i)), T_MS = MPRESC.map((_, i) => beatsFrom(id, T_PRESC + 1.1, 2 * i));   // o 1º card entra a mais de 0,8 s do título (leitura separada)
+  const MCOL = { classification: C.red, clusters: C.yellow, forecast: '#E8822A', lp: C.red, ab: C.orange }, CW = 540, CH = 470, MGAP = 36, MY = 300;
+  const mTxt = m => `${m.method} (ex.: ${m.case}): ${m.tech.join(', ')}` + (m.etc ? ' e outras técnicas' : '');
+  const Z = [960, 3160, 5360, 7560, 9760], GY = 800;
+  const CAM = [[0, Z[0], 560, 1.04], [3.8, Z[0], 540, 1], [T_CAP - 1.2, Z[0], 540, 1], [T_CAP, Z[1], 540, 1], [T_INT - 1.2, Z[1], 540, 1], [T_INT, Z[2], 540, 1],
+    [T_PRED - 1.2, Z[2], 540, 1], [T_PRED, Z[3], 540, 1], [T_PRESC - 1.2, Z[3], 540, 1], [T_PRESC, Z[4], 540, 1], [T_SYN - .6, Z[4], 540, 1], [T_SYN + 1.2, 8660, 600, .55], [64, 8660, 600, .53]];
+  T_CLI.forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + i * .1, v: .2 })); [T_CAP, T_INT, T_PRED, T_PRESC].forEach(t0 => cue(id, t0 - 1.2, 'whoosh', { dur: 1.1, v: .3 }));
+  cue(id, T_INT + 2.2, 'shimmer', { dur: 1.5 }); [...T_MP, ...T_MS].forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + (i % 3) * .1, v: .18 })); cue(id, T_SYN, 'whoosh', { dur: 1.4, v: .3 }); cue(id, T_SYN + 1.4, 'chime', { f: 784, up: 7 });
+  const SCRIPT = SAY.reg(id, [
+    [3.8, T_CAP - .9, 'title', 'Onde aplicamos *analytics*', { visual: true }],
+    [T_CAP + .1, T_INT - .9, 'title', 'O que entregamos em cada projeto', { visual: true }],
+    [T_INT + .1, T_PRED - .9, 'title', 'Com as outras tracks'],
+    [T_INT + .3, T_PRED - .9, 'body', 'Combinamos analytics com as *demais tracks* para ampliar o *impacto* dos projetos.', { y: 250, visual: true }],
+    [T_PRED + .1, T_PRESC - .9, 'title', 'Modelos *preditivos*: métodos e técnicas', { visual: true }],
+    [T_PRESC + .1, T_SYN - .5, 'title', 'Modelos *prescritivos*: métodos e técnicas', { visual: true }],
+    [T_SYN + 1.0, 64.2, 'title', 'Antecipar o que vem. *Escolher como agir.*'],
+    [T_SYN + 1.6, 64.2, 'concl', 'A escolha do modelo depende do *problema* e da *decisão de negócio*.']
+  ]);
+  SAY.reg(id, MPRED.map((m, i) => [T_MP[i], T_PRESC - .9, 'label', mTxt(m)]));
+  SAY.reg(id, MPRESC.map((m, i) => [T_MS[i], T_SYN - .5, 'label', mTxt(m)]));
+  const streetSet = ctx => {
+    const g = ctx.createLinearGradient(0, GY, 0, H + 200); g.addColorStop(0, '#2A1C14'); g.addColorStop(1, '#0E0907'); ctx.fillStyle = g; ctx.fillRect(-1600, GY, 13000, 600);
+    line(ctx, -1600, GY, 11400, GY, INK, 6); for (let x = -1600; x < 11400; x += 160) line(ctx, x, GY + 120, x + 80, GY + 120, 'rgba(255,214,160,.18)', 6);
+  };
+  /** zona 1: os três tipos de cliente, cada um com uma aplicação e a decisão que ela apoia */
+  function clients(ctx, t) {
+    TYPES.forEach(([name, ic, app, dec, col], i) => {
+      const x = Z[0] - 560 + i * 560, p = E.outBack(P(t, T_CLI[i], .6)); if (p <= 0) return;
+      ctx.save(); ctx.translate(x, GY); ctx.scale(1, p);
+      // fachada
+      vslab(ctx, -170, -330, 340, 330, 40, mix('#3A2A24', col, .25), { lw: 4 });
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { rr(ctx, -140 + c * 72, -300 + r * 74, 46, 52, 4); ctx.fillStyle = hash(i * 31 + r * 7 + c) > .4 ? rgba('#FFD08A', .9) : '#2A1E18'; ctx.fill(); }
+      if (i === 0) { ctx.beginPath(); ctx.moveTo(-190, -330); ctx.lineTo(0, -410); ctx.lineTo(190, -330); ctx.closePath(); ctx.fillStyle = mix('#5A3A30', col, .3); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.stroke(); for (let k = 0; k < 5; k++) vslab(ctx, -150 + k * 66, -80, 22, 80, 6, '#E9DCC8', { lw: 2 }); }
+      if (i === 2) { for (let k = 0; k < 6; k++) { ctx.beginPath(); ctx.moveTo(-180 + k * 60, -120); ctx.lineTo(-150 + k * 60, -80); ctx.lineTo(-120 + k * 60, -120); ctx.closePath(); ctx.fillStyle = k % 2 ? C.yellow : C.red; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.stroke(); } }
+      ctx.restore();
+      if (p > .2) { const iy = GY - 400 - (i === 0 ? 40 : 0), s = E.outBack(clamp((p - .2) * 1.3)); ctx.save(); ctx.translate(x, iy); ctx.scale(s, s); glow(ctx, 0, 0, 120, col, .35); circle(ctx, 0, 0, 50, col, INK, 6); icon(ctx, ic, 0, 0, 56, col === C.yellow ? INK : '#FFF', 7); ctx.restore(); }
+      const la = P(t, T_CLI[i] + .3, .5);
+      late(ctx, c => { c.globalAlpha *= la; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;
+        text(c, name, x, GY - 490 - (i === 0 ? 40 : 0), { size: 40, weight: 900, color: '#FFF', align: 'center' }); c.shadowBlur = 0;
+        c.translate(x, GY + 120); paper(c, -230, -54, 460, 132, { r: 14, fill: '#F6EEDF', shadow: 8, shadowColor: '#000', lw: 3 });
+        text(c, app, 0, -16, { size: 32, weight: 900, color: INK, align: 'center' }); text(c, dec, 0, 30, { size: 26, weight: 700, color: '#4A4038', align: 'center' }); });
+    });
+  }
+  /** zona 2: as capabilities como máquinas, três de cada vez */
+  function capabilities(ctx, t) {
+    CAPS.forEach(([name, sub, ic], i) => {
+      const x = Z[1] - 620 + i * 620, y = 520, p = E.outBack(P(t, T_CAP + .3 + i * .5, .5)); if (p <= 0) return;
+      ctx.save(); ctx.translate(x, y); ctx.scale(p, p);
+      holo(ctx, -250, -190, 500, 380, { color: [C.red, C.orange, C.yellow][i] });
+      const lt = t - T_CAP - i * .5;
+      if (i === 0) { for (let k = 0; k < 36; k++) { const g = k % 3, a = hash(k * 7) * TAU, r0 = 150 * hash(k * 3), cxs = [-120, 0, 120][g], tx = cxs + Math.cos(a) * 46 * hash(k + 1), ty = Math.sin(a) * 46 * hash(k + 2) + 10, e = E.inOutCubic(clamp(lt / 2.4));
+          circle(ctx, lerp(Math.cos(a * 3) * r0, tx, e), lerp(Math.sin(a * 2) * r0 * .6, ty, e), 9, e > .5 ? [C.red, C.orange, C.yellow][g] : '#BFB3A3', INK, 2); } }
+      if (i === 1) { const ord = [2, 0, 3, 1], e = E.inOutCubic(clamp((lt - .8) / 1.6)); for (let k = 0; k < 4; k++) { const to = ord.indexOf(k), yy = -120 + lerp(k, to, e) * 70;
+          rr(ctx, -170, yy - 26, 340, 52, 10); ctx.fillStyle = to === 0 && e > .9 ? C.orange : '#F6EEDF'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke();
+          rr(ctx, -150, yy - 8, 160 - k * 26, 16, 8); ctx.fillStyle = to === 0 && e > .9 ? '#FFF' : '#BFB3A3'; ctx.fill(); text(ctx, String(lerp(k, to, e) < .5 ? 1 : Math.round(lerp(k, to, e)) + 1), 140, yy, { size: 26, weight: 900, color: INK, align: 'center' }); } }
+      if (i === 2) { for (let k = 0; k < 3; k++) { ctx.save(); ctx.translate(-120 + k * 120, -40); ctx.rotate(t * (k % 2 ? -1.6 : 1.6)); icon(ctx, 'gear', 0, 0, 100, [C.red, C.orange, C.yellow][k], 9); ctx.restore(); }
+        for (let k = 0; k < 4; k++) { const d = (t * .5 + k / 4) % 1, xx = lerp(-210, 210, d); paper(ctx, xx - 18, 80, 36, 46, { r: 3, fill: d > .5 ? '#F6EEDF' : '#FFD9CF', shadow: 2, lw: 2, volume: false }); if (d > .5) icon(ctx, 'check', xx, 103, 26, '#D9890B', 7); } }
+      ctx.restore();
+      const la = P(t, T_CAP + .6 + i * .5, .5);
+      late(ctx, c => { c.globalAlpha *= la; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12; text(c, name, x, y - 240, { size: 40, weight: 900, color: '#FFF', align: 'center' }); text(c, sub, x, y + 240, { size: 32, weight: 800, color: C.yellow, align: 'center' }); });
+    });
+  }
+  /** zona 3: as tracks se encontram na mesma decisão (baldeação) */
+  function integration(ctx, t) {
+    const a = P(t, T_INT - .8, .6); if (a <= 0) return; const cx = Z[2], cy = 600, lt = t - T_INT;
+    const LINES = [[[cx - 980, GY - 40], [cx - 500, 720], [cx - 150, cy + 30], [cx, cy]], [[cx - 700, 160], [cx - 360, 330], [cx - 90, 520], [cx, cy]], [[cx + 760, 140], [cx + 420, 320], [cx + 110, 520], [cx, cy]], [[cx + 980, GY - 20], [cx + 520, 740], [cx + 160, cy + 40], [cx, cy]]];
+    const COL = [C.orange, C.red, C.yellow, '#E9DCC8'];
+    LINES.forEach((pts, k) => { const p = E.inOutSine(clamp((lt - k * .35) / 1.6)); LINE.draw(ctx, pts, p, { w: k ? 14 : 20, col: COL[k], head: p > 0 && p < .99, glow: k ? 0 : 12 }); });
+    const sp = E.outBack(P(t, T_INT + 2.0, .5)); if (sp > 0) { glow(ctx, cx, cy, 260, C.orange, .5 * sp); ctx.save(); ctx.translate(cx, cy); ctx.scale(sp, sp); circle(ctx, 0, 0, 70, '#FFF8EE', INK, 6); icon(ctx, 'board', 0, 0, 74, INK, 7); ctx.restore(); }
+    late(ctx, c => { c.globalAlpha *= P(t, T_INT + 2.2, .5); c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;
+      text(c, 'a decisão do cliente', cx, cy + 116, { size: 34, weight: 900, color: '#FFF', align: 'center' });
+      text(c, 'analytics', cx - 640, GY - 92, { size: 30, weight: 900, color: C.orange, align: 'center' });
+      text(c, 'outras tracks', cx - 560, 330, { size: 30, weight: 900, color: C.yellow, align: 'center' }); });
+  }
+  /** um card de método (v7.15): o desenho do método, o nome, o exemplo e as técnicas */
+  function methodCard(ctx, m, x, y, t, t0) {
+    const p = P(t, t0, .5); if (p <= 0) return;
+    const e = E.outBack(p), col = MCOL[m.viz] || C.orange, vp = E.outCubic(clamp((t - t0 - .2) / 1.2)), sc = lerp(.92, 1, e);
+    ctx.save(); ctx.globalAlpha *= clamp(p * 2); ctx.translate(x + CW / 2, y + CH / 2 + (1 - E.outCubic(p)) * 40); ctx.scale(sc, sc); ctx.translate(-CW / 2, -CH / 2);
+    rr(ctx, 8, 12, CW, CH, 18); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
+    rr(ctx, 0, 0, CW, CH, 18); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.stroke();
+    rr(ctx, 22, 22, CW - 44, 140, 12); ctx.fillStyle = 'rgba(255,255,255,.04)'; ctx.fill();
+    ctx.save(); rr(ctx, 22, 22, CW - 44, 140, 12); ctx.clip(); (VIZ[m.viz] || VIZ.gaussian)(ctx, 52, 36, CW - 104, 112, vp, { t, theme: 'dark' }); ctx.restore();
+    late(ctx, c => { const ex = 'ex.: ' + m.case;
+      text(c, m.method, 28, 200, { size: fitSize(c, m.method, 32, CW - 56, 900), weight: 900, color: '#FFF' });
+      text(c, ex, 28, 238, { size: fitSize(c, ex, 22, CW - 56, 800), weight: 800, color: col === C.red ? '#FF8A7A' : col });
+      line(c, 28, 264, CW - 28, 264, 'rgba(243,230,214,.25)', 2);
+      m.tech.forEach((s2, i) => { const yy = 302 + i * 42; circle(c, 40, yy, 7, col); text(c, s2, 60, yy + 1, { size: fitSize(c, s2, 26, CW - 90, 800), weight: 800, color: '#F3E6D6' }); });
+      if (m.etc) text(c, 'e outras técnicas', 60, 302 + m.tech.length * 42, { size: 21, weight: 700, color: '#BFB3A3' }); });
+    ctx.restore();
+  }
+  /** zonas 4 e 5 (v7.15): os cards dos métodos, centrados na tela da zona */
+  function methodZone(ctx, t, list, zx, T0, TC) {
+    const a = P(t, T0 - .9, .6); if (a <= 0 || !list.length) return;
+    const n = list.length, x0 = zx - W / 2 + (W - (n * CW + (n - 1) * MGAP)) / 2;
+    ctx.save(); ctx.globalAlpha *= a; list.forEach((m, i) => methodCard(ctx, m, x0 + i * (CW + MGAP), MY, t, TC[i])); ctx.restore();
+  }
+  function synthesis(ctx, t) {
+    const a = P(t, T_SYN + .4, .7); if (a <= 0) return;
+    ctx.save(); ctx.globalAlpha = .72 * a; ctx.fillStyle = '#0C0806'; ctx.fillRect(0, 0, W, H); ctx.restore();
+    [[520, 'PREDITIVOS', 'Antecipar o que', 'pode acontecer', C.orange, 0], [1400, 'PRESCRITIVOS', 'Recomendar', 'como agir', C.red, 1]].forEach(([x, k, s1, s2, col, i]) => {
+      const p = E.outBack(P(t, T_SYN + .7 + i * .35, .55)); if (p <= 0) return;
+      hud(ctx, c => { c.translate(x, 560); c.scale(p, p); c.rotate(i ? .012 : -.012);
+        paper(c, -380, -250, 760, 500, { r: 22, fill: '#F6EEDF', shadow: 14, shadowColor: '#000', lw: 4 });
+        tag(c, 0, -250, k, { size: 34, fill: col, color: '#FFF' });
+        text(c, s1, 0, -150, { size: 60, weight: 900, color: INK, align: 'center' }); text(c, s2, 0, -82, { size: 60, weight: 900, color: col, align: 'center' });
+        c.save(); c.translate(0, 90);
+        if (!i) { line(c, -260, 60, -40, 0, INK, 7); c.beginPath(); c.moveTo(-40, 0); c.lineTo(260, -110); c.lineTo(260, 110); c.closePath(); c.fillStyle = rgba(C.orange, .35); c.fill(); c.setLineDash([14, 10]); line(c, -40, 0, 260, 0, C.orange, 6); c.setLineDash([]); circle(c, -40, 0, 12, '#FFF', INK, 3); }
+        else { line(c, -260, 0, -60, 0, INK, 8); [[-110], [0], [110]].forEach(([dy], j) => line(c, -60, 0, 240, dy, j === 1 ? C.red : '#BFB3A3', j === 1 ? 9 : 5)); circle(c, -60, 0, 14, '#FFF', INK, 3); circle(c, 240, 0, 16, C.red, INK, 3); }
+        c.restore();
+        text(c, i ? 'próxima oferta · campanhas · incentivos' : 'fraude · saída · gastos', 0, 210, { size: 28, weight: 800, color: '#4A4038', align: 'center' }); }, a);
+    });
+  }
+  SCENES[id] = {
+    themeAt: () => 'dark', script: SCRIPT,
+    peaks: [[T_INT + 2, T_INT + 2.8, .45], [T_MP[0] - .1, T_MP[0] + .7, .4], [T_MS[0] - .1, T_MS[0] + .7, .4], [T_SYN, T_SYN + 1.2, .4]],
+    draw(ctx, t) {
+      const cam = camKey(t, CAM);
+      bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
+      layer(ctx, cam, 1, () => {
+        streetSet(ctx);
+        LINE.draw(ctx, [[-1200, GY + 60], [11200, GY + 60]], 1, { w: 14, alpha: .55, shadow: false });
+        clients(ctx, t); capabilities(ctx, t); integration(ctx, t); methodZone(ctx, t, MPRED, Z[3], T_PRED, T_MP); methodZone(ctx, t, MPRESC, Z[4], T_PRESC, T_MS); synthesis(ctx, t);
+      });
+      SAY.draw(ctx, t, SCRIPT, 'dark');
+    }
+  };
+})();
+
+/* ---------- Conversa 1: o que já foi explicado, legível sem fala (cartazes 01, 02, 03 + lupa) ---------- */
+POSTERS[1] = (ctx, w, h, tl) => {
+  const SV = TX.engagement.map(e => e[0]), DEF = ['entender o problema', 'definir o caminho', 'construir a solução', 'verificar o resultado'], COL = [C.red, C.orange, C.yellow, '#FFD9A8'];
+  late(ctx, c => para(c, 'Conectamos *perguntas de negócio*, dados, execução e mensuração.', 0, -246, 420, { size: 26, weight: 900, color: INK, accent: C.red, align: 'center', lh: 1.15 }));
+  SV.forEach((sv, i) => { const y = -90 + i * 86, on = Math.floor(tl / 2) % 4 === i; rr(ctx, -210, y - 36, 420, 72, 10); ctx.fillStyle = on ? COL[i] : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
+    late(ctx, c => { circle(c, -178, y, 16, COL[i], INK, 2.5); text(c, String(i + 1), -178, y + 1, { size: 18, weight: 900, color: i === 3 ? INK : '#FFF', align: 'center' });
+      text(c, sv, -150, y - 13, { size: 24, weight: 900, color: INK }); text(c, DEF[i], -150, y + 16, { size: 20, weight: 700, color: '#3A332C' }); }); });
+  late(ctx, c => text(c, 'Dados → Decisão → Ação → Resultado', 0, 262, { size: 20, weight: 900, mono: true, color: '#8A6A48', align: 'center' }));
+};
+POSTERS[2] = (ctx, w, h, tl) => {
+  const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9);
+  const isF = k => /forecast/i.test(k);
+  line(ctx, -200, 30, 200, 30, INK, 3);
+  R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else fbar(ctx, x, 30 - hh, 70, hh, mix(C.red, C.orange, i / 2), { r: 6 });
+    late(ctx, c => { text(c, FMT.usdMM(+v), x + 35, 30 - hh - 18, { size: 17, weight: 900, color: INK, align: 'center' }); text(c, k.replace(/_?forecast/i, '') + (isF(k) ? '*' : ''), x + 35, 50, { size: 18, weight: 900, color: INK, align: 'center' }); }); });
+  const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, yk = String(Object.keys(sec).map(k => (k.match(/^business_scale_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
+  const bs = sec['business_scale_' + yk] || {}, pm = sec['project_mix_' + yk] || {}, tm = sec['team_structure_' + yk] || {}, np = +bs.projects_delivered || 0, disp = String(bs.projects_delivered_display || '').trim();
+  const projTxt = /^[+~]?\d[\d.,]*$/.test(disp) ? disp : (np ? FMT.num(np, 0) : '—'), xt = parseFloat(String(pm.projects_with_other_tracks_approx || bs.projects_with_other_tracks_approx || ''));
+  const tot = +tm.current_internal_positions || 0;
+  late(ctx, c => { text(c, 'receita anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
+    if (mult) para(c, `De ${R[0][0]} a ${R[2][0]}: *${FMT.num(mult, 1)}×* o valor inicial`, 0, 84, 420, { size: 22, weight: 900, color: INK, accent: C.red, align: 'center' });
+    para(c, `*${projTxt} projetos* em ${yk}` + (isFinite(xt) ? ` · *~${FMT.num(xt, 0)}%* com outras tracks` : '') + (tot ? ` · time de *${FMT.num(tot, 0)} pessoas*` : ''), 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
+    text(c, 'Crescimento com integração e um time para escalar.', 0, 246, { size: 19, weight: 900, color: C.red, align: 'center' }); });
+};
+POSTERS[3] = (ctx, w, h, tl) => {
+  // v7.15: os métodos e uma técnica de cada (TX.methods), como na estação
+  const G = g => (TX.methods || []).filter(m => m.group === g), low = m => m.method.replace(/^Modelo /i, '').replace(/^./, ch => ch.toLowerCase());
+  // uma linha por método: o método e a técnica que o representa
+  late(ctx, c => { const pr = G('pred'), y2 = -196 + 40 + pr.length * 32 + 26;
+    [['PREDITIVOS', pr, C.orange, -196], ['PRESCRITIVOS', G('presc'), C.red, y2]].forEach(([k, list, col, y]) => {
+      tag(c, 0, y, k, { size: 22, fill: col, color: '#FFF' });
+      list.forEach((m, i) => { const ln = `*${low(m)}* · ${m.key || m.tech[0]}`, sz = Math.min(23, fitSize(c, ln.replace(/\*/g, ''), 23, 420, 800));
+        para(c, ln, 0, y + 30 + i * 32, 420, { size: sz, weight: 800, color: '#6A6056', accent: INK, align: 'center', lh: 1.2 }); }); });
+    text(c, 'Emissores · Adquirentes · Varejo', 0, -238, { size: 22, weight: 900, color: '#8A6A48', align: 'center' });
+    para(c, 'A escolha do modelo depende do *problema* e da *decisão de negócio*.', 0, 160, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
+    text(c, 'lupa: catálogo com 20 modelos', 0, 252, { size: 18, weight: 800, mono: true, color: '#8A6A48', align: 'center' }); });
+};
+/** lupa da estação 03: o catálogo completo de modelos (preditivos × prescritivos) */
+SLIDE_SCREENS.catalog = (c, t) => {
+  bgDark(c, t, { centerA: .9, center: '#2A1A10' });
+  text(c, 'Modelos que levamos a *bancos e fintechs*'.replace(/\*/g, ''), LAY.x, 110, { size: 52, weight: 900, color: '#FFF' });
+  text(c, 'caso de uso em português · técnica em inglês', LAY.x, 168, { size: 26, weight: 700, color: '#E9DCC8' });
+  [['PREDITIVOS · antecipam o que vai acontecer', TX.ml.pred, C.orange, 96], ['PRESCRITIVOS · recomendam o que fazer', TX.ml.presc, C.red, 990]].forEach(([h, list, col, x]) => {
+    tag(c, x + 300, 236, h, { size: 26, fill: col, color: '#FFF' });
+    list.forEach(([uc, tech], i) => { const y = 300 + i * 74; rr(c, x, y, 834, 62, 10); c.fillStyle = i % 2 ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.11)'; c.fill();
+      text(c, uc, x + 20, y + 31, { size: 28, weight: 800, color: '#FFF' }); text(c, tech, x + 814, y + 31, { size: 22, weight: 700, mono: true, color: C.yellow, align: 'right' }); });
+  });
+  para(c, TX.ml.frontier, W / 2, 1050 - 40, 1700, { size: 26, weight: 700, color: '#E9DCC8', accent: C.yellow, align: 'center' });
+};
+STOPSCN.stop1 = recapScene({ posters: [1, 2, 3], sign: 'PARADA 1 · CONVERSA', from: CONFIG.sceneById.s03.end, call: 'ONDE ISSO ENCONTRA O SEU CLIENTE?',
+  banner: 'A seguir: *quatro cases*, do problema à solução e ao resultado.', doodles: [['star', 120, 250, 70, C.yellow], ['arrow', 1800, 230, 90, C.orange]] });

@@ -18,7 +18,7 @@ import librosa
 import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TRACKS = {'funk': 'musica/funk.mp3', 'tech': 'musica/tech-edit.mp3', 'piano': 'musica/piano.mp3'}
+TRACKS = {'funk': 'musica/parte1.mp3', 'tech': 'musica/parte2.mp3', 'piano': 'musica/parte3.mp3'}  # ElevenLabs encaixada (tools/eleven_fit.py); ids antigos mantidos
 SR, FPS = 22050, 50
 HOP = SR // FPS  # 441 amostras = 20 ms
 
@@ -37,7 +37,19 @@ def band(S, freqs, lo, hi):
     return S[(freqs >= lo) & (freqs < hi)].sum(axis=0)
 
 
-def analyze(path):
+# um começo de compasso conhecido por faixa: fixa a fase dos compassos (as camadas do remix mudam o grave
+# e poderiam deslocar a detecção em 1–2 tempos; as cenas foram marcadas nesses compassos)
+DOWN_REF = {'funk': 11.92, 'tech': 11.111, 'piano': 22.773}
+
+
+# grade conhecida (BPM exato, um começo de compasso/batida e as seções): as faixas encaixadas por tools/eleven_fit.py
+# têm andamento fixo, e o detector erraria (introduções filtradas sem batida, contratempos de chimbal fortes)
+GRID = {'funk': (110.0, 105.897, [1.17, 12.079, 90.62, 105.897, 143.0]),      # parte 1: drop da parte B em 105,897
+        'tech': (108.0, 0.0, [11.111, 46.667, 100.0, 162.222, 217.778]),    # parte 2 (opção A): blocos, subida e drops das versões
+        'piano': (100.0, 22.773, [22.773, 40.773])}                         # parte 3 (v7.15, 11 compassos a menos): a orquestra volta e o prato do letreiro
+
+
+def analyze(path, down_ref=None, grid=None):
     y, sr = librosa.load(path, sr=SR, mono=True)
     dur = len(y) / sr
     onset = librosa.onset.onset_strength(y=y, sr=sr, hop_length=HOP)
@@ -48,6 +60,8 @@ def analyze(path):
     a, b = np.polyfit(i, bt, 1)
     if np.std(bt - (a * i + b)) < .03:
         bt = a * i + b
+    if grid:
+        per = 60 / grid[0]; bt = np.arange(grid[1] % per, dur, per); down_ref = grid[1]
     S = np.abs(librosa.stft(y, n_fft=2048, hop_length=HOP))
     freqs = librosa.fft_frequencies(sr=sr, n_fft=2048)
     low = np.log1p(band(S, freqs, 30, 150))
@@ -62,6 +76,8 @@ def analyze(path):
     # compasso: fase (0–3) com mais grave nos tempos
     bf = np.clip(librosa.time_to_frames(bt, sr=sr, hop_length=HOP), 0, len(low) - 1)
     phase = int(np.argmax([low[bf[p::4]].mean() if len(bf[p::4]) else 0 for p in range(4)]))
+    if down_ref is not None:
+        phase = int(np.argmin([np.min(np.abs(bt[p::4] - down_ref)) if len(bt[p::4]) else 9 for p in range(4)]))
     down = bt[phase::4]
     # picos fortes (hits) com espaçamento mínimo de 0,25 s
     on = norm(onset)
@@ -74,6 +90,8 @@ def analyze(path):
     feat = np.vstack([librosa.util.sync(mf, dbf), librosa.util.sync(ch, dbf)])
     k = int(np.clip(round(dur / 25), 4, 9))
     sections = sorted({round(float(down[min(x, len(down) - 1)]), 3) for x in librosa.segment.agglomerative(feat, k)})
+    if grid and len(grid) > 2:
+        sections = [round(float(x), 3) for x in grid[2]]
     return {
         'dur': round(dur, 3), 'bpm': round(float(60 / np.median(np.diff(bt))), 2), 'fps': FPS,
         'beats': [round(float(t), 3) for t in bt], 'down': [round(float(t), 3) for t in down],
@@ -83,7 +101,7 @@ def analyze(path):
 
 
 def main():
-    out = {k: analyze(ROOT / p) for k, p in TRACKS.items()}
+    out = {k: analyze(ROOT / p, DOWN_REF.get(k), GRID.get(k)) for k, p in TRACKS.items()}
     js = ('/* ============================================================================\n'
           '   7. BATIDAS — gerado por tools/music.py a partir de musica/ (não editar à mão)\n'
           '   Grade de batidas e compassos, envelopes a 50 Hz (base64, 0–255), picos e seções.\n'

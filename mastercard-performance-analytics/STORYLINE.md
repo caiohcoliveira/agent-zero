@@ -1,415 +1,292 @@
-# A Linha — Storyline v5
+# A Linha — Storyline v7.4 (experimento)
 
-**Sessão:** até 20 min. São ~7:40 de vídeo em 4 plays, e o resto é fala das apresentadoras nas 4 paradas.
+**Decisões que movem o negócio.** Esta versão aplica o roteiro criativo v7: o filme contém o contexto, o mecanismo e a conclusão de cada assunto. As apresentadoras aprofundam, mas assistir em silêncio basta.
 
-**Vídeo:** HTML único offline, 1920×1080, em **modo apresentação**. Ele intercala trechos de vídeo com paradas em loop e é controlado pelo teclado, pelo passador de slides ou pelo mouse nas paradas.
+- **Branch:** `claude/mastercard-analytics-video-experimento`.
+- **Histórico das versões anteriores:** fica na branch `claude/mastercard-analytics-video-4cof1t` (v5.4).
 
-**Sem narrador:** cada cena se explica sozinha. Uma faixa de legenda na base da tela diz o que está acontecendo, e cada estação fecha com uma conclusão escrita.
+## O que mudou da v5.4 para a v7
 
-**Status:** implementado no `performance-analytics.html`. O roteiro da v3 está no histórico do Git (commit `62b1d98`).
+**Mudanças estruturais**
+- **Contrato de cada tela:** etiqueta e título no topo, explicação junto ao visual, rótulos nos gráficos e conclusão embaixo.
+  - O texto é desenhado depois da pintura e fica nítido.
+  - Os tamanhos são fixos: 56 / 36 / 28 / 40 px.
+  - A câmera para na leitura.
+- **Tempo de leitura medido:** `tools/read_check.js` mede o tempo de cada texto (2,5 palavras/s + 2,5 s por visual novo). Resultado: 72 telas, 0 curtas.
+- **Filme:** 7:41 → **9:11**, com as músicas remontadas para dar tempo de ler.
+- **A linha laranja** vira o fio do filme: a pergunta ligada ao valor, a ponte, a tendência do gráfico, a cidade das capabilities, o fluxo da automação, o ciclo dos agentes e o viaduto dos pilares.
+- **Sem personagem (v7.2):** a analista saiu do filme. Onde ela aparecia, outra imagem conta o mesmo:
+  - no embarque, o bilhete grande entra sozinho pela porta aberta;
+  - na ponte da 01, um trem atravessa os vãos;
+  - na 05, a equipe vira três ícones planos;
+  - nos relatórios de fraude, a tela, o cursor e o interruptor contam a história;
+  - na 07, um trem de dois vagões puxa a linha pela cidade e para na próxima estação.
+- **Espaço 3D (v7.2):** atrás do conteúdo há partículas com constelações, curvas 3D em fita e objetos flutuando (cubos e octaedros em arame, anéis, orbes), em perspectiva e girando com a câmera. Eles ficam perto da câmera com brilho e longe apagados (profundidade de campo).
+- **Mais sóbrio (v7.11):**
+  - nas telas com gráfico saem fachos de luz, poeira, partículas, objetos flutuando, fitas 3D, grade neon, rastros de velocidade e prédios ao fundo;
+  - a cidade só aparece onde o trem passa: ponte da 01, viaduto da 06 e cidade da 07;
+  - barras chapadas, sem volume 3D, e números-manchete sem respingo;
+  - o trem da linha é um **trem bala** de dois vagões;
+  - a **estação das conversas** é futurista, arejada e verde: ao ar livre, com cobertura de nervuras brancas e vidro, cidade clara e um trem bala ao longe atrás da parede de vidro, jardins verticais, árvores e painéis brancos pendurados. Referências: Oculus (WTC), Zaragoza-Delicias, West Kowloon, "Train Station in the Forest" (MAD), Jönköping e Atocha.
 
----
+**Dados e qualificadores**
+- **Números com qualificador:**
+  - Brasil marcado como *estimativa de fechamento*, T4 como *preliminar*;
+  - cestas como **índice** (2ª melhor = 100 → 118,8, "não é taxa absoluta");
+  - principalidade em **p.p. sobre o controle, backtest, ganho teórico, Top 3**;
+  - agentes como **8 ativos + 22 oportunidades = universo de 30**. O "15" da manchete antiga sai do filme;
+  - "4 cases" em vez de "4 clientes".
+- **Relatórios de fraude:** o fluxo não tem mais o nó "Insights". A ligação com o Insight Agent aparece tracejada como **integração possível**.
 
-## Ajustes da v5.4
+**Mantido da v5.4, por escolha**
+- explosão de neon só no fluxo e na placa;
+- o clímax com cards nos tempos fortes (v7.11: 5 cases que viram);
+- o letreiro WELCOME TO…;
+- a estação nas conversas (v7.11: futurista, arejada e verde).
 
-- **Relatórios de fraude:** o nome do projeto deixou de ter "Lights-off". O case agora se chama apenas "Relatórios de fraude".
-- **Da ideia à construção:** a automação começa a ser montada logo depois da lâmpada da ideia; antes, ela ficava cerca de 6 s só digitando.
-- **Suspense:** ela apaga a luz cerca de 2 s antes do drop e a sala fica no escuro, com batidas de coração e a subida da música.
-- **O drop:**
-  - clarão, ondas de choque a partir do interruptor e faíscas;
-  - os neons acendem em cascata, com a placa **"LIGHTS OFF RPA"**;
-  - o dado corre o pipeline sozinho, cada vez mais rápido, soltando relatórios no board;
-  - um contador de "execuções" sobe.
-- **Paradas:** a cena aberta no popup roda em loop no trecho daquela etapa, para ajudar a explicar o funcionamento.
+## A sessão (até 20 min)
 
-## Ajustes da v5.2
-
-- **Trem:** o adesivo "Performance Analytics" saiu de cima da porta. Ele fica entre as portas, e elas abrem sem cobrir o adesivo.
-- **Mapa (Parada 0) e encerramento:** a estação viva continua rodando ao fundo, como nas paradas de baldeação.
-- **Cestas:**
-  - são 3 empresas do mesmo grupo (BUs), não bandeiras;
-  - os pontos do gráfico de dispersão não tremem mais;
-  - a alça da sacola ganhou contraste.
-- **Lights-off:**
-  - acende a lâmpada da ideia;
-  - ela monta a automação feliz, com corações e estrelas;
-  - quando apaga a luz, a sala vira neon com "TUDO AUTOMATIZADO";
-  - ela sai dançando pela direita.
-- **"Destaques" virou "Insights".**
-- **Insight Agent:** a caixa do Random Forest foi refeita. O texto cabe e a barra mostra a nota até "aprovado ✓".
-- **Estação 07:**
-  - o board foi redesenhado: sala, tela de resultados, mesa em perspectiva, conselheiros e a cadeira de Analytics;
-  - entraram "Eficiência operacional · automação de projetos", com robozinhos na esteira;
-  - entraram "Projetos User-Pay com Advanced Analytics", por último, fazendo o gancho para o clímax.
-- **Clímax:**
-  - Estatística ganhou "setup de projetos de marketing e estratégia";
-  - a palavra "Otimização" virou "Otimização & Pesquisa operacional", com o subtítulo "modelos para tomada de decisão".
-
-## O que mudou da v4 para a v5
-
-**Visual.** A animação passou a ser híbrida 2D/3D com acabamento pintado, tendo Arcane como referência. Tudo continua num único HTML offline: o "3D" é feito com volume pintado, luz e profundidade, e não com um motor 3D.
-- **Acabamento em todos os quadros:**
-  - pinceladas pintadas à mão;
-  - gradação de cor, com luz quente no alto e sombra fria embaixo;
-  - brilho nos pontos de luz.
-- **Atmosfera:** fachos de luz volumétrica, poeira no ar e desfoque de fundo, sempre se movendo.
-- **Volume:** cartões, bolas, blocos e personagens com luz, sombra e recorte laranja.
-
-**Estação viva.** A plataforma das paradas, da abertura e do pré-show tem eventos acontecendo em paralelo:
-- a luminária pisca;
-- um ratinho cruza os trilhos;
-- uma goteira cai do teto;
-- um pombo bica o chão;
-- um passageiro passa;
-- o farol de um trem atravessa a estação e balança os cartazes;
-- há um relógio e um painel de LED rolando.
-
-**Respiro entre os cases.**
-- Cada case abre com o seu cartão: as portas do vagão abrem e mostram o case.
-- No fim de cada case, a tela escurece.
-
-**Cestas (Banana):**
-1. A matriz cliente × produto aparece **esparsa**, com o percentual vazio calculado pelo JSON.
-2. BM25.
-3. **ALS:** U e Vᵀ se ajustam em turnos (fixa V e ajusta U, fixa U e ajusta V). A curva de erro cai e a matriz fica densa.
-4. Com os vetores prontos, a similaridade de cosseno.
-
-**Principalidade (Manga):**
-1. UMAP + K-Means.
-2. Um ALS curto, por ser o mesmo processo das cestas.
-3. Os **embeddings em 3D**: clientes e produtos girando no mesmo espaço.
-
-**Lights-off.** Uma analista loira:
-1. Digita os relatórios à mão, com a pilha crescendo, o relógio correndo e o dia virando noite na janela.
-2. Levanta e vai até o interruptor.
-3. Apaga a luz no drop.
-4. Sai dançando no ritmo da música, de fones.
-
-**Agentes:**
-- Saíram a restrição e a ênfase em GPU.
-- No lugar, entra a escala do problema: 30 adquirentes, cada um com suas páginas e painéis.
-
-**Clímax.** Agora fala de disciplinas, não de técnicas soltas:
-1. Estatística;
-2. Otimização (pesquisa operacional);
-3. Modelos supervisionados;
-4. Modelos não supervisionados;
-5. NLP;
-6. Redes neurais (MLP);
-7. Deep learning (transformer);
-8. Inteligência artificial.
-
-O clímax fecha em **"Tudo se resume a Analytics & Advanced Analytics"**.
-
----
-
-## O que mudou da v3 para a v4
-
-Esta rodada atendeu à revisão de vocês.
-
-**Batidas:**
-- Fora dos clímax, câmera, cores e elementos reagem só 15% à batida.
-- A reação inteira aparece só nos picos de cada cena: o drop de cada case, o marco do Brasil, o ∞, o clímax e o acorde final.
-
-**Português:**
-- Todos os textos estão em português.
-- As técnicas de analytics ficam em inglês: BM25, Matrix Factorization (ALS), UMAP, embeddings, Random Forest etc.
-- A exceção é o letreiro final em inglês ("WELCOME TO…"), como vocês pediram antes. Uma legenda em português acompanha.
-
-**Sem narrador:**
-- Legendas por cena.
-- Títulos de gráfico e conclusões escritas.
-- Cartões de conexão entre estações.
-
-**Estação de trem:**
-- A abertura acontece numa plataforma: painel de partidas, o trem chega, as portas abrem e o bilhete é validado.
-- Um trem passa na frente da câmera na chegada de cada estação.
-- Um painel de LED avisa a "próxima estação".
-
-**Abertura:** saiu "O nosso desafio hoje". O vídeo começa direto na Linha Performance Analytics.
-
-**Mapa (Parada 0):** ficou clicável. Clique numa estação para ver o detalhe dela, sem apertar → várias vezes.
-
-**Estações 01 a 03:**
-- **01:** fecha as perguntas com "Quem pode resolver esse problema?" e termina em "Esse é o nosso papel estratégico".
-- **02:**
-  - o gráfico ganhou título: "Evolução do faturamento da track";
-  - saiu "Escala de verdade";
-  - um cartão de conexão pergunta "E o que levamos para o mercado?".
-- **03:**
-  - abre com "Alguns de nossos últimos projetos";
-  - em seguida, 20 casos de machine learning preditivo e prescritivo que bancos e fintechs usam.
-
-**Estação 04:**
-- Abre com o título da seção e "agora, os cases de impacto".
-- Cada case ganhou ~53 s (o de agentes, ~62 s). O vídeo ficou mais longo só por isso.
-- Cada case segue a ordem problema → dados → estratégia → como fizemos → solução → impacto.
-- A música da estação 04 foi remontada para o drop cair na solução de cada case.
-
-**Paradas de retomada:**
-- Clique num cartaz para dar zoom na estação.
-- As cenas montadas da estação aparecem embaixo, em miniaturas.
-- Clique numa miniatura para abrir a cena num popup que fecha com ✕, Esc ou clique fora.
-
----
-
-## A sessão
-
-| Momento | O que acontece | Duração |
+| Momento | Modo | Filme |
 |---|---|---|
-| Pré-show | letreiro em loop | até a primeira tecla |
-| Play 1 · embarque | plataforma → trem → bilhete → mapa | 0:10 |
-| **Parada 0** · mapa | mapa clicável; as apresentadoras contam o roteiro | fala |
-| Play 2 · estações 01–03 | "Vintage Film Funk" | 1:59 |
-| **Parada 1** | plataforma com os cartazes 01, 02 e 03 | fala |
-| Play 3 · estações 04–06 | "Technology" remontada | 4:24 |
-| **Parada 2** | cartazes 04, 05 e 06 | fala |
-| Play 4 · 07, clímax e letreiro | "Epic Piano" | 1:07 |
-| **Encerramento** | letreiro vivo; clique abre o cartaz 07 | fala |
+| Play 1 · embarque | vídeo | 0:00–0:20 |
+| Conversa 0 | fala | — |
+| Play 2 · estações 01–03 | vídeo | 0:20–2:55 |
+| Conversa 1 | fala | — |
+| Play 3 · estação 04 (4 cases), 05, 06 | vídeo | 2:55–7:37 |
+| Conversa 2 | fala | — |
+| Play 4 · 07 e letreiro (v7.15: sem o clímax) | vídeo | 7:37–8:22 |
+| Encerramento | fala | — |
 
-Total de vídeo: **7:41**.
+## Play 1 · embarque (20 s; desde a v7.17, com a música das conversas)
 
----
+- **Trilha (v7.17–v7.18):** a música das conversas é a trilha da abertura, no nível do filme, sem a trilha sintetizada. Ela segue sem recomeçar para a Conversa 0, onde desce para o fundo.
+  - v7.18: a música começa no ponto em que o primeiro drop dela cai **na abertura das portas do trem** (6,0 s). A introdução e a pausa da música acompanham a chegada do trem.
+  - Do drop em diante, os pulsos da abertura seguem a grade da própria música.
 
-## Play 1 · embarque (10 s)
+1. **Identidade (0–6 s)**
+   - As luzes da plataforma acendem.
+   - O painel de partidas vira as placas até **PERFORMANCE ANALYTICS**.
+   - Embaixo, a missão escrita: "Transformamos *dados* em *decisões* e soluções de negócio."
+   - O trem encosta vindo da esquerda, com o farol varrendo a plataforma.
+2. **Propósito (6–14 s)**, como na v5.4, a pedido:
+   - As portas abrem no tempo cheio da música e o painel apaga.
+   - O bilhete sobe em close: "PERFORMANCE ANALYTICS · DE *dados* · PARA *valor* · 7 estações · 2 baldeações". O carimbo bate: **EMBARQUE ✓ validado**.
+   - Título "Dos *dados* ao *valor*" e explicação "Combinamos conhecimento de negócio, analytics e implementação para orientar decisões."
+   - A câmera mergulha pela porta aberta.
+3. **Percurso (14–20 s)**
+   - Do outro lado, o mapa completo da linha se desenha sobre um campo de estrelas em 3D.
+   - Três capítulos escritos: **Nossa atuação** (01–03), **Cases e resultados** (04–06) e **O que vem pela frente** (07).
+   - Título "O percurso" e a frase "Uma viagem pelas capacidades da nossa área, em três capítulos."
 
-1. **0–4,5 s.** Plataforma 1 à noite.
-   - O painel de partidas vira para "LINHA PERFORMANCE ANALYTICS" e o trem chega da direita, freando.
-   - *Legenda:* "Bem-vindos à Linha Performance Analytics".
-2. **4,5 s.** As portas abrem (drop da trilha) e o bilhete aparece com "de dados → para valor".
-   - O carimbo "EMBARQUE" bate.
-   - *Legenda:* "Bilhete validado…".
-3. **7–10 s.**
-   - A câmera entra pela porta e o mapa da linha se desenha com o letreiro.
-   - *Legenda:* "7 estações e 2 paradas para conversa".
+## Conversa 0
 
-## Parada 0 · o mapa (interativo)
+- **Música (v7.16–v7.17):** a música que vem da abertura continua sem recomeçar, desce para o fundo em 2 s e toca em loop enquanto quem apresenta fala. É uma balada pop original com violino no lugar da voz, cerca de 10 dB abaixo do filme. Ela sai em fade quando o vídeo segue; o mesmo vale para as duas baldeações.
 
-- **Mapa:** completo, com o letreiro no topo.
-- **Clique numa estação:** a câmera aproxima e abre um cartão com:
-  - o número e o nome completo da estação;
-  - o que ela mostra;
-  - os tópicos que aparecem nela.
-- **Paradas 1 e 2 no mapa:** também são clicáveis.
-- **Para voltar ao mapa:** clique fora do cartão, use Esc ou uma seta.
-- **→ (sem cartão aberto):** embarca no play 2.
+- **Tela:** a estação futurista ao fundo, a missão escrita no topo e o mapa com os 3 capítulos.
+- **Interação:** clique numa estação para aproximar e ver o cartão (título, o que mostra, tópicos); → embarca.
 
----
+## Play 2 · estações 01–03 ("Vintage Film Funk" remontada, 2:35)
 
-## Play 2 · estações 01–03 ("Vintage Film Funk", 1:59)
+### 01 · Papel estratégico (47 s) — o mundo das perguntas encontra uma ponte
 
-Cada estação começa com o trem passando na frente da câmera e o letreiro split-flap da estação. Nos últimos segundos, o painel de LED avisa a próxima.
+1. **Perguntas:** a câmera atravessa o corredor das perguntas, com pontos de interrogação flutuando em 3D. Há postes com cartões pendurados ("Como recomendar melhor?", "Como medir principalidade?", "Como ganhar eficiência?", uma pergunta para cada case) e a cidade das perguntas ao fundo.
+   - Título "Decisões difíceis começam com perguntas".
+2. **A ponte:** a câmera recua e mostra dois penhascos com etiquetas **NEGÓCIO** e **DADOS**.
+   - "O papel da área": "Conectamos perguntas de negócio aos dados necessários para respondê-las."
+   - O cabo da ponte é a linha laranja.
+3. **Os 4 serviços:** os quatro vãos da ponte caem um por um, numerados e rotulados.
+   - A lista "OS 4 SERVIÇOS" cresce junto: *Diagnóstico*: entender o problema · *Estratégia*: definir o caminho · *Execução*: construir a solução · *Mensuração*: verificar o resultado.
+   - O trem da linha entra pela margem do negócio, atravessa a ponte e para do lado dos dados, que amanhece: as torres acendem.
+4. **Do diagnóstico à mensuração:** a linha segue pelas estações Dados → Decisão → Ação → Resultado.
+   - "Atuamos do diagnóstico à mensuração para gerar valor para o cliente."
+5. **Conclusão:** "Analytics é uma *capacidade estratégica* da consultoria."
 
-### 01 · Papel estratégico (34 s)
+### 02 · Evolução e impacto (44 s) — receita, projetos e capacidade (v7.13, ajustada na v7.14)
 
-1. **Mural de cortiça.** Post-its com perguntas de negócio.
-   - *Legenda:* "Todo dia, nossos clientes chegam com perguntas de negócio".
-2. **A pergunta.** "Quem pode resolver esse problema?" é pintada sobre o mural.
-3. **A resposta (pico).** Os círculos Negócio × Dados batem e formam "Performance Analytics".
-4. **Nossos serviços:** Diagnóstico, Estratégia, Implementação e Mensuração.
-5. **O caminho do valor:** Dados → Decisões → Impacto → Valor.
-6. **Conclusão:** **"Esse é o nosso papel estratégico."**
+1. **Receita anual da track:** gráfico com eixo de base zero, unidade (US$ mil ou US$ mi, conforme o JSON) e marcas.
+   - Valor em cima de cada barra, anos embaixo, 2026 hachurado como "(previsão)" e a fonte.
+   - Leitura: 2023 e 2025 acendem e uma régua mede "×1,8" ("Entre 2023 e 2025, a receita passou a 1,8 vez o valor inicial.").
+2. **Projetos (no lugar do Brasil):** "*N projetos* em 2026". O gráfico fica à esquerda e os dados à direita.
+   - **Esquerda:** a receita por tipo de projeto em barras (laranja = só a track, amarelo = com outras tracks).
+   - **Direita:** o número conta até o valor e pousa no acento da música.
+     - Uma rosca mostra a % dos projetos feitos com outras tracks (base: projetos).
+     - Uma barra empilhada mostra a receita por modelo de entrega (base: receita), com as tracks parceiras embaixo.
+     - "Cerca de *X%* dos projetos são feitos *com outras tracks* (*Y%* da receita)."
+   - **Frente em destaque (v7.14):** a barra da frente ganha um contorno branco e um cartão diz quanto ela trouxe: "~US$ X em receita de *Tipo* em 2026 (*Y%* do total)".
+     - A frente é a de `highlight_project_type`; sem esse campo, vale a de maior receita.
+3. **Capacidade do time (no lugar dos trimestres):** pirâmide de pessoas por nível (K2 a K7), só com as posições internas (v7.14: sem contractors).
+   - O total aparece num cartão ("N pessoas hoje · em posições internas").
+   - "A maior parte do time está em *K5, K6 e K7*." (calculado a partir do JSON)
+4. **Conclusão:** "Crescimento com *integração* e um *time* para escalar."
 
-### 02 · Evolução e impacto (37 s)
+### 03 · O que levamos ao mercado (64 s) — capabilities explicadas no próprio filme
 
-1. **O gráfico.**
-   - Título: "Evolução do faturamento da track", com o subtítulo "receita anual em US$".
-   - As barras sobem ano a ano.
-   - O ano de 2026 aparece como previsão.
-2. **Crescimento.** Selo "1,8× em 2 anos".
-   - A legenda é montada a partir do JSON.
-3. **Brasil (pico).** 1,74× o período anterior e 1,65× o orçamento.
-   - Em seguida, os trimestres.
-   - A legenda conta quantos trimestres ficaram acima do orçamento, a partir do JSON.
-4. **Conclusão:** "Crescimento consistente, acima do planejado."
-5. **Cartão de conexão:** **"E o que levamos para o mercado?"**
+A câmera viaja por uma avenida noturna, com a linha no chão.
 
-### 03 · O que levamos ao mercado (49 s)
+1. **Onde aplicamos analytics:** três fachadas, cada uma com um ícone plano (como em "Analytics em ação"), uma aplicação e a decisão que ela apoia.
+   - Emissores · *Principalidade* · decidir qual produto oferecer.
+   - Adquirentes · *Market share* · decidir onde crescer.
+   - Varejo · *Cestas de produtos* · decidir o que promover.
+2. **O que entregamos:** três máquinas, só três de cada vez.
+   - Segmentação · identificar públicos.
+   - Recomendação · priorizar ofertas.
+   - Automação · executar rotinas.
+3. **Com as outras tracks:** linhas coloridas convergem na mesma baldeação, "a decisão do cliente".
+4. **Modelos preditivos: métodos e técnicas (v7.15, vieram do antigo clímax):** três cards entram a cada 2 tempos. Cada um tem o desenho do método, o nome, um exemplo e as técnicas:
+   - Modelo supervisionado (ex.: prevenção a fraude) → cross validation, PCA, gradient boosting e outras técnicas;
+   - Modelo não supervisionado (ex.: segmentação e recomendação) → k-means, filtro colaborativo, matrix factorization e outras técnicas;
+   - Séries temporais (ex.: forecast) → ARIMA, SARIMAX, boosting, componentes de Fourier.
+5. **Modelos prescritivos: métodos e técnicas (v7.15):** dois cards, no mesmo formato:
+   - Otimização (ex.: pricing e dimensionamento) → PO (pesquisa operacional), simulação de Monte Carlo, programação linear, modelos de estoque;
+   - Teste A/B (ex.: mesa de performance) → power analysis, testes de hipótese, plano de amostragem.
+   - A estação manteve os mesmos tempos (a música da parte 1 não mudou). Os exemplos de negócio (fraude, saída, gastos · oferta, campanhas, incentivos) seguem nos cartões da síntese.
+6. **Síntese:** dois cartões, "Antecipar o que pode acontecer" × "Recomendar como agir".
+   - "A escolha do modelo depende do *problema* e da *decisão de negócio*."
 
-1. **Projetos recentes.** "Alguns de nossos últimos projetos", em três colunas: Emissores, Adquirentes e Varejo.
-   - Cada capability aparece em português, com as técnicas em inglês e a etiqueta do case.
-2. **Os cases em destaque.** As etiquetas pulsam.
-   - *Legenda:* "os 4 em destaque são os cases da estação 04".
-3. **Com as outras tracks.** "Analytics complementa e potencializa as demais tracks".
-4. **Machine learning para bancos e fintechs.**
-   - **10 preditivos:** fraude, risco de crédito, churn, propensão de compra, LTV, previsão de gastos, inadimplência, AML, aprovação e chargeback.
-   - **10 prescritivos:** próxima melhor oferta, limite ótimo, preço e MDR, régua de cobrança, retenção, alocação de verba, roteamento, cashback, personalização e aprovação × fraude.
-   - Cada um vem com a técnica em inglês.
-   - A legenda mostra a fronteira: graph neural networks, causal ML, reinforcement learning e agentes de LLM.
-5. **∞ (pico).** "Com dados, as possibilidades são infinitas".
-6. **Letreiro:** "PARADA 1 · BALDEAÇÃO / HORA DA CONVERSA".
+## Conversa 1
 
-## Parada 1
+- **Música (v7.16):** a música das conversas em loop, por baixo da fala.
 
-- **Cena:** plataforma com os cartazes 01, 02 e 03.
-- **Clique num cartaz:** dá zoom e mostra as cenas montadas da estação.
-- **Clique numa cena:** abre o popup.
-- **→:** percorre os cartazes e embarca.
+- **Entrada (v7.2):** o último quadro do vídeo some em zoom, um véu escuro com o rastro de luz de um trem cobre a tela e só depois a estação aparece. Os textos das duas telas nunca ficam juntos.
+- **Tela:** a estação futurista e a chamada no topo, "ONDE ISSO ENCONTRA O SEU CLIENTE?".
+- **Cartazes legíveis sem clicar:**
+  - **01:** os 4 serviços com definição;
+  - **02:** gráfico de faturamento, 1,8×, Brasil (estimativa) e conclusão;
+  - **03:** preditivos × prescritivos; v7.15: uma linha por método, com a técnica que o representa.
+- **Faixa:** "A seguir: *quatro cases*, do problema à solução e ao resultado."
+- **Lupa:** cenas em loop. Na 03, o **catálogo com os 20 modelos** (caso de uso em português · técnica em inglês).
 
----
+## Play 3 · estações 04–06 (ElevenLabs, opção A, 4:42)
 
-## Play 3 · estações 04–06 ("Technology" remontada, 4:24)
+### 04 · Analytics em ação (11 s)
 
-**A música.** A faixa foi remontada com cortes nos compassos (`tools/edit_tech.py`).
-- **Como cada case é montado:**
-  - 8 compassos da parte calma;
-  - 8 compassos da construção;
-  - a parte cheia da faixa.
-- **Onde cai o drop:** sempre em 35,6 s do case, que é a hora da **solução**. O **impacto** vem 8,9 s depois.
+- "ANALYTICS EM AÇÃO" pintado.
+- Os 4 cases surgem como estações na linha: Cestas de produtos · Principalidade · Relatórios automatizados · Agentes de insights.
+- "Do *problema* ao *resultado*."
 
-**Os compassos de cada case:**
+**Estrutura de cada case:**
+- Respiro: a porta do vagão com "CASE N DE 4".
+- Etiqueta + etapa no topo (PROBLEMA, DADOS, COMO FIZEMOS, SOLUÇÃO, RESULTADO…), título fixo e explicação no painel.
+- A virada da música de cada case cai na solução (bloco novo, subida ou drop da própria versão).
 
-| Compassos | Etapa |
-|---|---|
-| 0–4 | Problema |
-| 4–8 | Dados do cliente (ou o trabalho manual, ou a restrição) |
-| 8–10 | Estratégia |
-| 10–16 | Como fizemos, passo a passo |
-| 16–20 | Solução, no drop |
-| 20 em diante | Impacto |
+### Case 1 · Cestas de produtos (Cliente Banana · varejo, 53 s)
 
-A régua no canto superior direito acende a etapa atual. A fileira de passos mostra em que ponto do "como fizemos" o case está.
+| Etapa | Texto | Visual |
+|---|---|---|
+| Problema | Como incentivar clientes a comprar em *outras empresas do mesmo grupo*? | as três empresas e um cliente que hoje compra em uma só |
+| Dados | Analisamos o histórico de compras para aprender afinidades… | a matriz clientes × produtos (SKU), esparsa, com ícones: as compras do histórico acendem; uma linha é um cliente, uma coluna é um produto; nas células vazias aparecem "?" (sem compra, o sinal é desconhecido · % das combinações sem compra); ao lado, as fichas: 24 meses · 101 mil clientes · 894 subgrupos · 3,8 mi interações |
+| Como fizemos | *BM25* reduz o destaque de itens muito comuns. *ALS* aprende padrões… | a matriz vira **R ≈ U · Vᵀ**: U (clientes × fatores) e Vᵀ (fatores × produtos), os fatores latentes ("gostos ocultos"), c = 1 + α·r e rank k = 64; os dois produtos mais comprados perdem peso (BM25); o ALS alterna **fixa V → resolve U** e **fixa U → resolve V**, com a fórmula de cada passo, e o erro cai até **convergir**; resolvida, a matriz inicial volta completa: **lacunas → propensões** (r̂ᵢⱼ = uᵢᵀ vⱼ) |
+| Solução (drop) | Produtos com afinidade formam *cestas*… | no drop, as estrelas marcam as recomendações (maior propensão entre o que o cliente ainda não comprou); depois, afinidades → cestas → públicos → campanhas; as 3 cestas e o público de cada uma; DECISÃO: mecânicas de campanha |
+| Resultado | Destilados teve conversão *+18,8% maior* que a 2ª melhor campanha. | índice: 2ª melhor = 100, Destilados = 118,8 ("não é taxa absoluta") |
+| Conclusão | O histórico de compras orienta *cestas* e *públicos*. | — |
 
-### 04 · Abertura (9 s)
+### Case 2 · Principalidade (Cliente Manga · emissor, 60 s)
 
-- "ANALYTICS EM AÇÃO · do dado ao impacto · agora, os cases de impacto".
-- Os 4 cases aparecem como cartões.
+| Etapa | Texto | Visual |
+|---|---|---|
+| Objetivo | *Principalidade* é tornar o banco a *principal escolha* do cliente. + "Quais produtos ajudam a fortalecer esse relacionamento?" | a carteira; o cartão do banco sobe com a coroa "o banco principal" |
+| Dados | Analisamos 92 mil associados, seus produtos e sua principalidade atual. | fichas e "cada associado recebe a sua recomendação" |
+| Como fizemos | *UMAP* e *K-Means* organizam perfis. *ALS* estima afinidades… | v7.11, os clusters 3D da v5: os produtos (vetores) saem soltos e o UMAP os leva para o espaço 3D (dim 1, dim 2, dim 3 … dim 128); o K-Means agrupa as famílias (Dia a dia, Investimentos, Crédito, Proteção); "proximidade = afinidade"; cos θ = 0,94 (CDB e LCI, alta afinidade) e cos θ = 0,12 (Cashback e Consignado, baixa); d_cos(a,b) = 1 − a·b / (‖a‖ ‖b‖); um associado percorre a trilha até o núcleo de principalidade |
+| Solução (drop) | A recomendação combina afinidade, conversão e ganho de principalidade. | ranking **ANTES** (só afinidade) × **DEPOIS** (critérios combinados); pontos de principalidade do Top 3 |
+| Resultado | *+4 p.p. de principalidade* versus controle, em backtest. | ganho em p.p. sobre o controle (= 0), geral e por subsegmento (PF I–IV+); "backtest: avaliação retrospectiva · ganho teórico · Top 3"; melhor perfil |
+| Conclusão | O motor prioriza produtos pelo *objetivo de relacionamento* do banco. | — |
 
-### Case 1 · Cliente Banana · cestas de produtos (53 s)
+### Case 3 · Relatórios automatizados (fraude, 58 s) — a automação apaga a luz, o processo continua
 
-1. **Problema.** O texto do JSON e as três bandeiras ligadas.
-   - "fazer o cliente de uma bandeira comprar também nas outras".
-2. **Dados.**
-   - O que o cliente tinha: 24 meses de compras por CPF × SKU, 101 mil clientes, 894 subgrupos e 3,8 mi interações.
-   - O que dificultava: os 3 desafios do JSON.
-3. **Estratégia:** **"Gerar cestas de produtos"** e achar o público de cada uma.
-4. **Como fizemos.**
-   1. BM25 apaga sacola e pão.
-   2. ALS fatora em clientes × produtos.
-   3. A similaridade de cosseno junta os produtos em 3 cestas.
-5. **Solução (drop).** As cestas e os clientes-alvo.
-   - Decisão: "as cestas viraram mecânicas de campanha".
-6. **Impacto.** Ranking de conversão, 1,19× e o comprovante.
+| Etapa | Texto | Visual |
+|---|---|---|
+| Antes | Cada relatório de fraude para o board era *montado manualmente*. | close na tela: o cursor seleciona a planilha, confere linha a linha, copia e cola e monta o gráfico; cada gesto escrito ao lado: 1 extrair os dados · 2 conferir · 3 copiar e colar · 4 montar o relatório |
+| Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | a câmera abre: cadeira vazia, relógio acelerado, pilhas crescendo, o dia vira noite, "↻ de novo · relatório N" (sem contador de horas inventado) |
+| Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia acende na tela; o código se escreve com a barra "automação %"; faíscas saem da tela e montam o fluxo nomeado: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
+| Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; clique seco e escuro na pausa composta da própria música; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
+| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); v7.12: os painéis saem do monitor um atrás do outro e se empilham no canto inferior esquerdo, com "gerado automaticamente" e o contador de painéis, sem cobrir a animação (o da frente é o arquivo dashboard-fraude.png ao lado do HTML: ilustrativo no Git, o real na cópia local); o ANTES × DEPOIS fica ao lado; a cadeira vazia gira num foco de luz e os relatórios voam como confete |
+| Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; o fluxo se apaga e a câmera mergulha nela |
 
-### Case 2 · Cliente Manga · motor de principalidade (53 s)
+### Case 4 · Agentes de IA para insights (Insight Agent · adquirentes, 56 s)
 
-1. **Problema.** Recomendar o que faz o cliente escolher o banco como principal.
-   - O visual é a carteira com a coroa.
-2. **Dados.** 92 mil associados PF, 4 subsegmentos, produtos e principalidade.
-3. **Estratégia:** um motor de recomendação que prioriza a principalidade.
-4. **Como fizemos.**
-   1. UMAP + K-Means, com 8 segmentos look-alike.
-   2. **Embeddings**: clientes e produtos no mesmo espaço.
-   3. **ALS**: listas de cross-sell e upsell.
-5. **Solução (drop).** A camada ΔP reordena as listas: 3,336 pts contra 2,112 pts.
-6. **Impacto.** +4 p.p., os subsegmentos e o melhor segmento.
-   - Depois, o comprovante "produtizado".
+| Etapa | Texto | Visual |
+|---|---|---|
+| Problema | A escrita manual de insights *não acompanhava* o volume… | painel "Market share e share of wallet · adquirentes", insight escrito à mão, fila de páginas |
+| Gerar | Agentes *geradores* produzem versões… para *diferentes públicos*. | v7.11, como na v5: o relatório "REPORT DE FRAUDE · BOARD" com o DESTAQUE vazio e o dashboard embaixo, à esquerda; Analista, Business e C-Level caem no palco, leem o relatório e os painéis e escrevem (exemplos ilustrativos) |
+| Avaliar e corrigir | Agentes *avaliam* os textos e encaminham os *reprovados*… | os rascunhos vão ao Validador, que reprova (✕, "reprovado: sem período de comparação"); eles voltam pela seta tracejada "refazer"; saem as versões 2, o Validador aprova (✓), o Embalador fecha o título e ele entra no DESTAQUE do relatório e como faixa no dashboard |
+| Qualidade | *Regras* e *modelos* avaliam critérios de qualidade do texto. | Regex · regras textuais; BERT · modelo de linguagem; Random Forest · nota de qualidade (164 características); "é uma avaliação do sistema, não uma garantia" |
+| Escala (drop) | O mesmo processo se repete em *milhares* de páginas e painéis. | a parede de páginas se abre; uma janela ampliada mostra o ciclo em cada página |
+| Situação | 8 adquirentes ativos. 22 oportunidades adicionais. Universo apresentado: 30. | 30 marcas: 8 acesas e 22 tracejadas, com legenda |
 
-### Case 3 · Lights-off · relatórios de fraude (53 s)
+### 05 · Escalando o impacto (20 s) — a mesma equipe, um alcance maior
 
-1. **Problema.** Os relatórios para o board eram montados à mão: papelada crescendo e relógio.
-2. **Trabalho manual.** O ciclo extrair → conferir → copiar e colar → escrever destaques → revisar → enviar gira cada vez mais rápido.
-   - O analista sua: "de novo… e de novo".
-3. **Estratégia.** "Automatizar de ponta a ponta".
-   - O **interruptor** aparece, ligado, com a etiqueta "trabalho manual".
-4. **Como fizemos.** O pipeline se monta nó a nó com a luz acesa.
-   - A mão chega no interruptor.
-5. **Solução (drop).**
-   - **Clique: as luzes apagam.**
-   - O pipeline acende em neon e roda sozinho, e o carimbo marca "Relatório automatizado".
-6. **Impacto.** Antes × depois.
-   - Em seguida, "Mas quem escreve os destaques?" e o mergulho no nó Destaques, que leva ao case 4.
+- **Diagrama nomeado:** **Equipe** (três pessoas em ícones planos) → **Motor produtizado** → **Ativo reutilizável**.
+- **Espaço:** uma curva 3D em fita ganha corpo quando os projetos se ligam ao ativo.
+- **Projetos:** cinco contextos diferentes ligados ao mesmo ativo; a equipe fica na origem.
+- **Texto:** "*Automação*, *padronização* e *reutilização* ampliam o alcance das entregas."
+- **Conclusão:** "Um *ativo reutilizável* permite aplicar capacidades em *novos projetos*."
 
-### Case 4 · Insight Agent · agentes de IA (62 s)
+### 06 · A Prática (24 s) — os pilares viram a infraestrutura da viagem
 
-1. **Abertura.** **"Um case de agentes de IA"**, que escala a geração de insights para milhares de páginas e painéis.
-2. **Problema.** O painel de market share com os destaques escritos à mão e 30 adquirentes esperando.
-3. **Restrição.** O dado não pode sair do ambiente Mastercard. A API externa de IA aparece riscada.
-4. **Estratégia.** Um time de agentes de IA rodando localmente, em GPU.
-5. **Como fizemos.**
-   1. Geradores: analista, negócio e C-Level.
-   2. Julgadores com guardrails (Regex e BERT).
-   3. Corretores.
-   4. Nota de qualidade com Random Forest, com as 164 features e o MAE.
-   - Fecha com o carimbo "Insight validado".
-6. **Solução (drop).** Uma parede de páginas e painéis se escreve sozinha enquanto a câmera se afasta.
-   - Texto na tela: **"Milhares de páginas e painéis"**.
-   - Segunda onda: IA local, o dado nunca sai.
-7. **Impacto.** 30 adquirentes: 8 ativos, 22 a conquistar sem crescer o time.
-   - Depois, 12 + 4 clientes e PoCs e os projetos user-pay.
+- **Visual:** os pilares sobem como colunas de viaduto com os nomes, e a linha corre por cima, com o trem passando como um monotrilho. Objetos 3D flutuam no céu.
+- **Contribuições:** cada pilar ganha um cartão com uma contribuição curta (campo `contribution` do JSON) e "N entregas", em dois grupos que ficam até o fim.
+- **Conclusão (v7.14):** "Ao mesmo tempo que traz *governança*, a prática permite a *evolução das técnicas* e da *jornada analytics*."
 
-### 05 · Escalando o impacto (13 s)
+## Conversa 2
 
-- A escada vai do manual à IA escalável, com os exemplos dos cases.
-- *Legenda:* "Cada degrau leva o mesmo time a mais clientes".
+- **Música (v7.16):** a música das conversas em loop, por baixo da fala.
 
-### 06 · A Prática (20 s)
+- **Tela:** a estação futurista e a chamada "QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?".
+- **Cartazes:**
+  - **04:** as quatro provas lado a lado (+18,8% · +4 p.p. · automáticos · 8 + 22);
+  - **05:** o diagrama do reuso;
+  - **06:** os pilares com a contribuição de cada um.
+- **Lupa:** 12 cenas em loop dos cases, mais a 05 e a 06.
 
-- Mostra pilares, entregas e evoluções.
-- O conteúdo ainda é um rascunho no JSON, à espera do material da Nat.
-- Fecha com o letreiro "PARADA 2 · BALDEAÇÃO".
+## Play 4 · final (ElevenLabs, final orquestral, 0:45 desde a v7.15)
 
-## Parada 2
+1. **07 · Para onde vamos (26 s):** uma cidade noturna conectada.
+   - Cada direção tem painel ilustrado, título e subtítulo, em três grupos:
+     - Apoiar decisões estratégicas · dos clientes (sala do board) e Combinar analytics · com as demais tracks;
+     - Automatizar rotinas · para ganhar eficiência (robôs) e Eficiência operacional · e ganho de escala (uma grade que cresce): a automação das rotinas leva ao ganho de escala;
+     - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
+   - Um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?" (v7.14: sem as linhas coloridas que subiam em curva até a laranja).
+   - No fim, uma estação tracejada "?": a próxima estação. v7.15: ela aparece com a volta da orquestra (a emenda da parte 3, 22,8 s).
+2. **(Até a v7.14) Por trás de tudo (26 s, v7.11):** saiu na v7.15. Os métodos e as técnicas foram para a estação 03, e a frase-chave foi para o letreiro. "Por trás de tudo, *métodos* e *técnicas*". Cinco cases entram numa fileira, um por compasso desde que a batida começa, e cada card **vira** 2 tempos depois. Frente: visualização, case e método. Verso: as técnicas. Todos ficam virados para leitura até a frase-chave:
+   - Mesa de performance · teste A/B → power analysis, testes de hipótese, plano de amostragem
+   - Prevenção a fraude · modelo supervisionado → cross validation, PCA, gradient boosting e outras técnicas
+   - Segmentação / Recomendação · modelo não supervisionado → k-means, filtro colaborativo, matrix factorization e outras técnicas
+   - Forecast · séries temporais → ARIMA, SARIMAX, boosting, componentes de Fourier
+   - Pricing / dimensionamento · otimização → PO (pesquisa operacional), simulação de Monte Carlo, programação linear, modelos de estoque
 
-- **Cena:** cartazes 04, 05 e 06. A estação 04 tem 11 cenas montadas, divididas em duas fileiras de miniaturas.
-
----
-
-## Play 4 · final ("Epic Piano", 1:07)
-
-1. **07 · O futuro de analytics.**
-   - As três placas:
-     - mais perto das decisões;
-     - mais integrados às demais tracks;
-     - mais escaláveis e diferenciados.
-   - Cada placa entra com a sua legenda.
-   - Fecha com "É esse o papel que queremos ocupar".
-2. **Clímax.** Oito cortes rápidos, da estatística aos agentes.
-   - Legenda no topo: "Tudo o que vimos se apoia em ciência de dados".
-   - Fecha com "Nossa especialidade é analytics".
-3. **Letreiro final.**
-   - O split-flap mostra "WELCOME TO THE FUTURE / AI / ANALYTICS / PERFORMANCE ANALYTICS", com legendas em português.
-   - Depois vem "Obrigado! Agora a conversa é com vocês".
+   No grande ataque (v7.12), os cards saem e a frase sobe: "Tudo se resume a *Analytics*." Embaixo dela volta o eixo da v5, "do mais simples ao mais complexo": 12 técnicas em cards com mini-visualização (estatística, regressão, séries temporais, otimização, clusters, árvores, gradient boosting, recomendação, embeddings, redes neurais, transformers, agentes de IA), acesas uma a uma por uma varredura que termina no último tempo forte da música.
+3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português (v7.12: sem "próxima parada").
+   - O prato da cadência final acende o letreiro e, desde a v7.15, a frase **"Tudo se resume a *Analytics*."** aparece entre o símbolo e o letreiro.
+   - O "Obrigado! Agora a conversa é com *vocês*" entra 2 tempos depois, e o vídeo termina com a cauda do acorde.
 
 ## Encerramento
 
-- **Cena:** o letreiro fica vivo.
-- **Clique ou →:** abre o cartaz 07 com as cenas embaixo.
+- **Música (v7.17):** depois do letreiro, a música das conversas entra do começo em fade e toca em loop até alguém apertar uma tecla.
 
----
+O letreiro fica aceso sobre a estação futurista. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
 
-## Trilha
+## Trilha (v7.4–v7.7 · ElevenLabs; conversas na v7.16)
 
-| Play | Faixa (Pixabay) | Uso |
-|---|---|---|
-| 1 | trilha sintetizada a 120 BPM | drop quando as portas abrem |
-| 2 | berrydeep — "Vintage Film Funk" | inteira (1:59) |
-| 3 | kulakovka — "Technology" | remontada em 4:24 (`tools/edit_tech.py`): abertura + 4 × (calma → construção → drop) + saída |
-| 4 | twisterium — "Epic Piano Background" | a partir de 0:07 (1:07) |
+As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tempos do filme (`tools/eleven_fit.py`).
 
-- **Os MP3:** ficam em `musica/`, fora do Git. O build embute as faixas no HTML.
-- **Picos de cada cena:** ficam em `SCENES[id].peaks`.
-- **Intensidade fora dos picos:** é `CONFIG.motion.beatBase`, hoje em 0,15.
-
----
-
-## Dados
-
-- **Onde ficam:** os números vêm de `data/presentation.json`, embutido no topo do HTML no bloco `pa-data`.
-- **Legendas:** as que citam números também são montadas a partir dele.
-- **Para completar depois:**
-  - a seção 6 (Prática);
-  - os campos vazios do Lights-off: se `business_results.headline` for preenchido, ele aparece no carimbo;
-  - `other_tracks`, na seção 3.
-
----
-
-## Direção visual
-
-- **Paleta Mastercard:** vermelho `#EB001B`, laranja `#FF5F00` e amarelo `#F79E1B`, sobre tinta e papel.
-- **Colagem com traço de tinta:** contornos marcados, sombras chapadas e respingos, no estilo Fortiche/Arcane.
-- **Futurista quando o assunto é modelo:** neon, grid em perspectiva e scanlines.
-- **Elementos de metrô:**
-  - plataforma, painel de partidas e vagão com a faixa vermelho-laranja-amarelo;
-  - bilhete, letreiro split-flap e painel de LED "próxima estação";
-  - mapa da linha e cartazes das paradas.
+- **Parte 1 · estações 01–03 (funk cinematográfico, 110 BPM):**
+  - intro abafada que abre no tema (0:12);
+  - o tema volta maior na estação 02;
+  - na estação 03 a música fica só com médios (o "low"), faz uma pausa e o drop entra na parte B (1:45,9) com riser e impacto;
+  - as viradas de estação caem no tempo forte.
+- **Parte 2 · os cases, 05 e 06 (opção A, 108 BPM):**
+  - uma versão por case, cada uma do jeito que foi composta (sem filtros, efeitos, compassos repetidos ou silêncios); as cenas seguem a música;
+  - case 1: os blocos novos da música entram no começo do case e na solução;
+  - case 2: a subida da música cai na solução, e o acorde final soa até a porta;
+  - automação: a pausa composta na própria música é o interruptor, e o drop acende o neon;
+  - IA: a cena começa com o crescendo de 16 compassos, e o maior drop cai na escala, o pico da apresentação;
+  - 05/06: o acorde final da música cai na conclusão da 06.
+- **Parte 3 · 07 e letreiro (final orquestral, 100 BPM, sem coro):**
+  - v7.15: 11 compassos a menos (1:11 → 0:45), num corte só, escolhido pelo usuário: o piano segue até 22,8 s e emenda, no tempo forte, na volta da orquestra (mesmo tom, 80 ms de transição, sem filtros);
+  - a cidade tem piano e cordas, e a orquestra volta junto com a estação "?";
+  - o letreiro e a frase-chave acendem no prato da cadência final, e o vídeo termina com a cauda desse acorde.
+- **Música das conversas (v7.16):** balada pop original (ElevenLabs), com violino cantando a melodia no lugar da voz, piano, cordas, violão e uma batida suave, a 106,7 BPM.
+  - Toca na Conversa 0 e nas duas baldeações, em loop sem fim: introdução uma vez, depois um trecho de 192 tempos que se repete com 0,3 s de transição.
+  - Entra e sai em fade, cerca de 10 dB abaixo do filme.
+  - Não é uma versão de música existente: a geração descreve só o clima.
+  - v7.17: a mesma música é a trilha da abertura e toca também no encerramento. Nas cópias locais, é a música escolhida pelo usuário (uma música conhecida, em loop inteiro). No HTML do Git fica a da ElevenLabs, porque o repositório é público.

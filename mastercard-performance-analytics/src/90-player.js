@@ -13,6 +13,11 @@ const PLAYER = (() => {
   const stage = document.getElementById('stage'), intro = document.getElementById('intro'), ui = document.getElementById('ui');
   const $ = id => document.getElementById(id);
   const bar = $('bar'), fill = bar.querySelector('.fill'), knob = bar.querySelector('.knob'), tip = bar.querySelector('.tip');
+  // v7.19: sem sources.js (as músicas), o vídeo roda em silêncio; o aviso diz o que falta (clique fecha)
+  if (!SOURCES_OK) { const w = document.createElement('div'); w.id = 'srcwarn';
+    w.textContent = 'Falta o arquivo sources.js na mesma pasta deste HTML: o vídeo roda, mas sem as músicas. (clique para fechar)';
+    w.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99;background:#B3261E;color:#fff;font:600 15px/1.3 system-ui,sans-serif;padding:10px 16px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.4);cursor:pointer;max-width:90vw;text-align:center';
+    w.onclick = () => w.remove(); document.body.appendChild(w); console.warn('[fontes] sources.js não carregou: sem músicas'); }
   const DUR = CONFIG.duration, SHOW = CONFIG.mode !== 'reel', STOPS = CONFIG.stops, ITEM_DUR = 1.1;
   const st = { T: 0, playing: false, startPerf: 0, startT: 0, ended: false,
     mode: SHOW ? 'stop' : 'play', stop: 0, item: 0, prevItem: 0, itemAt: performance.now(), stopAt: performance.now(), next: null };
@@ -24,7 +29,7 @@ const PLAYER = (() => {
     popup(v) { if (v === UI.pop) return; UI.prevPop = UI.pop; UI.pop = v; UI.popAt = performance.now(); poke(); },
     next: () => next(), depart: () => depart(), setItem: k => setItem(k)
   };
-  const NAME = s => s.station ? `${TX.stations[s.station - 1].n} · ${TX.stations[s.station - 1].short}` : ({ open: 'Abertura', climax: 'Clímax', close: 'Letreiro final' })[s.id] || s.id;
+  const NAME = s => s.station ? `${TX.stations[s.station - 1].n} · ${TX.stations[s.station - 1].short}` : ({ open: 'Abertura', close: 'Letreiro final' })[s.id] || s.id;
   const STOP_NAME = { preshow: 'Pré-show', stop0: 'Parada 0 · roteiro', stop1: 'Parada 1 · retomada', stop2: 'Parada 2 · retomada', end: 'Encerramento' };
 
   // ---------- render ----------
@@ -35,12 +40,12 @@ const PLAYER = (() => {
   }
   function themeOf(s, t) { const impl = SCENES[s.id]; return impl && impl.themeAt ? impl.themeAt(t) : s.theme; }
   /** desenha o quadro do trecho no instante T, sem sobreposições (as paradas usam para emendar) */
-  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); [BT, NOW] = keep; }
+  function frameAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = BEAT.at(T); NOW = T; HUD.begin(c); try { (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); } finally { HUD.flush(c); } [BT, NOW] = keep; }
   /** slide "montado" para as paradas: o quadro do trecho sem batida, com a legenda daquele momento */
-  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
+  function slideAt(c, T) { const s = sceneAt(T), keep = [BT, NOW]; BT = { ...BEAT.quiet, level: .3, low: .3 }; NOW = T; HUD.begin(c); try { c.save(); (SCENES[s.id] || { draw: () => bgDark(c, 0) }).draw(c, T - s.start, T); c.restore(); PAINT.post(c); } finally { HUD.flush(c); } captionStrip(c, s, T - s.start); [BT, NOW] = keep; }
 
   function renderPlay(T) {
-    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T;
+    T = clamp(T, 0, DUR - 1e-3); BT = BEAT.at(T); NOW = T; HUD.reset(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; HUD.begin(ctx);
     const s = sceneAt(T), t = T - s.start, sh = shakeAt(T), fx = typeof FX !== 'undefined';
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.save(); ctx.translate(sh.x, sh.y); ctx.translate(W / 2, H / 2); ctx.rotate(sh.r);
@@ -50,19 +55,25 @@ const PLAYER = (() => {
     ctx.restore();
     if (fx) FX.post(ctx, T, s);
     PAINT.post(ctx);
+    HUD.flush(ctx);   // texto nítido por cima do acabamento pintado (src/14-v7.js)
     if (typeof overlayPlay === 'function') overlayPlay(ctx, T, s, themeOf(s, t));
     if (CONFIG.captions) caption(VOICE.caption(T));
     grain(ctx, T);
+    mockBadge(ctx);
   }
   function renderStop(id, tl, item, prevItem, p) {
     BT = BEAT.idle(tl); NOW = tl;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     const impl = STOPSCN[id], now = performance.now();
     UI.selP = clamp((now - UI.selAt) / 1000 / .9); UI.popP = clamp((now - UI.popAt) / 1000 / .35); UI.popT = (now - UI.popAt) / 1000;
+    HUD.reset(); HUD.begin(ctx);
     if (impl) impl.draw(ctx, tl, item, prevItem, p, UI);
     if (!(impl && impl.noPaint)) PAINT.post(ctx);
+    HUD.flush(ctx);
+    if (impl && impl.ui) impl.ui(ctx, tl, item, prevItem, p, UI);   // interface da parada (cartões, miniaturas, popup) por cima, sem pintura
     else { bgDark(ctx, tl); text(ctx, `${STOP_NAME[id]} · item ${item + 1}`, W / 2, H / 2, { size: 56, align: 'center', color: C.stone }); }
     grain(ctx, tl * 30);
+    mockBadge(ctx);
   }
   function render() {
     if (st.mode === 'stop') {
@@ -89,18 +100,27 @@ const PLAYER = (() => {
     if (st.T >= DUR - .05) st.T = 0;
     st.mode = 'play'; st.playing = true; st.ended = false; st.startT = st.T; st.startPerf = performance.now(); st.next = nextStop(st.T);
     if (CONFIG.audio.music || CONFIG.audio.sfx) AUDIO.start(st.T); else AUDIO.init();
+    // v7.17–v7.18: na abertura (play com pause) a música das conversas é a trilha, no mesmo relógio das faixas do filme (o drop cai
+    // nas portas do trem); nos outros plays ela sai em fade enquanto o vídeo volta
+    const pl = CONFIG.playById[sceneAt(st.T).play];
+    if (pl && pl.pause && PAUSE.buf) PAUSE.playFrom(st.T - pl.start, AUDIO.playing ? AUDIO.ctxTime(st.T) : 0); else PAUSE.stop();
     VOICE.reset(st.T); intro.classList.add('hidden'); syncUI(); poke();
   }
-  function pause() { st.T = now(); st.playing = false; AUDIO.stop(); VOICE.pause(); syncUI(); poke(); }
+  function pause() { st.T = now(); st.playing = false; PAUSE.stop(.25); AUDIO.stop(); VOICE.pause(); syncUI(); poke(); }
   function seek(T) {
     const was = st.playing && st.mode === 'play'; if (was) pause();
-    st.mode = 'play'; st.T = clamp(T, 0, DUR); st.next = nextStop(st.T);
+    PAUSE.stop(); st.mode = 'play'; st.T = clamp(T, 0, DUR); st.next = nextStop(st.T);
     if (was) play(); else { VOICE.reset(st.T); syncUI(); }
   }
   function toggle() { if (st.mode === 'stop') return next(); st.playing ? pause() : play(); }
+  const SNAP = { cv: null, T: -1 };
+  /** o último quadro do vídeo, se foi o instante T (a transição para a conversa usa ele) */
+  function snapshot(T) { return SNAP.cv && Math.abs(SNAP.T - T) < .3 ? SNAP.cv : null; }
   function enterStop(i) {
+    if (st.mode === 'play') { SNAP.cv = SNAP.cv || makeCanvas(W, H, () => {}); const g = SNAP.cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.drawImage(cv, 0, 0); SNAP.T = STOPS[i].T; }
     if (st.playing) { st.playing = false; AUDIO.stop(); VOICE.pause(); }
     st.mode = 'stop'; st.stop = i; st.T = STOPS[i].T; st.item = st.prevItem = 0; st.itemAt = st.stopAt = performance.now(); st.next = null; resetUI();
+    PAUSE.start(STOPS[i].id);   // v7.16: a música das conversas (só nas paradas de CONFIG.audio.pause.stops)
     syncUI(); poke();
   }
   function setItem(k) { st.prevItem = st.item; st.item = k; st.itemAt = performance.now(); UI.pop = UI.prevPop = null; poke(); }
@@ -208,5 +228,5 @@ const PLAYER = (() => {
   window.__renderStop = (id, tl, item = 0, prevItem = item, p = 1, ui) => { const keep = { ...UI }; if (ui) Object.assign(UI, { selAt: -1e9, popAt: -1e9 }, ui); renderStop(id, tl, item, prevItem, p); Object.assign(UI, keep); };
   window.__ui = UI; window.__ctl = CTL;
   window.__seek = seek; window.__state = st; window.__next = next; window.__prev = prev; window.__gotoStop = gotoStop; window.__jump = jumpStation;
-  return { play, pause, seek, frameAt, slideAt, next, prev };
+  return { play, pause, seek, frameAt, slideAt, snapshot, next, prev };
 })();

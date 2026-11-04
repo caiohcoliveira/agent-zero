@@ -18,12 +18,15 @@ function cue(sceneId, at, type, opt = {}) {
 // Flags: kick hat hat16 clap bass arp pad pluck comic roll big soft minor arpOct rise (filtro sobe até o fim da seção)
 const FULL = { kick: 1, hat: 1, clap: 1, bass: 1, arp: 1, pad: 1 };
 const MUSIC_SPEC = {
-  open: [[0, { pad: 1, f: 700 }], [2.5, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [4.5, { ...FULL, f: 14000 }], [9, { pad: 1, f: 1400 }]]
+  // embarque (20 s): identidade → as portas abrem no tempo cheio (6 s) → o mapa ganha brilho (13 s) → respiro para a Conversa 0
+  open: [[0, { pad: 1, f: 700 }], [2, { pad: 1, kick: 1, soft: 1, f: 1200, rise: 1 }], [6, { ...FULL, f: 14000 }], [13, { ...FULL, arpOct: 1, f: 14000 }], [18, { pad: 1, f: 1400 }]]
 };
 const FALLBACK_SPEC = [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 6000 }]], SILENT_SPEC = [[0, { f: 3000 }]];
 const MUSIC = (() => {
-  const out = [], hasTrack = sc => { const p = CONFIG.playById[sc.play]; return !!(p && p.track && document.getElementById('music-' + p.track)); };
-  CONFIG.scenes.forEach(sc => { const spec = MUSIC_SPEC[sc.id] || (hasTrack(sc) ? SILENT_SPEC : FALLBACK_SPEC);
+  const out = [], hasTrack = sc => { const p = CONFIG.playById[sc.play]; return !!(p && p.track && MUSIC_SRC(p.track)); };
+  // v7.17: o play com a música das conversas (a abertura) fica sem a trilha sintetizada, se a faixa estiver no HTML
+  const pauseMusic = sc => { const p = CONFIG.playById[sc.play], c = CONFIG.audio.pause; return !!(p && p.pause && c && MUSIC_SRC(c.track)); };
+  CONFIG.scenes.forEach(sc => { const spec = (pauseMusic(sc) ? SILENT_SPEC : null) || MUSIC_SPEC[sc.id] || (hasTrack(sc) ? SILENT_SPEC : FALLBACK_SPEC);
     spec.forEach(([at, f], i) => out.push([sc.start + at, sc.start + (i + 1 < spec.length ? spec[i + 1][0] : sc.dur), f])); });
   out.push([CONFIG.duration, CONFIG.duration + 1, { f: 3000 }]);
   return out;
@@ -60,7 +63,7 @@ const AUDIO = {
     if (!this.ready) return; const n = this.ctx.currentTime;
     this.music.gain.setTargetAtTime(CONFIG.audio.music ? CONFIG.audio.musicVolume * this.duck : 0, n, .08);
     this.sfx.gain.setTargetAtTime(CONFIG.audio.sfx ? CONFIG.audio.sfxVolume : 0, n, .05);
-    TRACK.apply();
+    TRACK.apply(); PAUSE.apply();
   },
   setDuck(on) { this.duck = on ? CONFIG.audio.duckDuringVoice : 1; this.applyToggles(); },
 
@@ -79,7 +82,7 @@ const AUDIO = {
   },
   stop() {
     this.playing = false; clearInterval(this.timer); TRACK.stopAll();
-    if (this.ready) { this.music.gain.cancelScheduledValues(0); this.sfx.gain.cancelScheduledValues(0); this.ctx.suspend(); this.rebuildBuses(); }
+    if (this.ready) { this.music.gain.cancelScheduledValues(0); this.sfx.gain.cancelScheduledValues(0); if (!PAUSE.on) this.ctx.suspend(); this.rebuildBuses(); }   // v7.17: a música das conversas continua
   },
   /** ao pausar/seek, descarta notas já agendadas recriando os buses */
   rebuildBuses() {

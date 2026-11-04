@@ -6,10 +6,65 @@
 <title>Performance Analytics — A Linha</title>
 <!--
   ============================================================================
-  DADOS DO VÍDEO (JSON) — os números e textos das cenas vêm deste bloco.
-  Para trocar uma informação: edite o valor abaixo e salve o arquivo.
-  No projeto, a fonte é data/presentation.json, que ./build.sh injeta aqui.
-  Um item de "headline_numbers_for_slides" aceita "display" para fixar o texto exato de tela.
+  LEIA-ME · COMO TROCAR OS DADOS DESTE VÍDEO
+  ============================================================================
+  Este arquivo é o vídeo (1920 × 1080, funciona offline). Todos os números e textos
+  das telas de dados vêm do bloco JSON logo abaixo (<script id="pa-data">).
+  O resto do arquivo (estilos e código) não precisa ser mexido.
+
+  ARQUIVOS (todos NA MESMA PASTA)
+    • este HTML ................. o vídeo: guia, dados, estilos e código (sem base64)
+    • sources.js ................ as músicas (MP3 em base64) e as grades de batida;
+                                  não precisa ser aberto nem editado. Sem ele, o vídeo
+                                  roda em silêncio e mostra um aviso no topo.
+    • dashboard-fraude.png ...... o print do dashboard (veja o passo 5)
+
+  PASSO A PASSO
+    1. Abra este arquivo num editor de texto (VS Code, Notepad++, Sublime…).
+    2. Troque o conteúdo entre  <script type="application/json" id="pa-data">  e
+       </script>  pelo JSON com os dados reais, mantendo os mesmos nomes de chave.
+    3. Salve e abra no Chrome ou no Edge. Se aparecer "—" numa tela, a chave daquele
+       dado não foi encontrada: confira o nome.
+    4. Na versão real, apague o campo presentation_context.disclaimer (é ele que mostra
+       o aviso "versão mockada" no canto de todas as telas).
+    5. A imagem do dashboard (case de relatórios) é o arquivo dashboard-fraude.png NA
+       MESMA PASTA deste HTML: troque pelo print real com o mesmo nome (ou escreva outro
+       nome no campo dashboard_image do case). Sem o arquivo, o vídeo desenha um
+       dashboard ilustrativo.
+
+  REGRAS DO JSON
+    • aspas duplas e nenhuma vírgula depois do último item (valide no VS Code ou em
+      jsonlint.com antes de salvar: um JSON inválido deixa as telas sem dados);
+    • valores em milhões de US$ são números: 2.5 = US$ 2,5 mi;
+    • percentuais podem vir como texto: "21%";
+    • o ano vem do nome da chave: business_scale_2026 → "em 2026";
+    • versão para circular (mascarada): troque os nomes de clientes, tracks, tipos de projeto
+      e PILARES da prática por frutas e verduras (ex.: pilares Alface, Rúcula, Chuchu…).
+
+  ONDE CADA CAMPO APARECE
+    presentation_context.organization ............. pré-show e letreiro final
+    presentation_context.disclaimer ............... aviso "versão mockada" (apague na versão real)
+    Seção 2 · estação 02 (evolução e impacto)
+      revenue_performance_analytics_usd_millions .... tela 1: receita por ano ("2026_forecast" = previsão)
+      business_scale_AAAA.projects_delivered ........ tela 2: número de projetos
+        (projects_delivered_display curto, como "+30", substitui o número na tela)
+      business_scale_AAAA.highlight_project_type .... tela 2: a frente em destaque (opcional; sem ele, a de
+        maior receita). Valor = revenue_share da frente × business_scale_AAAA.revenue_usd_millions_approx
+      revenue_contribution_by_project_type_AAAA ..... tela 2: receita por tipo de projeto
+        (project_type, revenue_share e delivery_model: "Track" = só a track; "Track + Outra" = com outra track)
+      revenue_contribution_summary_AAAA ............. tela 2: receita só da track × com outras tracks
+      project_mix_AAAA.projects_with_other_tracks_approx .. tela 2: % de projetos com outras tracks
+      team_structure_AAAA ........................... tela 3: pessoas por nível
+        (levels: level, current_internal_positions; e o total current_internal_positions.
+         Só as posições internas aparecem: os contractors ficam fora da tela)
+    Seção 3 (client_types, capabilities) ............ estação 03
+    Seção 4 · cases, NESTA ORDEM .................... estação 04
+      1º cestas de produtos · 2º principalidade · 3º relatórios automatizados · 4º agentes de IA
+      (o vídeo acha cada case pelo começo do nome: "Cliente Banana", "Cliente Manga", "Lights-off",
+       "Insight Agent"; se o nome for outro, vale a posição na lista)
+    Seção 5 (innovation_examples) ................... estação 05
+    Seção 6 (pillars: pillar, contribution ou highlights) .. estação 06
+    headline_numbers_for_slides ..................... números de apoio ("display" fixa o texto exato)
   ============================================================================
 -->
 <script type="application/json" id="pa-data">
@@ -17,21 +72,13 @@
 </script>
 <!--
   ============================================================================
-  PERFORMANCE ANALYTICS — "A INTERSEÇÃO"
-  Vídeo animado executivo (~4:00) · 1920×1080 · arquivo único, 100% offline.
+  PERFORMANCE ANALYTICS — "A LINHA"
+  Vídeo executivo animado (~8:22 em 4 trechos + paradas de conversa) · 1920 × 1080 ·
+  offline. Ordem do arquivo: dados (acima) → estilos → sources.js (músicas e grades de
+  batida, arquivo à parte) → código (um <script>, montado a partir de src/ por tools/build.py).
 
-  Arquitetura (um único <script>, organizado em seções):
-    1. CONFIG ........ parâmetros editáveis (cores, tempos, textos, narração, áudio, motion)
-    2. CORE .......... easing, interpolação, RNG com seed, cores, primitivas de desenho, câmera
-    3. COMPONENTS .... ícones, agentes, cards, carimbos, chips de capítulo, dashboard
-    4. VIZ ........... visualizações de modelos (gaussiana, regressão, árvore, clusters…)
-    5. AUDIO ......... trilha + SFX sintetizados em Web Audio (sincronizados à timeline)
-    6. VOICE ......... narração via Web Speech API (pt-BR, voz feminina quando disponível)
-    7. SCENES ........ 10 cenas; cada uma é uma função pura draw(ctx, t) → seek perfeito
-    8. PLAYER ........ loop requestAnimationFrame, transições, controles, teclado
-
-  Atalhos: Espaço = play/pause · R = reiniciar · ←/→ = ±5s · F = tela cheia
-           M = som · V = voz · C = legendas
+  Atalhos: → / Espaço = seguir · ← = voltar · 1 a 7 = estação · P = pausa · F = tela cheia · M = som
+           Home ou R = começo · End = fim · C = legendas · Q = qualidade
   ============================================================================
 -->
 <style>
@@ -129,7 +176,7 @@
   <button id="bFull" title="Tela cheia (F)">⛶</button>
   <span id="voiceinfo"></span>
 </div>
-<!-- MÚSICAS (base64, geradas pelo build a partir de musica/) -->
+<!-- FONTES: as músicas (base64) e as grades de batida ficam em sources.js, NA MESMA PASTA deste HTML -->
 <!--PA_MUSIC-->
 <script>
 "use strict";

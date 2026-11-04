@@ -1,12 +1,92 @@
-# Performance Analytics — "A Linha" (v5)
+# Performance Analytics — "A Linha" (v7.19, experimento)
 
-Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há paradas em loop, para as apresentadoras falarem. O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito de Arcane. Os objetos e personagens têm volume, as texturas parecem pintadas à mão e a iluminação é cinematográfica. A estação tem eventos acontecendo em paralelo.
+> **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
+> - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
+> - os métodos e as técnicas por trás dos cases (v7.11 no clímax; desde a v7.15, em cards na estação 03);
+> - o letreiro WELCOME TO… no final;
+> - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.19:**
+> - **o base64 saiu do HTML:** a apresentação agora são arquivos lado a lado, na mesma pasta:
+>   - `performance-analytics.html`: o guia, o JSON de dados, os estilos e toda a programação das animações (≈ 0,5 MB, sem base64, nenhuma linha longa). **É o arquivo que se edita**, à mão ou por outra IA;
+>   - `sources.js`: as músicas (MP3 em base64) e as grades de batida (`src/07-beats.js`), carregado pelo HTML com `<script src="sources.js">`. Não precisa ser aberto nem editado;
+>   - `dashboard-fraude.png`: o print do dashboard (nome no campo `dashboard_image` do case; pode ser .png ou .jpg).
+> - Sem o `sources.js`, o vídeo roda em silêncio, com a grade sintetizada, e mostra um aviso no topo.
+> - `tools/build.py` gera o HTML e o `sources.js` juntos, na pasta de saída. Duas versões (dados mockados e mascarados) na mesma pasta usam o mesmo `sources.js`.
+>
+> **v7.18:**
+> - **o drop nas portas do trem:** a abertura começa a música no ponto em que o primeiro drop dela cai exatamente quando as portas do trem abrem (6,0 s).
+>   - Na música do usuário, ela começa em 28,85 s. A introdução e a pausa da música antes do drop acompanham a chegada do trem.
+>   - Do drop em diante, os pulsos da abertura voltam, na grade da própria música (112 BPM, ancorada no drop).
+>   - `tools/pausa.py` acha o drop e a grade sozinho; `--drop SEGUNDOS` fixa o drop à mão. Os valores vão no bloco (`data-drop`, `data-beat0`, `data-beat`), e a cena marca o ponto de encontro (`musicSync` da abertura).
+>
+> **v7.17:**
+> - **música das conversas = trilha da abertura:** a mesma música toca na abertura (a parte zero), no nível do filme, e segue sem recomeçar para a Conversa 0, onde desce para o fundo em 2 s.
+>   - Depois entra do começo nas duas baldeações e no encerramento (depois do letreiro PERFORMANCE ANALYTICS), sempre em loop sem fim até alguém apertar uma tecla.
+>   - Na abertura, a trilha sintetizada e os pulsos de 120 BPM saem.
+> - **música escolhida pelo usuário:** veio como arquivo (MP4 só com áudio, 2:45) e é a música de **todas as cópias de apresentação**. Não vai para o Git: o repositório é público e a gravação é de terceiros.
+>   - O HTML do Git sai **sem música das conversas**: a da ElevenLabs saiu a pedido do usuário. A abertura volta para a trilha sintetizada, e as paradas ficam em silêncio.
+>   - Se o repositório ficar privado, a música pode entrar no HTML do Git também.
+>   - Por ser uma música conhecida, o loop é a música inteira: do fim volta ao começo, como "repetir" num player (`tools/pausa.py --inteira`).
+>   - O laço e o volume viajam com a faixa (`data-*` no bloco `music-pausa`). `PA_PAUSA=musica/pausa-usuario.mp3 python3 tools/build.py dados.json saida.html` monta a cópia com ela.
+>
+> **v7.16:**
+> - **música das conversas:** uma balada pop original com violino no lugar da voz, gerada na ElevenLabs, toca em loop sem fim na Conversa 0 (mapa da linha) e nas duas baldeações (Conversas 1 e 2), por baixo da fala de quem apresenta. Ela entra em fade quando a parada abre e sai em fade quando o vídeo segue. Fica cerca de 10 dB abaixo do filme, e a tecla M silencia;
+> - não é uma versão de música existente: a melodia da música pedida como referência é protegida, e a ElevenLabs não gera a partir de nomes de músicas. A geração descreve só o clima (balada pop calorosa, violino cantando a melodia, piano, cordas e uma batida suave).
+>
+> **v7.15:**
+> - **sem o clímax "Por trás de tudo":** os 5 cases com métodos e técnicas foram para a estação 03, no lugar de "Modelos preditivos antecipam resultados" e "Modelos prescritivos ajudam a escolher ações": 3 cards preditivos (supervisionado, não supervisionado, séries temporais) e 2 prescritivos (otimização, teste A/B), com o desenho do método, um exemplo e as técnicas. A estação 03 manteve a duração, e a música da parte 1 não mudou;
+> - **parte 3 com 11 compassos a menos** (1:11 → 0:45): um corte só, aprovado na prévia A. O piano segue até 22,8 s e emenda, no tempo forte, na volta da orquestra; o letreiro continua no prato da cadência final e o vídeo termina com a cauda do acorde;
+> - **"Tudo se resume a *Analytics*."** agora aparece no letreiro final, no prato da cadência, entre o símbolo e o PERFORMANCE ANALYTICS;
+> - o vídeo tem **8:22** (eram 8:48).
+>
+> **v7.11:**
+> - **estação das conversas:** saiu o metrô subterrâneo (azulejos, ratinho, pombo, goteira, grafites). Agora é uma estação ao ar livre, com cobertura de nervuras brancas e vidro, parede de vidro com a cidade clara e um viaduto onde um trem bala passa ao longe, jardins verticais, árvores e floreiras, e painéis brancos pendurados no lugar dos cartazes de papel. Referências: Oculus (WTC), Zaragoza-Delicias, West Kowloon, "Train Station in the Forest" (MAD), Jönköping e o jardim de Atocha;
+> - **trem bala:** o vagão antigo virou um trem bala de dois vagões (nariz aerodinâmico, faixa contínua de janelas, saia lisa e as cores da Mastercard), no embarque, na ponte, no viaduto, na 07, na passagem entre estações e ao fundo da estação;
+> - **telas com gráfico minimalistas:** sem fachos de luz, poeira, partículas, objetos flutuando, fitas 3D, grade neon, rastros de velocidade e prédios ao fundo. A cidade só aparece onde o trem passa (ponte da 01, viaduto da 06 e cidade da 07);
+> - **barras chapadas** (sem volume 3D nem brilho) e números-manchete sem respingo;
+> - **cases:** os clusters 3D da v5 na principalidade e a resolução de erros da v5 no case de IA;
+> - **clímax:** 5 cases que entram nos compassos e viram (frente: case e método; verso: técnicas).
+>
+> **v7.12:**
+> - **sem "próxima parada"** (o letreiro final e o aviso antes das conversas) e **sem "linha" no nome**: "Performance Analytics" no bilhete, no pré-show e no painel da estação;
+> - **sem tinta:** títulos em faixa lisa (sem pincelada, respingo ou contorno), sem respingos no letreiro e sem a textura de pinceladas por cima do quadro (`motion.strokes` = 0);
+> - **clímax:** a frase final é "Tudo se resume a *Analytics*." e volta o eixo da v5: 12 técnicas, do mais simples ao mais complexo, acesas por uma varredura até o último tempo forte;
+> - **relatórios automatizados:** os painéis saem do monitor e se empilham no canto inferior esquerdo, com o contador, sem cobrir a animação da automação; o ANTES × DEPOIS fica ao lado;
+> - **ajustes:** as linhas da 07 correm alinhadas à linha laranja; o leque da 05 sai da borda do ativo reutilizável; o painel 07 do encerramento fica reto; o case de IA volta ao painel desenhado da v5.
+>
+> **v7.2:**
+> - **sem personagem:** cada aparição virou outra solução visual (o bilhete sozinho, um trem que cruza a ponte, a equipe em ícones planos, a tela e o interruptor contando a fraude, um trem que segue pela cidade);
+> - **espaço 3D:** campo de partículas com constelações, curvas 3D em fita e objetos flutuando (cubos, octaedros, anéis, orbes) atrás do conteúdo, girando com a câmera;
+> - **correções:** entrada das conversas sem textos misturados, barras do faturamento sem a "sujeira" no topo, ícones planos em "Onde aplicamos analytics" e embeddings imersivos (sem moldura).
 
-O vídeo roda **sem narrador**: cada cena tem legenda e uma conclusão escrita. A música marca os tempos das cenas, mas os efeitos de batida ficam contidos e só crescem nos clímax.
+Vídeo executivo animado para a reunião da área. A track vira uma linha de metrô com 7 estações em 4 plays. Entre os plays há **conversas**, telas em loop para as apresentadoras falarem.
 
-- **Arquivo final:** [`performance-analytics.html`](performance-analytics.html), um único HTML 1920×1080, 100% offline, com dados e músicas embutidos.
-- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v5).
+O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito de Arcane, e o texto fica **sempre nítido por cima da pintura**.
+
+**Teste do roteiro v7:** assistir sem som e sem ajuda precisa bastar. Em qualquer pausa dá para reconhecer o problema, o método, o resultado e a base da comparação.
+
+- **Arquivos finais (v7.19), na mesma pasta:**
+  - [`performance-analytics.html`](performance-analytics.html): 1920×1080, 100% offline, com os dados e a programação das animações;
+  - [`sources.js`](sources.js): as músicas e as grades de batida;
+  - `dashboard-fraude.png`.
+- **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v7).
 - **Checkpoint de retomada:** [`PROGRESS.md`](PROGRESS.md).
+
+## O contrato de cada tela
+
+| Camada | Onde | Tamanho |
+|---|---|---|
+| Etiqueta de contexto + etapa (cases) | topo à esquerda | 22 px |
+| Título: qual assunto ou etapa estamos vendo | topo à esquerda | 56 px |
+| Explicação: o que foi feito e por quê | painel junto ao visual | 36 px |
+| Rótulos dos gráficos e diagramas | no visual | 28 px ou mais |
+| Conclusão: o que guardar | faixa embaixo | 40 px |
+
+- **Leitura:** a câmera anda na apresentação da ideia e para durante a leitura.
+- **Gráficos:** sempre com métrica, unidade, período, categorias e base da comparação.
+- **Desenhos ilustrativos:** são identificados como ilustrativos.
+- **Tempo de leitura:** `tools/read_check.js` mede o tempo que cada texto fica parado na tela contra o roteiro v7: até 2,5 palavras/s, mais 2,5 s para cada visual novo. Hoje: **72 telas, 0 curtas**.
 
 ## Como apresentar
 
@@ -16,31 +96,29 @@ O vídeo roda **sem narrador**: cada cena tem legenda e uma conclusão escrita. 
 
 | Momento | O que acontece | Duração |
 |---|---|---|
-| Pré-show | loop de espera | até a primeira tecla |
-| Play 1 · embarque | plataforma, o trem chega, bilhete validado → o mapa da linha | 0:10 |
-| **Parada 0** · mapa | **clique numa estação** para ver o detalhe; → embarca | fala |
-| Play 2 · estações 01–03 | "Vintage Film Funk" | 1:59 |
-| **Parada 1** · retomada | plataforma com os cartazes 01, 02 e 03 (clicáveis) | fala |
-| Play 3 · estações 04–06 | "Technology" remontada para os cases | 4:24 |
-| **Parada 2** · retomada | cartazes 04, 05 e 06 (clicáveis) | fala |
-| Play 4 · 07, clímax e letreiro | "Epic Piano" (a partir de 0:07) | 1:07 |
+| Pré-show | loop de espera, com a missão escrita | até a primeira tecla |
+| Play 1 · embarque | identidade → propósito (o bilhete "DE dados → PARA valor" carimbado) → percurso (mapa com 3 capítulos) | 0:20 |
+| **Conversa 0** · mapa | missão + mapa; **clique numa estação** para ver o detalhe; → embarca | fala, com a música das conversas em loop (v7.16) |
+| Play 2 · estações 01–03 | funk cinematográfico (ElevenLabs), encaixado | 2:35 |
+| **Conversa 1** | cartazes 01, 02, 03 legíveis, chamada "Onde isso encontra o seu cliente?", "A seguir: quatro cases…" | fala, com a música das conversas |
+| Play 3 · estações 04–06 | opção A (ElevenLabs): uma versão por case, como foi composta; as cenas seguem a música | 4:42 |
+| **Conversa 2** | cartazes 04, 05, 06, chamada "Qual desafio pode virar o próximo case?" | fala, com a música das conversas |
+| Play 4 · 07 e letreiro | final orquestral (ElevenLabs) com 11 compassos a menos (v7.15); termina com o vídeo | 0:45 |
 | **Encerramento** | letreiro vivo; clique ou → abre o cartaz 07 | fala |
 
-São ~7:40 de vídeo no total.
+São **8:22 de vídeo** (v7.15). Com as conversas, a sessão cabe em 20 minutos.
 
-**Nas paradas, com o mouse:**
-- **Parada 0:**
+**Nas conversas, com o mouse:**
+- **Conversa 0:**
   - clique numa estação para aproximar e ver o cartão com o que ela mostra;
   - clique fora, Esc ou uma seta para voltar.
-- **Paradas 1, 2 e encerramento:**
-  - clique num cartaz para dar zoom na estação;
-  - embaixo aparecem as **cenas montadas** da estação, em miniaturas;
-  - clique numa miniatura para abrir a cena num **popup**, com a animação daquela etapa rodando em loop;
-  - para fechar, use ✕, Esc ou clique fora;
-  - para trocar de cena, use ‹ › ou as setas;
-  - clique fora do zoom para voltar à plataforma.
+- **Conversas 1, 2 e encerramento:**
+  - os cartazes já trazem o resumo completo, legível sem clicar;
+  - clique num cartaz para dar zoom: embaixo aparecem as **cenas montadas** da estação;
+  - clique numa miniatura para abrir a cena num **popup**, com a animação daquela etapa rodando em loop. Na estação 03 há uma tela extra, o **catálogo com os 20 modelos**;
+  - para fechar, use ✕, Esc ou clique fora; para trocar de cena, use ‹ › ou as setas.
 
-| Tecla | Na parada | Durante o vídeo |
+| Tecla | Na conversa | Durante o vídeo |
 |---|---|---|
 | → · PageDown · espaço · Enter | próximo cartaz; no último, embarca no próximo play (com popup aberto: próxima cena) | só espaço/Enter: pausa |
 | ← · PageUp | cartaz anterior (com popup aberto: cena anterior) | — (setas não pulam o vídeo) |
@@ -51,118 +129,181 @@ São ~7:40 de vídeo no total.
 | F · M · V · C | tela cheia · som · narração · legendas | idem |
 | Q | qualidade: automática → leve → máxima | idem |
 
-A barra de progresso mostra as estações (traços) e as paradas (losangos). Ela aceita clique e arraste, para quem opera. Os controles somem sozinhos durante as paradas e o vídeo e voltam ao mover o mouse.
-
-O modo `CONFIG.mode = 'reel'` roda tudo direto, sem paradas, para mandar por e-mail.
+O modo `CONFIG.mode = 'reel'` roda tudo direto, sem conversas, para mandar por e-mail.
 
 ## Dados do vídeo
 
-Os números e resultados das cenas vêm de um JSON embutido no topo do HTML, no bloco `<script type="application/json" id="pa-data">`.
+Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<script type="application/json" id="pa-data">`.
 
 - **No HTML pronto:** abra o arquivo num editor de texto, mude o valor no bloco `pa-data` e salve. É assim que os números mascarados podem ser trocados pelos originais.
-- **No projeto:** a fonte é `data/presentation.json`. Rode `./build.sh` para gerar o HTML com ele.
-- **Repositório público:**
-  - troque pelos números originais só na cópia local do HTML;
-  - edições feitas direto no HTML não voltam para o `data/presentation.json`. Para levar uma mudança adiante, atualize o JSON.
-- **Formatação:** automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`). Um item de `headline_numbers_for_slides` aceita `display` para fixar o texto exato de tela.
-- **Campo faltando:** a cena mostra "—" ou a versão sem número, em vez de quebrar.
-- **Prática (estação 06):** vem toda do JSON, em `presentation_structure` → seção 6 → `pillars`:
+- **No projeto:** a fonte é `data/presentation.json`. Rode `python3 tools/build.py` para gerar o HTML com ele (`python3 tools/build.py outro.json saida.html` monta uma cópia com outro JSON, sem mexer no HTML do projeto).
+- **Guia no próprio HTML (v7.13):** o topo do arquivo traz um LEIA-ME com o passo a passo, as regras do JSON e o mapa "campo → tela", logo acima do bloco de dados. Quem pegar o processo só precisa trocar o JSON e a imagem do dashboard.
+- **Repositório público:** troque pelos números originais só na cópia local do HTML. Não suba essa cópia para o Git.
+- **Formatação:** automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`, `+0.1875 relative` → `+18,8%`).
+  - A unidade da receita se ajusta ao valor: o mesmo gráfico mostra "US$ mil" ou "US$ mi".
+  - Dentro de um mesmo gráfico, a unidade é uma só.
+- **Estação 02 (v7.13):** em `presentation_structure` → seção 2 (o ano vem do nome da chave; vale o mais recente):
+  - `revenue_performance_analytics_usd_millions`: receita por ano, em milhões de US$ (`"2026_forecast"` = previsão);
+  - `business_scale_2026.projects_delivered`: o número de projetos (um `projects_delivered_display` curto, como `"+30"`, substitui o número na tela);
+  - `business_scale_2026.highlight_project_type` (opcional, v7.14): a frente em destaque. Sem ele, vale a de maior receita. O valor mostrado é `revenue_share` × `revenue_usd_millions_approx` ("~US$ X em receita de *Tipo* em 2026 (*Y%* do total)");
+  - `revenue_contribution_by_project_type_2026`: `project_type`, `revenue_share` (`"21%"`) e `delivery_model` (`"Track"` = só a track; `"Track + Outra"` = com outra track; `"Not specified"`);
+  - `revenue_contribution_summary_2026`: `pa_only_revenue_share`, `cross_track_revenue_share`, `unspecified_delivery_model_revenue_share` e `cross_track_revenue_breakdown`;
+  - `project_mix_2026.projects_with_other_tracks_approx`: % de projetos com outras tracks (base de projetos, mostrada separada da base de receita);
+  - `team_structure_2026`: `levels` (`level`, `current_internal_positions`) e o total `current_internal_positions`. Desde a v7.14 a tela mostra só as posições internas; os campos de contractors podem ficar no JSON, mas não aparecem.
+- **Versão mascarada (v7.13):** para circular, os nomes de clientes, tracks, tipos de projeto e **pilares da prática** viram frutas e verduras (no JSON público os pilares são Cenoura, Brócolis, Abobrinha, Beterraba e Couve). Sem o campo `contribution`, o pilar mostra o primeiro item de `highlights`.
+- **Cases pela posição (v7.13):** o vídeo acha cada case pelo começo do nome ("Cliente Banana", "Cliente Manga", "Lights-off", "Insight Agent"); se o JSON usar outros nomes, vale a posição na lista (1º cestas, 2º principalidade, 3º relatórios, 4º agentes).
+- **Frases calculadas a partir dos dados:**
+  - o índice das cestas é calculado: 2ª melhor campanha = 100 → Destilados = 118,8;
+  - agentes: ativos + oportunidades = universo, vindos de `business_results.pipeline`.
+- **Prática (estação 06):** em `presentation_structure` → seção 6 → `pillars`:
   ```json
   "pillars": [
-    { "pillar": "Nome do pilar", "highlights": ["entrega 1", "entrega 2", "…"] }
+    { "pillar": "Nome do pilar", "contribution": "uma contribuição de 6 a 8 palavras", "highlights": ["entrega 1", "entrega 2"] }
   ]
   ```
-  - A cena aceita de 1 a 6 pilares, com quantos itens quiser.
-  - A fonte diminui sozinha para o texto caber no cartão.
-  - O templo, os cartões, o cartaz da Parada 2 e o slide em popup são montados a partir desses campos.
-- **Ambiente seguro:** os nomes do repositório estão sanitizados (pilares "Cenoura", "Brócolis"…, clientes "Banana", "Manga"…). Para trocar pelos reais:
+  - `contribution` é **novo na v7**: a frase curta que aparece na estação 06 e no cartaz 06.
+  - Sem esse campo, a cena usa o primeiro item de `highlights`.
+  - A contagem "N entregas" vem do tamanho de `highlights`.
+- **Exemplos ilustrativos do case de agentes:** os objetos `AGX`, `WHY` e `SHORT`, no case 4 em `src/22-cases.js`, trazem:
+  - os rascunhos de cada gerador (Analista, Business, C-Level), na versão 1 e na versão 2;
+  - o motivo da reprovação e o título aprovado.
+
+  O filme rotula esses textos como exemplos. Troque por um exemplo real do tipo de revisão quando puder.
+- **Ambiente seguro:** os nomes do repositório estão sanitizados (pilares "Cenoura", "Brócolis"…, clientes "Banana", "Manga"…).
+  - **Lorem ipsum (v7.3):** as informações da prática estão em lorem ipsum: contribuições e entregas dos pilares. Mantêm a mesma quantidade de entregas por pilar.
+  - **Outros dados mascarados:** as fontes internas, os motivos do Brasil, os nomes das mecânicas de campanha ("Mecânica Lorem"…) e as ferramentas do case Manga.
+
+  Para trocar pelos reais:
   1. Abra uma **cópia local** de `performance-analytics.html` num editor de texto.
   2. Procure `id="pa-data"`.
-  3. Edite os textos e números dentro desse bloco e salve. Não é preciso rodar build.
-  - Mantenha as aspas e as vírgulas do JSON. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
-  - Não suba essa cópia para o Git.
-- **Para completar depois:**
-  - `other_tracks` (seção 3): nomes das demais tracks no faixa da estação 03;
-  - campos vazios do case Lights-off (seção 4): `business_problem`, `business_results.headline`, `client_type`;
-  - Practice (seção 6): `pillars`, `deliveries`, `evolutions`. Hoje é um rascunho; apague `placeholder` para tirar a etiqueta "rascunho".
+  3. Edite dentro do bloco e salve. Não é preciso rodar build. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
+- **Dashboard real (case de relatórios automatizados):** depois da automação, um popup mostra o dashboard enviado ao board.
+  - A imagem é o arquivo **`dashboard-fraude.png`**, na mesma pasta do HTML. No Git ela é ilustrativa.
+  - Para usar o real, troque esse arquivo pela imagem do dashboard real, **com o mesmo nome** (qualquer tamanho; ela se ajusta à janela). Outra extensão (JPG, WEBP): mude o campo `dashboard_image` do case de relatórios no JSON. Sem o campo, o vídeo procura `dashboard-fraude.png`; com o campo vazio (`""`), não usa imagem.
+  - Ao enviar o vídeo, mande o HTML e a imagem juntos, na mesma pasta. Sem a imagem, o popup mostra o dashboard desenhado, marcado como ilustrativo.
+  - A imagem real fica só na cópia local: não suba para o Git (o repositório é público).
+- **Aviso de versão mockada:** `presentation_context.disclaimer` aparece no canto inferior esquerdo de todas as telas, inclusive nas conversas ("Este vídeo é a versão mockada, com dados sanitizados."). Na cópia local com os dados reais, deixe o campo vazio (`""`) e o aviso some.
 
 ## Música e batidas
 
-- **Faixas (Pixabay):** berrydeep "Vintage Film Funk", kulakovka "Technology" e twisterium "Epic Piano Background".
-  - "Technology" é **remontada** por `tools/edit_tech.py`: cortes nos compassos com crossfade, para que cada case tenha parte calma → construção → drop, e o drop caia na solução. O resultado é `musica/tech-edit.mp3`.
-  - Entram embutidas no HTML, recodificadas a 128 kbps, como parte do vídeo.
-  - Os MP3 avulsos ficam em `musica/`, fora do Git, porque a licença não permite redistribuir a faixa solta.
-- **Sincronia:** `tools/music.py` analisa as faixas e gera `src/07-beats.js`, com batidas, compassos, envelopes de grave e caixa, picos e mudanças de seção.
-  - As cenas marcam os eventos nos compassos: `grid(id).bars`.
-  - O estado da música no quadro fica em `BT`: `beat`, `down`, `kick`, `snare`, `level`, `hit` e `drop`.
-- **O que reage à música** (`src/09-fx.js`):
-  - **câmera:** soco de zoom nos tempos fortes, balanço no compasso e tranco nos picos;
-  - **cores:** calor no 1º tempo, separação RGB nas caixas e picos, linhas de foco e quadros invertidos (*impact frames*) nas viradas de seção;
-  - **elementos:** pulsam com o grave, e o traço de tinta "ferve" mais forte nas caixas.
-- **Intensidade:**
-  - `CONFIG.motion.beat` (0 desliga);
-  - `CONFIG.motion.beatBase` é o nível fora dos clímax (0,15);
-  - cada cena declara os seus picos em `SCENES[id].peaks`.
-- **Paradas:** ficam em silêncio. A abertura usa a trilha sintetizada a 120 BPM. Se uma faixa faltar no HTML, o play correspondente usa um groove sintetizado de reserva.
+- **Faixas (v7.4–v7.7, ElevenLabs Music):** as três partes foram geradas na conta ElevenLabs do usuário, como instrumentais, e encaixadas nos tempos do filme. Entram no `sources.js` (ao lado do HTML), recodificadas a 128 kbps.
+  - **Parte 1 · estações 01–03 (2:34,5):** funk cinematográfico, 110 BPM.
+    - Intro abafada que abre no tema e as viradas de estação no tempo forte.
+    - Low só com médios antes da parte B, pausa, riser e drop na estação 03.
+  - **Parte 2 · estação 04, os 4 cases, 05 e 06 (4:42):** a **opção A** (v7.7): funk corporativo, 108 BPM, uma versão por case, cada uma **tocada como foi composta**, sem filtros, efeitos, compassos repetidos ou silêncios. A música não é editada: as cenas é que foram reajustadas a ela.
+    - **04 e case 1:** a versão começa no 3º compasso dela, e os blocos de 8 compassos entram no começo do case e na solução. A gravação acaba tocando, então some no último compasso.
+    - **Case 2:** a versão toca inteira; a subida dela cai na solução, e o acorde final soa até a porta.
+    - **Automação:** a pausa de 2 tempos composta na própria música é o interruptor, e o drop dela acende o neon. O acorde final soa no mergulho.
+    - **IA:** a cena começa com o crescendo de 16 compassos da versão; o maior drop da parte cai na escala, e o acorde final soa até a 05.
+    - **05 e 06:** 16 compassos de groove, e o acorde final cai na conclusão da 06.
+  - **Parte 3 · 07 e letreiro (0:45):** final orquestral, 100 BPM, **sem o coro**.
+    - Toca a gravação original até pouco antes do coro e, depois, a versão sem coro, alinhada à amostra.
+    - **v7.15, um corte de 11 compassos** (`CUT3` em `tools/eleven_fit.py`), escolhido pelo usuário entre duas prévias:
+      - o piano segue até 22,773 s e emenda, no tempo forte, na volta da orquestra depois da pausa (49,173 s da versão inteira), com 80 ms de transição;
+      - mesmo tom dos dois lados, sem filtros ou efeitos; o corte vem depois da masterização da peça inteira;
+      - saíram a construção da orquestra e o grande ataque, onde ficava a frase-chave do antigo clímax.
+    - O filme se ajusta à música:
+      - a estação "?" da 07 aparece com a volta da orquestra (22,8 s);
+      - o letreiro e "Tudo se resume a *Analytics*." acendem no prato da cadência final (40,8 s);
+      - o vídeo termina com a cauda desse acorde (44,97 s).
+    - A versão inteira fica em `musica/parte3-inteira.mp3` (fora do Git).
+  - **Música das conversas (v7.16, 2:30, 106,7 BPM):** balada pop original com violino no lugar da voz, gerada na ElevenLabs (fluxo "A Linha · Música das conversas", 4 gerações; a escolhida é a 4, a de dinâmica mais estável).
+    - A faixa não é editada. O player toca a introdução uma vez e repete sem fim o trecho de 30,809 s a 138,777 s, 192 tempos.
+    - As duas pontas do trecho caem na mesma posição da frase (semelhança 0,95, mesmo nível), e as voltas se emendam com 0,3 s de transição linear.
+    - O nível fica a ±1 dB da música seguindo, e o laço não depende do atraso do decodificador de MP3.
+    - `tools/pausa.py` escolhe o trecho e copia a geração para `musica/pausa.mp3`. O config fica em `CONFIG.audio.pause`: paradas, volume, fades, loop e transição.
+  - **v7.17, a música das conversas vira também a trilha da abertura** (play 1 com `pause: true`) e toca no encerramento.
+    - `tools/pausa.py ORIGEM [DESTINO] [--inteira]` aceita qualquer áudio ou vídeo que o ffmpeg lê (mp3, m4a, mp4…).
+      - Mede o LUFS e grava `DESTINO.json` com o laço, a transição e os dois volumes: `gain` deixa a música ≈ 10 dB abaixo do filme nas paradas; `openGain` deixa no nível do filme na abertura.
+      - `--inteira` faz o laço da música inteira (para uma música conhecida); sem a opção, o laço é um trecho de frases (para música ambiente).
+    - O build embute esses valores no bloco (`data-loop`, `data-xfade`, `data-gain`, `data-open-gain`).
+    - **Build:** a música das conversas só entra quando é pedida, com `PA_PAUSA=arquivo` ou com `musica/pausa.mp3` existindo, e nunca é reaproveitada do HTML anterior.
+      - O `./build.sh` padrão monta o HTML do repositório sem ela.
+      - As cópias de apresentação usam `PA_PAUSA=musica/pausa-usuario.mp3 python3 tools/build.py dados.json saida.html`.
+      - A música fica fora do Git: `musica/usuario/` e `musica/pausa-usuario.mp3`.
+      - A geração da ElevenLabs ficou guardada em `musica/elevenlabs/pausa/`.
+- **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
+  - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
+  - **Partes 2 e 3:** nada além do nível; cada versão só é deslocada inteira (`PARTE2_A`), e o filme acompanha (a grade e as seções saem delas).
+- **Arquivos (fora do Git):**
+  - versões brutas em `musica/elevenlabs/`: `parte1-bruta.mp3`, `parte2-A/p2-1-A.mp3` … `p2-5-A.mp3` (opção A da parte 2), `parte3-bruta-A.mp3` e `parte3-sem-coro.wav`;
+  - mixes finais em `musica/parte1.mp3`, `musica/parte2.mp3` e `musica/parte3.mp3`;
+  - música das conversas: as 4 gerações em `musica/elevenlabs/pausa/take1.mp3` … `take4.mp3`, e a escolhida em `musica/pausa.mp3`.
+  - **Sem coro:** `parte3-sem-coro.wav` sai do Demucs: `python -m demucs --two-stems=vocals -n htdemucs_ft parte3-bruta-A.mp3`, arquivo `no_vocals.wav`. Precisa de torch e demucs num ambiente à parte.
+- **Ordem:** `python3 tools/eleven_fit.py todas` → `python3 tools/music.py` → `./build.sh`.
+  - O build usa `musica/parteN.mp3` quando existe.
+  - Sem esses arquivos, cai na trilha Pixabay anterior (`tools/edit_music.py` → `tools/remix.py`, arquivos `<faixa>-mix.mp3`).
+  - Os ids internos das faixas (`funk`, `tech`, `piano`) continuam os mesmos.
+- **Volume:** `CONFIG.tracks` (0,81 · 0,75 · 0,66) mantém o mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS), equilibrado com os efeitos.
+- **Uso:** confira os termos do plano da conta ElevenLabs para uso das músicas geradas no evento.
+- **Sincronia:** `tools/music.py` gera `src/07-beats.js`.
+  - Para as três faixas, a grade é **exata** (`GRID`: andamento, um tempo forte conhecido e as seções), em vez de detectada.
+  - Assim as cenas acertam a batida mesmo em intros filtradas.
+  - As cenas marcam eventos nos compassos (`grid(id).bars`) e encaixam as entradas nas batidas (`onBeat`, `beatsFrom`).
+  - O estado da música fica em `BT`.
+  - A batida mexe pouco (`CONFIG.motion.beatBase` = 0,15) e só cresce nos picos declarados em `SCENES[id].peaks`.
 
 ## Arquitetura
 
 ```
 src/
   00-head.html     HTML + CSS, bloco de dados (pa-data) e blocos de música
-  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, paradas, textos, narração, áudio
+  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, conversas, textos (estações, capítulos, missão, futuro, métodos da 03)
   01-data.js       ★ DADOS: lê o JSON, acessos seguros (SEC, CASE, HEADLINES) e formatação pt-BR (FMT)
-  02-core.js       easing, cores, primitivas, texto, câmera, fundos, granulação
-  03-collage.js    papel, contornos, meio-tom, fita, stickers, fórmulas; camada futurista (grid, sol, holo)
-  03-components.js ícones, agentes, cards, carimbo ✓, dashboard
-  04-viz.js        visualizações de modelos (gaussiana, regressão, classificação, clusters, embeddings…)
-  05-audio.js      trilha sintetizada da abertura + SFX + sistema de cues
-  06-voice.js      narração (speechSynthesis) e legendas
-  07-beats.js      gerado por tools/music.py: batidas e envelopes das faixas
-  08-music.js      toca as faixas em sincronia e expõe BEAT/BT
-  09-fx.js         câmera e pós-processamento guiados pela música; traço de tinta, respingos, grafites, pinceladas
-  10-ui.js         split-flap, mapa do metrô, mini-mapa, letreiro de estação, plataforma, cartazes, slides montados + popup, régua e comprovante
-  11-station.js    vagão, trem que passa entre estações, painel "próxima estação", bilhete, legendas de tela e cartões de conexão
-  12-paint.js      acabamento pintado (pinceladas, gradação, brilho), luz volumétrica e poeira, volume (vball, vlimb, vslab, lightCone)
-  13-people.js     personagem 2.5D (poses que se misturam: digitar, andar, alcançar, dançar), ratinho e pombo
-  20-open.js       pré-show, embarque e Parada 0 (mapa clicável)
-  21-trecho1.js    estações 01, 02, 03 e Parada 1
-  22-cases.js      estação 04: abertura e os 4 cases (problema → dados → estratégia → como → solução → impacto)
-  23-scale.js      estações 05 e 06 e Parada 2
-  24-final.js      estação 07, clímax, letreiro final e encerramento
-  90-player.js     modo apresentação: plays, paradas em loop, navegação, controles
-  99-tail.html
-  legacy/          cenas da v2 (só referência; fora do build)
+  02-core.js · 03-collage.js · 03-components.js · 04-viz.js   primitivas, papel, ícones, agentes, visualizações
+  05-audio.js      trilha sintetizada do embarque + SFX + cues
+  07-beats.js      gerado por tools/music.py · 08-music.js toca as faixas e expõe BT
+  09-fx.js         câmera e pós-processamento guiados pela música; tinta, respingos, pinceladas
+  10-ui.js         grade musical por cena (grid, onBeat, beatsFrom: entradas no tempo da música), split-flap, mapa, mini-mapa,
+                   estação das conversas (v7.11: futurista, arejada e verde), painéis, slides + popup, telas extras (SLIDE_SCREENS)
+  11-station.js    trem bala (v7.11; trainCar/sideTrain/trainLen), trem que passa, painel "próxima estação", bilhete
+  12-paint.js      acabamento pintado, luz volumétrica, volume
+  13-people.js     personagens antigos (ratinho, pombo e o rig): ficam no arquivo, mas não são usados desde a v7.11
+  14-v7.js         ★ v7: TY/LAY (tipografia e grade), HUD (texto nítido), SAY (roteiro de tela), LINE (a linha laranja),
+                   camKey/layer (câmera 2.5D), flowRow (diagramas nomeados), skyline, balão de pergunta,
+                   SPACE (v7.2: campo de partículas, curva 3D em fita e objetos flutuando; v7.11: fora das telas com gráfico),
+                   fbar (v7.11: barras chapadas dos gráficos),
+                   mockBadge (aviso de versão mockada)
+  20-open.js       pré-show, embarque e Conversa 0
+  21-trecho1.js    estações 01, 02, 03, cartazes 01–03, catálogo de modelos e Conversa 1
+  22-cases.js      estação 04 e os 4 cases
+  23-scale.js      estações 05 e 06, cartazes 04–06 e Conversa 2
+  24-final.js      estação 07, letreiro final (com "Tudo se resume a Analytics"), cartaz 07 e encerramento
+  90-player.js     modo apresentação (HUD depois da pintura; interface das conversas por cima, sem pintura)
 data/presentation.json
-tools/build.py     monta o HTML (python3; ffmpeg para as músicas)
-tools/music.py     analisa as músicas (requer librosa)
-tools/edit_tech.py remonta "Technology" para os cases (requer numpy e ffmpeg)
-build.sh           atalho para tools/build.py
+tools/build.py       monta o HTML (python3; ffmpeg para as músicas)
+tools/edit_music.py  remonta funk e Technology (numpy, scipy e ffmpeg)
+tools/remix.py       versão animada das 3 faixas: bateria, risers, drops, sidechain, graves (numpy, scipy e ffmpeg)
+tools/music.py       analisa as músicas (librosa)
+tools/read_check.js  medidor de leitura (node + Playwright)
+build.sh             atalho para tools/build.py
 ```
 
 - **Para montar:** depois de editar `src/` ou `data/`, rode `./build.sh`.
   - Sem a pasta `musica/`, o build reaproveita as músicas que já estão no HTML.
-  - Ao trocar uma faixa, rode `tools/music.py` antes, e ajuste os `dur` das cenas em `src/01-config.js` aos novos compassos.
+  - Ao mudar a remontagem ou o remix, rode `tools/edit_music.py` → `tools/remix.py` → `tools/music.py` → `./build.sh` e confira os `dur` das cenas.
+- **Para conferir a leitura:** `node tools/read_check.js`.
 
 **Decisões principais:**
-- **Render puro em função do tempo.** Cada cena é `draw(ctx, t)` sem estado, e a música vira dados (`BT`) também em função do tempo. Por isso o seek é exato e o resultado é sempre igual.
-- **Paradas com relógio próprio.** O loop usa o tempo desde a entrada na parada, e a transição entre cartazes é uma câmera que viaja na plataforma, sem corte.
-- **Leveza:** brilhos com gradiente radial e granulação pré-renderizada. A separação RGB só roda nos picos da música.
-- **Qualidade adaptativa:** se a máquina não segurar ~30 quadros por segundo, o player tira sozinho o acabamento pintado, a separação RGB, a granulação, as scanlines e o zoom de câmera. A tecla Q força o modo leve ou o máximo. Em notebook com aceleração de vídeo do Chrome/Edge, roda no máximo.
+- **Render puro em função do tempo.** Seek exato, resultado sempre igual.
+- **Texto nítido.**
+  - Cada cena desenha o visual normalmente e põe os textos numa fila (`late`, `pin`, `hud`, `SAY`), desenhada depois do acabamento pintado.
+  - `pin` mantém o tamanho do texto mesmo quando a câmera aproxima ou afasta.
+- **Roteiro de tela por cena.** `SCENES[id].script` lista cada texto com o tempo em que entra e sai. É a fonte do medidor de leitura.
+- **Qualidade adaptativa:**
+  - se a máquina não segurar ~30 qps, o player tira o acabamento pintado e os efeitos caros;
+  - texto, gráficos e rótulos ficam iguais;
+  - a tecla Q força o modo leve ou o máximo.
 
-## Parâmetros úteis (`src/01-config.js`)
+## Parâmetros úteis
 
-| Parâmetro | Efeito |
-|---|---|
-| `mode` | `'show'` (paradas em loop) ou `'reel'` (direto) |
-| `plays[].from` | de onde cada faixa começa |
-| `scenes[].dur` | duração de cada cena; casada com os compassos da faixa |
-| `stops[].items` | quantos passos o → percorre em cada parada |
-| `text` | todos os textos fixos (estações, casos de ML, rótulos) |
-| `motion.beatBase` | quanto a batida mexe fora dos clímax |
-| `motion.paint` | intensidade do acabamento pintado (0 desliga) |
-| `SCENES[id].caps` / `.peaks` | legendas e picos de batida de cada cena (nos arquivos de cena) |
-| `SLIDES` (`src/10-ui.js`) | quais momentos de cada estação viram cenas montadas nas paradas |
-| `motion.beat`, `motion.intensity`, `motion.grain` | quanto a música mexe nos visuais, energia, granulação |
-| `audio.tracks.*.gain`, `audio.trackVolume` | volume das faixas (já equalizadas) |
-| `audio.voice`, `captions` | narração e legendas (desligadas por padrão) |
+| Onde | Parâmetro | Efeito |
+|---|---|---|
+| `src/01-config.js` | `mode` | `'show'` (conversas em loop) ou `'reel'` (direto) |
+| | `scenes[].dur` | duração de cada cena; casada com os compassos da faixa |
+| | `text.mission`, `text.chapters`, `text.stations` | missão, capítulos do mapa e textos das estações |
+| | `text.future`, `text.methods`, `text.finalKey` | direções do futuro; os métodos da estação 03 (`group` pred/presc, método, exemplo, desenho, técnicas; `etc` acrescenta "e outras técnicas"; `key` é a técnica do cartaz); a frase do letreiro final |
+| | `motion.beatBase`, `motion.paint` | batida fora dos picos das cenas; acabamento pintado (0 desliga) |
+| `src/14-v7.js` | `TY`, `LAY` | tamanhos de texto e posições do contrato de tela |
+| arquivos de cena | `SCENES[id].script` | o roteiro de tela: título, explicação, conclusão e os tempos |
+| `src/10-ui.js` | `SLIDES` | quais trechos viram cenas montadas (em loop) nas conversas |
