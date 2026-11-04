@@ -95,19 +95,22 @@
    - "Atuamos do diagnóstico à mensuração para gerar valor para o cliente."
 5. **Conclusão:** "Analytics é uma *capacidade estratégica* da consultoria."
 
-### 02 · Evolução e impacto (44 s) — o crescimento ganha forma e uma régua
+### 02 · Evolução e impacto (44 s) — receita, projetos e capacidade (v7.13)
 
-1. **Faturamento anual da track:** gráfico com eixo de base zero, unidade (US$ mil, conforme o JSON) e marcas.
+1. **Receita anual da track:** gráfico com eixo de base zero, unidade (US$ mil ou US$ mi, conforme o JSON) e marcas.
    - Valor em cima de cada barra, anos embaixo, 2026 hachurado como "(previsão)" e a fonte.
-   - Um brilho percorre o topo das barras de 2023 a 2025 (a tendência), sem traço por cima dos rótulos.
-2. **Leitura:** 2023 e 2025 acendem e uma régua mede "×1,8".
-   - "Entre 2023 e 2025, o faturamento passou a 1,8 vez o valor inicial."
-3. **Brasil:** "período de referência · estimativa de fechamento". Dois comparadores separados, na mesma unidade:
-   - **1,74×** o período anterior;
-   - **1,65×** o orçamento.
-4. **Trimestres:** barras agrupadas (anterior · orçamento · realizado), com legenda fixa e T4 marcado "(prel.)".
-   - A frase é calculada: "O realizado superou o orçamento em *todos os trimestres*."
-5. **Conclusão:** "Crescimento *consistente*, acima do *planejado*."
+   - Leitura: 2023 e 2025 acendem e uma régua mede "×1,8" ("Entre 2023 e 2025, a receita passou a 1,8 vez o valor inicial.").
+2. **Projetos (no lugar do Brasil):** "*N projetos* em 2026".
+   - O número conta até o valor e pousa no acento da música.
+   - A receita por tipo de projeto aparece em barras: laranja = só a track, amarelo = com outras tracks.
+   - Uma rosca mostra a % dos projetos feitos com outras tracks (base: projetos).
+   - Uma barra empilhada mostra a receita por modelo de entrega (base: receita), com as tracks parceiras embaixo.
+   - "Cerca de *X%* dos projetos são feitos *com outras tracks* (*Y%* da receita)."
+3. **Capacidade do time (no lugar dos trimestres):** pirâmide de pessoas por nível (K2 a K7).
+   - Cada nível separa posições internas e contractors.
+   - O total aparece num cartão ("N pessoas hoje · internas · contractors").
+   - "A maior parte do time está em *K5, K6 e K7*; os *contractors* reforçam *K5 e K6*." (calculado a partir do JSON)
+4. **Conclusão:** "Crescimento com *integração* e um *time* para escalar."
 
 ### 03 · O que levamos ao mercado (64 s) — capabilities explicadas no próprio filme
 

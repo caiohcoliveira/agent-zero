@@ -1,7 +1,7 @@
 /* ============================================================================
    1b. DADOS — os números e textos das cenas vêm do bloco <script id="pa-data">
    ----------------------------------------------------------------------------
-   • No projeto: data/presentation.json (fora do Git) → ./build.sh injeta no HTML.
+   • No projeto: data/presentation.json → python3 tools/build.py injeta no HTML.
    • No HTML pronto: edite o bloco "pa-data" no topo do arquivo e salve.
    • Todo acesso tem valor-reserva: se faltar um campo, a cena mostra "—".
    ========================================================================== */
@@ -21,8 +21,11 @@ function dget(obj, path, fb) {
 }
 /** seção n da apresentação (1 a 7) */
 const SEC = n => (DATA.presentation_structure || []).find(s => s.section === n) || {};
-/** case da seção 4 pelo começo do nome (ex.: 'Cliente X') */
-const CASE = prefix => (SEC(4).cases || []).find(c => String(c.case_name || '').startsWith(prefix)) || {};
+/** case da seção 4 pelo começo do nome (ex.: 'Cliente X'); se nenhum nome bater, vale a POSIÇÃO na lista
+ *  (1º cestas de produtos, 2º principalidade, 3º relatórios automatizados, 4º agentes de IA) — assim o JSON real
+ *  pode usar outros nomes de cliente sem quebrar o vídeo */
+const CASE_ORDER = ['Cliente Banana', 'Cliente Manga', 'Lights-off', 'Insight Agent'];
+const CASE = prefix => { const cs = SEC(4).cases || []; return cs.find(c => String(c.case_name || '').startsWith(prefix)) || cs[CASE_ORDER.indexOf(prefix)] || {}; };
 /** números-manchete de uma seção */
 const HEADLINES = n => (DATA.headline_numbers_for_slides || []).filter(h => h.section === n);
 

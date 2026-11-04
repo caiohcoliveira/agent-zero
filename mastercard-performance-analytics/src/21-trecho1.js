@@ -159,35 +159,59 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   };
 })();
 
-/* ---------- 02 · Evolução e impacto: o crescimento ganha forma e uma régua ---------- */
+/* ---------- 02 · Evolução e impacto (v7.13): RECEITA da track → PROJETOS (receita por tipo e parceria com outras tracks) → CAPACIDADE do time ----------
+   Dados (seção 2 do JSON): revenue_performance_analytics_usd_millions · business_scale_AAAA · revenue_contribution_by_project_type_AAAA ·
+   revenue_contribution_summary_AAAA · project_mix_AAAA · team_structure_AAAA (AAAA = o ano mais recente que aparecer nessas chaves) */
 (() => {
-  const id = 's02', sec = () => SEC(2), BR = sec().brazil_2023_milestone || {};
+  const id = 's02', sec = () => SEC(2);
   const ROWS = Object.entries(sec().revenue_performance_analytics_usd_millions || {}), VALS = ROWS.map(r => +r[1] || 0), MAXV = Math.max(...VALS, 1e-9);
   const isF = k => /forecast|previs/i.test(k), yr = k => k.replace(/_?forecast/i, '');
   const MULT = VALS.length > 2 && VALS[0] ? VALS[2] / VALS[0] : null;
   const UNIT = (() => { const m = MAXV * 1e6; return m >= 1e6 ? ['US$ mi', 1e6] : m >= 1e3 ? ['US$ mil', 1e3] : ['US$', 1]; })(), toU = v => v * 1e6 / UNIT[1];
   const niceStep = mx => { const raw = mx / 4, p = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; };
   const STEP = niceStep(toU(MAXV)), TOP = Math.ceil(toU(MAXV) * 1.08 / STEP) * STEP;
-  const PREV = +BR.actuals_2022_usd_millions || 0, BUD = +BR.budget_2023_usd_millions || 0, ACT = +BR.actuals_2023_usd_millions || 0;
-  const VS_PREV = PREV ? ACT / PREV : null, VS_BUD = BUD ? ACT / BUD : null;
-  const QS = Object.entries(BR.quarterly_usd_millions || {}), QUP = QS.filter(([, q]) => q.actuals_2023 > q.budget_2023).length;
-  const qLabel = k => (k.match(/(\d)/) ? 'T' + k.match(/(\d)/)[1] : k) + (/prelim/i.test(k) ? ' (prel.)' : '');
+  // ---- projetos e capacidade: as chaves terminam no ano (ex.: business_scale_2026); vale o ano mais recente que existir ----
+  const YR = String(Object.keys(sec()).map(k => (k.match(/^(?:business_scale|team_structure|revenue_contribution_by_project_type)_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
+  const B26 = sec()['business_scale_' + YR] || {}, MIX = sec()['project_mix_' + YR] || {}, SUMR = sec()['revenue_contribution_summary_' + YR] || {}, TEAM = sec()['team_structure_' + YR] || {};
+  const pct = v => { const x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(x) ? x : null; };
+  const TYPES = (sec()['revenue_contribution_by_project_type_' + YR] || []).map(r => ({ name: String(r.project_type || '—'), share: pct(r.revenue_share) || 0, model: String(r.delivery_model || '') }))
+    .sort((a, b) => b.share - a.share).slice(0, 9);
+  /** modelo de entrega: x = com outras tracks ("Track + Outra") · n = não especificado · p = só a track */
+  const kindOf = m => /\+/.test(m) ? 'x' : (!m || /not specified|n[ãa]o especificado/i.test(m)) ? 'n' : 'p', KCOL = { p: C.orange, x: C.yellow, n: '#8A8378' };
+  const NPROJ = +B26.projects_delivered || 0, DISP = String(B26.projects_delivered_display || '').trim();
+  const PROJ_TXT = /^[+~]?\d[\d.,]*$/.test(DISP) ? DISP : (NPROJ ? FMT.num(NPROJ, 0) : '—');   // "display" curto (ex.: "+30") tem prioridade
+  const XT_PROJ = pct(MIX.projects_with_other_tracks_approx != null ? MIX.projects_with_other_tracks_approx : B26.projects_with_other_tracks_approx);
+  const XT_REV = pct(SUMR.cross_track_revenue_share != null ? SUMR.cross_track_revenue_share : B26.projects_with_other_tracks_revenue_share);
+  const PA_REV = pct(SUMR.pa_only_revenue_share), NA_REV = pct(SUMR.unspecified_delivery_model_revenue_share);
+  const PARTNERS = Object.entries(SUMR.cross_track_revenue_breakdown || {}).map(([k, v]) => ['+ ' + String(k).replace(/^.*?\+\s*/, ''), pct(v)]).filter(q => q[1] != null);
+  const LV = (TEAM.levels || []).map(l => ({ lv: String(l.level || ''), int: +l.current_internal_positions || 0, con: +l.current_contractors || 0 })).map(l => ({ ...l, tot: l.int + l.con }));
+  const T_INT = +TEAM.current_internal_positions || LV.reduce((a, l) => a + l.int, 0), T_CON = +TEAM.current_contractors || LV.reduce((a, l) => a + l.con, 0);
+  const T_TOT = +TEAM.current_total_including_contractors || (T_INT + T_CON), MXL = Math.max(1, ...LV.map(l => l.tot));
+  const TOP3 = LV.slice().sort((a, b) => b.tot - a.tot).slice(0, 3).map(l => l.lv).sort(), list = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1] : a.join('');
+  const OX = 2200;   // a câmera passa para x = 3160 no mundo: o que vem depois da receita é desenhado com x de tela + OX
   const T_BAR = ROWS.map((_, i) => beatsFrom(id, 1.0, 2 * i)), T_TREND = 5.6, T_READ = 12.2, T_BR = 20.4, T_CMP = [21.9, 23.3], T_Q = 30.6, T_CONC = 38.4;
+  const T_TY = TYPES.map((_, i) => T_CMP[0] + .2 + i * .14), T_LV = LV.map((_, i) => beatsFrom(id, T_Q + .8, i));
   const CX = [430, 680, 930, 1180], BASE = 820, HH = 500, X0 = 250, BW = 160;
   const CAM = [[0, 960, 560, 1.05], [3.6, 960, 540, 1], [T_BR - .2, 960, 540, 1], [T_BR + 1.3, 3160, 540, 1], [43.7, 3160, 540, 1]];
   const hY = v => BASE - toU(v) / TOP * HH;
   T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_READ, 'chime', { f: 784, up: 7 });
   cue(id, T_BR, 'whoosh', { dur: 1, v: .3 }); T_CMP.forEach(t0 => cue(id, t0, 'impact', { size: .5 })); cue(id, T_Q, 'whoosh', { dur: .7, v: .25 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
-  const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, o faturamento passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'O faturamento cresceu ano a ano.';
-  const qTxt = QS.length ? (QUP === QS.length ? 'O realizado superou o orçamento em *todos os trimestres*.' : `O realizado superou o orçamento em *${QUP} de ${QS.length} trimestres*.`) : '';
+  T_LV.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .08, v: .16 }));
+  const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, a receita passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'A receita cresceu ano a ano.';
+  const xtTxt = XT_PROJ != null ? `Cerca de *${FMT.num(XT_PROJ, 0)}%* dos projetos são feitos *com outras tracks*` + (XT_REV != null ? ` (*${FMT.num(XT_REV, 0)}%* da receita).` : '.') : 'Parte dos projetos é feita *com outras tracks*.';
+  const CONL = LV.filter(l => l.con > 0).map(l => l.lv);
+  const teamTxt = TOP3.length ? `A maior parte do time está em *${list(TOP3)}*` + (CONL.length ? `; os *contractors* reforçam *${list(CONL)}*.` : '.') : '';
   const SCRIPT = SAY.reg(id, [
-    [3.9, T_BR - .1, 'title', 'Evolução do faturamento da track'],
-    [4.1, T_BR - .1, 'note', `faturamento anual, em ${UNIT[0]} · base zero`, { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [3.9, T_BR - .1, 'title', 'Evolução da receita da track'],
+    [4.1, T_BR - .1, 'note', `receita anual, em ${UNIT[0]} · base zero`, { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
     [T_READ, T_BR - .1, 'body', growTxt, { x: 1380, y: 300, w: 470 }],
-    [T_BR + .9, 43.8, 'title', 'Faturamento do *Brasil*'],
-    [T_BR + 1.0, 43.8, 'note', 'período de referência · estimativa de fechamento', { x: LAY.x, y: 196, align: 'left', size: 28 }],
-    [T_Q + .3, 43.8, 'body', qTxt, { x: 1380, y: 300, w: 470, visual: true }],
-    [T_CONC, 43.9, 'concl', 'Crescimento *consistente*, acima do *planejado*.']
+    [T_BR + .9, T_Q - .1, 'title', `*${PROJ_TXT} projetos* em ${YR}`],
+    [T_BR + 1.0, T_Q - .1, 'note', 'receita por tipo de projeto · parceria com outras tracks', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_BR + 2.0, T_Q - .1, 'body', xtTxt, { x: 1380, y: 300, w: 470 }],
+    [T_Q + .3, 43.8, 'title', 'Capacidade do *time*'],
+    [T_Q + .4, 43.8, 'note', 'pessoas por nível · posições internas e contractors', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_Q + 2.4, 43.8, 'body', teamTxt, { x: 1380, y: 300, w: 470 }],
+    [T_CONC, 43.9, 'concl', 'Crescimento com *integração* e um *time* para escalar.']
   ]);
   function axis(ctx, a) {
     ctx.save(); ctx.globalAlpha *= a;
@@ -222,43 +246,53 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       arrowHead(ctx, xr, lerp(y0, y2, g) - 6, -Math.PI / 2, 22, C.yellow); ctx.restore();
       late(ctx, c => { c.globalAlpha *= g; retroText(c, '×' + FMT.num(MULT, 1), xr + 34, (y0 + y2) / 2, { size: 64, weight: 900, color: C.yellow, depth: 4, lw: 3 }); }); }
   }
-  function brazil(ctx, t) {
-    const a = P(t, T_BR, .8) * (1 - P(t, T_Q - .3, .5)); if (a <= 0) return;
+  /** PROJETOS: o número de projetos, a receita por tipo de projeto (cor = modelo de entrega) e a parceria com outras tracks
+   *  (em projetos, ~%, e em receita, %, mostrados separados: as bases de medida são diferentes) */
+  function projects(ctx, t) {
+    const a = P(t, T_BR + .6, .6) * (1 - P(t, T_Q - .3, .5)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
-    const B0 = 860, HB = 300, M = Math.max(PREV, BUD, ACT, 1e-9), hb = v => v / M * HB, UB = (M * 1e6 >= 1e6 ? ['mi', 1e6] : M * 1e6 >= 1e3 ? ['mil', 1e3] : ['', 1]), fu = v => `US$ ${FMT.num(v * 1e6 / UB[1], 2)}${UB[0] ? ' ' + UB[0] : ''}`;
-    [[2560, PREV, 'período anterior', VS_PREV, 'o período anterior'], [3420, BUD, 'orçamento', VS_BUD, 'o orçamento']].forEach(([cx, ref, refL, mult, cap], g) => {
-      const p = E.outBack(P(t, T_CMP[g], .6)); if (p <= 0) return;
-      line(ctx, cx - 260, B0, cx + 260, B0, '#F3E6D6', 4);
-      [[ref, refL, g ? null : '#8A8378', g === 1], [ACT, 'realizado', C.orange, false]].forEach(([v, l, col, dash], j) => {
-        const x = cx - 190 + j * 220, hh = hb(v) * Math.min(1, p);
-        if (dash) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, B0 - hh, 160, hh, 6); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); }
-        else fbar(ctx, x, B0 - hh, 160, hh, col);
-        late(ctx, c => { c.globalAlpha *= clamp(p); text(c, fu(v), x + 80, B0 - hh - 30, { size: 28, weight: 900, color: '#FFF', align: 'center' }); text(c, l, x + 80, B0 + 36, { size: 28, weight: 800, color: j ? C.orange : '#F3E6D6', align: 'center' }); });
-      });
-      late(ctx, c => { c.globalAlpha *= clamp(p); c.translate(cx, B0 - HB - 215); const s = lerp(1.6, 1, E.outExpo(clamp(p))); c.scale(s, s);
-        text(c, mult ? FMT.mult(mult) : '—', 0, 0, { size: 96, weight: 900, color: g ? C.yellow : C.orange, align: 'center' });
-        text(c, cap, 0, 82, { size: 32, weight: 900, color: '#FFF', align: 'center' }); });
-    });
-    late(ctx, c => text(c, 'Fonte: ' + (BR.source || 'dados internos'), 2260, 940, { size: 22, weight: 700, mono: true, color: '#BFB3A3' }));
+    // o número de projetos (conta até o valor e pousa no acento da música)
+    const np = P(t, T_BR + 1.0, T_CMP[0] - T_BR - 1.0, E.outCubic), shown = np >= 1 ? PROJ_TXT : (PROJ_TXT[0] === '+' ? '+' : '') + FMT.num(Math.round(NPROJ * np), 0);
+    late(ctx, c => { text(c, shown, OX + 330, 380, { size: 150, weight: 900, color: C.orange, align: 'center' });
+      text(c, `projetos entregues em ${YR}`, OX + 330, 470, { size: 30, weight: 800, color: '#F3E6D6', align: 'center' }); });
+    // a parceria em projetos: rosca
+    if (XT_PROJ != null) { const dp = E.inOutCubic(P(t, T_CMP[1], .9)), cx = OX + 330, cy = 700, r = 112;
+      ctx.lineCap = 'butt'; ctx.lineWidth = 34; ctx.strokeStyle = 'rgba(243,230,214,.16)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+      ctx.strokeStyle = C.yellow; ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + TAU * XT_PROJ / 100 * dp); ctx.stroke();
+      late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1], .4); text(c, '~' + FMT.num(XT_PROJ * dp, 0) + '%', cx, cy + 2, { size: 50, weight: 900, color: '#FFF', align: 'center' });
+        text(c, 'dos projetos com outras tracks', cx, cy + 162, { size: 24, weight: 800, color: C.yellow, align: 'center' }); }); }
+    // a receita por tipo de projeto
+    if (TYPES.length) { const X1 = OX + 640, BX = OX + 910, MW = 330, mx = Math.max(...TYPES.map(q => q.share), 1), DY = Math.min(62, 560 / TYPES.length);
+      late(ctx, c => { text(c, `receita ${YR} por tipo de projeto`, X1, 300, { size: 24, weight: 900, mono: true, color: C.yellow });
+        [['p', 'só a track'], ['x', 'com outras tracks']].forEach(([k, l], i) => { const lx = X1 + i * 230; rr(c, lx, 330, 26, 18, 4); c.fillStyle = KCOL[k]; c.fill(); text(c, l, lx + 36, 340, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
+      TYPES.forEach((q, i) => { const p = E.outCubic(P(t, T_TY[i], .5)), y = 400 + i * DY, w = Math.max(4, q.share / mx * MW) * p; if (p <= 0) return;
+        fbar(ctx, BX, y - 16, w, 32, KCOL[kindOf(q.model)], { r: 6 });
+        late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, q.name, BX - 16, y, { size: fitSize(c, q.name, 24, 250), weight: 800, color: '#FFF', align: 'right' });
+          text(c, FMT.num(q.share, 0) + '%', BX + w + 12, y + 1, { size: 24, weight: 900, color: kindOf(q.model) === 'x' ? C.yellow : '#FFF' }); }); }); }
+    // a receita por modelo de entrega: barra empilhada (só a track · com outras tracks · não especificado)
+    const segs = [[PA_REV, 'p', 'só a track'], [XT_REV, 'x', 'com outras tracks'], [NA_REV, 'n', 'n/e']].filter(q => q[0] != null && q[0] > 0), tot = segs.reduce((a2, q) => a2 + q[0], 0);
+    if (segs.length) { const sp = E.inOutCubic(P(t, T_CMP[1] + .6, .9)), X = OX + 1380, Y = 640, Wb = 470; let x = X;
+      late(ctx, c => { c.globalAlpha *= clamp(sp * 3); text(c, `receita ${YR} por modelo de entrega`, X, Y - 40, { size: 22, weight: 900, mono: true, color: '#E9DCC8' }); });
+      segs.forEach(([v, k, l]) => { const w = Wb * v / tot * sp, x0 = x; if (w > 0) { fbar(ctx, x0, Y, w - 3, 44, KCOL[k], { r: 4 });
+          if (v >= 8) late(ctx, c => { c.globalAlpha *= clamp(sp * 2); text(c, FMT.num(v, 0) + '%', x0 + w / 2, Y + 23, { size: 22, weight: 900, color: k === 'x' ? INK : '#FFF', align: 'center' }); text(c, l, x0 + w / 2, Y + 72, { size: 19, weight: 800, color: '#E9DCC8', align: 'center' }); }); }
+        x += Wb * v / tot; });
+      if (PARTNERS.length) late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1] + 1.6, .5); text(c, PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '), X, Y + 130, { size: fitSize(c, PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '), 22, Wb), weight: 800, color: C.yellow }); }); }
     ctx.restore();
   }
-  function quarters(ctx, t) {
-    const a = P(t, T_Q, .7); if (a <= 0 || !QS.length) return;
+  /** CAPACIDADE: pessoas por nível (internas + contractors), o total e onde está a maior parte do time */
+  function team(ctx, t) {
+    const a = P(t, T_Q, .6); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
-    const B0 = 800, HQ = 420, M = Math.max(...QS.flatMap(([, q]) => [q.actuals_2022, q.budget_2023, q.actuals_2023]), 1e-9), gx = i => 2300 + i * 240;
-    line(ctx, 2210, B0, 3240, B0, '#F3E6D6', 4);
-    QS.forEach(([k, q], i) => {
-      [[q.actuals_2022, '#8A8378', 0], [q.budget_2023, null, 1], [q.actuals_2023, C.orange, 2]].forEach(([v, col, j]) => {
-        const p = E.outCubic(P(t, T_Q + .3 + i * .25 + j * .08, .5)), x = gx(i) + j * 56, hh = v / M * HQ * p;
-        if (col) fbar(ctx, x, B0 - hh, 46, hh, col, { r: 5 }); else { ctx.save(); ctx.setLineDash([9, 7]); rr(ctx, x, B0 - hh, 46, hh, 4); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); }
-      });
-      const up = q.actuals_2023 > q.budget_2023, la = P(t, T_Q + .9 + i * .25, .4);
-      late(ctx, c => { c.globalAlpha *= la; text(c, qLabel(k), gx(i) + 74, B0 + 36, { size: 30, weight: 900, color: '#FFF', align: 'center' }); if (up) icon(c, 'check', gx(i) + 130, B0 - Math.max(q.actuals_2023, q.budget_2023) / M * HQ - 40, 36, C.yellow, 10); });
-    });
-    // legenda fixa
-    late(ctx, c => { [['anterior', '#8A8378', 0], ['orçamento', null, 1], ['realizado', C.orange, 2]].forEach(([l, col, j]) => { const x = 2240 + j * 300, y = 300;
-      if (col) { rr(c, x, y - 16, 34, 32, 4); c.fillStyle = col; c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); } else { c.save(); c.setLineDash([6, 5]); rr(c, x, y - 16, 34, 32, 4); c.strokeStyle = '#F3E6D6'; c.lineWidth = 3; c.stroke(); c.restore(); }
-      text(c, l, x + 48, y, { size: 28, weight: 800, color: '#FFF' }); }); text(c, `${UNIT[0]} · por trimestre`, 2240, 356, { size: 24, weight: 700, mono: true, color: '#BFB3A3' }); });
+    const CXp = OX + 700, Y0 = 330, DY = Math.min(92, 520 / Math.max(1, LV.length)), BH = DY * .64, U = 620 / MXL, LBX = CXp - MXL * U / 2 - 28;
+    late(ctx, c => { [[C.orange, 'posições internas'], [C.yellow, 'contractors']].forEach(([col, l], i) => { const lx = OX + 420 + i * 280; rr(c, lx, 266, 26, 18, 4); c.fillStyle = col; c.fill(); text(c, l, lx + 36, 276, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
+    LV.forEach((l, i) => { const p = E.outCubic(P(t, T_LV[i], .55)), y = Y0 + i * DY, wi = l.int * U * p, wc = l.con * U * p, w = wi + wc, x0 = CXp - w / 2, hot = TOP3.includes(l.lv); if (p <= 0) return;
+      if (wi > 0) fbar(ctx, x0, y, wi, BH, C.orange, { r: 6 }); if (wc > 0) fbar(ctx, x0 + wi + (wi > 0 ? 2 : 0), y, wc - (wi > 0 ? 2 : 0), BH, C.yellow, { r: 6 });
+      late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, l.lv, LBX, y + BH / 2, { size: 28, weight: 900, mono: true, color: hot ? C.yellow : '#F3E6D6', align: 'right' });
+        text(c, FMT.num(l.tot, 0) + (l.con ? `  (${FMT.num(l.con, 0)} contractors)` : ''), x0 + w + 16, y + BH / 2, { size: 24, weight: 900, color: '#FFF' }); }); });
+    // o total do time
+    const tp = P(t, T_Q + 3.6, .6); if (tp > 0 && T_TOT) hud(ctx, c => { c.translate(1380, 600); c.globalAlpha *= tp; panel(c, 0, 0, 470, 230, { dark: true });
+      text(c, FMT.num(T_TOT, 0), 44, 92, { size: 96, weight: 900, color: C.orange }); text(c, 'pessoas hoje', 44 + measure(c, FMT.num(T_TOT, 0), 96, 900) + 20, 104, { size: 30, weight: 800, color: '#FFF' });
+      text(c, `${FMT.num(T_INT, 0)} internas · ${FMT.num(T_CON, 0)} contractors`, 44, 178, { size: 26, weight: 800, color: '#E9DCC8' }); });
     ctx.restore();
   }
   SCENES[id] = {
@@ -271,7 +305,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
         // chão da galeria com reflexo
         const g = ctx.createLinearGradient(0, 820, 0, H + 80); g.addColorStop(0, 'rgba(60,32,18,.9)'); g.addColorStop(1, 'rgba(12,8,6,.95)'); ctx.fillStyle = g; ctx.fillRect(-400, 822, 4600, 400);
         axis(ctx, P(t, .3, .6) * (1 - P(t, T_BR + .4, .6))); bars(ctx, t);
-        brazil(ctx, t); quarters(ctx, t);
+        projects(ctx, t); team(ctx, t);
         // a linha segue para a próxima estação
         const run = E.inCubic(P(t, T_CONC + 1.6, 3)); if (run > 0) LINE.draw(ctx, [[2200, 960], [3400, 960], [4300, 960]], run, { w: 16, head: true });
       });
@@ -440,16 +474,19 @@ POSTERS[1] = (ctx, w, h, tl) => {
   late(ctx, c => text(c, 'Dados → Decisão → Ação → Resultado', 0, 262, { size: 20, weight: 900, mono: true, color: '#8A6A48', align: 'center' }));
 };
 POSTERS[2] = (ctx, w, h, tl) => {
-  const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9), BR = sec.brazil_2023_milestone || {};
+  const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9);
   const isF = k => /forecast/i.test(k);
   line(ctx, -200, 30, 200, 30, INK, 3);
   R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else fbar(ctx, x, 30 - hh, 70, hh, mix(C.red, C.orange, i / 2), { r: 6 });
     late(ctx, c => { text(c, FMT.usdMM(+v), x + 35, 30 - hh - 18, { size: 17, weight: 900, color: INK, align: 'center' }); text(c, k.replace(/_?forecast/i, '') + (isF(k) ? '*' : ''), x + 35, 50, { size: 18, weight: 900, color: INK, align: 'center' }); }); });
-  const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, vp = BR.actuals_2022_usd_millions ? BR.actuals_2023_usd_millions / BR.actuals_2022_usd_millions : null, vb = BR.budget_2023_usd_millions ? BR.actuals_2023_usd_millions / BR.budget_2023_usd_millions : null;
-  late(ctx, c => { text(c, 'faturamento anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
+  const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, yk = String(Object.keys(sec).map(k => (k.match(/^business_scale_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
+  const bs = sec['business_scale_' + yk] || {}, pm = sec['project_mix_' + yk] || {}, tm = sec['team_structure_' + yk] || {}, np = +bs.projects_delivered || 0, disp = String(bs.projects_delivered_display || '').trim();
+  const projTxt = /^[+~]?\d[\d.,]*$/.test(disp) ? disp : (np ? FMT.num(np, 0) : '—'), xt = parseFloat(String(pm.projects_with_other_tracks_approx || bs.projects_with_other_tracks_approx || ''));
+  const tot = +tm.current_total_including_contractors || 0;
+  late(ctx, c => { text(c, 'receita anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
     if (mult) para(c, `De ${R[0][0]} a ${R[2][0]}: *${FMT.num(mult, 1)}×* o valor inicial`, 0, 84, 420, { size: 22, weight: 900, color: INK, accent: C.red, align: 'center' });
-    para(c, `Brasil (estimativa): *${vp ? FMT.mult(vp) : '—'}* o período anterior · *${vb ? FMT.mult(vb) : '—'}* o orçamento`, 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
-    text(c, 'Crescimento consistente, acima do planejado.', 0, 246, { size: 20, weight: 900, color: C.red, align: 'center' }); });
+    para(c, `*${projTxt} projetos* em ${yk}` + (isFinite(xt) ? ` · *~${FMT.num(xt, 0)}%* com outras tracks` : '') + (tot ? ` · time de *${FMT.num(tot, 0)} pessoas*` : ''), 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
+    text(c, 'Crescimento com integração e um time para escalar.', 0, 246, { size: 19, weight: 900, color: C.red, align: 'center' }); });
 };
 POSTERS[3] = (ctx, w, h, tl) => {
   late(ctx, c => { [['PREDITIVOS', 'antecipam resultados', 'fraude · saída · gastos', C.orange, -150], ['PRESCRITIVOS', 'ajudam a escolher ações', 'oferta · campanhas · incentivos', C.red, 40]].forEach(([k, s1, s2, col, y]) => {

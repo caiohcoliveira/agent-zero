@@ -66,7 +66,7 @@ const fitSize = (ctx, str, size, maxW, weight = 800) => Math.min(size, size * ma
 /** a imagem do dashboard (case de relatórios): o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque
  *  pelo real, com o mesmo nome). Usada no popup do case de relatórios e na pilha de painéis do case de agentes. Sem o arquivo: null */
 const DASHIMG = (() => { let src = null, img = null; return () => {
-  const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
+  const s = String(dget(CASE('Lights-off'), 'dashboard_image', 'dashboard-fraude.png') || ''); if (!s) return null;   // sem o campo: o arquivo padrão; campo vazio: sem imagem
   if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
 DASHIMG();   // começa a carregar a imagem já na abertura da página
 /* ---------- abertura da 04: analytics em ação · os 4 cases ---------- */

@@ -6,10 +6,53 @@
 <title>Performance Analytics — A Linha</title>
 <!--
   ============================================================================
-  DADOS DO VÍDEO (JSON) — os números e textos das cenas vêm deste bloco.
-  Para trocar uma informação: edite o valor abaixo e salve o arquivo.
-  No projeto, a fonte é data/presentation.json, que ./build.sh injeta aqui.
-  Um item de "headline_numbers_for_slides" aceita "display" para fixar o texto exato de tela.
+  LEIA-ME · COMO TROCAR OS DADOS DESTE VÍDEO
+  ============================================================================
+  Este arquivo é o vídeo inteiro (1920 × 1080, funciona offline). Todos os números
+  e textos das telas de dados vêm do bloco JSON logo abaixo (<script id="pa-data">).
+  O resto do arquivo (estilos, músicas embutidas e código) não precisa ser mexido.
+
+  PASSO A PASSO
+    1. Abra este arquivo num editor de texto (VS Code, Notepad++, Sublime…).
+    2. Troque o conteúdo entre  <script type="application/json" id="pa-data">  e
+       </script>  pelo JSON com os dados reais, mantendo os mesmos nomes de chave.
+    3. Salve e abra no Chrome ou no Edge. Se aparecer "—" numa tela, a chave daquele
+       dado não foi encontrada: confira o nome.
+    4. Na versão real, apague o campo presentation_context.disclaimer (é ele que mostra
+       o aviso "versão mockada" no canto de todas as telas).
+    5. A imagem do dashboard (case de relatórios) é o arquivo dashboard-fraude.png NA
+       MESMA PASTA deste HTML: troque pelo print real com o mesmo nome (ou escreva outro
+       nome no campo dashboard_image do case). Sem o arquivo, o vídeo desenha um
+       dashboard ilustrativo.
+
+  REGRAS DO JSON
+    • aspas duplas e nenhuma vírgula depois do último item (valide no VS Code ou em
+      jsonlint.com antes de salvar: um JSON inválido deixa as telas sem dados);
+    • valores em milhões de US$ são números: 2.5 = US$ 2,5 mi;
+    • percentuais podem vir como texto: "21%";
+    • o ano vem do nome da chave: business_scale_2026 → "em 2026".
+
+  ONDE CADA CAMPO APARECE
+    presentation_context.organization ............. pré-show e letreiro final
+    presentation_context.disclaimer ............... aviso "versão mockada" (apague na versão real)
+    Seção 2 · estação 02 (evolução e impacto)
+      revenue_performance_analytics_usd_millions .... tela 1: receita por ano ("2026_forecast" = previsão)
+      business_scale_AAAA.projects_delivered ........ tela 2: número de projetos
+        (projects_delivered_display curto, como "+30", substitui o número na tela)
+      revenue_contribution_by_project_type_AAAA ..... tela 2: receita por tipo de projeto
+        (project_type, revenue_share e delivery_model: "Track" = só a track; "Track + Outra" = com outra track)
+      revenue_contribution_summary_AAAA ............. tela 2: receita só da track × com outras tracks
+      project_mix_AAAA.projects_with_other_tracks_approx .. tela 2: % de projetos com outras tracks
+      team_structure_AAAA ........................... tela 3: pessoas por nível
+        (levels: level, current_internal_positions, current_contractors; e os totais current_*)
+    Seção 3 (client_types, capabilities) ............ estação 03
+    Seção 4 · cases, NESTA ORDEM .................... estação 04
+      1º cestas de produtos · 2º principalidade · 3º relatórios automatizados · 4º agentes de IA
+      (o vídeo acha cada case pelo começo do nome: "Cliente Banana", "Cliente Manga", "Lights-off",
+       "Insight Agent"; se o nome for outro, vale a posição na lista)
+    Seção 5 (innovation_examples) ................... estação 05
+    Seção 6 (pillars: pillar, contribution ou highlights) .. estação 06
+    headline_numbers_for_slides ..................... números de apoio ("display" fixa o texto exato)
   ============================================================================
 -->
 <script type="application/json" id="pa-data">
@@ -42,6 +85,119 @@
         "2023_to_2024": "+0.4 relative",
         "2024_to_2025": "+0.285714 relative",
         "2023_to_2025": "+0.8 relative"
+      },
+      "business_scale_2026": {
+        "revenue_usd_millions_approx": 0.0036,
+        "projects_delivered": 28,
+        "projects_delivered_display": "28",
+        "projects_with_other_tracks_approx": "45%",
+        "projects_with_other_tracks_revenue_share": "54%",
+        "executive_message": "Lorem ipsum dolor sit amet: 28 projetos fictícios, cerca de metade com outras tracks."
+      },
+      "revenue_contribution_by_project_type_2026": [
+        {
+          "project_type": "Figo",
+          "revenue_share": "22%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Caqui",
+          "revenue_share": "18%",
+          "delivery_model": "Performance Analytics + Cenoura"
+        },
+        {
+          "project_type": "Pitanga",
+          "revenue_share": "15%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Amora",
+          "revenue_share": "13%",
+          "delivery_model": "Performance Analytics + Brócolis"
+        },
+        {
+          "project_type": "Carambola",
+          "revenue_share": "11%",
+          "delivery_model": "Performance Analytics + Abobrinha"
+        },
+        {
+          "project_type": "Lichia",
+          "revenue_share": "8%",
+          "delivery_model": "Performance Analytics + Cenoura"
+        },
+        {
+          "project_type": "Mirtilo",
+          "revenue_share": "6%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Framboesa",
+          "revenue_share": "4%",
+          "delivery_model": "Performance Analytics + Abobrinha"
+        },
+        {
+          "project_type": "Cereja",
+          "revenue_share": "3%",
+          "delivery_model": "Not specified"
+        }
+      ],
+      "revenue_contribution_summary_2026": {
+        "pa_only_revenue_share": "43%",
+        "cross_track_revenue_share": "54%",
+        "unspecified_delivery_model_revenue_share": "3%",
+        "cross_track_revenue_breakdown": {
+          "Performance Analytics + Cenoura": "26%",
+          "Performance Analytics + Brócolis": "13%",
+          "Performance Analytics + Abobrinha": "15%"
+        }
+      },
+      "project_mix_2026": {
+        "projects_with_other_tracks_approx": "45%",
+        "measurement_basis": "Share of projects",
+        "note": "Project-count shares and revenue shares use different measurement bases and should be presented separately."
+      },
+      "team_structure_2026": {
+        "current_internal_positions": 53,
+        "current_contractors": 5,
+        "current_total_including_contractors": 58,
+        "levels": [
+          {
+            "level": "K2",
+            "current_internal_positions": 1,
+            "current_contractors": 0,
+            "current_total": 1
+          },
+          {
+            "level": "K3",
+            "current_internal_positions": 4,
+            "current_contractors": 0,
+            "current_total": 4
+          },
+          {
+            "level": "K4",
+            "current_internal_positions": 9,
+            "current_contractors": 0,
+            "current_total": 9
+          },
+          {
+            "level": "K5",
+            "current_internal_positions": 13,
+            "current_contractors": 3,
+            "current_total": 16
+          },
+          {
+            "level": "K6",
+            "current_internal_positions": 14,
+            "current_contractors": 2,
+            "current_total": 16
+          },
+          {
+            "level": "K7",
+            "current_internal_positions": 12,
+            "current_contractors": 0,
+            "current_total": 12
+          }
+        ]
       },
       "brazil_2023_milestone": {
         "headline": "Performance Analytics Brazil estimated to close the reference period at USD 1220, approximately 1.648649x budget and 1.742857x prior-period revenue",
@@ -517,21 +673,13 @@
 </script>
 <!--
   ============================================================================
-  PERFORMANCE ANALYTICS — "A INTERSEÇÃO"
-  Vídeo animado executivo (~4:00) · 1920×1080 · arquivo único, 100% offline.
+  PERFORMANCE ANALYTICS — "A LINHA"
+  Vídeo executivo animado (~8:48 em 4 trechos + paradas de conversa) · 1920 × 1080 ·
+  arquivo único e offline. Ordem do arquivo: dados (acima) → estilos → músicas
+  embutidas (base64) → código (um <script>, montado a partir de src/ por tools/build.py).
 
-  Arquitetura (um único <script>, organizado em seções):
-    1. CONFIG ........ parâmetros editáveis (cores, tempos, textos, narração, áudio, motion)
-    2. CORE .......... easing, interpolação, RNG com seed, cores, primitivas de desenho, câmera
-    3. COMPONENTS .... ícones, agentes, cards, carimbos, chips de capítulo, dashboard
-    4. VIZ ........... visualizações de modelos (gaussiana, regressão, árvore, clusters…)
-    5. AUDIO ......... trilha + SFX sintetizados em Web Audio (sincronizados à timeline)
-    6. VOICE ......... narração via Web Speech API (pt-BR, voz feminina quando disponível)
-    7. SCENES ........ 10 cenas; cada uma é uma função pura draw(ctx, t) → seek perfeito
-    8. PLAYER ........ loop requestAnimationFrame, transições, controles, teclado
-
-  Atalhos: Espaço = play/pause · R = reiniciar · ←/→ = ±5s · F = tela cheia
-           M = som · V = voz · C = legendas
+  Atalhos: → / Espaço = seguir · ← = voltar · 1 a 7 = estação · P = pausa · F = tela cheia · M = som
+           Home ou R = começo · End = fim · C = legendas · Q = qualidade
   ============================================================================
 -->
 <style>
@@ -739,8 +887,8 @@ const CONFIG = {
     stations: [
       { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'conectamos perguntas de negócio aos dados, do diagnóstico à mensuração',
         see: ['Decisões difíceis começam com perguntas', 'A ponte entre negócio e dados', 'Diagnóstico, estratégia, execução e mensuração'] },
-      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'o faturamento da track e o resultado do Brasil',
-        see: ['Faturamento anual da track, com base zero', 'Brasil: comparado ao período anterior e ao orçamento', 'Trimestres: anterior × orçamento × realizado'] },
+      { n: '02', short: 'EVOLUÇÃO E IMPACTO',       title: 'Nossa evolução e o impacto no negócio',                teaser: 'a receita da track, os projetos e o time',
+        see: ['Receita anual da track, com base zero', 'Projetos: receita por tipo e parceria com outras tracks', 'Capacidade: pessoas por nível'] },
       { n: '03', short: 'O QUE LEVAMOS AO MERCADO', title: 'Onde aplicamos analytics',                             teaser: 'tipos de cliente, capabilities e modelos',
         see: ['Emissores, adquirentes e varejo', 'Segmentação, recomendação e automação', 'Modelos que antecipam e modelos que recomendam'] },
       { n: '04', short: 'ANALYTICS EM AÇÃO',        title: 'Analytics em ação: do problema ao resultado',          teaser: '4 cases, do problema à solução e ao resultado',
@@ -815,7 +963,7 @@ const CONFIG = {
     { scene: 's01', at: 8.0, text: 'Todo projeto começa com uma pergunta de negócio.' },
     { scene: 's01', at: 22.0, text: 'Transformamos dados em decisões, decisões em impacto… e impacto em valor.' },
     { scene: 's02', at: 1.0, text: 'Próxima estação: a nossa evolução.' },
-    { scene: 's02', at: 22.5, text: 'E o Brasil fechou acima do período anterior e acima do budget.' },
+    { scene: 's02', at: 22.5, text: 'Cerca de metade dos projetos é feita com outras tracks.' },
     { scene: 's03', at: 1.0, text: 'Próxima estação: o que levamos ao mercado.' },
     { scene: 's03', at: 10.0, text: 'Para emissores, adquirentes e merchants, cada capability já tem um case para mostrar.' },
     { scene: 's04', at: 1.0, text: 'Próxima estação: analytics em ação. Agora, os cases de impacto.' },
@@ -877,7 +1025,7 @@ const SCENES = {}, STOPSCN = {};
 /* ============================================================================
    1b. DADOS — os números e textos das cenas vêm do bloco <script id="pa-data">
    ----------------------------------------------------------------------------
-   • No projeto: data/presentation.json (fora do Git) → ./build.sh injeta no HTML.
+   • No projeto: data/presentation.json → python3 tools/build.py injeta no HTML.
    • No HTML pronto: edite o bloco "pa-data" no topo do arquivo e salve.
    • Todo acesso tem valor-reserva: se faltar um campo, a cena mostra "—".
    ========================================================================== */
@@ -897,8 +1045,11 @@ function dget(obj, path, fb) {
 }
 /** seção n da apresentação (1 a 7) */
 const SEC = n => (DATA.presentation_structure || []).find(s => s.section === n) || {};
-/** case da seção 4 pelo começo do nome (ex.: 'Cliente X') */
-const CASE = prefix => (SEC(4).cases || []).find(c => String(c.case_name || '').startsWith(prefix)) || {};
+/** case da seção 4 pelo começo do nome (ex.: 'Cliente X'); se nenhum nome bater, vale a POSIÇÃO na lista
+ *  (1º cestas de produtos, 2º principalidade, 3º relatórios automatizados, 4º agentes de IA) — assim o JSON real
+ *  pode usar outros nomes de cliente sem quebrar o vídeo */
+const CASE_ORDER = ['Cliente Banana', 'Cliente Manga', 'Lights-off', 'Insight Agent'];
+const CASE = prefix => { const cs = SEC(4).cases || []; return cs.find(c => String(c.case_name || '').startsWith(prefix)) || cs[CASE_ORDER.indexOf(prefix)] || {}; };
 /** números-manchete de uma seção */
 const HEADLINES = n => (DATA.headline_numbers_for_slides || []).filter(h => h.section === n);
 
@@ -2669,7 +2820,7 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
 // [cena, instante montado (miniatura), título, início do loop, fim do loop] — o popup roda a animação em loop nesse trecho
 const SLIDES = {
   1: [['s01', 11.6, 'As perguntas de negócio', 3.9, 12.2], ['s01', 35.0, 'A ponte: os 4 serviços', 19.8, 35.6], ['s01', 46.0, 'Do diagnóstico à mensuração', 35.8, 46.9]],
-  2: [['s02', 19.5, 'Faturamento da track', 3.9, 20.2], ['s02', 29.5, 'Brasil: anterior e orçamento', 20.6, 30.3], ['s02', 38.0, 'Brasil por trimestre', 30.8, 43.4]],
+  2: [['s02', 19.5, 'Receita da track', 3.9, 20.2], ['s02', 29.5, 'Projetos e receita por tipo', 20.6, 30.3], ['s02', 41.0, 'Capacidade do time', 30.8, 43.4]],
   3: [['s03', 15.0, 'Onde aplicamos', 3.8, 15.2], ['s03', 25.0, 'O que entregamos', 16.1, 25.2], ['s03', 33.5, 'Junto com as outras tracks', 26.1, 33.4],
     ['s03', 43.5, 'Modelos preditivos', 34.5, 43.4], ['s03', 51.5, 'Modelos prescritivos', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
   4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 31.5, 'Cestas · como fizemos (ALS)', 24.5, 35.4], ['banana', 52.5, 'Cestas · solução e resultado', 35.6, 53.1],
@@ -4063,35 +4214,59 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   };
 })();
 
-/* ---------- 02 · Evolução e impacto: o crescimento ganha forma e uma régua ---------- */
+/* ---------- 02 · Evolução e impacto (v7.13): RECEITA da track → PROJETOS (receita por tipo e parceria com outras tracks) → CAPACIDADE do time ----------
+   Dados (seção 2 do JSON): revenue_performance_analytics_usd_millions · business_scale_AAAA · revenue_contribution_by_project_type_AAAA ·
+   revenue_contribution_summary_AAAA · project_mix_AAAA · team_structure_AAAA (AAAA = o ano mais recente que aparecer nessas chaves) */
 (() => {
-  const id = 's02', sec = () => SEC(2), BR = sec().brazil_2023_milestone || {};
+  const id = 's02', sec = () => SEC(2);
   const ROWS = Object.entries(sec().revenue_performance_analytics_usd_millions || {}), VALS = ROWS.map(r => +r[1] || 0), MAXV = Math.max(...VALS, 1e-9);
   const isF = k => /forecast|previs/i.test(k), yr = k => k.replace(/_?forecast/i, '');
   const MULT = VALS.length > 2 && VALS[0] ? VALS[2] / VALS[0] : null;
   const UNIT = (() => { const m = MAXV * 1e6; return m >= 1e6 ? ['US$ mi', 1e6] : m >= 1e3 ? ['US$ mil', 1e3] : ['US$', 1]; })(), toU = v => v * 1e6 / UNIT[1];
   const niceStep = mx => { const raw = mx / 4, p = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; };
   const STEP = niceStep(toU(MAXV)), TOP = Math.ceil(toU(MAXV) * 1.08 / STEP) * STEP;
-  const PREV = +BR.actuals_2022_usd_millions || 0, BUD = +BR.budget_2023_usd_millions || 0, ACT = +BR.actuals_2023_usd_millions || 0;
-  const VS_PREV = PREV ? ACT / PREV : null, VS_BUD = BUD ? ACT / BUD : null;
-  const QS = Object.entries(BR.quarterly_usd_millions || {}), QUP = QS.filter(([, q]) => q.actuals_2023 > q.budget_2023).length;
-  const qLabel = k => (k.match(/(\d)/) ? 'T' + k.match(/(\d)/)[1] : k) + (/prelim/i.test(k) ? ' (prel.)' : '');
+  // ---- projetos e capacidade: as chaves terminam no ano (ex.: business_scale_2026); vale o ano mais recente que existir ----
+  const YR = String(Object.keys(sec()).map(k => (k.match(/^(?:business_scale|team_structure|revenue_contribution_by_project_type)_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
+  const B26 = sec()['business_scale_' + YR] || {}, MIX = sec()['project_mix_' + YR] || {}, SUMR = sec()['revenue_contribution_summary_' + YR] || {}, TEAM = sec()['team_structure_' + YR] || {};
+  const pct = v => { const x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(x) ? x : null; };
+  const TYPES = (sec()['revenue_contribution_by_project_type_' + YR] || []).map(r => ({ name: String(r.project_type || '—'), share: pct(r.revenue_share) || 0, model: String(r.delivery_model || '') }))
+    .sort((a, b) => b.share - a.share).slice(0, 9);
+  /** modelo de entrega: x = com outras tracks ("Track + Outra") · n = não especificado · p = só a track */
+  const kindOf = m => /\+/.test(m) ? 'x' : (!m || /not specified|n[ãa]o especificado/i.test(m)) ? 'n' : 'p', KCOL = { p: C.orange, x: C.yellow, n: '#8A8378' };
+  const NPROJ = +B26.projects_delivered || 0, DISP = String(B26.projects_delivered_display || '').trim();
+  const PROJ_TXT = /^[+~]?\d[\d.,]*$/.test(DISP) ? DISP : (NPROJ ? FMT.num(NPROJ, 0) : '—');   // "display" curto (ex.: "+30") tem prioridade
+  const XT_PROJ = pct(MIX.projects_with_other_tracks_approx != null ? MIX.projects_with_other_tracks_approx : B26.projects_with_other_tracks_approx);
+  const XT_REV = pct(SUMR.cross_track_revenue_share != null ? SUMR.cross_track_revenue_share : B26.projects_with_other_tracks_revenue_share);
+  const PA_REV = pct(SUMR.pa_only_revenue_share), NA_REV = pct(SUMR.unspecified_delivery_model_revenue_share);
+  const PARTNERS = Object.entries(SUMR.cross_track_revenue_breakdown || {}).map(([k, v]) => ['+ ' + String(k).replace(/^.*?\+\s*/, ''), pct(v)]).filter(q => q[1] != null);
+  const LV = (TEAM.levels || []).map(l => ({ lv: String(l.level || ''), int: +l.current_internal_positions || 0, con: +l.current_contractors || 0 })).map(l => ({ ...l, tot: l.int + l.con }));
+  const T_INT = +TEAM.current_internal_positions || LV.reduce((a, l) => a + l.int, 0), T_CON = +TEAM.current_contractors || LV.reduce((a, l) => a + l.con, 0);
+  const T_TOT = +TEAM.current_total_including_contractors || (T_INT + T_CON), MXL = Math.max(1, ...LV.map(l => l.tot));
+  const TOP3 = LV.slice().sort((a, b) => b.tot - a.tot).slice(0, 3).map(l => l.lv).sort(), list = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1] : a.join('');
+  const OX = 2200;   // a câmera passa para x = 3160 no mundo: o que vem depois da receita é desenhado com x de tela + OX
   const T_BAR = ROWS.map((_, i) => beatsFrom(id, 1.0, 2 * i)), T_TREND = 5.6, T_READ = 12.2, T_BR = 20.4, T_CMP = [21.9, 23.3], T_Q = 30.6, T_CONC = 38.4;
+  const T_TY = TYPES.map((_, i) => T_CMP[0] + .2 + i * .14), T_LV = LV.map((_, i) => beatsFrom(id, T_Q + .8, i));
   const CX = [430, 680, 930, 1180], BASE = 820, HH = 500, X0 = 250, BW = 160;
   const CAM = [[0, 960, 560, 1.05], [3.6, 960, 540, 1], [T_BR - .2, 960, 540, 1], [T_BR + 1.3, 3160, 540, 1], [43.7, 3160, 540, 1]];
   const hY = v => BASE - toU(v) / TOP * HH;
   T_BAR.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .1, v: .2 })); cue(id, T_READ, 'chime', { f: 784, up: 7 });
   cue(id, T_BR, 'whoosh', { dur: 1, v: .3 }); T_CMP.forEach(t0 => cue(id, t0, 'impact', { size: .5 })); cue(id, T_Q, 'whoosh', { dur: .7, v: .25 }); cue(id, T_CONC, 'chime', { f: 659, up: 7 });
-  const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, o faturamento passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'O faturamento cresceu ano a ano.';
-  const qTxt = QS.length ? (QUP === QS.length ? 'O realizado superou o orçamento em *todos os trimestres*.' : `O realizado superou o orçamento em *${QUP} de ${QS.length} trimestres*.`) : '';
+  T_LV.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .08, v: .16 }));
+  const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, a receita passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'A receita cresceu ano a ano.';
+  const xtTxt = XT_PROJ != null ? `Cerca de *${FMT.num(XT_PROJ, 0)}%* dos projetos são feitos *com outras tracks*` + (XT_REV != null ? ` (*${FMT.num(XT_REV, 0)}%* da receita).` : '.') : 'Parte dos projetos é feita *com outras tracks*.';
+  const CONL = LV.filter(l => l.con > 0).map(l => l.lv);
+  const teamTxt = TOP3.length ? `A maior parte do time está em *${list(TOP3)}*` + (CONL.length ? `; os *contractors* reforçam *${list(CONL)}*.` : '.') : '';
   const SCRIPT = SAY.reg(id, [
-    [3.9, T_BR - .1, 'title', 'Evolução do faturamento da track'],
-    [4.1, T_BR - .1, 'note', `faturamento anual, em ${UNIT[0]} · base zero`, { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [3.9, T_BR - .1, 'title', 'Evolução da receita da track'],
+    [4.1, T_BR - .1, 'note', `receita anual, em ${UNIT[0]} · base zero`, { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
     [T_READ, T_BR - .1, 'body', growTxt, { x: 1380, y: 300, w: 470 }],
-    [T_BR + .9, 43.8, 'title', 'Faturamento do *Brasil*'],
-    [T_BR + 1.0, 43.8, 'note', 'período de referência · estimativa de fechamento', { x: LAY.x, y: 196, align: 'left', size: 28 }],
-    [T_Q + .3, 43.8, 'body', qTxt, { x: 1380, y: 300, w: 470, visual: true }],
-    [T_CONC, 43.9, 'concl', 'Crescimento *consistente*, acima do *planejado*.']
+    [T_BR + .9, T_Q - .1, 'title', `*${PROJ_TXT} projetos* em ${YR}`],
+    [T_BR + 1.0, T_Q - .1, 'note', 'receita por tipo de projeto · parceria com outras tracks', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_BR + 2.0, T_Q - .1, 'body', xtTxt, { x: 1380, y: 300, w: 470 }],
+    [T_Q + .3, 43.8, 'title', 'Capacidade do *time*'],
+    [T_Q + .4, 43.8, 'note', 'pessoas por nível · posições internas e contractors', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_Q + 2.4, 43.8, 'body', teamTxt, { x: 1380, y: 300, w: 470 }],
+    [T_CONC, 43.9, 'concl', 'Crescimento com *integração* e um *time* para escalar.']
   ]);
   function axis(ctx, a) {
     ctx.save(); ctx.globalAlpha *= a;
@@ -4126,43 +4301,53 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       arrowHead(ctx, xr, lerp(y0, y2, g) - 6, -Math.PI / 2, 22, C.yellow); ctx.restore();
       late(ctx, c => { c.globalAlpha *= g; retroText(c, '×' + FMT.num(MULT, 1), xr + 34, (y0 + y2) / 2, { size: 64, weight: 900, color: C.yellow, depth: 4, lw: 3 }); }); }
   }
-  function brazil(ctx, t) {
-    const a = P(t, T_BR, .8) * (1 - P(t, T_Q - .3, .5)); if (a <= 0) return;
+  /** PROJETOS: o número de projetos, a receita por tipo de projeto (cor = modelo de entrega) e a parceria com outras tracks
+   *  (em projetos, ~%, e em receita, %, mostrados separados: as bases de medida são diferentes) */
+  function projects(ctx, t) {
+    const a = P(t, T_BR + .6, .6) * (1 - P(t, T_Q - .3, .5)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
-    const B0 = 860, HB = 300, M = Math.max(PREV, BUD, ACT, 1e-9), hb = v => v / M * HB, UB = (M * 1e6 >= 1e6 ? ['mi', 1e6] : M * 1e6 >= 1e3 ? ['mil', 1e3] : ['', 1]), fu = v => `US$ ${FMT.num(v * 1e6 / UB[1], 2)}${UB[0] ? ' ' + UB[0] : ''}`;
-    [[2560, PREV, 'período anterior', VS_PREV, 'o período anterior'], [3420, BUD, 'orçamento', VS_BUD, 'o orçamento']].forEach(([cx, ref, refL, mult, cap], g) => {
-      const p = E.outBack(P(t, T_CMP[g], .6)); if (p <= 0) return;
-      line(ctx, cx - 260, B0, cx + 260, B0, '#F3E6D6', 4);
-      [[ref, refL, g ? null : '#8A8378', g === 1], [ACT, 'realizado', C.orange, false]].forEach(([v, l, col, dash], j) => {
-        const x = cx - 190 + j * 220, hh = hb(v) * Math.min(1, p);
-        if (dash) { ctx.save(); ctx.setLineDash([12, 10]); rr(ctx, x, B0 - hh, 160, hh, 6); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 5; ctx.stroke(); ctx.restore(); }
-        else fbar(ctx, x, B0 - hh, 160, hh, col);
-        late(ctx, c => { c.globalAlpha *= clamp(p); text(c, fu(v), x + 80, B0 - hh - 30, { size: 28, weight: 900, color: '#FFF', align: 'center' }); text(c, l, x + 80, B0 + 36, { size: 28, weight: 800, color: j ? C.orange : '#F3E6D6', align: 'center' }); });
-      });
-      late(ctx, c => { c.globalAlpha *= clamp(p); c.translate(cx, B0 - HB - 215); const s = lerp(1.6, 1, E.outExpo(clamp(p))); c.scale(s, s);
-        text(c, mult ? FMT.mult(mult) : '—', 0, 0, { size: 96, weight: 900, color: g ? C.yellow : C.orange, align: 'center' });
-        text(c, cap, 0, 82, { size: 32, weight: 900, color: '#FFF', align: 'center' }); });
-    });
-    late(ctx, c => text(c, 'Fonte: ' + (BR.source || 'dados internos'), 2260, 940, { size: 22, weight: 700, mono: true, color: '#BFB3A3' }));
+    // o número de projetos (conta até o valor e pousa no acento da música)
+    const np = P(t, T_BR + 1.0, T_CMP[0] - T_BR - 1.0, E.outCubic), shown = np >= 1 ? PROJ_TXT : (PROJ_TXT[0] === '+' ? '+' : '') + FMT.num(Math.round(NPROJ * np), 0);
+    late(ctx, c => { text(c, shown, OX + 330, 380, { size: 150, weight: 900, color: C.orange, align: 'center' });
+      text(c, `projetos entregues em ${YR}`, OX + 330, 470, { size: 30, weight: 800, color: '#F3E6D6', align: 'center' }); });
+    // a parceria em projetos: rosca
+    if (XT_PROJ != null) { const dp = E.inOutCubic(P(t, T_CMP[1], .9)), cx = OX + 330, cy = 700, r = 112;
+      ctx.lineCap = 'butt'; ctx.lineWidth = 34; ctx.strokeStyle = 'rgba(243,230,214,.16)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+      ctx.strokeStyle = C.yellow; ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + TAU * XT_PROJ / 100 * dp); ctx.stroke();
+      late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1], .4); text(c, '~' + FMT.num(XT_PROJ * dp, 0) + '%', cx, cy + 2, { size: 50, weight: 900, color: '#FFF', align: 'center' });
+        text(c, 'dos projetos com outras tracks', cx, cy + 162, { size: 24, weight: 800, color: C.yellow, align: 'center' }); }); }
+    // a receita por tipo de projeto
+    if (TYPES.length) { const X1 = OX + 640, BX = OX + 910, MW = 330, mx = Math.max(...TYPES.map(q => q.share), 1), DY = Math.min(62, 560 / TYPES.length);
+      late(ctx, c => { text(c, `receita ${YR} por tipo de projeto`, X1, 300, { size: 24, weight: 900, mono: true, color: C.yellow });
+        [['p', 'só a track'], ['x', 'com outras tracks']].forEach(([k, l], i) => { const lx = X1 + i * 230; rr(c, lx, 330, 26, 18, 4); c.fillStyle = KCOL[k]; c.fill(); text(c, l, lx + 36, 340, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
+      TYPES.forEach((q, i) => { const p = E.outCubic(P(t, T_TY[i], .5)), y = 400 + i * DY, w = Math.max(4, q.share / mx * MW) * p; if (p <= 0) return;
+        fbar(ctx, BX, y - 16, w, 32, KCOL[kindOf(q.model)], { r: 6 });
+        late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, q.name, BX - 16, y, { size: fitSize(c, q.name, 24, 250), weight: 800, color: '#FFF', align: 'right' });
+          text(c, FMT.num(q.share, 0) + '%', BX + w + 12, y + 1, { size: 24, weight: 900, color: kindOf(q.model) === 'x' ? C.yellow : '#FFF' }); }); }); }
+    // a receita por modelo de entrega: barra empilhada (só a track · com outras tracks · não especificado)
+    const segs = [[PA_REV, 'p', 'só a track'], [XT_REV, 'x', 'com outras tracks'], [NA_REV, 'n', 'n/e']].filter(q => q[0] != null && q[0] > 0), tot = segs.reduce((a2, q) => a2 + q[0], 0);
+    if (segs.length) { const sp = E.inOutCubic(P(t, T_CMP[1] + .6, .9)), X = OX + 1380, Y = 640, Wb = 470; let x = X;
+      late(ctx, c => { c.globalAlpha *= clamp(sp * 3); text(c, `receita ${YR} por modelo de entrega`, X, Y - 40, { size: 22, weight: 900, mono: true, color: '#E9DCC8' }); });
+      segs.forEach(([v, k, l]) => { const w = Wb * v / tot * sp, x0 = x; if (w > 0) { fbar(ctx, x0, Y, w - 3, 44, KCOL[k], { r: 4 });
+          if (v >= 8) late(ctx, c => { c.globalAlpha *= clamp(sp * 2); text(c, FMT.num(v, 0) + '%', x0 + w / 2, Y + 23, { size: 22, weight: 900, color: k === 'x' ? INK : '#FFF', align: 'center' }); text(c, l, x0 + w / 2, Y + 72, { size: 19, weight: 800, color: '#E9DCC8', align: 'center' }); }); }
+        x += Wb * v / tot; });
+      if (PARTNERS.length) late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1] + 1.6, .5); text(c, PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '), X, Y + 130, { size: fitSize(c, PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '), 22, Wb), weight: 800, color: C.yellow }); }); }
     ctx.restore();
   }
-  function quarters(ctx, t) {
-    const a = P(t, T_Q, .7); if (a <= 0 || !QS.length) return;
+  /** CAPACIDADE: pessoas por nível (internas + contractors), o total e onde está a maior parte do time */
+  function team(ctx, t) {
+    const a = P(t, T_Q, .6); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
-    const B0 = 800, HQ = 420, M = Math.max(...QS.flatMap(([, q]) => [q.actuals_2022, q.budget_2023, q.actuals_2023]), 1e-9), gx = i => 2300 + i * 240;
-    line(ctx, 2210, B0, 3240, B0, '#F3E6D6', 4);
-    QS.forEach(([k, q], i) => {
-      [[q.actuals_2022, '#8A8378', 0], [q.budget_2023, null, 1], [q.actuals_2023, C.orange, 2]].forEach(([v, col, j]) => {
-        const p = E.outCubic(P(t, T_Q + .3 + i * .25 + j * .08, .5)), x = gx(i) + j * 56, hh = v / M * HQ * p;
-        if (col) fbar(ctx, x, B0 - hh, 46, hh, col, { r: 5 }); else { ctx.save(); ctx.setLineDash([9, 7]); rr(ctx, x, B0 - hh, 46, hh, 4); ctx.strokeStyle = '#F3E6D6'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); }
-      });
-      const up = q.actuals_2023 > q.budget_2023, la = P(t, T_Q + .9 + i * .25, .4);
-      late(ctx, c => { c.globalAlpha *= la; text(c, qLabel(k), gx(i) + 74, B0 + 36, { size: 30, weight: 900, color: '#FFF', align: 'center' }); if (up) icon(c, 'check', gx(i) + 130, B0 - Math.max(q.actuals_2023, q.budget_2023) / M * HQ - 40, 36, C.yellow, 10); });
-    });
-    // legenda fixa
-    late(ctx, c => { [['anterior', '#8A8378', 0], ['orçamento', null, 1], ['realizado', C.orange, 2]].forEach(([l, col, j]) => { const x = 2240 + j * 300, y = 300;
-      if (col) { rr(c, x, y - 16, 34, 32, 4); c.fillStyle = col; c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); } else { c.save(); c.setLineDash([6, 5]); rr(c, x, y - 16, 34, 32, 4); c.strokeStyle = '#F3E6D6'; c.lineWidth = 3; c.stroke(); c.restore(); }
-      text(c, l, x + 48, y, { size: 28, weight: 800, color: '#FFF' }); }); text(c, `${UNIT[0]} · por trimestre`, 2240, 356, { size: 24, weight: 700, mono: true, color: '#BFB3A3' }); });
+    const CXp = OX + 700, Y0 = 330, DY = Math.min(92, 520 / Math.max(1, LV.length)), BH = DY * .64, U = 620 / MXL, LBX = CXp - MXL * U / 2 - 28;
+    late(ctx, c => { [[C.orange, 'posições internas'], [C.yellow, 'contractors']].forEach(([col, l], i) => { const lx = OX + 420 + i * 280; rr(c, lx, 266, 26, 18, 4); c.fillStyle = col; c.fill(); text(c, l, lx + 36, 276, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
+    LV.forEach((l, i) => { const p = E.outCubic(P(t, T_LV[i], .55)), y = Y0 + i * DY, wi = l.int * U * p, wc = l.con * U * p, w = wi + wc, x0 = CXp - w / 2, hot = TOP3.includes(l.lv); if (p <= 0) return;
+      if (wi > 0) fbar(ctx, x0, y, wi, BH, C.orange, { r: 6 }); if (wc > 0) fbar(ctx, x0 + wi + (wi > 0 ? 2 : 0), y, wc - (wi > 0 ? 2 : 0), BH, C.yellow, { r: 6 });
+      late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, l.lv, LBX, y + BH / 2, { size: 28, weight: 900, mono: true, color: hot ? C.yellow : '#F3E6D6', align: 'right' });
+        text(c, FMT.num(l.tot, 0) + (l.con ? `  (${FMT.num(l.con, 0)} contractors)` : ''), x0 + w + 16, y + BH / 2, { size: 24, weight: 900, color: '#FFF' }); }); });
+    // o total do time
+    const tp = P(t, T_Q + 3.6, .6); if (tp > 0 && T_TOT) hud(ctx, c => { c.translate(1380, 600); c.globalAlpha *= tp; panel(c, 0, 0, 470, 230, { dark: true });
+      text(c, FMT.num(T_TOT, 0), 44, 92, { size: 96, weight: 900, color: C.orange }); text(c, 'pessoas hoje', 44 + measure(c, FMT.num(T_TOT, 0), 96, 900) + 20, 104, { size: 30, weight: 800, color: '#FFF' });
+      text(c, `${FMT.num(T_INT, 0)} internas · ${FMT.num(T_CON, 0)} contractors`, 44, 178, { size: 26, weight: 800, color: '#E9DCC8' }); });
     ctx.restore();
   }
   SCENES[id] = {
@@ -4175,7 +4360,7 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
         // chão da galeria com reflexo
         const g = ctx.createLinearGradient(0, 820, 0, H + 80); g.addColorStop(0, 'rgba(60,32,18,.9)'); g.addColorStop(1, 'rgba(12,8,6,.95)'); ctx.fillStyle = g; ctx.fillRect(-400, 822, 4600, 400);
         axis(ctx, P(t, .3, .6) * (1 - P(t, T_BR + .4, .6))); bars(ctx, t);
-        brazil(ctx, t); quarters(ctx, t);
+        projects(ctx, t); team(ctx, t);
         // a linha segue para a próxima estação
         const run = E.inCubic(P(t, T_CONC + 1.6, 3)); if (run > 0) LINE.draw(ctx, [[2200, 960], [3400, 960], [4300, 960]], run, { w: 16, head: true });
       });
@@ -4344,16 +4529,19 @@ POSTERS[1] = (ctx, w, h, tl) => {
   late(ctx, c => text(c, 'Dados → Decisão → Ação → Resultado', 0, 262, { size: 20, weight: 900, mono: true, color: '#8A6A48', align: 'center' }));
 };
 POSTERS[2] = (ctx, w, h, tl) => {
-  const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9), BR = sec.brazil_2023_milestone || {};
+  const sec = SEC(2), R = Object.entries(sec.revenue_performance_analytics_usd_millions || {}), V = R.map(r => +r[1] || 0), mx = Math.max(...V, 1e-9);
   const isF = k => /forecast/i.test(k);
   line(ctx, -200, 30, 200, 30, INK, 3);
   R.forEach(([k, v], i) => { const x = -170 + i * 110, hh = (+v || 0) / mx * 190; if (isF(k)) { ctx.save(); ctx.setLineDash([7, 6]); rr(ctx, x, 30 - hh, 70, hh, 4); ctx.strokeStyle = '#C98A1A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); } else fbar(ctx, x, 30 - hh, 70, hh, mix(C.red, C.orange, i / 2), { r: 6 });
     late(ctx, c => { text(c, FMT.usdMM(+v), x + 35, 30 - hh - 18, { size: 17, weight: 900, color: INK, align: 'center' }); text(c, k.replace(/_?forecast/i, '') + (isF(k) ? '*' : ''), x + 35, 50, { size: 18, weight: 900, color: INK, align: 'center' }); }); });
-  const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, vp = BR.actuals_2022_usd_millions ? BR.actuals_2023_usd_millions / BR.actuals_2022_usd_millions : null, vb = BR.budget_2023_usd_millions ? BR.actuals_2023_usd_millions / BR.budget_2023_usd_millions : null;
-  late(ctx, c => { text(c, 'faturamento anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
+  const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, yk = String(Object.keys(sec).map(k => (k.match(/^business_scale_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
+  const bs = sec['business_scale_' + yk] || {}, pm = sec['project_mix_' + yk] || {}, tm = sec['team_structure_' + yk] || {}, np = +bs.projects_delivered || 0, disp = String(bs.projects_delivered_display || '').trim();
+  const projTxt = /^[+~]?\d[\d.,]*$/.test(disp) ? disp : (np ? FMT.num(np, 0) : '—'), xt = parseFloat(String(pm.projects_with_other_tracks_approx || bs.projects_with_other_tracks_approx || ''));
+  const tot = +tm.current_total_including_contractors || 0;
+  late(ctx, c => { text(c, 'receita anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
     if (mult) para(c, `De ${R[0][0]} a ${R[2][0]}: *${FMT.num(mult, 1)}×* o valor inicial`, 0, 84, 420, { size: 22, weight: 900, color: INK, accent: C.red, align: 'center' });
-    para(c, `Brasil (estimativa): *${vp ? FMT.mult(vp) : '—'}* o período anterior · *${vb ? FMT.mult(vb) : '—'}* o orçamento`, 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
-    text(c, 'Crescimento consistente, acima do planejado.', 0, 246, { size: 20, weight: 900, color: C.red, align: 'center' }); });
+    para(c, `*${projTxt} projetos* em ${yk}` + (isFinite(xt) ? ` · *~${FMT.num(xt, 0)}%* com outras tracks` : '') + (tot ? ` · time de *${FMT.num(tot, 0)} pessoas*` : ''), 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
+    text(c, 'Crescimento com integração e um time para escalar.', 0, 246, { size: 19, weight: 900, color: C.red, align: 'center' }); });
 };
 POSTERS[3] = (ctx, w, h, tl) => {
   late(ctx, c => { [['PREDITIVOS', 'antecipam resultados', 'fraude · saída · gastos', C.orange, -150], ['PRESCRITIVOS', 'ajudam a escolher ações', 'oferta · campanhas · incentivos', C.red, 40]].forEach(([k, s1, s2, col, y]) => {
@@ -4446,7 +4634,7 @@ const fitSize = (ctx, str, size, maxW, weight = 800) => Math.min(size, size * ma
 /** a imagem do dashboard (case de relatórios): o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque
  *  pelo real, com o mesmo nome). Usada no popup do case de relatórios e na pilha de painéis do case de agentes. Sem o arquivo: null */
 const DASHIMG = (() => { let src = null, img = null; return () => {
-  const s = String(dget(CASE('Lights-off'), 'dashboard_image', '') || ''); if (!s) return null;
+  const s = String(dget(CASE('Lights-off'), 'dashboard_image', 'dashboard-fraude.png') || ''); if (!s) return null;   // sem o campo: o arquivo padrão; campo vazio: sem imagem
   if (s !== src) { src = s; img = new Image(); img.src = s; } return img.complete && img.naturalWidth ? img : null; }; })();
 DASHIMG();   // começa a carregar a imagem já na abertura da página
 /* ---------- abertura da 04: analytics em ação · os 4 cases ---------- */
@@ -5406,7 +5594,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
         vslab(ctx, x - 52, GYp - h, 104, h, 26, mix('#5A4A40', [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i], .35), { lw: 4 });
         hatch(ctx, () => rr(ctx, x - 52, GYp - h, 104, h, 0), x - 52, GYp - h, 104, h, { alpha: .18, gap: 12 });
         vslab(ctx, x - 74, GYp - h - 26, 148, 26, 18, '#6A5A50', { lw: 3.5 });
-        pin(ctx, x, GYp - h / 2, c => { c.globalAlpha *= clamp(k); c.rotate(-Math.PI / 2); text(c, p.name.toUpperCase(), 0, 0, { size: 28, weight: 900, color: '#FFF', align: 'center', ls: 3 }); }); });
+        pin(ctx, x, GYp - h / 2, c => { c.globalAlpha *= clamp(k); c.rotate(-Math.PI / 2); const nm = p.name.toUpperCase(), fs = Math.min(28, 28 * Math.max(60, h - 50) / (measure(c, nm, 28, 900, false, 3) || 1)); text(c, nm, 0, 0, { size: fs, weight: 900, color: '#FFF', align: 'center', ls: 3 * fs / 28 }); }); });   /* nomes longos encolhem para caber no pilar */
       // a linha corre por cima dos pilares
       const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
@@ -5417,7 +5605,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;
           paper(c, -w / 2, -110, w, 220, { r: 14, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5 });
           rr(c, -w / 2, -110, w, 50, 14); c.fillStyle = [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i]; c.fill();
-          text(c, p.name, 0, -84, { size: 28, weight: 900, color: i === 2 ? INK : '#FFF', align: 'center' });
+          text(c, p.name, 0, -84, { size: fitSize(c, p.name, 28, w - 24, 900), weight: 900, color: i === 2 ? INK : '#FFF', align: 'center' });
           para(c, p.contrib, -w / 2 + 18, -46, w - 36, { size: 26, weight: 800, color: INK, lh: 1.16 });
           if (p.items.length) text(c, `${p.items.length} entregas`, w / 2 - 16, 90, { size: 20, weight: 800, mono: true, color: '#8A6A48', align: 'right' }); }); });
       SAY.draw(ctx, t, SCRIPT, 'dark');
@@ -5448,7 +5636,7 @@ POSTERS[5] = (ctx, w, h, tl) => {
 POSTERS[6] = (ctx, w, h, tl) => {
   const hi = Math.floor(tl / 2.5) % Math.max(1, PILLARS.length);
   PILLARS.forEach((p, i) => { const y = -220 + i * 96, on = i === hi; rr(ctx, -210, y - 40, 420, 84, 10); ctx.fillStyle = on ? C.orange : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
-    late(ctx, c => { text(c, p.name, -190, y - 14, { size: 22, weight: 900, color: on ? '#FFF' : INK }); text(c, p.items.length ? `${p.items.length} entregas` : '', 190, y - 14, { size: 16, weight: 800, mono: true, color: on ? '#FFF' : '#8A6A48', align: 'right' });
+    late(ctx, c => { text(c, p.name, -190, y - 14, { size: fitSize(c, p.name, 22, 270, 900), weight: 900, color: on ? '#FFF' : INK }); text(c, p.items.length ? `${p.items.length} entregas` : '', 190, y - 14, { size: 16, weight: 800, mono: true, color: on ? '#FFF' : '#8A6A48', align: 'right' });
       text(c, p.contrib.length > 46 ? p.contrib.slice(0, 44) + '…' : p.contrib, -190, y + 16, { size: 17, weight: 700, color: on ? '#FFF' : '#3A332C' }); }); });
 };
 STOPSCN.stop2 = recapScene({ posters: [4, 5, 6], sign: 'PARADA 2 · CONVERSA', from: CONFIG.sceneById.s06.end, call: 'QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?',
@@ -5633,8 +5821,9 @@ const FUTURE_ART = {
   function back(ctx, k, c) {
     rr(ctx, 8, 12, TW, TH, 18); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
     rr(ctx, 0, 0, TW, TH, 18); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = COL[k]; ctx.lineWidth = 4; ctx.stroke();
-    late(ctx, cc => { para(cc, c.name, 26, 30, TW - 52, { size: 24, weight: 900, color: '#FFF', lh: 1.08 });
-      const nh = wrapRich(cc, c.name, TW - 52, 24, 900).lines.length * 24 * 1.08;
+    // cabeçalho com a MESMA altura em todos os cards (a do nome mais longo): nome encostado no método; divisória e lista alinhadas
+    late(ctx, cc => { const nh = Math.max(...CC.map(q => wrapRich(cc, q.name, TW - 52, 24, 900).lines.length)) * 24 * 1.08, own = wrapRich(cc, c.name, TW - 52, 24, 900).lines.length * 24 * 1.08;
+      para(cc, c.name, 26, 30 + nh - own, TW - 52, { size: 24, weight: 900, color: '#FFF', lh: 1.08 });
       text(cc, c.method.toUpperCase(), 26, 46 + nh, { size: fitSize(cc, c.method.toUpperCase(), 17, TW - 52, 800), weight: 800, mono: true, color: COL[k] === C.red ? '#FF8A7A' : COL[k], ls: 1 });
       line(cc, 26, 70 + nh, TW - 26, 70 + nh, 'rgba(243,230,214,.25)', 2);
       c.tech.forEach((s, i) => { const y = 108 + nh + i * 62; circle(cc, 38, y, 7, COL[k]); para(cc, s, 58, y - 15, TW - 84, { size: 24, weight: 800, color: '#F3E6D6', lh: 1.05 }); });
@@ -5695,7 +5884,7 @@ const CLOSE = (() => {
     const meet = E.inOutCubic(P(t, .2, 1.2));
     intersection(ctx, W / 2, 300, 150, lerp(1400, 190, meet), { hot: Math.exp(-Math.max(0, t - T_CHORD) * 1.6) * (t > T_CHORD) * .8 + .15 * br });
     const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, glowA: gA });
-    if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x, b.y - 40, b.w, b.h + 40, 18); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
+    if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x - 4, b.y - 4, b.w + 8, b.h + 8, 21); /* v7.13: a borda acompanha o letreiro */ ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
     text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 860, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
     scanlines(ctx, .06);
   }

@@ -176,8 +176,9 @@ const FUTURE_ART = {
   function back(ctx, k, c) {
     rr(ctx, 8, 12, TW, TH, 18); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
     rr(ctx, 0, 0, TW, TH, 18); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = COL[k]; ctx.lineWidth = 4; ctx.stroke();
-    late(ctx, cc => { para(cc, c.name, 26, 30, TW - 52, { size: 24, weight: 900, color: '#FFF', lh: 1.08 });
-      const nh = wrapRich(cc, c.name, TW - 52, 24, 900).lines.length * 24 * 1.08;
+    // cabeçalho com a MESMA altura em todos os cards (a do nome mais longo): nome encostado no método; divisória e lista alinhadas
+    late(ctx, cc => { const nh = Math.max(...CC.map(q => wrapRich(cc, q.name, TW - 52, 24, 900).lines.length)) * 24 * 1.08, own = wrapRich(cc, c.name, TW - 52, 24, 900).lines.length * 24 * 1.08;
+      para(cc, c.name, 26, 30 + nh - own, TW - 52, { size: 24, weight: 900, color: '#FFF', lh: 1.08 });
       text(cc, c.method.toUpperCase(), 26, 46 + nh, { size: fitSize(cc, c.method.toUpperCase(), 17, TW - 52, 800), weight: 800, mono: true, color: COL[k] === C.red ? '#FF8A7A' : COL[k], ls: 1 });
       line(cc, 26, 70 + nh, TW - 26, 70 + nh, 'rgba(243,230,214,.25)', 2);
       c.tech.forEach((s, i) => { const y = 108 + nh + i * 62; circle(cc, 38, y, 7, COL[k]); para(cc, s, 58, y - 15, TW - 84, { size: 24, weight: 800, color: '#F3E6D6', lh: 1.05 }); });
@@ -238,7 +239,7 @@ const CLOSE = (() => {
     const meet = E.inOutCubic(P(t, .2, 1.2));
     intersection(ctx, W / 2, 300, 150, lerp(1400, 190, meet), { hot: Math.exp(-Math.max(0, t - T_CHORD) * 1.6) * (t > T_CHORD) * .8 + .15 * br });
     const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, glowA: gA });
-    if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x, b.y - 40, b.w, b.h + 40, 18); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
+    if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x - 4, b.y - 4, b.w + 8, b.h + 8, 21); /* v7.13: a borda acompanha o letreiro */ ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
     text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 860, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
     scanlines(ctx, .06);
   }

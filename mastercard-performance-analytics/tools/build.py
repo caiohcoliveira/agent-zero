@@ -5,7 +5,7 @@ Junta src/00-head.html + JSON de dados + músicas + src/[0-9][0-9]-*.js + src/99
 - Músicas: musica/parte1.mp3, parte2.mp3, parte3.mp3 (ElevenLabs, tools/eleven_fit.py; fora do Git), recodificadas a
   128 kbps e embutidas em base64. Sem elas, usa a trilha Pixabay (musica/<id>-mix.mp3).
   Sem a pasta musica/, reaproveita as músicas que já estão no HTML atual.
-Uso: python3 tools/build.py [dados.json]
+Uso: python3 tools/build.py [dados.json] [saida.html]   (sem saída: performance-analytics.html na pasta do projeto)
 """
 import base64
 import json
@@ -46,6 +46,7 @@ def music_blocks(prev):
 
 def main():
     data_path = sys.argv[1] if len(sys.argv) > 1 else ROOT / 'data/presentation.json'
+    out = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else OUT
     prev = OUT.read_text(encoding='utf-8') if OUT.exists() else ''
     head = (ROOT / 'src/00-head.html').read_text(encoding='utf-8')
     head = head.replace('/*PA_DATA*/', data_block(data_path)).replace('<!--PA_MUSIC-->', music_blocks(prev))
@@ -53,8 +54,8 @@ def main():
     for f in sorted((ROOT / 'src').glob('[0-9][0-9]-*.js')):
         parts.append(f'\n/* ===== {f.name} ===== */\n' + f.read_text(encoding='utf-8'))
     parts.append((ROOT / 'src/99-tail.html').read_text(encoding='utf-8'))
-    OUT.write_text(''.join(parts), encoding='utf-8')
-    print(f'OK → {OUT.name} ({OUT.stat().st_size} bytes) · dados: {data_path}')
+    out.write_text(''.join(parts), encoding='utf-8')
+    print(f'OK → {out} ({out.stat().st_size} bytes) · dados: {data_path}')
 
 
 if __name__ == '__main__':

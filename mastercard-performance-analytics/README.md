@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.12, experimento)
+# Performance Analytics — "A Linha" (v7.13, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -99,13 +99,21 @@ O modo `CONFIG.mode = 'reel'` roda tudo direto, sem conversas, para mandar por e
 Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<script type="application/json" id="pa-data">`.
 
 - **No HTML pronto:** abra o arquivo num editor de texto, mude o valor no bloco `pa-data` e salve. É assim que os números mascarados podem ser trocados pelos originais.
-- **No projeto:** a fonte é `data/presentation.json`. Rode `./build.sh` para gerar o HTML com ele.
+- **No projeto:** a fonte é `data/presentation.json`. Rode `python3 tools/build.py` para gerar o HTML com ele (`python3 tools/build.py outro.json saida.html` monta uma cópia com outro JSON, sem mexer no HTML do projeto).
+- **Guia no próprio HTML (v7.13):** o topo do arquivo traz um LEIA-ME com o passo a passo, as regras do JSON e o mapa "campo → tela", logo acima do bloco de dados. Quem pegar o processo só precisa trocar o JSON e a imagem do dashboard.
 - **Repositório público:** troque pelos números originais só na cópia local do HTML. Não suba essa cópia para o Git.
 - **Formatação:** automática em pt-BR (`1.5x` → `1,5×`, `0.25MM` → `250 mil`, `+0.1875 relative` → `+18,8%`).
   - A unidade da receita se ajusta ao valor: o mesmo gráfico mostra "US$ mil" ou "US$ mi".
   - Dentro de um mesmo gráfico, a unidade é uma só.
+- **Estação 02 (v7.13):** em `presentation_structure` → seção 2 (o ano vem do nome da chave; vale o mais recente):
+  - `revenue_performance_analytics_usd_millions`: receita por ano, em milhões de US$ (`"2026_forecast"` = previsão);
+  - `business_scale_2026.projects_delivered`: o número de projetos (um `projects_delivered_display` curto, como `"+30"`, substitui o número na tela);
+  - `revenue_contribution_by_project_type_2026`: `project_type`, `revenue_share` (`"21%"`) e `delivery_model` (`"Track"` = só a track; `"Track + Outra"` = com outra track; `"Not specified"`);
+  - `revenue_contribution_summary_2026`: `pa_only_revenue_share`, `cross_track_revenue_share`, `unspecified_delivery_model_revenue_share` e `cross_track_revenue_breakdown`;
+  - `project_mix_2026.projects_with_other_tracks_approx`: % de projetos com outras tracks (base de projetos, mostrada separada da base de receita);
+  - `team_structure_2026`: `levels` (`level`, `current_internal_positions`, `current_contractors`) e os totais `current_internal_positions`, `current_contractors`, `current_total_including_contractors`.
+- **Cases pela posição (v7.13):** o vídeo acha cada case pelo começo do nome ("Cliente Banana", "Cliente Manga", "Lights-off", "Insight Agent"); se o JSON usar outros nomes, vale a posição na lista (1º cestas, 2º principalidade, 3º relatórios, 4º agentes).
 - **Frases calculadas a partir dos dados:**
-  - "o realizado superou o orçamento em todos os trimestres" só aparece se a série confirmar; senão vira "em N de 4 trimestres";
   - o índice das cestas é calculado: 2ª melhor campanha = 100 → Destilados = 118,8;
   - agentes: ativos + oportunidades = universo, vindos de `business_results.pipeline`.
 - **Prática (estação 06):** em `presentation_structure` → seção 6 → `pillars`:
@@ -117,9 +125,9 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - `contribution` é **novo na v7**: a frase curta que aparece na estação 06 e no cartaz 06.
   - Sem esse campo, a cena usa o primeiro item de `highlights`.
   - A contagem "N entregas" vem do tamanho de `highlights`.
-- **Exemplos ilustrativos do case de agentes:** o objeto `EX`, no início do case 4 em `src/22-cases.js`, traz:
-  - o mesmo fato em três versões (Analista, Business, C-Level);
-  - uma revisão típica: um rascunho, o motivo da reprovação e o texto corrigido.
+- **Exemplos ilustrativos do case de agentes:** os objetos `AGX`, `WHY` e `SHORT`, no case 4 em `src/22-cases.js`, trazem:
+  - os rascunhos de cada gerador (Analista, Business, C-Level), na versão 1 e na versão 2;
+  - o motivo da reprovação e o título aprovado.
 
   O filme rotula esses textos como exemplos. Troque por um exemplo real do tipo de revisão quando puder.
 - **Ambiente seguro:** os nomes do repositório estão sanitizados (pilares "Cenoura", "Brócolis"…, clientes "Banana", "Manga"…).
@@ -132,7 +140,7 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   3. Edite dentro do bloco e salve. Não é preciso rodar build. Se o JSON ficar inválido, o vídeo abre sem dados em vez de quebrar.
 - **Dashboard real (case de relatórios automatizados):** depois da automação, um popup mostra o dashboard enviado ao board.
   - A imagem é o arquivo **`dashboard-fraude.png`**, na mesma pasta do HTML. No Git ela é ilustrativa.
-  - Para usar o real, troque esse arquivo pela imagem do dashboard real, **com o mesmo nome** (qualquer tamanho; ela se ajusta à janela). Outra extensão (JPG, WEBP): mude o campo `dashboard_image` do case "Lights-off" no JSON.
+  - Para usar o real, troque esse arquivo pela imagem do dashboard real, **com o mesmo nome** (qualquer tamanho; ela se ajusta à janela). Outra extensão (JPG, WEBP): mude o campo `dashboard_image` do case de relatórios no JSON. Sem o campo, o vídeo procura `dashboard-fraude.png`; com o campo vazio (`""`), não usa imagem.
   - Ao enviar o vídeo, mande o HTML e a imagem juntos, na mesma pasta. Sem a imagem, o popup mostra o dashboard desenhado, marcado como ilustrativo.
   - A imagem real fica só na cópia local: não suba para o Git (o repositório é público).
 - **Aviso de versão mockada:** `presentation_context.disclaimer` aparece no canto inferior esquerdo de todas as telas, inclusive nas conversas ("Este vídeo é a versão mockada, com dados sanitizados."). Na cópia local com os dados reais, deixe o campo vazio (`""`) e o aviso some.

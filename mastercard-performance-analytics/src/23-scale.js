@@ -82,7 +82,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
         vslab(ctx, x - 52, GYp - h, 104, h, 26, mix('#5A4A40', [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i], .35), { lw: 4 });
         hatch(ctx, () => rr(ctx, x - 52, GYp - h, 104, h, 0), x - 52, GYp - h, 104, h, { alpha: .18, gap: 12 });
         vslab(ctx, x - 74, GYp - h - 26, 148, 26, 18, '#6A5A50', { lw: 3.5 });
-        pin(ctx, x, GYp - h / 2, c => { c.globalAlpha *= clamp(k); c.rotate(-Math.PI / 2); text(c, p.name.toUpperCase(), 0, 0, { size: 28, weight: 900, color: '#FFF', align: 'center', ls: 3 }); }); });
+        pin(ctx, x, GYp - h / 2, c => { c.globalAlpha *= clamp(k); c.rotate(-Math.PI / 2); const nm = p.name.toUpperCase(), fs = Math.min(28, 28 * Math.max(60, h - 50) / (measure(c, nm, 28, 900, false, 3) || 1)); text(c, nm, 0, 0, { size: fs, weight: 900, color: '#FFF', align: 'center', ls: 3 * fs / 28 }); }); });   /* nomes longos encolhem para caber no pilar */
       // a linha corre por cima dos pilares
       const lp = E.inOutSine(P(t, T_LINE, 2.4)), deck = [[-120, TOPY - 40], [W + 120, TOPY - 40]];
       if (lp > 0) { vslab(ctx, -100, TOPY - 26, (W + 200) * lp, 22, 16, '#4A3A30', { lw: 3 }); LINE.draw(ctx, deck, lp, { w: 20, head: true, glow: 12 }); }
@@ -93,7 +93,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
         hud(ctx, c => { c.translate(x, 640 + (1 - E.outCubic(a)) * 20); c.globalAlpha *= a;
           paper(c, -w / 2, -110, w, 220, { r: 14, fill: '#F6EEDF', shadow: 10, shadowColor: '#000', lw: 3.5 });
           rr(c, -w / 2, -110, w, 50, 14); c.fillStyle = [C.red, C.orange, C.yellow, '#E8822A', C.red, C.orange][i]; c.fill();
-          text(c, p.name, 0, -84, { size: 28, weight: 900, color: i === 2 ? INK : '#FFF', align: 'center' });
+          text(c, p.name, 0, -84, { size: fitSize(c, p.name, 28, w - 24, 900), weight: 900, color: i === 2 ? INK : '#FFF', align: 'center' });
           para(c, p.contrib, -w / 2 + 18, -46, w - 36, { size: 26, weight: 800, color: INK, lh: 1.16 });
           if (p.items.length) text(c, `${p.items.length} entregas`, w / 2 - 16, 90, { size: 20, weight: 800, mono: true, color: '#8A6A48', align: 'right' }); }); });
       SAY.draw(ctx, t, SCRIPT, 'dark');
@@ -124,7 +124,7 @@ POSTERS[5] = (ctx, w, h, tl) => {
 POSTERS[6] = (ctx, w, h, tl) => {
   const hi = Math.floor(tl / 2.5) % Math.max(1, PILLARS.length);
   PILLARS.forEach((p, i) => { const y = -220 + i * 96, on = i === hi; rr(ctx, -210, y - 40, 420, 84, 10); ctx.fillStyle = on ? C.orange : '#FFFDF8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
-    late(ctx, c => { text(c, p.name, -190, y - 14, { size: 22, weight: 900, color: on ? '#FFF' : INK }); text(c, p.items.length ? `${p.items.length} entregas` : '', 190, y - 14, { size: 16, weight: 800, mono: true, color: on ? '#FFF' : '#8A6A48', align: 'right' });
+    late(ctx, c => { text(c, p.name, -190, y - 14, { size: fitSize(c, p.name, 22, 270, 900), weight: 900, color: on ? '#FFF' : INK }); text(c, p.items.length ? `${p.items.length} entregas` : '', 190, y - 14, { size: 16, weight: 800, mono: true, color: on ? '#FFF' : '#8A6A48', align: 'right' });
       text(c, p.contrib.length > 46 ? p.contrib.slice(0, 44) + '…' : p.contrib, -190, y + 16, { size: 17, weight: 700, color: on ? '#FFF' : '#3A332C' }); }); });
 };
 STOPSCN.stop2 = recapScene({ posters: [4, 5, 6], sign: 'PARADA 2 · CONVERSA', from: CONFIG.sceneById.s06.end, call: 'QUAL DESAFIO PODE VIRAR O PRÓXIMO CASE?',

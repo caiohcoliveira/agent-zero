@@ -28,6 +28,119 @@
         "2024_to_2025": "+0.285714 relative",
         "2023_to_2025": "+0.8 relative"
       },
+      "business_scale_2026": {
+        "revenue_usd_millions_approx": 0.0036,
+        "projects_delivered": 28,
+        "projects_delivered_display": "28",
+        "projects_with_other_tracks_approx": "45%",
+        "projects_with_other_tracks_revenue_share": "54%",
+        "executive_message": "Lorem ipsum dolor sit amet: 28 projetos fictícios, cerca de metade com outras tracks."
+      },
+      "revenue_contribution_by_project_type_2026": [
+        {
+          "project_type": "Figo",
+          "revenue_share": "22%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Caqui",
+          "revenue_share": "18%",
+          "delivery_model": "Performance Analytics + Cenoura"
+        },
+        {
+          "project_type": "Pitanga",
+          "revenue_share": "15%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Amora",
+          "revenue_share": "13%",
+          "delivery_model": "Performance Analytics + Brócolis"
+        },
+        {
+          "project_type": "Carambola",
+          "revenue_share": "11%",
+          "delivery_model": "Performance Analytics + Abobrinha"
+        },
+        {
+          "project_type": "Lichia",
+          "revenue_share": "8%",
+          "delivery_model": "Performance Analytics + Cenoura"
+        },
+        {
+          "project_type": "Mirtilo",
+          "revenue_share": "6%",
+          "delivery_model": "Performance Analytics"
+        },
+        {
+          "project_type": "Framboesa",
+          "revenue_share": "4%",
+          "delivery_model": "Performance Analytics + Abobrinha"
+        },
+        {
+          "project_type": "Cereja",
+          "revenue_share": "3%",
+          "delivery_model": "Not specified"
+        }
+      ],
+      "revenue_contribution_summary_2026": {
+        "pa_only_revenue_share": "43%",
+        "cross_track_revenue_share": "54%",
+        "unspecified_delivery_model_revenue_share": "3%",
+        "cross_track_revenue_breakdown": {
+          "Performance Analytics + Cenoura": "26%",
+          "Performance Analytics + Brócolis": "13%",
+          "Performance Analytics + Abobrinha": "15%"
+        }
+      },
+      "project_mix_2026": {
+        "projects_with_other_tracks_approx": "45%",
+        "measurement_basis": "Share of projects",
+        "note": "Project-count shares and revenue shares use different measurement bases and should be presented separately."
+      },
+      "team_structure_2026": {
+        "current_internal_positions": 53,
+        "current_contractors": 5,
+        "current_total_including_contractors": 58,
+        "levels": [
+          {
+            "level": "K2",
+            "current_internal_positions": 1,
+            "current_contractors": 0,
+            "current_total": 1
+          },
+          {
+            "level": "K3",
+            "current_internal_positions": 4,
+            "current_contractors": 0,
+            "current_total": 4
+          },
+          {
+            "level": "K4",
+            "current_internal_positions": 9,
+            "current_contractors": 0,
+            "current_total": 9
+          },
+          {
+            "level": "K5",
+            "current_internal_positions": 13,
+            "current_contractors": 3,
+            "current_total": 16
+          },
+          {
+            "level": "K6",
+            "current_internal_positions": 14,
+            "current_contractors": 2,
+            "current_total": 16
+          },
+          {
+            "level": "K7",
+            "current_internal_positions": 12,
+            "current_contractors": 0,
+            "current_total": 12
+          }
+        ]
+      },
       "brazil_2023_milestone": {
         "headline": "Performance Analytics Brazil estimated to close the reference period at USD 1220, approximately 1.648649x budget and 1.742857x prior-period revenue",
         "actuals_2022_usd_millions": 0.0007,

@@ -401,3 +401,27 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - medidor de leitura: 79 telas, 0 curtas;
   - navegação, clique e console limpos;
   - músicas idênticas às da v7.11.
+
+### v7.13 — estação 02 com receita, projetos e capacidade; HTML pronto para a troca de dados
+
+- [x] **Estação 02:** "faturamento" vira "receita"; as duas telas do Brasil saem.
+  - **Projetos:** o número de 2026, a receita por tipo de projeto (só a track × com outras tracks), a % de projetos com outras tracks e a receita por modelo de entrega.
+  - **Capacidade:** pessoas por nível (internas e contractors), o total e onde está a maior parte do time.
+  - Os dados vêm das chaves novas da seção 2. No JSON público, os valores são fictícios.
+- [x] **Clímax:** os cabeçalhos dos 5 cards têm a mesma altura (nome, método, divisória e lista alinhados).
+- [x] **Letreiro final:** a borda acompanha o letreiro (sem o espaço do antigo cabeçalho).
+- [x] **Pronto para a troca de dados:**
+  - LEIA-ME no topo do HTML, logo acima do JSON (passos, regras e o mapa "campo → tela");
+  - cases achados pela posição quando o nome muda;
+  - imagem do dashboard com nome padrão;
+  - nomes longos de pilares encolhem para caber;
+  - `tools/build.py` aceita um arquivo de saída.
+- [x] **Teste com o JSON novo colado na conversa:** montado fora do repositório.
+  - Varredura sem exceções.
+  - A estação 02 mostra a receita, os projetos, a parceria com outras tracks e o time com os valores desse JSON (que não vai para o Git).
+  - Os cases são achados pela posição.
+- [x] **QA:**
+  - varredura sem exceções (528,14 s);
+  - medidor de leitura: 81 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - músicas idênticas.

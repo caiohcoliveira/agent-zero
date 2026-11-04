@@ -306,7 +306,7 @@ function poster(ctx, x, y, w, h, n, tl, o = {}) {
 // [cena, instante montado (miniatura), título, início do loop, fim do loop] — o popup roda a animação em loop nesse trecho
 const SLIDES = {
   1: [['s01', 11.6, 'As perguntas de negócio', 3.9, 12.2], ['s01', 35.0, 'A ponte: os 4 serviços', 19.8, 35.6], ['s01', 46.0, 'Do diagnóstico à mensuração', 35.8, 46.9]],
-  2: [['s02', 19.5, 'Faturamento da track', 3.9, 20.2], ['s02', 29.5, 'Brasil: anterior e orçamento', 20.6, 30.3], ['s02', 38.0, 'Brasil por trimestre', 30.8, 43.4]],
+  2: [['s02', 19.5, 'Receita da track', 3.9, 20.2], ['s02', 29.5, 'Projetos e receita por tipo', 20.6, 30.3], ['s02', 41.0, 'Capacidade do time', 30.8, 43.4]],
   3: [['s03', 15.0, 'Onde aplicamos', 3.8, 15.2], ['s03', 25.0, 'O que entregamos', 16.1, 25.2], ['s03', 33.5, 'Junto com as outras tracks', 26.1, 33.4],
     ['s03', 43.5, 'Modelos preditivos', 34.5, 43.4], ['s03', 51.5, 'Modelos prescritivos', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
   4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 31.5, 'Cestas · como fizemos (ALS)', 24.5, 35.4], ['banana', 52.5, 'Cestas · solução e resultado', 35.6, 53.1],
