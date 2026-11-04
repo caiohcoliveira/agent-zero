@@ -100,6 +100,7 @@ function mapWorld(ctx, view, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.
   SCENES[id] = {
     themeAt: () => 'dark', hideMap: true,
     peaks: [[T_DOOR - .1, T_DOOR + 1.2], [T_PUNCH - .1, T_PUNCH + .6, .5]],
+    musicSync: T_DOOR,   // v7.18: com a música das conversas, o 1º drop dela cai aqui (as portas do trem abrem)
     script: SCRIPT,
     draw(ctx, t) {
       if (t < T_MAP + .8) platformShot(ctx, t);

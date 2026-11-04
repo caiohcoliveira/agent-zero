@@ -1,10 +1,16 @@
-# Performance Analytics — "A Linha" (v7.17, experimento)
+# Performance Analytics — "A Linha" (v7.18, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
 > - os métodos e as técnicas por trás dos cases (v7.11 no clímax; desde a v7.15, em cards na estação 03);
 > - o letreiro WELCOME TO… no final;
 > - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.18:**
+> - **o drop nas portas do trem:** a abertura começa a música no ponto em que o primeiro drop dela cai exatamente quando as portas do trem abrem (6,0 s).
+>   - Na música do usuário, ela começa em 28,85 s. A introdução e a pausa da música antes do drop acompanham a chegada do trem.
+>   - Do drop em diante, os pulsos da abertura voltam, na grade da própria música (112 BPM, ancorada no drop).
+>   - `tools/pausa.py` acha o drop e a grade sozinho; `--drop SEGUNDOS` fixa o drop à mão. Os valores vão no bloco (`data-drop`, `data-beat0`, `data-beat`), e a cena marca o ponto de encontro (`musicSync` da abertura).
 >
 > **v7.17:**
 > - **música das conversas = trilha da abertura:** a mesma música toca na abertura (a parte zero), no nível do filme, e segue sem recomeçar para a Conversa 0, onde desce para o fundo em 2 s.

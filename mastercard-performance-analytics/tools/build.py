@@ -34,8 +34,10 @@ def pause_attrs(src):
         return ''
     info = json.loads(side.read_text(encoding='utf-8'))
     loop = info.get('loop') or [0, info.get('duration', 0)]
+    drop = (f' data-drop="{info["drop"]}" data-beat0="{info.get("beat0", info["drop"])}" data-beat="{info["beat"]}"'
+            if info.get('drop') and info.get('beat') else '')   # v7.18: o 1º drop e a grade de tempos (abertura nas portas do trem)
     return (f' data-loop="{loop[0]},{loop[1]}" data-xfade="{info.get("xfade", .3)}"'
-            f' data-gain="{info.get("gain", .4)}" data-open-gain="{info.get("openGain", 1)}"')
+            f' data-gain="{info.get("gain", .4)}" data-open-gain="{info.get("openGain", 1)}"' + drop)
 
 
 def music_blocks(prev):

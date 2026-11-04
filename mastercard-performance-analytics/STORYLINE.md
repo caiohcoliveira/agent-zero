@@ -59,7 +59,9 @@
 
 ## Play 1 · embarque (20 s; desde a v7.17, com a música das conversas)
 
-- **Trilha (v7.17):** a música das conversas é a trilha da abertura, no nível do filme, sem a trilha sintetizada nem os pulsos de 120 BPM. Ela segue sem recomeçar para a Conversa 0, onde desce para o fundo.
+- **Trilha (v7.17–v7.18):** a música das conversas é a trilha da abertura, no nível do filme, sem a trilha sintetizada. Ela segue sem recomeçar para a Conversa 0, onde desce para o fundo.
+  - v7.18: a música começa no ponto em que o primeiro drop dela cai **na abertura das portas do trem** (6,0 s). A introdução e a pausa da música acompanham a chegada do trem.
+  - Do drop em diante, os pulsos da abertura seguem a grade da própria música.
 
 1. **Identidade (0–6 s)**
    - As luzes da plataforma acendem.

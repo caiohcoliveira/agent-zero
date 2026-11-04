@@ -64,19 +64,25 @@ const PAUSE = {
     return c;
   },
   wants(stopId) { const c = CONFIG.audio.pause || {}; return !!(c.track && (c.stops || []).includes(stopId)); },
+  /** v7.18: o 1º drop da faixa e a grade de tempos a partir dele (data-drop, data-beat0, data-beat) */
+  info() { const d = (this.el() || {}).dataset || {}; return { drop: d.drop != null ? +d.drop : null, beat0: d.beat0 != null ? +d.beat0 : null, beat: d.beat != null ? +d.beat : null }; },
+  /** na abertura, onde a faixa está quando o play começa: o drop cai no instante SCENES.open.musicSync (as portas do trem abrem) */
+  openOffset() { const i = this.info(), sync = SCENES.open && SCENES.open.musicSync; return i.drop != null && sync != null ? i.drop - sync : 0; },
   level(mode = this.mode) { const a = CONFIG.audio, c = this.cfg(), g = mode === 'open' ? (c.openGain == null ? 1 : c.openGain) : (c.gain == null ? .4 : c.gain); return a.music ? g * a.trackVolume : 0; },
   /** o trecho que se repete [s, e) e a transição x entre as voltas (x = 0: volta ao começo sem transição, como "repetir" num player) */
   span() { const c = this.cfg(), d = this.buf.duration, L = c.loop && c.loop[1] > c.loop[0] ? [c.loop[0], Math.min(c.loop[1], d)] : [0, d];
     return { s: L[0], e: L[1], x: Math.max(0, Math.min(c.xfade == null ? .3 : c.xfade, (L[1] - L[0]) / 4, L[0])) }; },
-  begin(offset, mode, fade) {
+  begin(offset, mode, fade, when = 0) {
     AUDIO.init(); if (!AUDIO.ready || !this.buf) return;
-    const ctx = AUDIO.ctx, n = ctx.currentTime + .05; ctx.resume();
+    const ctx = AUDIO.ctx; let n = Math.max(when || 0, ctx.currentTime + .02); ctx.resume();
+    if (offset < 0) { n += -offset; offset = 0; }   // a faixa ainda não começou nesse ponto do vídeo
     this.mode = mode; this.g = ctx.createGain(); this.g.gain.setValueAtTime(0, n); this.g.gain.linearRampToValueAtTime(this.level(), n + fade); this.g.connect(AUDIO.master);
     this.on = true; this.voices = []; this.next = n; this.off = Math.max(0, offset); this.fresh = true;
     this.pump(); clearInterval(this.timer); this.timer = setInterval(() => this.pump(), 400);
   },
-  /** abertura (a parte zero): a música é a trilha do play, no nível do filme, a partir do ponto em que o vídeo está */
-  playFrom(offset) { if (this.on) this.stop(.15); this.begin(offset, 'open', offset > .05 ? .3 : .05); },
+  /** abertura (a parte zero): a música é a trilha do play, no nível do filme, a partir do ponto em que o vídeo está;
+   *  when = instante do relógio de áudio em que o vídeo está em local (o mesmo das faixas do filme, AUDIO.ctxTime) */
+  playFrom(local, when) { if (this.on) this.stop(.15); this.begin(local + this.openOffset(), 'open', local > .05 ? .3 : .05, when); },
   /** parada: se a música já vem tocando (da abertura), segue sem emenda e só desce para o fundo; senão entra do começo em fade */
   start(stopId) {
     if (!this.wants(stopId)) { this.stop(); return; }
@@ -167,6 +173,14 @@ const BEAT = (() => {
       hit: 0, drop: Math.abs(x - 4.5) < 2.5 && x >= 4.5 ? Math.exp(-(x - 4.5) * 2.2) : 0, bpm: CONFIG.bpm, on: full };
   }
   const QUIET = { kick: 0, snare: 0, low: 0, level: 0, beat: 0, down: 0, phase: 0, bar: 0, i: 0, di: 0, hit: 0, drop: 0, bpm: 0, on: false, I: 0 };
+  /** v7.18: abertura com a música das conversas: antes do drop, só respiração; do drop em diante, pulsos na grade da faixa
+   *  (x = tempo na faixa; a grade vem de data-beat0/data-beat) */
+  function pauseBeat(x, inf) {
+    if (!(inf.drop != null && inf.beat > 0) || x < inf.drop) return { ...QUIET, breath: .5 + .5 * Math.sin(x * TAU / 4), level: .3, low: .25 };
+    const per = inf.beat, b0 = inf.beat0 != null ? inf.beat0 : inf.drop, k = (x - b0) / per, bi = Math.floor(k), sb = Math.max(0, x - (b0 + bi * per)), db = Math.floor(bi / 4), sd = Math.max(0, x - (b0 + db * 4 * per));
+    return { kick: Math.exp(-sb * 10) * .9, snare: bi % 2 ? Math.exp(-sb * 12) * .7 : 0, low: .7, level: .75, beat: Math.exp(-sb * 7), down: Math.exp(-sd * 4),
+      phase: sb / per, bar: sd / (per * 4), i: bi, di: db, hit: 0, drop: x - inf.drop < 2.5 ? Math.exp(-(x - inf.drop) * 2.2) : 0, bpm: 60 / per, on: true };
+  }
   /** intensidade da batida no instante T: base contida e picos nos clímax (SCENES[id].peaks = [[t0, t1], …] em tempo local) */
   function intensity(sc, t) {
     const base = CONFIG.motion.beatBase == null ? .15 : CONFIG.motion.beatBase, pk = (SCENES[sc.id] && SCENES[sc.id].peaks) || [];
@@ -182,7 +196,7 @@ const BEAT = (() => {
     /** estado da música no instante T da linha do tempo */
     at(T) {
       const sc = sceneAt(T), p = CONFIG.playById[sc.play], I = intensity(sc, T - sc.start);
-      if (p && p.pause && PAUSE.el()) return { ...QUIET, breath: .5 + .5 * Math.sin((T - p.start) * TAU / 4), level: .3, low: .25 };   // v7.17: abertura com a música das conversas, sem os pulsos de 120 BPM
+      if (p && p.pause && PAUSE.el()) return shape(pauseBeat(T - p.start + PAUSE.openOffset(), PAUSE.info()), I);   // v7.17–v7.18: abertura com a música das conversas, nos tempos dela
       if (!p || !p.track) return shape(synth(T - (p ? p.start : 0)), I);
       return shape(fromTrack(p.track, p.from + (T - p.start)), I);
     },

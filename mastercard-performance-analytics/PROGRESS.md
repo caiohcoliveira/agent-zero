@@ -502,3 +502,12 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - O build só embute a música das conversas quando ela é pedida (`PA_PAUSA` ou `musica/pausa.mp3`) e nunca reaproveita a do HTML anterior. Assim ela não entra no HTML do Git por acidente.
   - Testado: no HTML do Git, a abertura toca a trilha sintetizada, as paradas ficam sem música e o console fica limpo; nas cópias de apresentação, a música do usuário segue da abertura para a Conversa 0 e repete no encerramento.
 
+### v7.18 — o primeiro drop da música na abertura das portas do trem
+
+- [x] **A abertura começa a música no ponto certo:** o primeiro drop cai exatamente quando as portas do trem abrem (6,0 s, `musicSync` da abertura).
+  - Na música do usuário, o drop é o ataque depois da pausa da música (34,85 s), então a abertura começa a música em 28,85 s.
+  - Conferido no navegador: no relógio de áudio das faixas do filme, o drop passa pelo tempo 6,000 do vídeo.
+- [x] **Pulsos da abertura na grade da música:** antes do drop, só respiração; do drop em diante, pulsos a 112 BPM, ancorados no próprio drop. O 1º tempo forte cai em 6,05 s, com a intensidade cheia da abertura das portas.
+- [x] **`tools/pausa.py`:** acha o primeiro drop (a maior subida de nível depois de um trecho baixo) e a grade de tempos a partir dele; `--drop SEGUNDOS` fixa à mão (aqui, 34,85 s, o ataque medido em passos de 5 ms). O build leva `data-drop`, `data-beat0` e `data-beat`.
+- [x] A emenda com a Conversa 0, os loops e o encerramento continuam iguais (testados no navegador, console limpo).
+
