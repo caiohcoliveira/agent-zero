@@ -124,7 +124,7 @@ const FUTURE_ART = {
         const xt = trainX(t); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], (xt + 600) / 6800, { w: 22, head: false, glow: 14 });
         // as outras linhas (tracks) chegam alinhadas: paralelas à linha laranja, por baixo dela, e sobem a 45° para encontrá-la na estação
         [[C.red, 1360], [C.yellow, 3400], ['#E9DCC8', 5040]].forEach(([col, xm], k) => { const p = E.inOutSine(P(t, T_G[k] + 1.2, 2)), yk = RAIL + 44;
-          LINE.draw(ctx, [[xm - 1500, yk], [xm - 60 - (yk - RAIL), yk], [xm - 60, RAIL]], p, { w: 10, col, shadow: false, alpha: .6 }); });
+          LINE.draw(ctx, [[xm - 1500, yk], [xm - 130 - (yk - RAIL), yk], [xm - 130, RAIL]], p, { w: 10, col, shadow: false, alpha: .6, head: false }); });
         for (let i = 0; i < 5; i++) panelArt(ctx, t, i);
         // uma estação ainda em aberto
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
