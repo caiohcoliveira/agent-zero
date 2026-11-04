@@ -112,6 +112,7 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
   - `revenue_contribution_summary_2026`: `pa_only_revenue_share`, `cross_track_revenue_share`, `unspecified_delivery_model_revenue_share` e `cross_track_revenue_breakdown`;
   - `project_mix_2026.projects_with_other_tracks_approx`: % de projetos com outras tracks (base de projetos, mostrada separada da base de receita);
   - `team_structure_2026`: `levels` (`level`, `current_internal_positions`, `current_contractors`) e os totais `current_internal_positions`, `current_contractors`, `current_total_including_contractors`.
+- **Versão mascarada (v7.13):** para circular, os nomes de clientes, tracks, tipos de projeto e **pilares da prática** viram frutas e verduras (no JSON público os pilares são Cenoura, Brócolis, Abobrinha, Beterraba e Couve). Sem o campo `contribution`, o pilar mostra o primeiro item de `highlights`.
 - **Cases pela posição (v7.13):** o vídeo acha cada case pelo começo do nome ("Cliente Banana", "Cliente Manga", "Lights-off", "Insight Agent"); se o JSON usar outros nomes, vale a posição na lista (1º cestas, 2º principalidade, 3º relatórios, 4º agentes).
 - **Frases calculadas a partir dos dados:**
   - o índice das cestas é calculado: 2ª melhor campanha = 100 → Destilados = 118,8;

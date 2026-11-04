@@ -30,7 +30,9 @@
       jsonlint.com antes de salvar: um JSON inválido deixa as telas sem dados);
     • valores em milhões de US$ são números: 2.5 = US$ 2,5 mi;
     • percentuais podem vir como texto: "21%";
-    • o ano vem do nome da chave: business_scale_2026 → "em 2026".
+    • o ano vem do nome da chave: business_scale_2026 → "em 2026";
+    • versão para circular (mascarada): troque os nomes de clientes, tracks, tipos de projeto
+      e PILARES da prática por frutas e verduras (ex.: pilares Alface, Rúcula, Chuchu…).
 
   ONDE CADA CAMPO APARECE
     presentation_context.organization ............. pré-show e letreiro final
@@ -4672,7 +4674,10 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
   const MONTHS = (String(dget(CS(), 'analytics_solution.lookback', '')).match(/(\d+)\s*meses/) || [])[1] || '24';
   const CONV = Object.entries(dget(CS(), 'business_results.conversion_by_mechanic', {})).map(([k, v]) => [k, parseFloat(v) || 0]).sort((a, b) => b[1] - a[1]);
   const BEST = CONV.length ? CONV[0] : ['Destilados (cesta)', 1], SECOND = CONV.length > 1 ? CONV[1] : ['2ª melhor', 1];
-  const LIFT = (() => { const h = String(dget(CS(), 'business_results.headline', '')); const m = h.match(/([+-]?\d+(?:\.\d+)?)\s*relative/i); return m ? parseFloat(m[1]) : (BEST[1] && SECOND[1] ? BEST[1] / SECOND[1] - 1 : .1875); })();
+  // o ganho vem do headline ("+0.1875 relative" ou "+18.75% …"); sem ele, da conversão (1ª ÷ 2ª − 1), arredondado para não mostrar 18,7 por erro de ponto flutuante
+  const LIFT_HL = String(dget(CS(), 'business_results.headline', '')), LIFT_M = LIFT_HL.match(/([+-]?\d+(?:\.\d+)?)\s*relative/i), LIFT_P = LIFT_HL.match(/([+-]?\d+(?:[.,](\d+))?)\s*%/);
+  const LIFT = LIFT_M ? parseFloat(LIFT_M[1]) : LIFT_P ? parseFloat(LIFT_P[1].replace(',', '.')) / 100 : (BEST[1] && SECOND[1] ? Math.round((BEST[1] / SECOND[1] - 1) * 1e6) / 1e6 : .1875);
+  const LIFT_D = LIFT_P && LIFT_P[2] ? Math.min(2, LIFT_P[2].length) : 1;
   const IDX = 100 * (1 + LIFT), BEST_NAME = BEST[0].replace(/\s*\(cesta\)/i, '');
   const SPARSE = (() => { const m = ms(), c = parseFloat(m.customers_modeled) * 1e6, s = +m.sku_subgroups, it = parseFloat(m.interactions) * 1e6; return c && s && it ? 1 - it / (c * s) : .95; })();
   // recomendação (v5): matriz cliente × produto com fatores latentes de verdade (3 "gostos") e o passo a passo dentro das fases
@@ -4707,7 +4712,7 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
     [T_DATA, T_HOW, 'DADOS', 'Analisamos o *histórico de compras* para aprender afinidades entre clientes e produtos.', { y: 250 }],
     [T_HOW, T_DROP, 'COMO FIZEMOS', '*BM25* reduz o destaque de itens muito comuns. *ALS* aprende padrões entre clientes e produtos.', { y: 236 }],
     [T_DROP, T_RES, 'SOLUÇÃO', 'Produtos com afinidade formam *cestas*. O modelo prioriza os clientes com maior *potencial de compra*.', { y: 236 }],
-    [T_RES, 53.5, 'RESULTADO', `*${BEST_NAME}* teve conversão *${FMT.rel(LIFT)} maior* que a segunda melhor campanha.`, { y: 250 }]
+    [T_RES, 53.5, 'RESULTADO', `*${BEST_NAME}* teve conversão *${FMT.rel(LIFT, LIFT_D)} maior* que a segunda melhor campanha.`, { y: 250 }]
   ], [[T_CONC, 53.5, 'concl', 'O histórico de compras orienta *cestas* e *públicos*.']]);
 
   /** as três empresas do grupo e um cliente que hoje compra só em uma */
@@ -4861,7 +4866,7 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
         text(c, lab[i], X[i] + 10, B0 + 40, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); });
     late(ctx, c => { text(c, 'base = 100', 1160, y100 - 22, { size: 24, weight: 800, color: '#E9DCC8', align: 'right' });
       text(c, 'índice de conversão: 2ª melhor campanha = 100 (não é taxa absoluta)', 250, B0 + 104, { size: 26, weight: 700, color: '#E9DCC8' }); });
-    const hp = P(t, T_RES + 1.1, .4); CASEKIT.headline(ctx, hp, 1510, 640, FMT.rel(LIFT), 'em conversão vs. a 2ª melhor campanha', { size: 150, col: C.orange, seed: 9 });
+    const hp = P(t, T_RES + 1.1, .4); CASEKIT.headline(ctx, hp, 1510, 640, FMT.rel(LIFT, LIFT_D), 'em conversão vs. a 2ª melhor campanha', { size: 150, col: C.orange, seed: 9 });
     ctx.restore();
   }
   SCENES[id] = {
