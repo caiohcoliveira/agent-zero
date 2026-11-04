@@ -97,7 +97,7 @@ const FUTURE_ART = {
   const CAM = [[0, 960, 540, 1.06], [2.4, 960, 540, 1], [9.0, 960, 540, 1], [9.9, 3000, 540, 1], [17.8, 3000, 540, 1], [18.7, 5040, 540, 1], [23.6, 5040, 540, 1], [26.4, 5560, 540, 1.04]];
   T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_P[i], 'pop', { p: 1 + i * .06, v: .2 }));
   const SCRIPT = SAY.reg(id, [
-    [3.8, 26.6, 'title', 'Para onde a *linha* segue'],
+    [3.8, 26.6, 'title', 'Para onde *vamos*'],
     [T_G[2] + 1.6, 26.6, 'note', 'Entregas analíticas com *contratação definida* para cada projeto.', { x: 1580, y: 470, w: 540, size: 30, weight: 800 }]
   ]);
   SAY.reg(id, DIR.map((d, i) => [T_P[i], [9.4, 18.2, 26.4][GROUP[i]], 'label', d.title + ' ' + d.sub]));
@@ -122,9 +122,6 @@ const FUTURE_ART = {
       layer(ctx, cam, 1, () => {
         const g = ctx.createLinearGradient(0, RAIL, 0, H); g.addColorStop(0, '#24160E'); g.addColorStop(1, '#0C0806'); ctx.fillStyle = g; ctx.fillRect(-800, RAIL - 10, 7600, 400);
         const xt = trainX(t); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], (xt + 600) / 6800, { w: 22, head: false, glow: 14 });
-        // as outras linhas (tracks) chegam alinhadas: paralelas à linha laranja, por baixo dela, e sobem a 45° para encontrá-la na estação
-        [[C.red, 1360], [C.yellow, 3400], ['#E9DCC8', 5040]].forEach(([col, xm], k) => { const p = E.inOutSine(P(t, T_G[k] + 1.2, 2)), yk = RAIL + 44;
-          LINE.draw(ctx, [[xm - 1500, yk], [xm - 130 - (yk - RAIL), yk], [xm - 130, RAIL]], p, { w: 10, col, shadow: false, alpha: .6, head: false }); });
         for (let i = 0; i < 5; i++) panelArt(ctx, t, i);
         // uma estação ainda em aberto
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();

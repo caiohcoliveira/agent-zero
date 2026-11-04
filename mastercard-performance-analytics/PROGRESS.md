@@ -425,3 +425,20 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - medidor de leitura: 81 telas, 0 curtas;
   - navegação, clique e console limpos;
   - músicas idênticas.
+
+### v7.14 — "Nossa atuação", projetos com a frente em destaque, time sem contractors, "Para onde vamos"
+
+- [x] **Mapa (abertura e Conversa 0):** o capítulo 1 virou "Nossa atuação". A etiqueta "Cases e resultados" subiu para o espaço livre entre as duas fileiras. O capítulo 3 diz "ESTAÇÃO 07" (singular).
+- [x] **Projetos 2026 (estação 02):** o gráfico fica à esquerda e os dados à direita (número de projetos, rosca da parceria, receita por modelo de entrega).
+  - **Frente em destaque:** a barra da frente ganha um contorno branco e um cartão diz quanto ela trouxe: "~US$ X em receita de *Tipo* em 2026 (*Y%* do total)".
+  - A frente vem do campo opcional `business_scale_AAAA.highlight_project_type`; sem ele, vale a de maior receita. O valor é a participação × `revenue_usd_millions_approx`.
+- [x] **Capacidade (estação 02):** só as posições internas (sem contractors). As barras, o total ("N pessoas hoje · em posições internas") e a frase usam os mesmos números.
+- [x] **Estação 07:** o título virou "Para onde *vamos*" (e o teaser do mapa, "para onde vamos"). Saíram as linhas coloridas que subiam em curva até a linha laranja.
+- [x] **Prática (06):** a conclusão virou "Ao mesmo tempo que traz *governança*, a prática permite a *evolução das técnicas* e da *jornada analytics*."
+- [x] **LEIA-ME e README:** o campo da frente em destaque e a regra "só posições internas" entraram no mapa "campo → tela".
+- [x] **QA:**
+  - varredura sem exceções (528,14 s);
+  - medidor de leitura: 82 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - músicas idênticas;
+  - durações das cenas e batidas sem mudança.

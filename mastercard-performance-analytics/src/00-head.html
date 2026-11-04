@@ -41,12 +41,15 @@
       revenue_performance_analytics_usd_millions .... tela 1: receita por ano ("2026_forecast" = previsão)
       business_scale_AAAA.projects_delivered ........ tela 2: número de projetos
         (projects_delivered_display curto, como "+30", substitui o número na tela)
+      business_scale_AAAA.highlight_project_type .... tela 2: a frente em destaque (opcional; sem ele, a de
+        maior receita). Valor = revenue_share da frente × business_scale_AAAA.revenue_usd_millions_approx
       revenue_contribution_by_project_type_AAAA ..... tela 2: receita por tipo de projeto
         (project_type, revenue_share e delivery_model: "Track" = só a track; "Track + Outra" = com outra track)
       revenue_contribution_summary_AAAA ............. tela 2: receita só da track × com outras tracks
       project_mix_AAAA.projects_with_other_tracks_approx .. tela 2: % de projetos com outras tracks
       team_structure_AAAA ........................... tela 3: pessoas por nível
-        (levels: level, current_internal_positions, current_contractors; e os totais current_*)
+        (levels: level, current_internal_positions; e o total current_internal_positions.
+         Só as posições internas aparecem: os contractors ficam fora da tela)
     Seção 3 (client_types, capabilities) ............ estação 03
     Seção 4 · cases, NESTA ORDEM .................... estação 04
       1º cestas de produtos · 2º principalidade · 3º relatórios automatizados · 4º agentes de IA

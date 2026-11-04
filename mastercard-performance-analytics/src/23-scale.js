@@ -68,7 +68,7 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
   const SCRIPT = SAY.reg(id, [
     [3.8, 24.6, 'title', `Os *${NUMW[N] || N} pilares* da prática`],
     [4.0, T_G1 + 3, 'note', 'Capacidades complementares sustentam nossas entregas.', { x: LAY.x, y: 214, align: 'left', size: 30, weight: 800 }],
-    [T_CONC, 24.6, 'concl', 'A combinação dessas capacidades permite *executar os projetos*.']
+    [T_CONC, 24.6, 'concl', 'Ao mesmo tempo que traz *governança*, a prática permite a *evolução das técnicas* e da *jornada analytics*.']
   ]);
   SAY.reg(id, PILLARS.map((p, i) => [T_CARD[i], 24.4, 'body', p.name + ': ' + p.contrib]));
   SCENES[id] = {

@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.13, experimento)
+# Performance Analytics — "A Linha" (v7.14, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -108,10 +108,11 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
 - **Estação 02 (v7.13):** em `presentation_structure` → seção 2 (o ano vem do nome da chave; vale o mais recente):
   - `revenue_performance_analytics_usd_millions`: receita por ano, em milhões de US$ (`"2026_forecast"` = previsão);
   - `business_scale_2026.projects_delivered`: o número de projetos (um `projects_delivered_display` curto, como `"+30"`, substitui o número na tela);
+  - `business_scale_2026.highlight_project_type` (opcional, v7.14): a frente em destaque. Sem ele, vale a de maior receita. O valor mostrado é `revenue_share` × `revenue_usd_millions_approx` ("~US$ X em receita de *Tipo* em 2026 (*Y%* do total)");
   - `revenue_contribution_by_project_type_2026`: `project_type`, `revenue_share` (`"21%"`) e `delivery_model` (`"Track"` = só a track; `"Track + Outra"` = com outra track; `"Not specified"`);
   - `revenue_contribution_summary_2026`: `pa_only_revenue_share`, `cross_track_revenue_share`, `unspecified_delivery_model_revenue_share` e `cross_track_revenue_breakdown`;
   - `project_mix_2026.projects_with_other_tracks_approx`: % de projetos com outras tracks (base de projetos, mostrada separada da base de receita);
-  - `team_structure_2026`: `levels` (`level`, `current_internal_positions`, `current_contractors`) e os totais `current_internal_positions`, `current_contractors`, `current_total_including_contractors`.
+  - `team_structure_2026`: `levels` (`level`, `current_internal_positions`) e o total `current_internal_positions`. Desde a v7.14 a tela mostra só as posições internas; os campos de contractors podem ficar no JSON, mas não aparecem.
 - **Versão mascarada (v7.13):** para circular, os nomes de clientes, tracks, tipos de projeto e **pilares da prática** viram frutas e verduras (no JSON público os pilares são Cenoura, Brócolis, Abobrinha, Beterraba e Couve). Sem o campo `contribution`, o pilar mostra o primeiro item de `highlights`.
 - **Cases pela posição (v7.13):** o vídeo acha cada case pelo começo do nome ("Cliente Banana", "Cliente Manga", "Lights-off", "Insight Agent"); se o JSON usar outros nomes, vale a posição na lista (1º cestas, 2º principalidade, 3º relatórios, 4º agentes).
 - **Frases calculadas a partir dos dados:**

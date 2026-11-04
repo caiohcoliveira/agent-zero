@@ -184,9 +184,12 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   const XT_REV = pct(SUMR.cross_track_revenue_share != null ? SUMR.cross_track_revenue_share : B26.projects_with_other_tracks_revenue_share);
   const PA_REV = pct(SUMR.pa_only_revenue_share), NA_REV = pct(SUMR.unspecified_delivery_model_revenue_share);
   const PARTNERS = Object.entries(SUMR.cross_track_revenue_breakdown || {}).map(([k, v]) => ['+ ' + String(k).replace(/^.*?\+\s*/, ''), pct(v)]).filter(q => q[1] != null);
-  const LV = (TEAM.levels || []).map(l => ({ lv: String(l.level || ''), int: +l.current_internal_positions || 0, con: +l.current_contractors || 0 })).map(l => ({ ...l, tot: l.int + l.con }));
-  const T_INT = +TEAM.current_internal_positions || LV.reduce((a, l) => a + l.int, 0), T_CON = +TEAM.current_contractors || LV.reduce((a, l) => a + l.con, 0);
-  const T_TOT = +TEAM.current_total_including_contractors || (T_INT + T_CON), MXL = Math.max(1, ...LV.map(l => l.tot));
+  // v7.14: a capacidade mostra só as posições internas (sem contractors)
+  const LV = (TEAM.levels || []).map(l => ({ lv: String(l.level || ''), tot: +l.current_internal_positions || 0 }));
+  const T_TOT = +TEAM.current_internal_positions || LV.reduce((a, l) => a + l.tot, 0), MXL = Math.max(1, ...LV.map(l => l.tot));
+  // a frente em destaque: a do campo highlight_project_type (em business_scale_AAAA) ou a de maior receita; o valor = participação × receita do ano
+  const HL_NAME = String(B26.highlight_project_type || '').trim(), HLT = TYPES.find(q => q.name === HL_NAME) || TYPES[0] || null;
+  const REV_Y = +B26.revenue_usd_millions_approx || +((ROWS.find(([k]) => k.startsWith(YR)) || [])[1]) || 0, HLT_USD = HLT && REV_Y ? REV_Y * HLT.share / 100 : 0;
   const TOP3 = LV.slice().sort((a, b) => b.tot - a.tot).slice(0, 3).map(l => l.lv).sort(), list = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1] : a.join('');
   const OX = 2200;   // a câmera passa para x = 3160 no mundo: o que vem depois da receita é desenhado com x de tela + OX
   const T_BAR = ROWS.map((_, i) => beatsFrom(id, 1.0, 2 * i)), T_TREND = 5.6, T_READ = 12.2, T_BR = 20.4, T_CMP = [21.9, 23.3], T_Q = 30.6, T_CONC = 38.4;
@@ -199,8 +202,11 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   T_LV.forEach((t0, i) => cue(id, t0, 'pop', { p: .9 + i * .08, v: .16 }));
   const growTxt = MULT ? `Entre *${yr(ROWS[0][0])}* e *${yr(ROWS[2][0])}*, a receita passou a *${FMT.num(MULT, 1)} vez* o valor inicial.` : 'A receita cresceu ano a ano.';
   const xtTxt = XT_PROJ != null ? `Cerca de *${FMT.num(XT_PROJ, 0)}%* dos projetos são feitos *com outras tracks*` + (XT_REV != null ? ` (*${FMT.num(XT_REV, 0)}%* da receita).` : '.') : 'Parte dos projetos é feita *com outras tracks*.';
-  const CONL = LV.filter(l => l.con > 0).map(l => l.lv);
-  const teamTxt = TOP3.length ? `A maior parte do time está em *${list(TOP3)}*` + (CONL.length ? `; os *contractors* reforçam *${list(CONL)}*.` : '.') : '';
+  const teamTxt = TOP3.length ? `A maior parte do time está em *${list(TOP3)}*.` : '';
+  // a frente em destaque, em duas partes: o valor grande (~US$) e a frase ao lado; sem a receita do ano, o valor grande é a participação (%)
+  const HL_V = HLT ? (HLT_USD ? '~' + FMT.usdMM(HLT_USD) : FMT.num(HLT.share, 0) + '%') : '';
+  const HL_R = HLT ? (HLT_USD ? `em receita de *${HLT.name}* em ${YR} (*${FMT.num(HLT.share, 0)}%*\u00A0do\u00A0total)` : `da receita de ${YR} veio de *${HLT.name}*`) : '';
+  const hlTxt = HLT ? HL_V + ' ' + HL_R : '';
   const SCRIPT = SAY.reg(id, [
     [3.9, T_BR - .1, 'title', 'Evolução da receita da track'],
     [4.1, T_BR - .1, 'note', `receita anual, em ${UNIT[0]} · base zero`, { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
@@ -208,8 +214,9 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
     [T_BR + .9, T_Q - .1, 'title', `*${PROJ_TXT} projetos* em ${YR}`],
     [T_BR + 1.0, T_Q - .1, 'note', 'receita por tipo de projeto · parceria com outras tracks', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
     [T_BR + 2.0, T_Q - .1, 'body', xtTxt, { x: 1380, y: 300, w: 470 }],
+    [T_CMP[1] + 1.4, T_Q - .1, 'label', hlTxt],
     [T_Q + .3, 43.8, 'title', 'Capacidade do *time*'],
-    [T_Q + .4, 43.8, 'note', 'pessoas por nível · posições internas e contractors', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
+    [T_Q + .4, 43.8, 'note', 'pessoas por nível · posições internas', { x: LAY.x, y: 196, align: 'left', size: 28, visual: true }],
     [T_Q + 2.4, 43.8, 'body', teamTxt, { x: 1380, y: 300, w: 470 }],
     [T_CONC, 43.9, 'concl', 'Crescimento com *integração* e um *time* para escalar.']
   ]);
@@ -251,48 +258,54 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   function projects(ctx, t) {
     const a = P(t, T_BR + .6, .6) * (1 - P(t, T_Q - .3, .5)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
-    // o número de projetos (conta até o valor e pousa no acento da música)
-    const np = P(t, T_BR + 1.0, T_CMP[0] - T_BR - 1.0, E.outCubic), shown = np >= 1 ? PROJ_TXT : (PROJ_TXT[0] === '+' ? '+' : '') + FMT.num(Math.round(NPROJ * np), 0);
-    late(ctx, c => { text(c, shown, OX + 330, 380, { size: 150, weight: 900, color: C.orange, align: 'center' });
-      text(c, `projetos entregues em ${YR}`, OX + 330, 470, { size: 30, weight: 800, color: '#F3E6D6', align: 'center' }); });
-    // a parceria em projetos: rosca
-    if (XT_PROJ != null) { const dp = E.inOutCubic(P(t, T_CMP[1], .9)), cx = OX + 330, cy = 700, r = 112;
-      ctx.lineCap = 'butt'; ctx.lineWidth = 34; ctx.strokeStyle = 'rgba(243,230,214,.16)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
-      ctx.strokeStyle = C.yellow; ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + TAU * XT_PROJ / 100 * dp); ctx.stroke();
-      late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1], .4); text(c, '~' + FMT.num(XT_PROJ * dp, 0) + '%', cx, cy + 2, { size: 50, weight: 900, color: '#FFF', align: 'center' });
-        text(c, 'dos projetos com outras tracks', cx, cy + 162, { size: 24, weight: 800, color: C.yellow, align: 'center' }); }); }
-    // a receita por tipo de projeto
-    if (TYPES.length) { const X1 = OX + 640, BX = OX + 910, MW = 330, mx = Math.max(...TYPES.map(q => q.share), 1), DY = Math.min(62, 560 / TYPES.length);
+    const hp = P(t, T_CMP[1] + 1.4, .5);   // a frente em destaque acende
+    // ESQUERDA · a receita por tipo de projeto (cor = modelo de entrega)
+    if (TYPES.length) { const X1 = OX + 96, BX = OX + 360, MW = 420, mx = Math.max(...TYPES.map(q => q.share), 1), DY = Math.min(62, 560 / TYPES.length);
       late(ctx, c => { text(c, `receita ${YR} por tipo de projeto`, X1, 300, { size: 24, weight: 900, mono: true, color: C.yellow });
         [['p', 'só a track'], ['x', 'com outras tracks']].forEach(([k, l], i) => { const lx = X1 + i * 230; rr(c, lx, 330, 26, 18, 4); c.fillStyle = KCOL[k]; c.fill(); text(c, l, lx + 36, 340, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
-      TYPES.forEach((q, i) => { const p = E.outCubic(P(t, T_TY[i], .5)), y = 400 + i * DY, w = Math.max(4, q.share / mx * MW) * p; if (p <= 0) return;
+      TYPES.forEach((q, i) => { const p = E.outCubic(P(t, T_TY[i], .5)), y = 400 + i * DY, w = Math.max(4, q.share / mx * MW) * p, hot = q === HLT && hp > 0; if (p <= 0) return;
+        if (hot) { rr(ctx, BX - 6, y - 22, w + 12, 44, 9); ctx.strokeStyle = rgba('#FFFFFF', hp); ctx.lineWidth = 3; ctx.stroke(); }
         fbar(ctx, BX, y - 16, w, 32, KCOL[kindOf(q.model)], { r: 6 });
-        late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, q.name, BX - 16, y, { size: fitSize(c, q.name, 24, 250), weight: 800, color: '#FFF', align: 'right' });
+        late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, q.name, BX - 16, y, { size: fitSize(c, q.name, 24, 250), weight: 800, color: hot ? '#FFF' : '#F3E6D6', align: 'right' });
           text(c, FMT.num(q.share, 0) + '%', BX + w + 12, y + 1, { size: 24, weight: 900, color: kindOf(q.model) === 'x' ? C.yellow : '#FFF' }); }); }); }
-    // a receita por modelo de entrega: barra empilhada (só a track · com outras tracks · não especificado)
+    // DIREITA · o número de projetos (conta até o valor e pousa no acento da música)
+    const np = P(t, T_BR + 1.0, T_CMP[0] - T_BR - 1.0, E.outCubic), shown = np >= 1 ? PROJ_TXT : (PROJ_TXT[0] === '+' ? '+' : '') + FMT.num(Math.round(NPROJ * np), 0);
+    late(ctx, c => { text(c, shown, OX + 1150, 360, { size: 130, weight: 900, color: C.orange, align: 'center' });
+      text(c, `projetos entregues em ${YR}`, OX + 1150, 440, { size: 28, weight: 800, color: '#F3E6D6', align: 'center' }); });
+    // DIREITA · a parceria em projetos (rosca, base: projetos)
+    if (XT_PROJ != null) { const dp = E.inOutCubic(P(t, T_CMP[1], .9)), cx = OX + 1080, cy = 640, r = 88;
+      ctx.lineCap = 'butt'; ctx.lineWidth = 30; ctx.strokeStyle = 'rgba(243,230,214,.16)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+      ctx.strokeStyle = C.yellow; ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + TAU * XT_PROJ / 100 * dp); ctx.stroke();
+      late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1], .4); text(c, '~' + FMT.num(XT_PROJ * dp, 0) + '%', cx, cy + 2, { size: 42, weight: 900, color: '#FFF', align: 'center' });
+        para(c, 'dos projetos com outras tracks', cx, cy + 116, 230, { size: 21, weight: 800, color: C.yellow, align: 'center', lh: 1.1 }); }); }
+    // DIREITA · a receita por modelo de entrega (barra empilhada, base: receita)
     const segs = [[PA_REV, 'p', 'só a track'], [XT_REV, 'x', 'com outras tracks'], [NA_REV, 'n', 'n/e']].filter(q => q[0] != null && q[0] > 0), tot = segs.reduce((a2, q) => a2 + q[0], 0);
-    if (segs.length) { const sp = E.inOutCubic(P(t, T_CMP[1] + .6, .9)), X = OX + 1380, Y = 640, Wb = 470; let x = X;
-      late(ctx, c => { c.globalAlpha *= clamp(sp * 3); text(c, `receita ${YR} por modelo de entrega`, X, Y - 40, { size: 22, weight: 900, mono: true, color: '#E9DCC8' }); });
+    if (segs.length) { const sp = E.inOutCubic(P(t, T_CMP[1] + .6, .9)), X = OX + 1250, Y = 596, Wb = 600; let x = X;
+      late(ctx, c => { c.globalAlpha *= clamp(sp * 3); text(c, `receita ${YR} por modelo de entrega`, X, Y - 36, { size: 21, weight: 900, mono: true, color: '#E9DCC8' }); });
       segs.forEach(([v, k, l]) => { const w = Wb * v / tot * sp, x0 = x; if (w > 0) { fbar(ctx, x0, Y, w - 3, 44, KCOL[k], { r: 4 });
-          if (v >= 8) late(ctx, c => { c.globalAlpha *= clamp(sp * 2); text(c, FMT.num(v, 0) + '%', x0 + w / 2, Y + 23, { size: 22, weight: 900, color: k === 'x' ? INK : '#FFF', align: 'center' }); text(c, l, x0 + w / 2, Y + 72, { size: 19, weight: 800, color: '#E9DCC8', align: 'center' }); }); }
+          if (v >= 8) late(ctx, c => { c.globalAlpha *= clamp(sp * 2); text(c, FMT.num(v, 0) + '%', x0 + w / 2, Y + 23, { size: 22, weight: 900, color: k === 'x' ? INK : '#FFF', align: 'center' }); text(c, l, x0 + w / 2, Y + 70, { size: 19, weight: 800, color: '#E9DCC8', align: 'center' }); }); }
         x += Wb * v / tot; });
-      if (PARTNERS.length) late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1] + 1.6, .5); text(c, PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '), X, Y + 130, { size: fitSize(c, PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '), 22, Wb), weight: 800, color: C.yellow }); }); }
+      if (PARTNERS.length) late(ctx, c => { c.globalAlpha *= P(t, T_CMP[1] + 1.2, .5); const s2 = PARTNERS.map(([n, v]) => `${n} ${FMT.num(v, 0)}%`).join('  ·  '); text(c, s2, X, Y + 118, { size: fitSize(c, s2, 22, Wb), weight: 800, color: C.yellow }); }); }
+    // DIREITA · a frente em destaque: quanto ela trouxe de receita
+    if (HLT && hp > 0) late(ctx, c => { c.globalAlpha *= hp; const X = OX + 980, Y = 826, Wc = 870, Hc = 120; panel(c, X, Y, Wc, Hc, { dark: true, accent: C.orange });
+      const vs = fitSize(c, HL_V, 60, 330, 900), vw = measure(c, HL_V, vs, 900), rx = X + 44 + vw + 28, rw = X + Wc - 34 - rx, L = wrapRich(c, HL_R, rw, 27, 800);
+      text(c, HL_V, X + 44, Y + Hc / 2 + 2, { size: vs, weight: 900, color: C.orange });
+      para(c, HL_R, rx, Y + Hc / 2 - L.lines.length * 27 * 1.2 / 2, rw, { size: 27, weight: 800, color: '#F3E6D6', accent: C.yellow, lh: 1.2 }); });
     ctx.restore();
   }
-  /** CAPACIDADE: pessoas por nível (internas + contractors), o total e onde está a maior parte do time */
+  /** CAPACIDADE: pessoas por nível (posições internas), o total e onde está a maior parte do time */
   function team(ctx, t) {
     const a = P(t, T_Q, .6); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     const CXp = OX + 700, Y0 = 330, DY = Math.min(92, 520 / Math.max(1, LV.length)), BH = DY * .64, U = 620 / MXL, LBX = CXp - MXL * U / 2 - 28;
-    late(ctx, c => { [[C.orange, 'posições internas'], [C.yellow, 'contractors']].forEach(([col, l], i) => { const lx = OX + 420 + i * 280; rr(c, lx, 266, 26, 18, 4); c.fillStyle = col; c.fill(); text(c, l, lx + 36, 276, { size: 22, weight: 800, color: '#F3E6D6' }); }); });
-    LV.forEach((l, i) => { const p = E.outCubic(P(t, T_LV[i], .55)), y = Y0 + i * DY, wi = l.int * U * p, wc = l.con * U * p, w = wi + wc, x0 = CXp - w / 2, hot = TOP3.includes(l.lv); if (p <= 0) return;
-      if (wi > 0) fbar(ctx, x0, y, wi, BH, C.orange, { r: 6 }); if (wc > 0) fbar(ctx, x0 + wi + (wi > 0 ? 2 : 0), y, wc - (wi > 0 ? 2 : 0), BH, C.yellow, { r: 6 });
+    LV.forEach((l, i) => { const p = E.outCubic(P(t, T_LV[i], .55)), y = Y0 + i * DY, w = l.tot * U * p, x0 = CXp - w / 2, hot = TOP3.includes(l.lv); if (p <= 0) return;
+      if (w > 0) fbar(ctx, x0, y, w, BH, hot ? C.orange : '#C98A4A', { r: 6 });
       late(ctx, c => { c.globalAlpha *= clamp(p * 2); text(c, l.lv, LBX, y + BH / 2, { size: 28, weight: 900, mono: true, color: hot ? C.yellow : '#F3E6D6', align: 'right' });
-        text(c, FMT.num(l.tot, 0) + (l.con ? `  (${FMT.num(l.con, 0)} contractors)` : ''), x0 + w + 16, y + BH / 2, { size: 24, weight: 900, color: '#FFF' }); }); });
+        text(c, FMT.num(l.tot, 0), x0 + w + 16, y + BH / 2, { size: 26, weight: 900, color: '#FFF' }); }); });
     // o total do time
     const tp = P(t, T_Q + 3.6, .6); if (tp > 0 && T_TOT) hud(ctx, c => { c.translate(1380, 600); c.globalAlpha *= tp; panel(c, 0, 0, 470, 230, { dark: true });
       text(c, FMT.num(T_TOT, 0), 44, 92, { size: 96, weight: 900, color: C.orange }); text(c, 'pessoas hoje', 44 + measure(c, FMT.num(T_TOT, 0), 96, 900) + 20, 104, { size: 30, weight: 800, color: '#FFF' });
-      text(c, `${FMT.num(T_INT, 0)} internas · ${FMT.num(T_CON, 0)} contractors`, 44, 178, { size: 26, weight: 800, color: '#E9DCC8' }); });
+      text(c, 'em posições internas', 44, 178, { size: 26, weight: 800, color: '#E9DCC8' }); });
     ctx.restore();
   }
   SCENES[id] = {
@@ -482,7 +495,7 @@ POSTERS[2] = (ctx, w, h, tl) => {
   const mult = V.length > 2 && V[0] ? V[2] / V[0] : null, yk = String(Object.keys(sec).map(k => (k.match(/^business_scale_(\d{4})$/) || [])[1]).filter(Boolean).sort().pop() || '2026');
   const bs = sec['business_scale_' + yk] || {}, pm = sec['project_mix_' + yk] || {}, tm = sec['team_structure_' + yk] || {}, np = +bs.projects_delivered || 0, disp = String(bs.projects_delivered_display || '').trim();
   const projTxt = /^[+~]?\d[\d.,]*$/.test(disp) ? disp : (np ? FMT.num(np, 0) : '—'), xt = parseFloat(String(pm.projects_with_other_tracks_approx || bs.projects_with_other_tracks_approx || ''));
-  const tot = +tm.current_total_including_contractors || 0;
+  const tot = +tm.current_internal_positions || 0;
   late(ctx, c => { text(c, 'receita anual · base zero · * previsão', 0, -244, { size: 18, weight: 800, color: '#6A6056', align: 'center' });
     if (mult) para(c, `De ${R[0][0]} a ${R[2][0]}: *${FMT.num(mult, 1)}×* o valor inicial`, 0, 84, 420, { size: 22, weight: 900, color: INK, accent: C.red, align: 'center' });
     para(c, `*${projTxt} projetos* em ${yk}` + (isFinite(xt) ? ` · *~${FMT.num(xt, 0)}%* com outras tracks` : '') + (tot ? ` · time de *${FMT.num(tot, 0)} pessoas*` : ''), 0, 150, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });

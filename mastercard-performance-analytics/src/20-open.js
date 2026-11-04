@@ -30,7 +30,7 @@ STOPSCN.preshow = {
 
 /* ---------- o mapa com os 3 capítulos (fim do embarque e Conversa 0) ---------- */
 const MAPVIEW = { x: W / 2, y: H / 2 - 30, s: .93 };   // o mapa um pouco menor e mais baixo: o topo fica livre para o texto
-const CHAP_POS = [[700, 424], [856, 776], [1330, 812]];
+const CHAP_POS = [[700, 424], [1200, 492], [1330, 812]];   // v7.14: o capítulo 2 sobe para o espaço livre entre as fileiras
 function chapterTags(ctx, aFn) {
   TX.chapters.forEach(([name, ks, col], i) => {
     const a = aFn(i); if (a <= 0) return; const [x, y] = CHAP_POS[i], s = E.outBack(clamp(a)), w = measure(ctx, name, 34, 900) + 76;
@@ -38,7 +38,7 @@ function chapterTags(ctx, aFn) {
     paper(ctx, -w / 2, -38, w, 76, { r: 12, fill: col, shadow: 8, shadowColor: '#000', lw: 3.5 });
     tape(ctx, -w / 2 + 30, -38, 70, 24, -.3, 40 + i);
     late(ctx, c => { c.globalAlpha *= clamp(a * 1.6);
-      text(c, `CAPÍTULO ${i + 1}  ·  ESTAÇÕES ${ks.map(k => TX.stations[k - 1].n).join(', ')}`, 0, -60, { size: 19, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 2 });
+      text(c, `CAPÍTULO ${i + 1}  ·  ${ks.length > 1 ? 'ESTAÇÕES' : 'ESTAÇÃO'} ${ks.map(k => TX.stations[k - 1].n).join(', ')}`, 0, -60, { size: 19, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 2 });
       text(c, name, 0, 2, { size: 34, weight: 900, color: i === 2 ? INK : '#FFF', align: 'center' }); });
     ctx.restore();
   });

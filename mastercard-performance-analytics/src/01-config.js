@@ -110,11 +110,11 @@ const CONFIG = {
         see: ['Equipe → ativo reutilizável → aplicações', 'O mesmo ativo serve a novos projetos'] },
       { n: '06', short: 'A PRÁTICA',                title: 'A Prática: os pilares que sustentam a linha',          teaser: 'os pilares e o que cada um entrega',
         see: ['Os pilares da prática', 'Uma contribuição por pilar'] },
-      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'para onde a linha segue',
+      { n: '07', short: 'O FUTURO DE ANALYTICS',    title: 'O futuro de analytics',                                teaser: 'para onde vamos',
         see: ['Decisões estratégicas e integração', 'Automação de rotinas, eficiência e escala', 'Projetos User-Pay com Advanced Analytics'] }
     ],
     // os 3 capítulos da viagem (mapa da abertura e da Conversa 0)
-    chapters: [['Onde atuamos', [1, 2, 3], C_RED], ['Cases e resultados', [4, 5, 6], C_ORANGE], ['O que vem pela frente', [7], C_YELLOW]],
+    chapters: [['Nossa atuação', [1, 2, 3], C_RED], ['Cases e resultados', [4, 5, 6], C_ORANGE], ['O que vem pela frente', [7], C_YELLOW]],
     mission: 'Transformamos dados em decisões e soluções de negócio.',
     stopInfo: { p1: ['Conversa 1', 'perguntas sobre as estações 01, 02 e 03'], p2: ['Conversa 2', 'aplicações e aprofundamento dos cases'] },
     stop: { label: 'PARADA', next: 'PRÓXIMA PARTIDA', talk: 'hora de conversar', go: '→  seguir viagem', preshow: 'EMBARQUE EM INSTANTES', talkStop: 'parada para conversa' },

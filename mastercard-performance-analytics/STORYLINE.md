@@ -71,7 +71,7 @@
    - A câmera mergulha pela porta aberta.
 3. **Percurso (14–20 s)**
    - Do outro lado, o mapa completo da linha se desenha sobre um campo de estrelas em 3D.
-   - Três capítulos escritos: **Onde atuamos** (01–03), **Cases e resultados** (04–06) e **O que vem pela frente** (07).
+   - Três capítulos escritos: **Nossa atuação** (01–03), **Cases e resultados** (04–06) e **O que vem pela frente** (07).
    - Título "O percurso" e a frase "Uma viagem pelas capacidades da nossa área, em três capítulos."
 
 ## Conversa 0
@@ -95,21 +95,22 @@
    - "Atuamos do diagnóstico à mensuração para gerar valor para o cliente."
 5. **Conclusão:** "Analytics é uma *capacidade estratégica* da consultoria."
 
-### 02 · Evolução e impacto (44 s) — receita, projetos e capacidade (v7.13)
+### 02 · Evolução e impacto (44 s) — receita, projetos e capacidade (v7.13, ajustada na v7.14)
 
 1. **Receita anual da track:** gráfico com eixo de base zero, unidade (US$ mil ou US$ mi, conforme o JSON) e marcas.
    - Valor em cima de cada barra, anos embaixo, 2026 hachurado como "(previsão)" e a fonte.
    - Leitura: 2023 e 2025 acendem e uma régua mede "×1,8" ("Entre 2023 e 2025, a receita passou a 1,8 vez o valor inicial.").
-2. **Projetos (no lugar do Brasil):** "*N projetos* em 2026".
-   - O número conta até o valor e pousa no acento da música.
-   - A receita por tipo de projeto aparece em barras: laranja = só a track, amarelo = com outras tracks.
-   - Uma rosca mostra a % dos projetos feitos com outras tracks (base: projetos).
-   - Uma barra empilhada mostra a receita por modelo de entrega (base: receita), com as tracks parceiras embaixo.
-   - "Cerca de *X%* dos projetos são feitos *com outras tracks* (*Y%* da receita)."
-3. **Capacidade do time (no lugar dos trimestres):** pirâmide de pessoas por nível (K2 a K7).
-   - Cada nível separa posições internas e contractors.
-   - O total aparece num cartão ("N pessoas hoje · internas · contractors").
-   - "A maior parte do time está em *K5, K6 e K7*; os *contractors* reforçam *K5 e K6*." (calculado a partir do JSON)
+2. **Projetos (no lugar do Brasil):** "*N projetos* em 2026". O gráfico fica à esquerda e os dados à direita.
+   - **Esquerda:** a receita por tipo de projeto em barras (laranja = só a track, amarelo = com outras tracks).
+   - **Direita:** o número conta até o valor e pousa no acento da música.
+     - Uma rosca mostra a % dos projetos feitos com outras tracks (base: projetos).
+     - Uma barra empilhada mostra a receita por modelo de entrega (base: receita), com as tracks parceiras embaixo.
+     - "Cerca de *X%* dos projetos são feitos *com outras tracks* (*Y%* da receita)."
+   - **Frente em destaque (v7.14):** a barra da frente ganha um contorno branco e um cartão diz quanto ela trouxe: "~US$ X em receita de *Tipo* em 2026 (*Y%* do total)".
+     - A frente é a de `highlight_project_type`; sem esse campo, vale a de maior receita.
+3. **Capacidade do time (no lugar dos trimestres):** pirâmide de pessoas por nível (K2 a K7), só com as posições internas (v7.14: sem contractors).
+   - O total aparece num cartão ("N pessoas hoje · em posições internas").
+   - "A maior parte do time está em *K5, K6 e K7*." (calculado a partir do JSON)
 4. **Conclusão:** "Crescimento com *integração* e um *time* para escalar."
 
 ### 03 · O que levamos ao mercado (64 s) — capabilities explicadas no próprio filme
@@ -215,7 +216,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 - **Visual:** os pilares sobem como colunas de viaduto com os nomes, e a linha corre por cima, com o trem passando como um monotrilho. Objetos 3D flutuam no céu.
 - **Contribuições:** cada pilar ganha um cartão com uma contribuição curta (campo `contribution` do JSON) e "N entregas", em dois grupos que ficam até o fim.
-- **Conclusão:** "A combinação dessas capacidades permite *executar os projetos*."
+- **Conclusão (v7.14):** "Ao mesmo tempo que traz *governança*, a prática permite a *evolução das técnicas* e da *jornada analytics*."
 
 ## Conversa 2
 
@@ -228,12 +229,12 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ## Play 4 · final (ElevenLabs, final orquestral, 1:11)
 
-1. **07 · Para onde a linha segue (26 s):** uma cidade noturna conectada.
+1. **07 · Para onde vamos (26 s):** uma cidade noturna conectada.
    - Cada direção tem painel ilustrado, título e subtítulo, em três grupos:
      - Apoiar decisões estratégicas · dos clientes (sala do board) e Combinar analytics · com as demais tracks;
      - Automatizar rotinas · para ganhar eficiência (robôs) e Eficiência operacional · e ganho de escala (uma grade que cresce): a automação das rotinas leva ao ganho de escala;
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
-   - As outras linhas chegam à cidade e um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?"; partículas e objetos 3D giram com o passeio.
+   - Um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?" (v7.14: sem as linhas coloridas que subiam em curva até a laranja).
    - No fim, uma estação tracejada "?": a próxima estação.
 2. **Por trás de tudo (26 s, v7.11):** "Por trás de tudo, *métodos* e *técnicas*". Cinco cases entram numa fileira, um por compasso desde que a batida começa, e cada card **vira** 2 tempos depois. Frente: visualização, case e método. Verso: as técnicas. Todos ficam virados para leitura até a frase-chave:
    - Mesa de performance · teste A/B → power analysis, testes de hipótese, plano de amostragem
