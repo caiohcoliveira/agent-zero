@@ -8,9 +8,16 @@
   ============================================================================
   LEIA-ME · COMO TROCAR OS DADOS DESTE VÍDEO
   ============================================================================
-  Este arquivo é o vídeo inteiro (1920 × 1080, funciona offline). Todos os números
-  e textos das telas de dados vêm do bloco JSON logo abaixo (<script id="pa-data">).
-  O resto do arquivo (estilos, músicas embutidas e código) não precisa ser mexido.
+  Este arquivo é o vídeo (1920 × 1080, funciona offline). Todos os números e textos
+  das telas de dados vêm do bloco JSON logo abaixo (<script id="pa-data">).
+  O resto do arquivo (estilos e código) não precisa ser mexido.
+
+  ARQUIVOS (todos NA MESMA PASTA)
+    • este HTML ................. o vídeo: guia, dados, estilos e código (sem base64)
+    • sources.js ................ as músicas (MP3 em base64) e as grades de batida;
+                                  não precisa ser aberto nem editado. Sem ele, o vídeo
+                                  roda em silêncio e mostra um aviso no topo.
+    • dashboard-fraude.png ...... o print do dashboard (veja o passo 5)
 
   PASSO A PASSO
     1. Abra este arquivo num editor de texto (VS Code, Notepad++, Sublime…).
@@ -67,8 +74,8 @@
   ============================================================================
   PERFORMANCE ANALYTICS — "A LINHA"
   Vídeo executivo animado (~8:22 em 4 trechos + paradas de conversa) · 1920 × 1080 ·
-  arquivo único e offline. Ordem do arquivo: dados (acima) → estilos → músicas
-  embutidas (base64) → código (um <script>, montado a partir de src/ por tools/build.py).
+  offline. Ordem do arquivo: dados (acima) → estilos → sources.js (músicas e grades de
+  batida, arquivo à parte) → código (um <script>, montado a partir de src/ por tools/build.py).
 
   Atalhos: → / Espaço = seguir · ← = voltar · 1 a 7 = estação · P = pausa · F = tela cheia · M = som
            Home ou R = começo · End = fim · C = legendas · Q = qualidade
@@ -169,7 +176,7 @@
   <button id="bFull" title="Tela cheia (F)">⛶</button>
   <span id="voiceinfo"></span>
 </div>
-<!-- MÚSICAS (base64, geradas pelo build a partir de musica/) -->
+<!-- FONTES: as músicas (base64) e as grades de batida ficam em sources.js, NA MESMA PASTA deste HTML -->
 <!--PA_MUSIC-->
 <script>
 "use strict";

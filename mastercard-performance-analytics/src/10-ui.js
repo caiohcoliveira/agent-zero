@@ -9,7 +9,7 @@ const GRIDS = {};
 function grid(id) {
   if (GRIDS[id]) return GRIDS[id];
   const s = CONFIG.sceneById[id], p = CONFIG.playById[s.play];
-  if (!p.track) { const per = 60 / CONFIG.bpm, n = Math.ceil(s.dur / per); return GRIDS[id] = { beats: Array.from({ length: n }, (_, i) => i * per), bars: Array.from({ length: Math.ceil(n / 4) }, (_, i) => i * per * 4) }; }
+  if (!p.track || !BEATS[p.track]) { const per = 60 / CONFIG.bpm, n = Math.ceil(s.dur / per); return GRIDS[id] = { beats: Array.from({ length: n }, (_, i) => i * per), bars: Array.from({ length: Math.ceil(n / 4) }, (_, i) => i * per * 4) }; }
   const d = BEATS[p.track], off = p.from + (s.start - p.start), loc = arr => arr.map(x => +(x - off).toFixed(3)).filter(x => x >= -1e-3 && x < s.dur);
   // a grade cobre a cena inteira: onde o detector parou (fim de faixa, trecho filtrado) ela segue no mesmo período
   const med = a => { const d2 = a.slice(1).map((x, i) => x - a[i]).sort((u, v) => u - v); return d2.length ? d2[d2.length >> 1] : 0; };

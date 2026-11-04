@@ -13,6 +13,11 @@ const PLAYER = (() => {
   const stage = document.getElementById('stage'), intro = document.getElementById('intro'), ui = document.getElementById('ui');
   const $ = id => document.getElementById(id);
   const bar = $('bar'), fill = bar.querySelector('.fill'), knob = bar.querySelector('.knob'), tip = bar.querySelector('.tip');
+  // v7.19: sem sources.js (as músicas), o vídeo roda em silêncio; o aviso diz o que falta (clique fecha)
+  if (!SOURCES_OK) { const w = document.createElement('div'); w.id = 'srcwarn';
+    w.textContent = 'Falta o arquivo sources.js na mesma pasta deste HTML: o vídeo roda, mas sem as músicas. (clique para fechar)';
+    w.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99;background:#B3261E;color:#fff;font:600 15px/1.3 system-ui,sans-serif;padding:10px 16px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.4);cursor:pointer;max-width:90vw;text-align:center';
+    w.onclick = () => w.remove(); document.body.appendChild(w); console.warn('[fontes] sources.js não carregou: sem músicas'); }
   const DUR = CONFIG.duration, SHOW = CONFIG.mode !== 'reel', STOPS = CONFIG.stops, ITEM_DUR = 1.1;
   const st = { T: 0, playing: false, startPerf: 0, startT: 0, ended: false,
     mode: SHOW ? 'stop' : 'play', stop: 0, item: 0, prevItem: 0, itemAt: performance.now(), stopAt: performance.now(), next: null };

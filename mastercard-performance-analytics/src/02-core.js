@@ -4,6 +4,15 @@
 const C = CONFIG.colors, F = CONFIG.fonts, M = CONFIG.motion;
 const TAU = Math.PI * 2;
 
+// ---------- fontes (v7.19): as músicas (base64) e as grades de batida ficam em sources.js, na mesma pasta do HTML ----------
+// sources.js define BEATS (grades e envelopes, src/07-beats.js) e PA_MUSIC = { id: { data: MP3 em base64, attrs: {...} } }.
+// Sem ele, o vídeo roda com a grade sintetizada, sem as músicas, e mostra um aviso.
+if (typeof BEATS === 'undefined') var BEATS = {};
+if (typeof PA_MUSIC === 'undefined') var PA_MUSIC = null;
+const SOURCES_OK = !!PA_MUSIC && Object.keys(BEATS).length > 0;
+/** a música `id` de sources.js ({ data, attrs }) ou null */
+const MUSIC_SRC = id => (PA_MUSIC && id && PA_MUSIC[id]) || null;
+
 // ---------- matemática ----------
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;

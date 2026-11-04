@@ -1,10 +1,18 @@
-# Performance Analytics — "A Linha" (v7.18, experimento)
+# Performance Analytics — "A Linha" (v7.19, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
 > - os métodos e as técnicas por trás dos cases (v7.11 no clímax; desde a v7.15, em cards na estação 03);
 > - o letreiro WELCOME TO… no final;
 > - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.19:**
+> - **o base64 saiu do HTML:** a apresentação agora são arquivos lado a lado, na mesma pasta:
+>   - `performance-analytics.html`: o guia, o JSON de dados, os estilos e toda a programação das animações (≈ 0,5 MB, sem base64, nenhuma linha longa). **É o arquivo que se edita**, à mão ou por outra IA;
+>   - `sources.js`: as músicas (MP3 em base64) e as grades de batida (`src/07-beats.js`), carregado pelo HTML com `<script src="sources.js">`. Não precisa ser aberto nem editado;
+>   - `dashboard-fraude.png`: o print do dashboard (nome no campo `dashboard_image` do case; pode ser .png ou .jpg).
+> - Sem o `sources.js`, o vídeo roda em silêncio, com a grade sintetizada, e mostra um aviso no topo.
+> - `tools/build.py` gera o HTML e o `sources.js` juntos, na pasta de saída. Duas versões (dados mockados e mascarados) na mesma pasta usam o mesmo `sources.js`.
 >
 > **v7.18:**
 > - **o drop nas portas do trem:** a abertura começa a música no ponto em que o primeiro drop dela cai exatamente quando as portas do trem abrem (6,0 s).
@@ -58,7 +66,10 @@ O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito d
 
 **Teste do roteiro v7:** assistir sem som e sem ajuda precisa bastar. Em qualquer pausa dá para reconhecer o problema, o método, o resultado e a base da comparação.
 
-- **Arquivo final:** [`performance-analytics.html`](performance-analytics.html), um único HTML 1920×1080, 100% offline, com dados e músicas embutidos.
+- **Arquivos finais (v7.19), na mesma pasta:**
+  - [`performance-analytics.html`](performance-analytics.html): 1920×1080, 100% offline, com os dados e a programação das animações;
+  - [`sources.js`](sources.js): as músicas e as grades de batida;
+  - `dashboard-fraude.png`.
 - **Roteiro:** [`STORYLINE.md`](STORYLINE.md) (v7).
 - **Checkpoint de retomada:** [`PROGRESS.md`](PROGRESS.md).
 
@@ -175,7 +186,7 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
 
 ## Música e batidas
 
-- **Faixas (v7.4–v7.7, ElevenLabs Music):** as três partes foram geradas na conta ElevenLabs do usuário, como instrumentais, e encaixadas nos tempos do filme. Entram embutidas no HTML, recodificadas a 128 kbps.
+- **Faixas (v7.4–v7.7, ElevenLabs Music):** as três partes foram geradas na conta ElevenLabs do usuário, como instrumentais, e encaixadas nos tempos do filme. Entram no `sources.js` (ao lado do HTML), recodificadas a 128 kbps.
   - **Parte 1 · estações 01–03 (2:34,5):** funk cinematográfico, 110 BPM.
     - Intro abafada que abre no tema e as viradas de estação no tempo forte.
     - Low só com médios antes da parte B, pausa, riser e drop na estação 03.

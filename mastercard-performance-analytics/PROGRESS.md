@@ -511,3 +511,19 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 - [x] **`tools/pausa.py`:** acha o primeiro drop (a maior subida de nível depois de um trecho baixo) e a grade de tempos a partir dele; `--drop SEGUNDOS` fixa à mão (aqui, 34,85 s, o ataque medido em passos de 5 ms). O build leva `data-drop`, `data-beat0` e `data-beat`.
 - [x] A emenda com a Conversa 0, os loops e o encerramento continuam iguais (testados no navegador, console limpo).
 
+### v7.19 — o base64 sai do HTML: HTML + sources.js na mesma pasta
+
+- [x] **HTML editável:** o `performance-analytics.html` fica só com o guia, o JSON de dados, os estilos e a programação das animações (≈ 0,5 MB, sem base64; a linha mais longa tem cerca de 600 caracteres). É o arquivo que outra IA ou uma pessoa edita.
+- [x] **`sources.js`** (mesma pasta): `BEATS` (as grades de batida e os envelopes de `src/07-beats.js`) e `PA_MUSIC` (as músicas em MP3/base64, com o laço, os volumes e o drop da música das conversas em `attrs`).
+  - O HTML carrega o arquivo com `<script src="sources.js">`, o que funciona em arquivo local (file://).
+  - O código lê as músicas por `MUSIC_SRC(id)` no lugar dos antigos blocos `<script id="music-…">`.
+- [x] **Sem o `sources.js`:** o vídeo roda em silêncio, com a grade sintetizada, e mostra um aviso no topo ("Falta o arquivo sources.js…"). Testado sem exceções.
+- [x] **Imagem do dashboard:** continua um arquivo à parte, na mesma pasta (campo `dashboard_image`; .png ou .jpg).
+- [x] **Build:** `tools/build.py` gera o HTML e o `sources.js` juntos. Sem a pasta `musica/`, reaproveita as músicas do `sources.js` anterior, menos a música das conversas.
+- [x] **Conjunto de apresentação:** as duas versões (dados mockados e mascarados) ficam na mesma pasta e usam o mesmo `sources.js`, com a música do usuário.
+- [x] **QA:**
+  - o drop continua caindo nas portas (6,000 s);
+  - a emenda com a Conversa 0, os loops e o encerramento funcionam;
+  - navegação e clique OK, varredura sem exceções;
+  - console limpo.
+

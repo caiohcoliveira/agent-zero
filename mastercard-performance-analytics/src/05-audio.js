@@ -23,9 +23,9 @@ const MUSIC_SPEC = {
 };
 const FALLBACK_SPEC = [[0, { kick: 1, hat: 1, bass: 1, arp: 1, pad: 1, f: 6000 }]], SILENT_SPEC = [[0, { f: 3000 }]];
 const MUSIC = (() => {
-  const out = [], hasTrack = sc => { const p = CONFIG.playById[sc.play]; return !!(p && p.track && document.getElementById('music-' + p.track)); };
+  const out = [], hasTrack = sc => { const p = CONFIG.playById[sc.play]; return !!(p && p.track && MUSIC_SRC(p.track)); };
   // v7.17: o play com a música das conversas (a abertura) fica sem a trilha sintetizada, se a faixa estiver no HTML
-  const pauseMusic = sc => { const p = CONFIG.playById[sc.play], c = CONFIG.audio.pause; return !!(p && p.pause && c && c.track && document.getElementById('music-' + c.track)); };
+  const pauseMusic = sc => { const p = CONFIG.playById[sc.play], c = CONFIG.audio.pause; return !!(p && p.pause && c && MUSIC_SRC(c.track)); };
   CONFIG.scenes.forEach(sc => { const spec = (pauseMusic(sc) ? SILENT_SPEC : null) || MUSIC_SPEC[sc.id] || (hasTrack(sc) ? SILENT_SPEC : FALLBACK_SPEC);
     spec.forEach(([at, f], i) => out.push([sc.start + at, sc.start + (i + 1 < spec.length ? spec[i + 1][0] : sc.dur), f])); });
   out.push([CONFIG.duration, CONFIG.duration + 1, { f: 3000 }]);

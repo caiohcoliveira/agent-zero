@@ -2,8 +2,8 @@
    8. MÚSICA — faixas embutidas tocando em sincronia com a linha do tempo,
    e leitura das batidas (BEAT) para câmera, cores e elementos.
    ----------------------------------------------------------------------------
-   • As faixas ficam em <script type="text/plain" id="music-<id>"> (base64),
-     gerados pelo build a partir de musica/ (fora do Git).
+   • As faixas ficam em sources.js (PA_MUSIC[id].data, MP3 em base64), na mesma pasta do HTML,
+     geradas pelo build a partir de musica/ (fora do Git).
    • BEAT.at(T) é função pura do tempo: seek e pausa continuam exatos.
    ========================================================================== */
 const TRACKS = (() => {
@@ -12,7 +12,7 @@ const TRACKS = (() => {
   for (const id in BEATS) {
     const d = BEATS[id], env = {};
     for (const k in d.env) env[k] = bytes(d.env[k]);
-    out[id] = { id, data: d, env, hitT: d.hits.map(h => h[0]), buf: null, embedded: !!document.getElementById('music-' + id) };
+    out[id] = { id, data: d, env, hitT: d.hits.map(h => h[0]), buf: null, embedded: !!MUSIC_SRC(id) };
   }
   return out;
 })();
@@ -55,17 +55,16 @@ const TRACK = {
    --------------------------------------------------------------------------- */
 const PAUSE = {
   buf: null, g: null, on: false, voices: [], next: 0, off: 0, timer: null, fresh: false, mode: 'stop',
-  el() { const c = CONFIG.audio.pause; return c && c.track ? document.getElementById('music-' + c.track) : null; },
-  /** o config do player, com o laço e o volume que vieram com a faixa (data-* do bloco) por cima */
+  el() { const c = CONFIG.audio.pause; return c ? MUSIC_SRC(c.track) : null; },
+  /** o config do player, com o laço e o volume que vieram com a faixa (PA_MUSIC.pausa.attrs, de tools/pausa.py) por cima */
   cfg() {
-    const c = { ...(CONFIG.audio.pause || {}) }, d = (this.el() || {}).dataset || {};
-    if (d.loop) c.loop = d.loop.split(',').map(Number);
-    if (d.xfade != null) c.xfade = +d.xfade; if (d.gain != null) c.gain = +d.gain; if (d.openGain != null) c.openGain = +d.openGain;
+    const c = { ...(CONFIG.audio.pause || {}) }, a = (this.el() || {}).attrs || {};
+    ['loop', 'xfade', 'gain', 'openGain'].forEach(k => { if (a[k] != null) c[k] = a[k]; });
     return c;
   },
   wants(stopId) { const c = CONFIG.audio.pause || {}; return !!(c.track && (c.stops || []).includes(stopId)); },
   /** v7.18: o 1º drop da faixa e a grade de tempos a partir dele (data-drop, data-beat0, data-beat) */
-  info() { const d = (this.el() || {}).dataset || {}; return { drop: d.drop != null ? +d.drop : null, beat0: d.beat0 != null ? +d.beat0 : null, beat: d.beat != null ? +d.beat : null }; },
+  info() { const a = (this.el() || {}).attrs || {}; return { drop: a.drop != null ? +a.drop : null, beat0: a.beat0 != null ? +a.beat0 : null, beat: a.beat != null ? +a.beat : null }; },
   /** na abertura, onde a faixa está quando o play começa: o drop cai no instante SCENES.open.musicSync (as portas do trem abrem) */
   openOffset() { const i = this.info(), sync = SCENES.open && SCENES.open.musicSync; return i.drop != null && sync != null ? i.drop - sync : 0; },
   level(mode = this.mode) { const a = CONFIG.audio, c = this.cfg(), g = mode === 'open' ? (c.openGain == null ? 1 : c.openGain) : (c.gain == null ? .4 : c.gain); return a.music ? g * a.trackVolume : 0; },
@@ -125,15 +124,15 @@ const PAUSE = {
   const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OAC) return;
   const oac = new OAC(2, 44100, 44100);
   Object.values(TRACKS).forEach(tr => {
-    const el = document.getElementById('music-' + tr.id); if (!el) return;
-    const raw = atob(el.textContent.trim()), buf = new Uint8Array(raw.length);
+    const src = MUSIC_SRC(tr.id); if (!src) return;
+    const raw = atob(src.data), buf = new Uint8Array(raw.length);
     for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
     oac.decodeAudioData(buf.buffer).then(b => { tr.buf = b; TRACK.onReady(); })
       .catch(e => console.warn('[música] não deu para decodificar', tr.id, e));
   });
   // v7.16: a música das conversas (não tem grade de batidas: não mexe nas cenas)
-  const pc = CONFIG.audio.pause, pel = pc && document.getElementById('music-' + pc.track);
-  if (pel) { const raw = atob(pel.textContent.trim()), buf = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
+  const pc = CONFIG.audio.pause, pel = pc && MUSIC_SRC(pc.track);
+  if (pel) { const raw = atob(pel.data), buf = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
     oac.decodeAudioData(buf.buffer).then(b => { PAUSE.buf = b; PAUSE.onReady(); }).catch(e => console.warn('[música] não deu para decodificar', pc.track, e)); }
 })();
 
@@ -197,7 +196,7 @@ const BEAT = (() => {
     at(T) {
       const sc = sceneAt(T), p = CONFIG.playById[sc.play], I = intensity(sc, T - sc.start);
       if (p && p.pause && PAUSE.el()) return shape(pauseBeat(T - p.start + PAUSE.openOffset(), PAUSE.info()), I);   // v7.17–v7.18: abertura com a música das conversas, nos tempos dela
-      if (!p || !p.track) return shape(synth(T - (p ? p.start : 0)), I);
+      if (!p || !p.track || !TRACKS[p.track]) return shape(synth(T - (p ? p.start : 0)), I);   // sem a grade da faixa (sem sources.js): a sintetizada
       return shape(fromTrack(p.track, p.from + (T - p.start)), I);
     },
     intensity,
