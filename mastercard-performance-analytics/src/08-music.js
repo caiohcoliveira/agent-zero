@@ -48,46 +48,63 @@ const TRACK = {
 };
 
 /* ---------------------------------------------------------------------------
-   PAUSE (v7.16) — a música das conversas: entra em fade quando a parada abre, repete sem fim o trecho
-   CONFIG.audio.pause.loop (frases inteiras, escolhidas pela semelhança das duas pontas) com uma transição curta
-   entre as voltas, e sai em fade quando o vídeo segue.
-   Continua tocando entre os itens da parada e entre paradas seguidas; M (som) silencia.
+   PAUSE (v7.16–v7.17) — a música das conversas: é a trilha da abertura (a parte zero) e segue sem emenda para a
+   Conversa 0, onde desce para o fundo; nas baldeações e no encerramento entra do começo em fade. Em todas, repete
+   sem fim (a música inteira ou um trecho de frases, conforme a faixa) até alguém seguir; sai em fade quando o
+   vídeo continua. M (som) silencia.
    --------------------------------------------------------------------------- */
 const PAUSE = {
-  buf: null, g: null, on: false, voices: [], next: 0, off: 0, timer: null,
-  cfg() { return CONFIG.audio.pause || {}; },
-  wants(stopId) { const c = this.cfg(); return !!(c.track && (c.stops || []).includes(stopId)); },
-  level() { const a = CONFIG.audio; return a.music ? (this.cfg().gain == null ? .4 : this.cfg().gain) * a.trackVolume : 0; },
-  /** o trecho que se repete [início, fim) e a transição entre as voltas (s) */
-  span() { const c = this.cfg(), d = this.buf.duration, L = c.loop && c.loop[1] > c.loop[0] ? [c.loop[0], Math.min(c.loop[1], d)] : [0, d]; return { s: L[0], e: L[1], x: Math.min(c.xfade || .3, (L[1] - L[0]) / 4) }; },
-  start(stopId) {
-    if (!this.wants(stopId)) { this.stop(); return; }
-    if (this.on || !this.buf) return;
-    AUDIO.init(); if (!AUDIO.ready) return;
-    const ctx = AUDIO.ctx, c = this.cfg(), n = ctx.currentTime + .05; ctx.resume();
-    this.g = ctx.createGain(); this.g.gain.setValueAtTime(0, n); this.g.gain.linearRampToValueAtTime(this.level(), n + (c.fadeIn || 2)); this.g.connect(AUDIO.master);
-    this.on = true; this.voices = []; this.next = n; this.off = 0;
+  buf: null, g: null, on: false, voices: [], next: 0, off: 0, timer: null, fresh: false, mode: 'stop',
+  el() { const c = CONFIG.audio.pause; return c && c.track ? document.getElementById('music-' + c.track) : null; },
+  /** o config do player, com o laço e o volume que vieram com a faixa (data-* do bloco) por cima */
+  cfg() {
+    const c = { ...(CONFIG.audio.pause || {}) }, d = (this.el() || {}).dataset || {};
+    if (d.loop) c.loop = d.loop.split(',').map(Number);
+    if (d.xfade != null) c.xfade = +d.xfade; if (d.gain != null) c.gain = +d.gain; if (d.openGain != null) c.openGain = +d.openGain;
+    return c;
+  },
+  wants(stopId) { const c = CONFIG.audio.pause || {}; return !!(c.track && (c.stops || []).includes(stopId)); },
+  level(mode = this.mode) { const a = CONFIG.audio, c = this.cfg(), g = mode === 'open' ? (c.openGain == null ? 1 : c.openGain) : (c.gain == null ? .4 : c.gain); return a.music ? g * a.trackVolume : 0; },
+  /** o trecho que se repete [s, e) e a transição x entre as voltas (x = 0: volta ao começo sem transição, como "repetir" num player) */
+  span() { const c = this.cfg(), d = this.buf.duration, L = c.loop && c.loop[1] > c.loop[0] ? [c.loop[0], Math.min(c.loop[1], d)] : [0, d];
+    return { s: L[0], e: L[1], x: Math.max(0, Math.min(c.xfade == null ? .3 : c.xfade, (L[1] - L[0]) / 4, L[0])) }; },
+  begin(offset, mode, fade) {
+    AUDIO.init(); if (!AUDIO.ready || !this.buf) return;
+    const ctx = AUDIO.ctx, n = ctx.currentTime + .05; ctx.resume();
+    this.mode = mode; this.g = ctx.createGain(); this.g.gain.setValueAtTime(0, n); this.g.gain.linearRampToValueAtTime(this.level(), n + fade); this.g.connect(AUDIO.master);
+    this.on = true; this.voices = []; this.next = n; this.off = Math.max(0, offset); this.fresh = true;
     this.pump(); clearInterval(this.timer); this.timer = setInterval(() => this.pump(), 400);
   },
-  /** agenda as voltas com antecedência: cada volta nova entra x s antes do fim da anterior, com fade cruzado linear
-   *  (as duas pontas tocam a mesma posição da frase, então o nível fica a ±1 dB da música seguindo; e, como as duas vozes
-   *  saem do mesmo buffer, o laço não depende do atraso do decodificador de MP3) */
+  /** abertura (a parte zero): a música é a trilha do play, no nível do filme, a partir do ponto em que o vídeo está */
+  playFrom(offset) { if (this.on) this.stop(.15); this.begin(offset, 'open', offset > .05 ? .3 : .05); },
+  /** parada: se a música já vem tocando (da abertura), segue sem emenda e só desce para o fundo; senão entra do começo em fade */
+  start(stopId) {
+    if (!this.wants(stopId)) { this.stop(); return; }
+    if (this.on) {
+      if (this.mode !== 'stop') { this.mode = 'stop'; const n = AUDIO.ctx.currentTime; this.g.gain.cancelScheduledValues(n); this.g.gain.setValueAtTime(this.g.gain.value, n); this.g.gain.linearRampToValueAtTime(this.level(), n + (this.cfg().duck || 2)); }
+      return;
+    }
+    if (this.buf) this.begin(0, 'stop', this.cfg().fadeIn || 2);
+  },
+  /** agenda as voltas com antecedência: cada volta nova entra x s antes do fim da anterior, com fade cruzado linear.
+   *  As duas vozes saem do mesmo buffer, então o laço não depende do atraso do decodificador de MP3. */
   pump() {
     if (!this.on) return; const ctx = AUDIO.ctx, { s, e, x } = this.span();
     while (this.next < ctx.currentTime + 3) {
-      const t0 = this.next, o = this.off, first = o === 0 && !this.voices.length, src = ctx.createBufferSource(), vg = ctx.createGain();
-      src.buffer = this.buf; src.connect(vg); vg.connect(this.g);
-      if (first) vg.gain.setValueAtTime(1, t0); else { vg.gain.setValueAtTime(0, t0); vg.gain.linearRampToValueAtTime(1, t0 + x); }
-      const tx = t0 + (e - x - o); vg.gain.setValueAtTime(1, tx); vg.gain.linearRampToValueAtTime(0, tx + x);
+      const t0 = this.next, o = Math.min(this.off, e - .01), first = this.fresh, src = ctx.createBufferSource(), vg = ctx.createGain();
+      this.fresh = false; src.buffer = this.buf; src.connect(vg); vg.connect(this.g);
+      if (first || x <= 0) vg.gain.setValueAtTime(1, t0); else { vg.gain.setValueAtTime(0, t0); vg.gain.linearRampToValueAtTime(1, t0 + x); }
+      const tx = t0 + Math.max(0, e - x - o);
+      if (x > 0) { vg.gain.setValueAtTime(1, tx); vg.gain.linearRampToValueAtTime(0, tx + x); }
       src.start(t0, o); src.stop(tx + x + .02);
       this.voices.push(src); src.onended = () => { this.voices = this.voices.filter(v => v !== src); };
       this.next = tx; this.off = s - x;
     }
   },
   apply() { if (this.g && AUDIO.ctx) { const n = AUDIO.ctx.currentTime; this.g.gain.cancelScheduledValues(n); this.g.gain.setTargetAtTime(this.level(), n, .15); } },
-  stop() {
+  stop(fade) {
     if (!this.on) return; this.on = false; clearInterval(this.timer);
-    const ctx = AUDIO.ctx, g = this.g, f = this.cfg().fadeOut || 1.2, vs = this.voices; this.g = null; this.voices = [];
+    const ctx = AUDIO.ctx, g = this.g, f = fade == null ? (this.cfg().fadeOut || 1.2) : fade, vs = this.voices; this.g = null; this.voices = [];
     if (!ctx || !g) return; const n = ctx.currentTime;
     g.gain.cancelScheduledValues(n); g.gain.setValueAtTime(g.gain.value, n); g.gain.linearRampToValueAtTime(0, n + f);
     vs.forEach(v => { try { v.stop(n + f + .05); } catch (err) {} });
@@ -165,6 +182,7 @@ const BEAT = (() => {
     /** estado da música no instante T da linha do tempo */
     at(T) {
       const sc = sceneAt(T), p = CONFIG.playById[sc.play], I = intensity(sc, T - sc.start);
+      if (p && p.pause && PAUSE.el()) return { ...QUIET, breath: .5 + .5 * Math.sin((T - p.start) * TAU / 4), level: .3, low: .25 };   // v7.17: abertura com a música das conversas, sem os pulsos de 120 BPM
       if (!p || !p.track) return shape(synth(T - (p ? p.start : 0)), I);
       return shape(fromTrack(p.track, p.from + (T - p.start)), I);
     },

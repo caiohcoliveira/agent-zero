@@ -44,10 +44,12 @@ const CONFIG = {
     musicVolume: 0.42, sfxVolume: 0.5,
     trackVolume: 1.0,      // volume geral das faixas (funk, technology, piano)
     tracks: { funk: { gain: .81 }, tech: { gain: .75 }, piano: { gain: .66 } },  // ElevenLabs (v7.4–v7.7): mesmo nível efetivo da trilha anterior (≈ −13,9 · −15,2 · −13,4 LUFS)
-    // v7.16: música das conversas (ElevenLabs, balada com violino): toca em loop sem fim enquanto a parada está na tela, por baixo da fala.
-    //   stops = as paradas com música · gain = volume (fundo, ≈ 10 dB abaixo do filme) · fadeIn/fadeOut em s
-    //   loop = [início, fim] do trecho que se repete (s): 192 tempos a 106,7 BPM, com as duas pontas parecidas (tools/pausa.py) · xfade = transição entre as voltas (s)
-    pause: { track: 'pausa', stops: ['stop0', 'stop1', 'stop2'], gain: .4, fadeIn: 2.5, fadeOut: 1.5, loop: [30.809, 138.777], xfade: .3 },
+    // v7.16–v7.17: música das conversas. É a trilha da abertura (a parte zero) e emenda com a Conversa 0; depois toca nas duas
+    //   baldeações e no encerramento, sempre em loop sem fim até alguém apertar uma tecla.
+    //   stops = as paradas com música · gain = volume nas paradas (fundo, ≈ 10 dB abaixo do filme) · openGain = volume na abertura
+    //   duck = em quantos s o volume desce da abertura para o fundo quando a Conversa 0 começa · fadeIn/fadeOut em s
+    //   loop/xfade/gain/openGain vêm da própria faixa (data-* do bloco music-pausa, gerados por tools/pausa.py); os valores daqui são o padrão
+    pause: { track: 'pausa', stops: ['stop0', 'stop1', 'stop2', 'end'], gain: .4, openGain: 1, duck: 2, fadeIn: 2.5, fadeOut: 1.5, loop: null, xfade: .3 },
     duckDuringVoice: 0.55,
     voiceRate: 1.07, voicePitch: 1.02,
     preferredVoices: ['Francisca', 'Thalita', 'Brenda', 'Giovanna', 'Leila', 'Manuela', 'Yara',
@@ -60,7 +62,7 @@ const CONFIG = {
   // ---------------------------------------------------------------- PLAYS (trechos de vídeo)
   // track = faixa embutida (src/07-beats.js) · from = de onde a faixa começa (s)
   plays: [
-    { id: 1, track: null },                    // embarque: trilha sintetizada (src/05-audio.js)
+    { id: 1, track: null, pause: true },       // embarque (a parte zero): v7.17, a música das conversas é a trilha e emenda com a Conversa 0 (sem ela, a trilha sintetizada de src/05-audio.js)
     { id: 2, track: 'funk', from: 0 },         // parte 1 · ElevenLabs, funk cinematográfico encaixado (tools/eleven_fit.py, 2:34,5, 110 BPM)
     { id: 3, track: 'tech', from: 0 },         // parte 2 · ElevenLabs, opção A (4:42, 108 BPM): uma versão por case, cada uma como foi composta; as cenas seguem a música
     { id: 4, track: 'piano', from: 0 }         // parte 3 · ElevenLabs, final orquestral sem coro tocado inteiro (1:11,4, 100 BPM): termina com a cauda do acorde final

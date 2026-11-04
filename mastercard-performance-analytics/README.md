@@ -1,10 +1,18 @@
-# Performance Analytics — "A Linha" (v7.16, experimento)
+# Performance Analytics — "A Linha" (v7.17, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
 > - os métodos e as técnicas por trás dos cases (v7.11 no clímax; desde a v7.15, em cards na estação 03);
 > - o letreiro WELCOME TO… no final;
 > - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.17:**
+> - **música das conversas = trilha da abertura:** a mesma música toca na abertura (a parte zero), no nível do filme, e segue sem recomeçar para a Conversa 0, onde desce para o fundo em 2 s.
+>   - Depois entra do começo nas duas baldeações e no encerramento (depois do letreiro PERFORMANCE ANALYTICS), sempre em loop sem fim até alguém apertar uma tecla.
+>   - Na abertura, a trilha sintetizada e os pulsos de 120 BPM saem.
+> - **música escolhida pelo usuário:** veio como arquivo (MP4 só com áudio, 2:45) e fica **só nas cópias locais**: o repositório é público e a gravação é de terceiros. O HTML do Git mantém a música da ElevenLabs no lugar.
+>   - Por ser uma música conhecida, o loop é a música inteira: do fim volta ao começo, como "repetir" num player (`tools/pausa.py --inteira`).
+>   - O laço e o volume viajam com a faixa (`data-*` no bloco `music-pausa`). `PA_PAUSA=musica/pausa-usuario.mp3 python3 tools/build.py dados.json saida.html` monta a cópia com ela.
 >
 > **v7.16:**
 > - **música das conversas:** uma balada pop original com violino no lugar da voz, gerada na ElevenLabs, toca em loop sem fim na Conversa 0 (mapa da linha) e nas duas baldeações (Conversas 1 e 2), por baixo da fala de quem apresenta. Ela entra em fade quando a parada abre e sai em fade quando o vídeo segue. Fica cerca de 10 dB abaixo do filme, e a tecla M silencia;
@@ -185,6 +193,12 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
     - As duas pontas do trecho caem na mesma posição da frase (semelhança 0,95, mesmo nível), e as voltas se emendam com 0,3 s de transição linear.
     - O nível fica a ±1 dB da música seguindo, e o laço não depende do atraso do decodificador de MP3.
     - `tools/pausa.py` escolhe o trecho e copia a geração para `musica/pausa.mp3`. O config fica em `CONFIG.audio.pause`: paradas, volume, fades, loop e transição.
+  - **v7.17, a música das conversas vira também a trilha da abertura** (play 1 com `pause: true`) e toca no encerramento.
+    - `tools/pausa.py ORIGEM [DESTINO] [--inteira]` aceita qualquer áudio ou vídeo que o ffmpeg lê (mp3, m4a, mp4…).
+      - Mede o LUFS e grava `DESTINO.json` com o laço, a transição e os dois volumes: `gain` deixa a música ≈ 10 dB abaixo do filme nas paradas; `openGain` deixa no nível do filme na abertura.
+      - `--inteira` faz o laço da música inteira (para uma música conhecida); sem a opção, o laço é um trecho de frases (para música ambiente).
+    - O build embute esses valores no bloco (`data-loop`, `data-xfade`, `data-gain`, `data-open-gain`).
+    - `PA_PAUSA=arquivo` troca a faixa só naquele build: é assim que as cópias locais levam a música escolhida pelo usuário, que não vai para o Git (`musica/usuario/`, `musica/pausa-usuario.mp3`).
 - **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
   - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
   - **Partes 2 e 3:** nada além do nível; cada versão só é deslocada inteira (`PARTE2_A`), e o filme acompanha (a grade e as seções saem delas).

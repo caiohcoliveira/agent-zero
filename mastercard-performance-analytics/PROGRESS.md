@@ -481,3 +481,21 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - simulação da emenda: o nível fica a ±1 dB e nenhum ataque novo aparece na transição;
   - as músicas do filme ficam idênticas.
 
+### v7.17 — a música escolhida pelo usuário na abertura, nas conversas e no encerramento
+
+- [x] **A música das conversas é a trilha da abertura** (a parte zero): toca no nível do filme, sem a trilha sintetizada nem os pulsos de 120 BPM.
+  - Segue **sem recomeçar** para a Conversa 0 e desce para o fundo em 2 s.
+  - Nas duas baldeações e no **encerramento** (depois do letreiro) entra do começo em fade.
+  - Sempre em loop sem fim até alguém apertar uma tecla. P (pausa) também para a música da abertura.
+- [x] **Música do usuário:** o MP4 enviado (só áudio, AAC, 2:45, −10,5 LUFS) virou `musica/pausa-usuario.mp3`, com o loop da música inteira.
+  - O fim tem um fade curto e o começo, 0,5 s de silêncio, então a volta soa como "repetir".
+  - Volumes: 0,67 na abertura e 0,22 nas paradas.
+  - Fica **só nas cópias locais** (`PA_PAUSA`): o repositório é público. O HTML do Git mantém a música da ElevenLabs no lugar.
+- [x] **Ferramentas:** `tools/pausa.py` lê qualquer formato do ffmpeg e tem a opção `--inteira`. Grava o laço e os volumes num JSON ao lado da faixa, e o build leva esses valores no bloco `music-pausa`.
+- [x] **QA no navegador** (a cópia local e a do Git):
+  - abertura no nível do filme, com a trilha sintetizada muda;
+  - na Conversa 0, a mesma volta (sem recomeçar) e o volume descendo;
+  - na estação 01, o fade de saída;
+  - no encerramento e na Conversa 2, a música em loop;
+  - console limpo.
+

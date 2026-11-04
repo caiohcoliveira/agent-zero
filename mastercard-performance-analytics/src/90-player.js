@@ -93,12 +93,14 @@ const PLAYER = (() => {
   function now() { return st.playing ? st.startT + (performance.now() - st.startPerf) / 1000 : st.T; }
   function play() {
     if (st.T >= DUR - .05) st.T = 0;
-    PAUSE.stop();   // v7.16: a música das conversas sai em fade enquanto o vídeo volta
+    // v7.17: na abertura (play com pause) a música das conversas é a trilha; nos outros plays ela sai em fade enquanto o vídeo volta
+    const pl = CONFIG.playById[sceneAt(st.T).play];
+    if (pl && pl.pause && PAUSE.buf) PAUSE.playFrom(st.T - pl.start); else PAUSE.stop();
     st.mode = 'play'; st.playing = true; st.ended = false; st.startT = st.T; st.startPerf = performance.now(); st.next = nextStop(st.T);
     if (CONFIG.audio.music || CONFIG.audio.sfx) AUDIO.start(st.T); else AUDIO.init();
     VOICE.reset(st.T); intro.classList.add('hidden'); syncUI(); poke();
   }
-  function pause() { st.T = now(); st.playing = false; AUDIO.stop(); VOICE.pause(); syncUI(); poke(); }
+  function pause() { st.T = now(); st.playing = false; PAUSE.stop(.25); AUDIO.stop(); VOICE.pause(); syncUI(); poke(); }
   function seek(T) {
     const was = st.playing && st.mode === 'play'; if (was) pause();
     PAUSE.stop(); st.mode = 'play'; st.T = clamp(T, 0, DUR); st.next = nextStop(st.T);

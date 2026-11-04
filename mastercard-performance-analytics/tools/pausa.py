@@ -1,39 +1,51 @@
-"""Música das conversas (v7.16): escolhe o trecho que se repete e instala a faixa em musica/pausa.mp3.
+"""Música das conversas (v7.16–v7.17): prepara a faixa que toca na abertura e nas paradas, com o laço e o volume dela.
 
-A faixa é uma das gerações da ElevenLabs no fluxo "A Linha · Música das conversas" (balada pop original com
-violino no lugar da voz; fica fora do Git, em musica/elevenlabs/pausa/). Ela não é editada: o player repete o
-trecho [início, fim) com uma transição curta entre as voltas (CONFIG.audio.pause, src/08-music.js).
+Uso:
+  python tools/pausa.py ORIGEM [DESTINO] [--inteira]
+    ORIGEM   qualquer arquivo de áudio ou vídeo que o ffmpeg lê (mp3, m4a, mp4, wav…)
+    DESTINO  padrão musica/pausa.mp3 (fora do Git); ao lado fica DESTINO.json com o laço e o volume
+    --inteira  o laço é a música inteira (do fim volta ao começo, como "repetir" num player).
+               É o certo para uma música conhecida; sem a opção, o laço é um trecho de frases inteiras
+               escolhido pela semelhança das duas pontas (música ambiente, sem forma de canção).
 
-O trecho é escolhido na grade de tempos da faixa (andamento fixo da geração):
-- começa depois da introdução e termina antes do final (que tem fade);
-- tem um número inteiro de frases (múltiplo de 16 tempos) e pelo menos 60 s, para a repetição não chamar atenção;
-- as duas pontas se parecem (harmonia e timbre dos 8 tempos antes e dos 8 tempos depois de cada ponta) e têm o
-  mesmo nível, então a volta soa como a música seguindo.
+O build embute a faixa como <script id="music-pausa" data-loop data-xfade data-gain data-open-gain>.
+A variável PA_PAUSA troca a faixa do build sem mexer em musica/pausa.mp3:
+  PA_PAUSA=musica/pausa-usuario.mp3 python3 tools/build.py dados.json saida.html
 
-Uso: python tools/pausa.py [musica/elevenlabs/pausa/take4.mp3]   (precisa de librosa)
-     → copia a faixa para musica/pausa.mp3 e imprime o loop para colar em CONFIG.audio.pause.loop
+Volume: a faixa é medida em LUFS. "gain" deixa a música ≈ 10 dB abaixo do filme nas paradas (fundo para a fala),
+e "openGain" deixa no nível do filme na abertura (a parte zero, que emenda com a Conversa 0).
+Precisa de ffmpeg e librosa.
 """
+import json
 import pathlib
-import shutil
+import re
+import subprocess
 import sys
+import tempfile
 
 import librosa
 import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DEFAULT = ROOT / 'musica' / 'elevenlabs' / 'pausa' / 'take4.mp3'
+DEFAULT_OUT = ROOT / 'musica' / 'pausa.mp3'
+FILM_LUFS, PAUSE_LUFS = -14.0, -23.7     # nível efetivo das faixas do filme e da música de fundo nas paradas
 
 
-def loop_points(path):
-    y, sr = librosa.load(path, sr=22050, mono=True)
-    hop, dur = 512, len(y) / 22050
+def lufs(path):
+    log = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', str(path), '-af', 'ebur128=framelog=quiet', '-f', 'null', '-'],
+                         capture_output=True, text=True).stderr
+    return float(re.findall(r'I:\s+(-?[\d.]+) LUFS', log)[-1])
+
+
+def phrase_loop(y, sr):
+    """trecho de frases inteiras (múltiplo de 16 tempos, ≥ 60 s) com as duas pontas parecidas e no mesmo nível"""
+    hop, dur = 512, len(y) / sr
     onset = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop)
     _, beats = librosa.beat.beat_track(onset_envelope=onset, sr=sr, hop_length=hop, tightness=400)
     bt = librosa.frames_to_time(beats, sr=sr, hop_length=hop)
     i = np.arange(len(bt))
-    per, b0 = np.polyfit(i, bt, 1)                       # grade regular: a geração tem andamento fixo
-    grid = b0 + per * i
-    frames = np.clip(librosa.time_to_frames(grid, sr=sr, hop_length=hop), 0, None)
+    per, b0 = np.polyfit(i, bt, 1)                       # grade regular: andamento fixo
+    frames = np.clip(librosa.time_to_frames(b0 + per * i, sr=sr, hop_length=hop), 0, None)
     chroma = librosa.feature.chroma_cqt(y=y, sr=sr, hop_length=hop)
     mfcc = librosa.feature.mfcc(y=y, sr=sr, hop_length=hop, n_mfcc=13)[1:]
     mfcc = (mfcc - mfcc.mean(1, keepdims=True)) / (mfcc.std(1, keepdims=True) + 1e-9)
@@ -54,18 +66,30 @@ def loop_points(path):
             jump = abs(20 * np.log10((rms[e - 2:e + 2].mean() + 1e-9) / (rms[s - 2:s + 2].mean() + 1e-9)))
             score = before + after - .02 * jump + .0015 * length * per / 10
             if best is None or score > best[0]:
-                best = (score, at(s), at(e), before, after, jump, length)
+                best = (score, at(s), at(e), before, after, float(jump), length)
     _, s, e, before, after, jump, length = best
-    return {'bpm': round(float(60 / per), 2), 'loop': [round(s, 3), round(e, 3)], 'beats': length,
-            'similarity': [round(before, 3), round(after, 3)], 'level_jump_db': round(float(jump), 1), 'duration': round(dur, 3)}
+    return {'loop': [round(s, 3), round(e, 3)], 'xfade': .3, 'bpm': round(float(60 / per), 2), 'beats': length,
+            'similarity': [round(before, 3), round(after, 3)], 'level_jump_db': round(jump, 1)}
 
 
 def main():
-    src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT
-    info = loop_points(src)
-    shutil.copyfile(src, ROOT / 'musica' / 'pausa.mp3')
-    print(f'{src.name} → musica/pausa.mp3 · {info}')
-    print(f"CONFIG.audio.pause.loop = [{info['loop'][0]}, {info['loop'][1]}]")
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    whole = '--inteira' in sys.argv
+    src = pathlib.Path(args[0]) if args else ROOT / 'musica' / 'elevenlabs' / 'pausa' / 'take4.mp3'
+    out = pathlib.Path(args[1]) if len(args) > 1 else DEFAULT_OUT
+    with tempfile.TemporaryDirectory() as tmp:
+        wav = pathlib.Path(tmp) / 'a.wav'
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(src), '-vn', '-ac', '2', '-ar', '44100', str(wav)], check=True)
+        y, sr = librosa.load(wav, sr=22050, mono=True)
+        level = lufs(wav)
+        info = {'duration': round(len(y) / sr, 3)}
+        info.update({'loop': [0, info['duration']], 'xfade': 0} if whole else phrase_loop(y, sr))
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(wav), '-map_metadata', '-1', '-b:a', '192k', str(out)], check=True)
+    info.update({'source': src.name, 'lufs': level,
+                 'gain': round(10 ** ((PAUSE_LUFS - level) / 20), 3),
+                 'openGain': round(min(1.0, 10 ** ((FILM_LUFS - level) / 20)), 3)})
+    out.with_suffix('.json').write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f'{src.name} → {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out} · {info}')
 
 
 if __name__ == '__main__':

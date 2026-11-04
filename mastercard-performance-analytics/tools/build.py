@@ -8,6 +8,7 @@ Junta src/00-head.html + JSON de dados + músicas + src/[0-9][0-9]-*.js + src/99
 Uso: python3 tools/build.py [dados.json] [saida.html]   (sem saída: performance-analytics.html na pasta do projeto)
 """
 import base64
+import os
 import json
 import pathlib
 import re
@@ -26,22 +27,36 @@ def data_block(path):
     return json.dumps(data, ensure_ascii=False, indent=2).replace('</', '<\\/').replace('<!--', '<\\u0021--')
 
 
+def pause_attrs(src):
+    """v7.17: o laço e o volume da música das conversas viajam com ela (DESTINO.json de tools/pausa.py)"""
+    side = pathlib.Path(src).with_suffix('.json')
+    if not side.exists():
+        return ''
+    info = json.loads(side.read_text(encoding='utf-8'))
+    loop = info.get('loop') or [0, info.get('duration', 0)]
+    return (f' data-loop="{loop[0]},{loop[1]}" data-xfade="{info.get("xfade", .3)}"'
+            f' data-gain="{info.get("gain", .4)}" data-open-gain="{info.get("openGain", 1)}"')
+
+
 def music_blocks(prev):
     out = []
     for mid in MUSIC_IDS:
         # ElevenLabs encaixada (tools/eleven_fit.py) → trilha Pixabay: versão animada (remix) → remontagem → original
         src = next((ROOT / 'musica' / f for f in (ELEVEN[mid], f'{mid}-mix.mp3', f'{mid}-edit.mp3', f'{mid}.mp3') if (ROOT / 'musica' / f).exists()), ROOT / 'musica' / f'{mid}.mp3')
+        if mid == 'pausa' and os.environ.get('PA_PAUSA'):
+            src = pathlib.Path(os.environ['PA_PAUSA']).resolve()   # v7.17: outra música das conversas só neste build
+        attrs = pause_attrs(src) if mid == 'pausa' else ''
         if src.exists():
             mp3 = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(src), '-map_metadata', '-1', '-ac', '2',
                                   '-b:a', '128k', '-f', 'mp3', '-'], capture_output=True, check=True).stdout
             b64 = base64.b64encode(mp3).decode()
         else:
-            m = re.search(rf'<script type="text/plain" id="music-{mid}">([A-Za-z0-9+/=]*)</script>', prev)
+            m = re.search(rf'<script type="text/plain" id="music-{mid}"([^>]*)>([A-Za-z0-9+/=]*)</script>', prev)
             if not m:
                 print(f'aviso: sem musica/{ELEVEN.get(mid, mid + ".mp3")} e sem música no HTML anterior; ' + ('as conversas ficam sem música' if mid == 'pausa' else 'o trecho usa a trilha sintetizada'))
                 continue
-            b64 = m.group(1)
-        out.append(f'<script type="text/plain" id="music-{mid}">{b64}</script>')
+            attrs, b64 = attrs or m.group(1), m.group(2)
+        out.append(f'<script type="text/plain" id="music-{mid}"{attrs}>{b64}</script>')
     return '\n'.join(out)
 
 

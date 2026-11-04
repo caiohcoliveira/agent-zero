@@ -57,7 +57,9 @@
 | Play 4 · 07 e letreiro (v7.15: sem o clímax) | vídeo | 7:37–8:22 |
 | Encerramento | fala | — |
 
-## Play 1 · embarque (20 s, trilha sintetizada)
+## Play 1 · embarque (20 s; desde a v7.17, com a música das conversas)
+
+- **Trilha (v7.17):** a música das conversas é a trilha da abertura, no nível do filme, sem a trilha sintetizada nem os pulsos de 120 BPM. Ela segue sem recomeçar para a Conversa 0, onde desce para o fundo.
 
 1. **Identidade (0–6 s)**
    - As luzes da plataforma acendem.
@@ -76,7 +78,7 @@
 
 ## Conversa 0
 
-- **Música (v7.16):** a música das conversas entra em fade quando o mapa aparece e toca em loop enquanto quem apresenta fala. É uma balada pop original com violino no lugar da voz, cerca de 10 dB abaixo do filme. Ela sai em fade quando o vídeo segue; o mesmo vale para as duas baldeações.
+- **Música (v7.16–v7.17):** a música que vem da abertura continua sem recomeçar, desce para o fundo em 2 s e toca em loop enquanto quem apresenta fala. É uma balada pop original com violino no lugar da voz, cerca de 10 dB abaixo do filme. Ela sai em fade quando o vídeo segue; o mesmo vale para as duas baldeações.
 
 - **Tela:** a estação futurista ao fundo, a missão escrita no topo e o mapa com os 3 capítulos.
 - **Interação:** clique numa estação para aproximar e ver o cartão (título, o que mostra, tópicos); → embarca.
@@ -257,6 +259,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 
 ## Encerramento
 
+- **Música (v7.17):** depois do letreiro, a música das conversas entra do começo em fade e toca em loop até alguém apertar uma tecla.
+
 O letreiro fica aceso sobre a estação futurista. O cartaz 07 lista as 5 direções e a base. As cenas montadas abrem em loop.
 
 ## Trilha (v7.4–v7.7 · ElevenLabs; conversas na v7.16)
@@ -283,3 +287,4 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - Toca na Conversa 0 e nas duas baldeações, em loop sem fim: introdução uma vez, depois um trecho de 192 tempos que se repete com 0,3 s de transição.
   - Entra e sai em fade, cerca de 10 dB abaixo do filme.
   - Não é uma versão de música existente: a geração descreve só o clima.
+  - v7.17: a mesma música é a trilha da abertura e toca também no encerramento. Nas cópias locais, é a música escolhida pelo usuário (uma música conhecida, em loop inteiro). No HTML do Git fica a da ElevenLabs, porque o repositório é público.
