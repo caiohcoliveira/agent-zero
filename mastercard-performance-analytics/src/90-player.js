@@ -24,7 +24,7 @@ const PLAYER = (() => {
     popup(v) { if (v === UI.pop) return; UI.prevPop = UI.pop; UI.pop = v; UI.popAt = performance.now(); poke(); },
     next: () => next(), depart: () => depart(), setItem: k => setItem(k)
   };
-  const NAME = s => s.station ? `${TX.stations[s.station - 1].n} · ${TX.stations[s.station - 1].short}` : ({ open: 'Abertura', climax: 'Clímax', close: 'Letreiro final' })[s.id] || s.id;
+  const NAME = s => s.station ? `${TX.stations[s.station - 1].n} · ${TX.stations[s.station - 1].short}` : ({ open: 'Abertura', close: 'Letreiro final' })[s.id] || s.id;
   const STOP_NAME = { preshow: 'Pré-show', stop0: 'Parada 0 · roteiro', stop1: 'Parada 1 · retomada', stop2: 'Parada 2 · retomada', end: 'Encerramento' };
 
   // ---------- render ----------

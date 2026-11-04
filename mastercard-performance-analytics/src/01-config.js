@@ -78,9 +78,8 @@ const CONFIG = {
     { id: 'insight',   play: 3, dur: 55.556, station: 4, theme: 'dark' },   // a cena começa com o crescendo de 16 compassos; o maior drop na escala (35,56)
     { id: 's05',       play: 3, dur: 20,     station: 5, theme: 'dark' },
     { id: 's06',       play: 3, dur: 24.444, station: 6, theme: 'dark' },   // o acorde final da música na conclusão (15,56) e a cauda até a parada
-    { id: 's07',       play: 4, dur: 26.4,   station: 7, theme: 'dark' },   // 11 compassos de piano
-    { id: 'climax',    play: 4, dur: 26.4,   theme: 'dark' },                   // as 8 disciplinas em duas frases da orquestra; a frase-chave no grande prato (21,57)
-    { id: 'close',     play: 4, dur: 18.573, theme: 'dark' }                // o letreiro no prato da cadência final (14,37); o vídeo acaba com a cauda do acorde
+    { id: 's07',       play: 4, dur: 26.4,   station: 7, theme: 'dark' },   // piano até 22,77; a orquestra volta junto com a estação "?" (v7.15)
+    { id: 'close',     play: 4, dur: 18.573, theme: 'dark' }                // o letreiro e "Tudo se resume a Analytics" no prato da cadência final (14,37); o vídeo acaba com a cauda do acorde
   ],
 
   // ---------------------------------------------------------------- PARADAS (loop + itens navegáveis)
@@ -155,16 +154,17 @@ const CONFIG = {
       { title: 'Ampliar projetos User-Pay', sub: 'com Advanced Analytics', icon: 'userpay' }
     ],
     futureKey: 'É esse o papel que queremos ocupar.',
-    // clímax: as disciplinas por trás de tudo (não técnicas soltas)
-    // clímax (v7.11): 5 cases que viram — frente: o case e o método; verso: as técnicas (etc = lista não exaustiva)
-    climaxCases: [
-      { name: 'Mesa de performance', method: 'teste A/B', tech: ['power analysis', 'testes de hipótese', 'plano de amostragem'] },
-      { name: 'Prevenção a fraude', method: 'modelo supervisionado', tech: ['cross validation', 'PCA', 'gradient boosting'], etc: true },
-      { name: 'Segmentação / Recomendação', method: 'modelo não supervisionado', tech: ['k-means', 'filtro colaborativo', 'matrix factorization'], etc: true },
-      { name: 'Forecast', method: 'séries temporais', tech: ['ARIMA', 'SARIMAX', 'boosting', 'componentes de Fourier'] },
-      { name: 'Pricing / dimensionamento', method: 'otimização', tech: ['PO · pesquisa operacional', 'simulação de Monte Carlo', 'programação linear', 'modelos de estoque'] }
+    // estação 03 (v7.15, vieram do antigo clímax): os métodos e as técnicas por trás dos cases, em dois grupos
+    //   group: 'pred' = preditivos · 'presc' = prescritivos · case = exemplo · viz = desenho do card (VIZ) · etc = "e outras técnicas"
+    //   key = a técnica que representa o método no cartaz da Conversa 1
+    methods: [
+      { group: 'pred',  method: 'Modelo supervisionado', case: 'prevenção a fraude', viz: 'classification', tech: ['cross validation', 'PCA', 'gradient boosting'], etc: true, key: 'gradient boosting' },
+      { group: 'pred',  method: 'Modelo não supervisionado', case: 'segmentação e recomendação', viz: 'clusters', tech: ['k-means', 'filtro colaborativo', 'matrix factorization'], etc: true, key: 'k-means' },
+      { group: 'pred',  method: 'Séries temporais', case: 'forecast', viz: 'forecast', tech: ['ARIMA', 'SARIMAX', 'boosting', 'componentes de Fourier'], key: 'ARIMA' },
+      { group: 'presc', method: 'Otimização', case: 'pricing e dimensionamento', viz: 'lp', tech: ['PO · pesquisa operacional', 'simulação de Monte Carlo', 'programação linear', 'modelos de estoque'], key: 'programação linear' },
+      { group: 'presc', method: 'Teste A/B', case: 'mesa de performance', viz: 'ab', tech: ['power analysis', 'testes de hipótese', 'plano de amostragem'], key: 'testes de hipótese' }
     ],
-    climaxKey: 'Tudo se resume a *Analytics*.',
+    finalKey: 'Tudo se resume a *Analytics*.',   // no letreiro final, no prato da cadência (v7.15)
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },
 
@@ -187,7 +187,7 @@ const CONFIG = {
     { scene: 's05', at: 1.0, text: 'Próxima estação: escalar o impacto, com dados, IA e inovação.' },
     { scene: 's06', at: 1.0, text: 'Próxima estação: a Prática.' },
     { scene: 's07', at: 1.0, text: 'Última estação: o futuro de analytics.' },
-    { scene: 'climax', at: 8.5, text: 'Nossa especialidade é analytics.' },
+    { scene: 'close', at: 14.4, text: 'Nossa especialidade é analytics.' },
     { scene: 'close', at: 1.0, text: 'Se o desafio pede eficiência, escala e valor, a resposta passa por Performance Analytics.' }
   ],
 

@@ -94,6 +94,7 @@ const FUTURE_ART = {
   const T_P = DIR.map((d, i) => beatsFrom(id, T_G[GROUP[i]] + .5, i % 2));   // cada painel numa batida (o segundo do grupo, uma batida depois)
   /** posição da frente do trem: anda constante (268 px/s) pela cidade e freia nos últimos 3 s, parando junto da estação "?" (5760) */
   const trainX = t => { const v = 268.1, t1 = 22, d = 3; if (t <= t1) return -600 + v * t; const u = Math.min(t - t1, d); return -600 + v * t1 + v * u - v * u * u / (2 * d); };
+  const T_ORQ = onBeat(id, 22.77, 'bar');   // v7.15: a orquestra volta (a emenda da parte 3) e a estação "?" aparece com ela
   const CAM = [[0, 960, 540, 1.06], [2.4, 960, 540, 1], [9.0, 960, 540, 1], [9.9, 3000, 540, 1], [17.8, 3000, 540, 1], [18.7, 5040, 540, 1], [23.6, 5040, 540, 1], [26.4, 5560, 540, 1.04]];
   T_G.forEach((t0, g) => cue(id, t0 + .2, g ? 'whoosh' : 'chime', g ? { dur: .9, v: .3 } : { f: 784, up: 7 })); DIR.forEach((d, i) => cue(id, T_P[i], 'pop', { p: 1 + i * .06, v: .2 }));
   const SCRIPT = SAY.reg(id, [
@@ -112,7 +113,7 @@ const FUTURE_ART = {
     circle(ctx, x, RAIL, 26, '#FFF8EE', INK, 6); icon(ctx, 'spark', x, RAIL, 30, C.orange, 5);
   }
   SCENES[id] = {
-    themeAt: () => 'dark', script: SCRIPT, peaks: [[4.6, 5.6, .5], [T_G[2] - .1, T_G[2] + 1, .4]],
+    themeAt: () => 'dark', script: SCRIPT, peaks: [[4.6, 5.6, .5], [T_G[2] - .1, T_G[2] + 1, .4], [T_ORQ - .1, T_ORQ + 1.4, .6]],
     draw(ctx, t) {
       const cam = camKey(t, CAM);
       ctx.drawImage(TEX.dark, 0, 0); const sky = ctx.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#120C1C'); sky.addColorStop(.7, '#3A1E2A'); sky.addColorStop(1, '#120A08'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
@@ -124,7 +125,7 @@ const FUTURE_ART = {
         const xt = trainX(t); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], (xt + 600) / 6800, { w: 22, head: false, glow: 14 });
         for (let i = 0; i < 5; i++) panelArt(ctx, t, i);
         // uma estação ainda em aberto
-        const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
+        const op = P(t, T_ORQ, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
           pin(ctx, x, RAIL, c => { c.globalAlpha *= op; text(c, '?', 0, 4, { size: 54, weight: 900, color: C.yellow, align: 'center' }); text(c, 'a próxima estação', 0, -90, { size: 30, weight: 900, color: '#FFF', align: 'center' }); }); }
         // o trem da linha puxa o traço laranja pela cidade e para na próxima estação
         sideTrain(ctx, xt, RAIL - 11);
@@ -134,94 +135,8 @@ const FUTURE_ART = {
   };
 })();
 
-/* ---------- clímax (v7.11): 5 cases entram nos compassos e viram — frente: case | método; verso: técnicas → Analytics & Advanced Analytics ---------- */
-(() => {
-  const id = 'climax', CC = TX.climaxCases, N = CC.length, VZ = ['ab', 'classification', 'clusters', 'forecast', 'lp'], COL = [C.orange, C.red, C.yellow, '#E8822A', C.red];
-  // cada card entra num tempo forte (um por compasso desde que a batida começa, 3,57) e vira 2 tempos depois;
-  // todos ficam virados para leitura até a frase-chave no grande ataque (20,37)
-  const T_IN = k => onBeat(id, 3.57 + 2.4 * k, 'bar'), T_FLIP = k => beatsFrom(id, T_IN(k), 2), T_KEY = onBeat(id, 20.37, 'bar');
-  const TW = 330, TH = 470, GAP = 22, TX0 = (W - (N * TW + (N - 1) * GAP)) / 2, TY0 = 322;
-  for (let k = 0; k < N; k++) { cue(id, T_IN(k), 'hit', { size: .3 + k * .05 }); cue(id, T_FLIP(k), 'whoosh', { dur: .3, v: .18 }); }
-  cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
-  // v7.12: o eixo da v5 — as técnicas do mais simples ao mais complexo, acesas por uma varredura até o último tempo forte (25,17)
-  const AXT = [['Estatística', 'gaussian'], ['Regressão', 'regression'], ['Séries temporais', 'forecast'], ['Otimização', 'lp'], ['Clusters', 'clusters'], ['Árvores', 'tree'],
-    ['Gradient boosting', 'ensemble'], ['Recomendação', 'recommend'], ['Embeddings', 'embeddings'], ['Redes neurais', 'mlp'], ['Transformers', 'transformer'], ['Agentes de IA', 'agents']];
-  const AX0 = 180, AX1 = 1740, AY = 820, axX = k => AX0 + k * (AX1 - AX0) / (AXT.length - 1), CW = 128, CH = 118;
-  const T_AX = T_KEY + .5, T_SW0 = T_KEY + .9, T_SW1 = onBeat(id, 25.17, 'bar'), SWX = u => lerp(AX0 - 50, AX1 + 50, E.inOutSine(u));
-  const T_LIT = AXT.map((_, k) => T_SW0 + Math.acos(1 - 2 * clamp((axX(k) - AX0 + 50) / (AX1 - AX0 + 100))) / Math.PI * (T_SW1 - T_SW0));
-  cue(id, T_SW0, 'riser', { dur: T_SW1 - T_SW0, v: .22 }); T_LIT.forEach((t0, k) => cue(id, t0, 'tick', { f: 1400 + k * 90, v: .12 })); cue(id, T_SW1, 'shimmer', { dur: 1.2 });
-  const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *métodos* e *técnicas*']]);
-  SAY.reg(id, CC.map((c, k) => [T_IN(k), T_KEY + .3, 'label', c.name + ' · ' + c.method]));     // o nome do case fica nos dois lados do card
-  SAY.reg(id, CC.map((c, k) => [T_FLIP(k), T_KEY + .3, 'label', c.tech.join(', ')]));
-  SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey], [T_AX, 26.6, 'label', 'do mais simples ao mais complexo']]);
-  /** teste A/B: duas distribuições (A e B) e a diferença entre as médias */
-  function abViz(ctx, x, y, w, h, p) {
-    const bell = (m, s, col, fill) => { ctx.beginPath(); for (let i = 0; i <= 60; i++) { const u = i / 60, px = x + u * w, py = y + h - Math.exp(-((u - m) ** 2) / (2 * s * s)) * h * .85 * p; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
-      ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fillStyle = rgba(col, fill); ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.stroke(); };
-    line(ctx, x, y + h, x + w, y + h, '#8A8378', 2); bell(.38, .12, '#8A8378', .18); bell(.6, .12, C.orange, .22);
-    if (p > .6) { const a = clamp((p - .6) * 3); [[.38, 'A', '#6A6056'], [.6, 'B', C.orange]].forEach(([m, l, col]) => { ctx.save(); ctx.globalAlpha *= a; ctx.setLineDash([5, 5]); line(ctx, x + m * w, y + h * .1, x + m * w, y + h, col, 2); ctx.restore();
-      late(ctx, c => { c.globalAlpha *= a; text(c, l, x + m * w, y + 2, { size: 20, weight: 900, color: col, align: 'center' }); }); }); }
-  }
-  function front(ctx, k, t, c) {
-    paper(ctx, 0, 0, TW, TH, { r: 18, fill: '#FFFDF8', shadow: 10, shadowColor: '#000', lw: 3 });
-    rr(ctx, 0, 0, TW, 12, 6); ctx.fillStyle = COL[k]; ctx.fill();
-    const vp = E.outCubic(clamp((t - T_IN(k)) / 1.2));
-    if (VZ[k] === 'ab') abViz(ctx, 30, 56, TW - 60, 150, vp); else VIZ[VZ[k]](ctx, 26, 40, TW - 52, 180, vp, { t, theme: 'light' });
-    late(ctx, cc => { para(cc, c.name, TW / 2, 248, TW - 44, { size: 30, weight: 900, color: INK, align: 'center', lh: 1.08 });
-      tag(cc, TW / 2, 400, c.method, { size: fitSize(cc, c.method, 24, TW - 70), fill: COL[k], color: COL[k] === C.yellow ? INK : '#FFF' }); });
-  }
-  function back(ctx, k, c) {
-    rr(ctx, 8, 12, TW, TH, 18); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
-    rr(ctx, 0, 0, TW, TH, 18); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = COL[k]; ctx.lineWidth = 4; ctx.stroke();
-    // cabeçalho com a MESMA altura em todos os cards (a do nome mais longo): nome encostado no método; divisória e lista alinhadas
-    late(ctx, cc => { const nh = Math.max(...CC.map(q => wrapRich(cc, q.name, TW - 52, 24, 900).lines.length)) * 24 * 1.08, own = wrapRich(cc, c.name, TW - 52, 24, 900).lines.length * 24 * 1.08;
-      para(cc, c.name, 26, 30 + nh - own, TW - 52, { size: 24, weight: 900, color: '#FFF', lh: 1.08 });
-      text(cc, c.method.toUpperCase(), 26, 46 + nh, { size: fitSize(cc, c.method.toUpperCase(), 17, TW - 52, 800), weight: 800, mono: true, color: COL[k] === C.red ? '#FF8A7A' : COL[k], ls: 1 });
-      line(cc, 26, 70 + nh, TW - 26, 70 + nh, 'rgba(243,230,214,.25)', 2);
-      c.tech.forEach((s, i) => { const y = 108 + nh + i * 62; circle(cc, 38, y, 7, COL[k]); para(cc, s, 58, y - 15, TW - 84, { size: 24, weight: 800, color: '#F3E6D6', lh: 1.05 }); });
-      if (c.etc) text(cc, 'e outras técnicas', 58, 108 + nh + c.tech.length * 62, { size: 21, weight: 700, color: '#BFB3A3' }); });
-  }
-  SCENES[id] = {
-    peaks: [[0, 26.4, .45], [T_KEY - .1, T_KEY + 1.6, 1]], script: SCRIPT,
-    themeAt: () => 'dark',
-    draw(ctx, t) {
-      bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' });
-      // na frase-chave os cards saem (encolhem e somem): ficam a frase e o eixo das técnicas
-      const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - kd;
-      for (let k = 0; k < N; k++) {
-        const p = P(t, T_IN(k), .5); if (p <= 0) continue;
-        const f = E.inOutCubic(P(t, T_FLIP(k), .5)), sx = Math.max(.02, Math.abs(Math.cos(f * Math.PI))), lift = 1 + .06 * Math.sin(f * Math.PI), s = lerp(1.15, 1, E.outExpo(p)) * lift * (1 - .08 * kd);
-        const x = TX0 + k * (TW + GAP), y = TY0 + (1 - E.outCubic(p)) * 40;
-        ctx.save(); ctx.globalAlpha *= clamp(p * 2) * dim; ctx.translate(lerp(x + TW / 2, W / 2, .06 * kd), lerp(y + TH / 2, H / 2, .06 * kd)); ctx.scale(s * sx, s); ctx.translate(-TW / 2, -TH / 2);
-        if (f < .5) front(ctx, k, t, CC[k]); else back(ctx, k, CC[k]);
-        ctx.restore();
-      }
-      if (t >= T_KEY) { const p = P(t, T_KEY, .5), end = P(t, T_SW1, .5);
-        glow(ctx, W / 2, 330, 640, C.orange, .26 + .14 * BT.level + .2 * end);
-        hud(ctx, c => { c.translate(W / 2, 330); const s = lerp(1.3, 1, E.outExpo(p)) * (1 + .05 * Math.sin(Math.PI * end)); c.scale(s, s);
-          const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); text(c, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
-          rich(c, k2 || '', 0, 30, { size: 110, weight: 900, color: '#FFF', accent: C.orange }); }, P(t, T_KEY + .2, .45));
-        // o eixo: as técnicas, da mais simples à mais complexa; a varredura acende uma a uma
-        const ax = P(t, T_AX, .6), sw = clamp((t - T_SW0) / (T_SW1 - T_SW0)), sx = SWX(sw);
-        if (ax > 0) { ctx.save(); ctx.globalAlpha *= ax;
-          line(ctx, AX0, AY, AX1, AY, 'rgba(245,241,234,.22)', 4); if (sw > 0) line(ctx, AX0, AY, Math.min(Math.max(sx, AX0), AX1), AY, C.orange, 6);
-          circle(ctx, AX0, AY, 10, C.cream); circle(ctx, AX1, AY, 10, sw >= 1 ? C.orange : '#5A4E44');
-          AXT.forEach(([nm, vz], k) => { const x = axX(k), pop = E.outBack(P(t, T_AX + k * .06, .4)), lit = t >= T_LIT[k]; if (pop <= 0) return;
-            line(ctx, x, AY - 18, x, AY, lit ? C.orange : 'rgba(245,241,234,.25)', 3);
-            ctx.save(); ctx.translate(x, AY - 30 - CH / 2); ctx.scale(pop, pop); ctx.globalAlpha *= lit ? 1 : .42;
-            rr(ctx, -CW / 2, -CH / 2, CW, CH, 12); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = lit ? C.orange : 'rgba(245,241,234,.3)'; ctx.lineWidth = 3; ctx.stroke();
-            ctx.save(); rr(ctx, -CW / 2, -CH / 2, CW, CH, 12); ctx.clip(); VIZ[vz](ctx, -CW / 2 + 12, -CH / 2 + 8, CW - 24, 58, lit ? 1 : .6, { t, theme: 'dark' }); ctx.restore();
-            late(ctx, c => para(c, nm, 0, 14, CW - 14, { size: 16, weight: 800, color: lit ? '#FFF' : '#BFB3A3', align: 'center', lh: 1.05 }));
-            ctx.restore(); });
-          if (sw > 0 && sw < 1) { glow(ctx, sx, AY - 90, 200, C.orange, .45); line(ctx, sx, AY - 200, sx, AY + 16, 'rgba(255,230,200,.9)', 4); }
-          ctx.restore();
-          late(ctx, c => { c.globalAlpha *= ax; text(c, 'mais simples', AX0, AY + 46, { size: 26, weight: 800, mono: true, color: '#E9DCC8', align: 'center' });
-            text(c, 'mais complexo', AX1, AY + 46, { size: 26, weight: 800, mono: true, color: C.orange, align: 'center' });
-            text(c, 'do mais simples ao mais complexo', W / 2, 560, { size: 34, weight: 800, color: '#E9DCC8', align: 'center' }); }); } }
-      SAY.draw(ctx, t, SCRIPT, 'dark');
-    }
-  };
-})();
+/* ---------- (v7.15) o antigo clímax saiu: os métodos e as técnicas foram para a estação 03, e a frase "Tudo se resume a Analytics"
+   foi para o letreiro final, no prato da cadência ---------- */
 
 /* ---------- letreiro final (split-flap) + encerramento ---------- */
 const CLOSE = (() => {
@@ -237,13 +152,18 @@ const CLOSE = (() => {
     intersection(ctx, W / 2, 300, 150, lerp(1400, 190, meet), { hot: Math.exp(-Math.max(0, t - T_CHORD) * 1.6) * (t > T_CHORD) * .8 + .15 * br });
     const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, glowA: gA });
     if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x - 4, b.y - 4, b.w + 8, b.h + 8, 21); /* v7.13: a borda acompanha o letreiro */ ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
+    // v7.15: a frase que fechava o antigo clímax, no prato da cadência, entre o símbolo e o letreiro
+    const kA = t > T_CHORD ? E.outCubic(P(t, T_CHORD, .5)) : 0;
+    if (kA > 0) { ctx.save(); ctx.globalAlpha *= kA; ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 18; const ks = lerp(1.15, 1, E.outExpo(clamp((t - T_CHORD) / .6)));
+      ctx.translate(W / 2, 527); ctx.scale(ks, ks); rich(ctx, TX.finalKey || '', 0, 0, { size: 60, weight: 900, color: '#FFF', accent: C.orange }); ctx.restore(); }
     text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 860, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
     scanlines(ctx, .06);
   }
   SCENES[id] = { themeAt: () => 'dark', fx: { chroma: .7 }, draw(ctx, t) { draw(ctx, t); },
     peaks: [[T_CHORD - .1, T_CHORD + 1.8]],
     caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*'],
-      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*'], [T_CHORD + .4, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
+      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*'], [T_CHORD + 1.2, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
+  SAY.reg(id, [[T_CHORD, 18.6, 'label', TX.finalKey || '']]);   // para o medidor de leitura
   return { draw, T_CHORD };
 })();
 

@@ -54,7 +54,7 @@
 | Conversa 1 | fala | — |
 | Play 3 · estação 04 (4 cases), 05, 06 | vídeo | 2:55–7:37 |
 | Conversa 2 | fala | — |
-| Play 4 · 07, clímax, letreiro | vídeo | 7:37–8:48 |
+| Play 4 · 07 e letreiro (v7.15: sem o clímax) | vídeo | 7:37–8:22 |
 | Encerramento | fala | — |
 
 ## Play 1 · embarque (20 s, trilha sintetizada)
@@ -126,13 +126,14 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
    - Recomendação · priorizar ofertas.
    - Automação · executar rotinas.
 3. **Com as outras tracks:** linhas coloridas convergem na mesma baldeação, "a decisão do cliente".
-4. **Modelos preditivos antecipam resultados:**
-   - histórico → "hoje" → cenário provável com faixa de incerteza ("previsão é cenário, não certeza");
-   - exemplos: risco de fraude, chance de saída, previsão de gastos.
-5. **Modelos prescritivos ajudam a escolher ações:**
-   - a linha chega a uma bifurcação com três ações e "objetivo: maior conversão";
-   - o resultado estimado aparece como ilustrativo e a melhor ação acende;
-   - exemplos: próxima oferta, alocação de campanhas, recomendação de incentivo.
+4. **Modelos preditivos: métodos e técnicas (v7.15, vieram do antigo clímax):** três cards entram a cada 2 tempos. Cada um tem o desenho do método, o nome, um exemplo e as técnicas:
+   - Modelo supervisionado (ex.: prevenção a fraude) → cross validation, PCA, gradient boosting e outras técnicas;
+   - Modelo não supervisionado (ex.: segmentação e recomendação) → k-means, filtro colaborativo, matrix factorization e outras técnicas;
+   - Séries temporais (ex.: forecast) → ARIMA, SARIMAX, boosting, componentes de Fourier.
+5. **Modelos prescritivos: métodos e técnicas (v7.15):** dois cards, no mesmo formato:
+   - Otimização (ex.: pricing e dimensionamento) → PO (pesquisa operacional), simulação de Monte Carlo, programação linear, modelos de estoque;
+   - Teste A/B (ex.: mesa de performance) → power analysis, testes de hipótese, plano de amostragem.
+   - A estação manteve os mesmos tempos (a música da parte 1 não mudou). Os exemplos de negócio (fraude, saída, gastos · oferta, campanhas, incentivos) seguem nos cartões da síntese.
 6. **Síntese:** dois cartões, "Antecipar o que pode acontecer" × "Recomendar como agir".
    - "A escolha do modelo depende do *problema* e da *decisão de negócio*."
 
@@ -143,7 +144,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 - **Cartazes legíveis sem clicar:**
   - **01:** os 4 serviços com definição;
   - **02:** gráfico de faturamento, 1,8×, Brasil (estimativa) e conclusão;
-  - **03:** preditivos × prescritivos, com exemplos.
+  - **03:** preditivos × prescritivos; v7.15: uma linha por método, com a técnica que o representa.
 - **Faixa:** "A seguir: *quatro cases*, do problema à solução e ao resultado."
 - **Lupa:** cenas em loop. Na 03, o **catálogo com os 20 modelos** (caso de uso em português · técnica em inglês).
 
@@ -227,7 +228,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
   - **06:** os pilares com a contribuição de cada um.
 - **Lupa:** 12 cenas em loop dos cases, mais a 05 e a 06.
 
-## Play 4 · final (ElevenLabs, final orquestral, 1:11)
+## Play 4 · final (ElevenLabs, final orquestral, 0:45 desde a v7.15)
 
 1. **07 · Para onde vamos (26 s):** uma cidade noturna conectada.
    - Cada direção tem painel ilustrado, título e subtítulo, em três grupos:
@@ -235,8 +236,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
      - Automatizar rotinas · para ganhar eficiência (robôs) e Eficiência operacional · e ganho de escala (uma grade que cresce): a automação das rotinas leva ao ganho de escala;
      - Ampliar projetos User-Pay · com Advanced Analytics + "Entregas analíticas com *contratação definida* para cada projeto."
    - Um trem de dois vagões puxa a linha laranja de painel em painel até a estação "?" (v7.14: sem as linhas coloridas que subiam em curva até a laranja).
-   - No fim, uma estação tracejada "?": a próxima estação.
-2. **Por trás de tudo (26 s, v7.11):** "Por trás de tudo, *métodos* e *técnicas*". Cinco cases entram numa fileira, um por compasso desde que a batida começa, e cada card **vira** 2 tempos depois. Frente: visualização, case e método. Verso: as técnicas. Todos ficam virados para leitura até a frase-chave:
+   - No fim, uma estação tracejada "?": a próxima estação. v7.15: ela aparece com a volta da orquestra (a emenda da parte 3, 22,8 s).
+2. **(Até a v7.14) Por trás de tudo (26 s, v7.11):** saiu na v7.15. Os métodos e as técnicas foram para a estação 03, e a frase-chave foi para o letreiro. "Por trás de tudo, *métodos* e *técnicas*". Cinco cases entram numa fileira, um por compasso desde que a batida começa, e cada card **vira** 2 tempos depois. Frente: visualização, case e método. Verso: as técnicas. Todos ficam virados para leitura até a frase-chave:
    - Mesa de performance · teste A/B → power analysis, testes de hipótese, plano de amostragem
    - Prevenção a fraude · modelo supervisionado → cross validation, PCA, gradient boosting e outras técnicas
    - Segmentação / Recomendação · modelo não supervisionado → k-means, filtro colaborativo, matrix factorization e outras técnicas
@@ -244,7 +245,9 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
    - Pricing / dimensionamento · otimização → PO (pesquisa operacional), simulação de Monte Carlo, programação linear, modelos de estoque
 
    No grande ataque (v7.12), os cards saem e a frase sobe: "Tudo se resume a *Analytics*." Embaixo dela volta o eixo da v5, "do mais simples ao mais complexo": 12 técnicas em cards com mini-visualização (estatística, regressão, séries temporais, otimização, clusters, árvores, gradient boosting, recomendação, embeddings, redes neurais, transformers, agentes de IA), acesas uma a uma por uma varredura que termina no último tempo forte da música.
-3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português (v7.12: sem "próxima parada"); o prato da cadência final acende o letreiro, e o vídeo termina com a cauda do acorde.
+3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português (v7.12: sem "próxima parada").
+   - O prato da cadência final acende o letreiro e, desde a v7.15, a frase **"Tudo se resume a *Analytics*."** aparece entre o símbolo e o letreiro.
+   - O "Obrigado! Agora a conversa é com *vocês*" entra 2 tempos depois, e o vídeo termina com a cauda do acorde.
 
 ## Encerramento
 
@@ -266,8 +269,7 @@ As três partes foram geradas na ElevenLabs (instrumentais) e encaixadas nos tem
   - automação: a pausa composta na própria música é o interruptor, e o drop acende o neon;
   - IA: a cena começa com o crescendo de 16 compassos, e o maior drop cai na escala, o pico da apresentação;
   - 05/06: o acorde final da música cai na conclusão da 06.
-- **Parte 3 · 07, clímax e letreiro (final orquestral, 100 BPM, sem coro):**
-  - tocado inteiro, do jeito que foi composto; o filme se ajusta à música;
-  - a cidade tem piano e cordas;
-  - os 5 cards do clímax entram um por compasso e viram 2 tempos depois, e a frase-chave aparece no grande ataque;
-  - o letreiro acende no prato da cadência final, e o vídeo termina com a cauda desse acorde.
+- **Parte 3 · 07 e letreiro (final orquestral, 100 BPM, sem coro):**
+  - v7.15: 11 compassos a menos (1:11 → 0:45), num corte só, escolhido pelo usuário: o piano segue até 22,8 s e emenda, no tempo forte, na volta da orquestra (mesmo tom, 80 ms de transição, sem filtros);
+  - a cidade tem piano e cordas, e a orquestra volta junto com a estação "?";
+  - o letreiro e a frase-chave acendem no prato da cadência final, e o vídeo termina com a cauda desse acorde.

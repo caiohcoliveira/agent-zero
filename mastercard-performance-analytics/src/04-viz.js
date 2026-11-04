@@ -13,6 +13,16 @@ const VIZ = (() => {
 
   const V = {};
 
+  // teste A/B (v7.15, veio do antigo clímax): duas distribuições, A e B, e a diferença entre as médias
+  V.ab = (ctx, x, y, w, h, p, o = {}) => {
+    const ga = o.theme === 'light' ? '#8A8378' : '#BFB3A3', u = U(w, h);
+    const bell = (m, s, col, fill) => { ctx.beginPath(); for (let i = 0; i <= 60; i++) { const q = i / 60, px = x + q * w, py = y + h - Math.exp(-((q - m) ** 2) / (2 * s * s)) * h * .85 * p; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fillStyle = rgba(col, fill); ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = Math.max(2, u * 1.2); ctx.stroke(); };
+    line(ctx, x, y + h, x + w, y + h, faint(o), Math.max(1, u * .5)); bell(.38, .12, ga, .18); bell(.6, .12, C.orange, .22);
+    if (p > .6) { const a = clamp((p - .6) * 3); [[.38, 'A', ga], [.6, 'B', C.orange]].forEach(([m, l, col]) => { ctx.save(); ctx.globalAlpha *= a; ctx.setLineDash([5, 5]); line(ctx, x + m * w, y + h * .1, x + m * w, y + h, col, 2); ctx.restore();
+      late(ctx, c => { c.globalAlpha *= a; text(c, l, x + m * w, y + 2, { size: 20, weight: 900, color: col, align: 'center' }); }); }); }
+  };
+
   V.gaussian = (ctx, x, y, w, h, p, o = {}) => {
     const u = U(w, h); axes(ctx, x, y, w, h, o, E.outCubic(clamp(p * 2)));
     const curve = []; const n = 80;

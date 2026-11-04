@@ -443,3 +443,24 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - navegação, clique e console limpos;
   - músicas idênticas;
   - durações das cenas e batidas sem mudança.
+
+### v7.15 — os métodos e as técnicas na estação 03, sem o clímax, parte 3 com 11 compassos a menos
+
+- [x] **Estação 03:** "Modelos *preditivos*: métodos e técnicas" e "Modelos *prescritivos*: métodos e técnicas" no lugar de "antecipam resultados" e "ajudam a escolher ações".
+  - 3 cards preditivos (supervisionado, não supervisionado, séries temporais) e 2 prescritivos (otimização, teste A/B), com o desenho do método (veio do antigo clímax), um exemplo e as técnicas.
+  - Os cards entram a cada 2 tempos, dentro das mesmas janelas de antes. A estação manteve a duração e a música da parte 1 não mudou.
+  - Os textos ficam em `text.methods` (`group` pred/presc). O cartaz 03 da Conversa 1 mostra uma linha por método com a técnica que o representa (`key`).
+- [x] **Sem o clímax "Por trás de tudo":** o play 4 virou 07 + letreiro.
+  - O slide do clímax saiu do resumo da 07.
+- [x] **Parte 3 com 11 compassos a menos (1:11 → 0:45):** o corte da prévia A, aprovado pelo usuário.
+  - O piano segue até 22,773 s e emenda, no tempo forte, na volta da orquestra (49,173 s da versão inteira), com 80 ms de transição. Mesmo tom dos dois lados, sem filtros.
+  - O corte está em `tools/eleven_fit.py` (`CUT3`), depois da masterização. O resultado bate com a prévia (correlação 0,999).
+  - A grade de batidas da parte 3 foi refeita com `tools/music.py`; as das partes 1 e 2 ficaram idênticas.
+  - A estação "?" da 07 aparece com a volta da orquestra.
+- [x] **Letreiro:** "Tudo se resume a *Analytics*." acende no prato da cadência final, entre o símbolo e o letreiro; o "Obrigado" entra 2 tempos depois.
+- [x] **Vídeo:** 8:22 (501,74 s); eram 8:48.
+- [x] **QA:**
+  - varredura sem exceções (501,74 s);
+  - medidor de leitura: 76 telas, 0 curtas (os cards prescritivos entram 1 tempo depois do título, para a leitura não somar);
+  - navegação, clique e console limpos; as três faixas carregam;
+  - músicas das partes 1 e 2 idênticas; parte 3 = a prévia A aprovada.

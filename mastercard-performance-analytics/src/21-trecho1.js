@@ -336,22 +336,29 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   const TYPES = [[nm(ctype[0] || 'Emissores'), 'bank', 'Principalidade', 'decidir qual produto oferecer', C.red], [nm(ctype[1] || 'Adquirentes'), 'card', 'Market share', 'decidir onde crescer', C.orange],
     [nm(ctype[2] || 'Varejo'), 'basket', 'Cestas de produtos', 'decidir o que promover', C.yellow]];
   const CAPS = [['Segmentação', 'identificar públicos', 'nodes'], ['Recomendação', 'priorizar ofertas', 'chart'], ['Automação', 'executar rotinas', 'gear']];
-  const PRED = [['risco de fraude', 'shield'], ['chance de saída', 'user'], ['previsão de gastos', 'coin']], PRESC = [['próxima oferta', 'card'], ['alocação de campanhas', 'chart'], ['recomendação de incentivo', 'spark']];
+  // v7.15: os métodos e as técnicas (vieram do antigo clímax, TX.methods): 3 cards preditivos na zona 4 e 2 prescritivos na zona 5,
+  // um a cada 2 tempos da música; os exemplos (fraude, saída, gastos…) seguem nos cartões da síntese
+  const MG = g => (TX.methods || []).filter(m => m.group === g), MPRED = MG('pred'), MPRESC = MG('presc');
+  const T_MP = MPRED.map((_, i) => beatsFrom(id, T_PRED + .8, 2 * i)), T_MS = MPRESC.map((_, i) => beatsFrom(id, T_PRESC + 1.1, 2 * i));   // o 1º card entra a mais de 0,8 s do título (leitura separada)
+  const MCOL = { classification: C.red, clusters: C.yellow, forecast: '#E8822A', lp: C.red, ab: C.orange }, CW = 540, CH = 470, MGAP = 36, MY = 300;
+  const mTxt = m => `${m.method} (ex.: ${m.case}): ${m.tech.join(', ')}` + (m.etc ? ' e outras técnicas' : '');
   const Z = [960, 3160, 5360, 7560, 9760], GY = 800;
   const CAM = [[0, Z[0], 560, 1.04], [3.8, Z[0], 540, 1], [T_CAP - 1.2, Z[0], 540, 1], [T_CAP, Z[1], 540, 1], [T_INT - 1.2, Z[1], 540, 1], [T_INT, Z[2], 540, 1],
     [T_PRED - 1.2, Z[2], 540, 1], [T_PRED, Z[3], 540, 1], [T_PRESC - 1.2, Z[3], 540, 1], [T_PRESC, Z[4], 540, 1], [T_SYN - .6, Z[4], 540, 1], [T_SYN + 1.2, 8660, 600, .55], [64, 8660, 600, .53]];
   T_CLI.forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + i * .1, v: .2 })); [T_CAP, T_INT, T_PRED, T_PRESC].forEach(t0 => cue(id, t0 - 1.2, 'whoosh', { dur: 1.1, v: .3 }));
-  cue(id, T_INT + 2.2, 'shimmer', { dur: 1.5 }); cue(id, T_PRESC + 3.2, 'ding'); cue(id, T_SYN, 'whoosh', { dur: 1.4, v: .3 }); cue(id, T_SYN + 1.4, 'chime', { f: 784, up: 7 });
+  cue(id, T_INT + 2.2, 'shimmer', { dur: 1.5 }); [...T_MP, ...T_MS].forEach((t0, i) => cue(id, t0, 'pop', { p: 1 + (i % 3) * .1, v: .18 })); cue(id, T_SYN, 'whoosh', { dur: 1.4, v: .3 }); cue(id, T_SYN + 1.4, 'chime', { f: 784, up: 7 });
   const SCRIPT = SAY.reg(id, [
     [3.8, T_CAP - .9, 'title', 'Onde aplicamos *analytics*', { visual: true }],
     [T_CAP + .1, T_INT - .9, 'title', 'O que entregamos em cada projeto', { visual: true }],
     [T_INT + .1, T_PRED - .9, 'title', 'Com as outras tracks'],
     [T_INT + .3, T_PRED - .9, 'body', 'Combinamos analytics com as *demais tracks* para ampliar o *impacto* dos projetos.', { y: 250, visual: true }],
-    [T_PRED + .1, T_PRESC - .9, 'title', 'Modelos *preditivos* antecipam resultados', { visual: true }],
-    [T_PRESC + .1, T_SYN - .5, 'title', 'Modelos *prescritivos* ajudam a escolher ações', { visual: true }],
+    [T_PRED + .1, T_PRESC - .9, 'title', 'Modelos *preditivos*: métodos e técnicas', { visual: true }],
+    [T_PRESC + .1, T_SYN - .5, 'title', 'Modelos *prescritivos*: métodos e técnicas', { visual: true }],
     [T_SYN + 1.0, 64.2, 'title', 'Antecipar o que vem. *Escolher como agir.*'],
     [T_SYN + 1.6, 64.2, 'concl', 'A escolha do modelo depende do *problema* e da *decisão de negócio*.']
   ]);
+  SAY.reg(id, MPRED.map((m, i) => [T_MP[i], T_PRESC - .9, 'label', mTxt(m)]));
+  SAY.reg(id, MPRESC.map((m, i) => [T_MS[i], T_SYN - .5, 'label', mTxt(m)]));
   const streetSet = ctx => {
     const g = ctx.createLinearGradient(0, GY, 0, H + 200); g.addColorStop(0, '#2A1C14'); g.addColorStop(1, '#0E0907'); ctx.fillStyle = g; ctx.fillRect(-1600, GY, 13000, 600);
     line(ctx, -1600, GY, 11400, GY, INK, 6); for (let x = -1600; x < 11400; x += 160) line(ctx, x, GY + 120, x + 80, GY + 120, 'rgba(255,214,160,.18)', 6);
@@ -406,44 +413,28 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
       text(c, 'analytics', cx - 640, GY - 92, { size: 30, weight: 900, color: C.orange, align: 'center' });
       text(c, 'outras tracks', cx - 560, 330, { size: 30, weight: 900, color: C.yellow, align: 'center' }); });
   }
-  /** zona 4: previsão como cenário (faixa de incerteza), não certeza */
-  function predictive(ctx, t) {
-    const a = P(t, T_PRED - .9, .6); if (a <= 0) return; const lt = t - T_PRED, x0 = Z[3] - 760, x1 = Z[3] + 560, xn = Z[3] + 40, yb = 760, yt = 340;
-    ctx.save(); ctx.globalAlpha *= a;
-    holo(ctx, x0 - 60, yt - 70, x1 - x0 + 120, yb - yt + 150, { color: C.orange });
-    line(ctx, x0, yb, x1, yb, 'rgba(255,233,214,.5)', 3); line(ctx, x0, yb, x0, yt, 'rgba(255,233,214,.5)', 3);
-    const f = x => 590 - 110 * Math.sin((x - x0) / 180) - (x - x0) * .12, hist = E.outCubic(clamp(lt / 1.2)), fut = E.outCubic(clamp((lt - 1.1) / 1.6));
-    ctx.beginPath(); for (let x = x0; x <= lerp(x0, xn, hist); x += 8) { x === x0 ? ctx.moveTo(x, f(x)) : ctx.lineTo(x, f(x)); } ctx.strokeStyle = '#F6EEDF'; ctx.lineWidth = 6; ctx.stroke();
-    if (fut > 0) { const xe = lerp(xn, x1, fut), y0 = f(xn); [[.9, .18], [.5, .32]].forEach(([w, al]) => { ctx.beginPath(); ctx.moveTo(xn, y0);
-        for (let x = xn; x <= xe; x += 8) ctx.lineTo(x, y0 - (x - xn) * .32 - (x - xn) * w * .55); for (let x = xe; x >= xn; x -= 8) ctx.lineTo(x, y0 - (x - xn) * .32 + (x - xn) * w * .55); ctx.closePath(); ctx.fillStyle = rgba(C.orange, al); ctx.fill(); });
-      ctx.save(); ctx.setLineDash([16, 12]); line(ctx, xn, y0, xe, y0 - (xe - xn) * .32, C.yellow, 6); ctx.restore(); }
-    line(ctx, xn, yt - 20, xn, yb, 'rgba(255,233,214,.6)', 3, [8, 8]);
+  /** um card de método (v7.15): o desenho do método, o nome, o exemplo e as técnicas */
+  function methodCard(ctx, m, x, y, t, t0) {
+    const p = P(t, t0, .5); if (p <= 0) return;
+    const e = E.outBack(p), col = MCOL[m.viz] || C.orange, vp = E.outCubic(clamp((t - t0 - .2) / 1.2)), sc = lerp(.92, 1, e);
+    ctx.save(); ctx.globalAlpha *= clamp(p * 2); ctx.translate(x + CW / 2, y + CH / 2 + (1 - E.outCubic(p)) * 40); ctx.scale(sc, sc); ctx.translate(-CW / 2, -CH / 2);
+    rr(ctx, 8, 12, CW, CH, 18); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
+    rr(ctx, 0, 0, CW, CH, 18); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.stroke();
+    rr(ctx, 22, 22, CW - 44, 140, 12); ctx.fillStyle = 'rgba(255,255,255,.04)'; ctx.fill();
+    ctx.save(); rr(ctx, 22, 22, CW - 44, 140, 12); ctx.clip(); (VIZ[m.viz] || VIZ.gaussian)(ctx, 52, 36, CW - 104, 112, vp, { t, theme: 'dark' }); ctx.restore();
+    late(ctx, c => { const ex = 'ex.: ' + m.case;
+      text(c, m.method, 28, 200, { size: fitSize(c, m.method, 32, CW - 56, 900), weight: 900, color: '#FFF' });
+      text(c, ex, 28, 238, { size: fitSize(c, ex, 22, CW - 56, 800), weight: 800, color: col === C.red ? '#FF8A7A' : col });
+      line(c, 28, 264, CW - 28, 264, 'rgba(243,230,214,.25)', 2);
+      m.tech.forEach((s2, i) => { const yy = 302 + i * 42; circle(c, 40, yy, 7, col); text(c, s2, 60, yy + 1, { size: fitSize(c, s2, 26, CW - 90, 800), weight: 800, color: '#F3E6D6' }); });
+      if (m.etc) text(c, 'e outras técnicas', 60, 302 + m.tech.length * 42, { size: 21, weight: 700, color: '#BFB3A3' }); });
     ctx.restore();
-    late(ctx, c => { c.globalAlpha *= a; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 10;
-      text(c, 'histórico', x0 + 200, yb + 40, { size: 28, weight: 800, color: '#F6EEDF', align: 'center' }); text(c, 'hoje', xn, yb + 40, { size: 28, weight: 800, color: '#FFF', align: 'center' });
-      c.globalAlpha *= clamp((lt - 1.6) / .5); text(c, 'cenário provável', x1 - 120, f(xn) - (x1 - xn) * .32 - 30, { size: 28, weight: 900, color: C.yellow, align: 'center' });
-      text(c, 'faixa de incerteza', x1 - 150, f(xn) - (x1 - xn) * .32 + 170, { size: 26, weight: 800, color: '#FFB58A', align: 'center' });
-      text(c, 'previsão é cenário, não certeza', Z[3], yt - 40, { size: 26, weight: 700, mono: true, color: '#E9DCC8', align: 'center' }); });
-    PRED.forEach(([l, ic], i) => { const p = E.outBack(P(t, T_PRED + 1.0 + i * .45, .45)); if (p <= 0) return; const x = Z[3] - 500 + i * 500;
-      late(ctx, c => { c.translate(x, 960); c.scale(p, p); circle(c, -tagW(c, l) / 2 - 10, 0, 30, C.orange, INK, 3); icon(c, ic, -tagW(c, l) / 2 - 10, 0, 34, '#FFF', 7); tag(c, 24, 0, l, { size: 30 }); }); });
   }
-  const tagW = (c, l) => measure(c, l, 30, 800) + 39;
-  /** zona 5: escolher uma ação com o objetivo escrito */
-  function prescriptive(ctx, t) {
-    const a = P(t, T_PRESC - .9, .6); if (a <= 0) return; const lt = t - T_PRESC, jx = Z[4] - 520, jy = 560, OUT = [[Z[4] + 380, 330, .55], [Z[4] + 380, 560, .86], [Z[4] + 380, 790, .38]];
-    ctx.save(); ctx.globalAlpha *= a;
-    LINE.draw(ctx, [[Z[4] - 1100, jy], [jx, jy]], E.inOutSine(clamp(lt / 1)), { w: 20, head: lt < 1 });
-    OUT.forEach(([x, y, v], k) => { const p = E.inOutSine(clamp((lt - .8 - k * .2) / 1.2)), best = k === 1, lit = best ? P(t, T_PRESC + 3.2, .5) : 0;
-      LINE.draw(ctx, [[jx, jy], [jx + 260, lerp(jy, y, .6)], [x - 150, y]], p, { w: best ? 18 : 12, col: best ? mix('#8A8378', C.orange, lit) : '#8A8378', head: best && lit > 0 && lit < 1, alpha: best ? 1 : 1 - .45 * lit });
-      if (p > .95) { const bw = 260 * v * E.outCubic(clamp((lt - 2 - k * .15) / .8)); rr(ctx, x - 120, y - 20, 300, 40, 10); ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fill(); rr(ctx, x - 120, y - 20, bw, 40, 10); ctx.fillStyle = best ? C.yellow : '#8A8378'; ctx.fill(); }
-      late(ctx, c => { c.globalAlpha *= clamp(p * 2) * (best ? 1 : 1 - .4 * lit); text(c, `ação ${'ABC'[k]}`, x - 150, y - 50, { size: 30, weight: 900, color: best && lit > .5 ? C.yellow : '#FFF' }); }); });
-    circle(ctx, jx, jy, 26, '#FFF8EE', INK, 5);
-    ctx.restore();
-    late(ctx, c => { c.globalAlpha *= a * P(t, T_PRESC + 1.4, .5); c.translate(jx - 40, jy - 140); c.rotate(-.03); tag(c, 0, 0, 'objetivo: maior conversão', { size: 30, fill: C.red, color: '#FFF' });
-      c.setTransform(c.getTransform()); });
-    late(ctx, c => { c.globalAlpha *= a * P(t, T_PRESC + 2.0, .5); text(c, 'resultado estimado (ilustrativo)', Z[4] + 530, 220, { size: 24, weight: 700, mono: true, color: '#E9DCC8', align: 'center' }); });
-    PRESC.forEach(([l, ic], i) => { const p = E.outBack(P(t, T_PRESC + 1.0 + i * .45, .45)); if (p <= 0) return; const x = Z[4] - 560 + i * 560;
-      late(ctx, c => { c.translate(x, 960); c.scale(p, p); circle(c, -tagW(c, l) / 2 - 10, 0, 30, C.red, INK, 3); icon(c, ic, -tagW(c, l) / 2 - 10, 0, 34, '#FFF', 7); tag(c, 24, 0, l, { size: 30 }); }); });
+  /** zonas 4 e 5 (v7.15): os cards dos métodos, centrados na tela da zona */
+  function methodZone(ctx, t, list, zx, T0, TC) {
+    const a = P(t, T0 - .9, .6); if (a <= 0 || !list.length) return;
+    const n = list.length, x0 = zx - W / 2 + (W - (n * CW + (n - 1) * MGAP)) / 2;
+    ctx.save(); ctx.globalAlpha *= a; list.forEach((m, i) => methodCard(ctx, m, x0 + i * (CW + MGAP), MY, t, TC[i])); ctx.restore();
   }
   function synthesis(ctx, t) {
     const a = P(t, T_SYN + .4, .7); if (a <= 0) return;
@@ -463,14 +454,14 @@ const barsOf = (id, per = 2.18) => { const B = grid(id).bars; return k => (B[k] 
   }
   SCENES[id] = {
     themeAt: () => 'dark', script: SCRIPT,
-    peaks: [[T_INT + 2, T_INT + 2.8, .45], [T_PRESC + 3.1, T_PRESC + 3.9, .5], [T_SYN, T_SYN + 1.2, .4]],
+    peaks: [[T_INT + 2, T_INT + 2.8, .45], [T_MP[0] - .1, T_MP[0] + .7, .4], [T_MS[0] - .1, T_MS[0] + .7, .4], [T_SYN, T_SYN + 1.2, .4]],
     draw(ctx, t) {
       const cam = camKey(t, CAM);
       bgDark(ctx, t, { centerA: .9, center: '#2A1A10' });
       layer(ctx, cam, 1, () => {
         streetSet(ctx);
         LINE.draw(ctx, [[-1200, GY + 60], [11200, GY + 60]], 1, { w: 14, alpha: .55, shadow: false });
-        clients(ctx, t); capabilities(ctx, t); integration(ctx, t); predictive(ctx, t); prescriptive(ctx, t); synthesis(ctx, t);
+        clients(ctx, t); capabilities(ctx, t); integration(ctx, t); methodZone(ctx, t, MPRED, Z[3], T_PRED, T_MP); methodZone(ctx, t, MPRESC, Z[4], T_PRESC, T_MS); synthesis(ctx, t);
       });
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
@@ -502,8 +493,14 @@ POSTERS[2] = (ctx, w, h, tl) => {
     text(c, 'Crescimento com integração e um time para escalar.', 0, 246, { size: 19, weight: 900, color: C.red, align: 'center' }); });
 };
 POSTERS[3] = (ctx, w, h, tl) => {
-  late(ctx, c => { [['PREDITIVOS', 'antecipam resultados', 'fraude · saída · gastos', C.orange, -150], ['PRESCRITIVOS', 'ajudam a escolher ações', 'oferta · campanhas · incentivos', C.red, 40]].forEach(([k, s1, s2, col, y]) => {
-      tag(c, 0, y - 60, k, { size: 22, fill: col, color: '#FFF' }); text(c, s1, 0, y - 6, { size: 28, weight: 900, color: INK, align: 'center' }); text(c, s2, 0, y + 34, { size: 21, weight: 700, color: '#3A332C', align: 'center' }); });
+  // v7.15: os métodos e uma técnica de cada (TX.methods), como na estação
+  const G = g => (TX.methods || []).filter(m => m.group === g), low = m => m.method.replace(/^Modelo /i, '').replace(/^./, ch => ch.toLowerCase());
+  // uma linha por método: o método e a técnica que o representa
+  late(ctx, c => { const pr = G('pred'), y2 = -196 + 40 + pr.length * 32 + 26;
+    [['PREDITIVOS', pr, C.orange, -196], ['PRESCRITIVOS', G('presc'), C.red, y2]].forEach(([k, list, col, y]) => {
+      tag(c, 0, y, k, { size: 22, fill: col, color: '#FFF' });
+      list.forEach((m, i) => { const ln = `*${low(m)}* · ${m.key || m.tech[0]}`, sz = Math.min(23, fitSize(c, ln.replace(/\*/g, ''), 23, 420, 800));
+        para(c, ln, 0, y + 30 + i * 32, 420, { size: sz, weight: 800, color: '#6A6056', accent: INK, align: 'center', lh: 1.2 }); }); });
     text(c, 'Emissores · Adquirentes · Varejo', 0, -238, { size: 22, weight: 900, color: '#8A6A48', align: 'center' });
     para(c, 'A escolha do modelo depende do *problema* e da *decisão de negócio*.', 0, 160, 420, { size: 22, weight: 800, color: INK, accent: C.red, align: 'center' });
     text(c, 'lupa: catálogo com 20 modelos', 0, 252, { size: 18, weight: 800, mono: true, color: '#8A6A48', align: 'center' }); });

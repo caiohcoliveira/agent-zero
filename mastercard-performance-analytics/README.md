@@ -1,10 +1,16 @@
-# Performance Analytics — "A Linha" (v7.14, experimento)
+# Performance Analytics — "A Linha" (v7.15, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
-> - o clímax com cards nos tempos fortes da música (v7.11: 5 cases que viram para mostrar as técnicas);
+> - os métodos e as técnicas por trás dos cases (v7.11 no clímax; desde a v7.15, em cards na estação 03);
 > - o letreiro WELCOME TO… no final;
 > - a estação atrás das conversas (v7.11: futurista, arejada e verde).
+>
+> **v7.15:**
+> - **sem o clímax "Por trás de tudo":** os 5 cases com métodos e técnicas foram para a estação 03, no lugar de "Modelos preditivos antecipam resultados" e "Modelos prescritivos ajudam a escolher ações": 3 cards preditivos (supervisionado, não supervisionado, séries temporais) e 2 prescritivos (otimização, teste A/B), com o desenho do método, um exemplo e as técnicas. A estação 03 manteve a duração, e a música da parte 1 não mudou;
+> - **parte 3 com 11 compassos a menos** (1:11 → 0:45): um corte só, aprovado na prévia A. O piano segue até 22,8 s e emenda, no tempo forte, na volta da orquestra; o letreiro continua no prato da cadência final e o vídeo termina com a cauda do acorde;
+> - **"Tudo se resume a *Analytics*."** agora aparece no letreiro final, no prato da cadência, entre o símbolo e o PERFORMANCE ANALYTICS;
+> - o vídeo tem **8:22** (eram 8:48).
 >
 > **v7.11:**
 > - **estação das conversas:** saiu o metrô subterrâneo (azulejos, ratinho, pombo, goteira, grafites). Agora é uma estação ao ar livre, com cobertura de nervuras brancas e vidro, parede de vidro com a cidade clara e um viaduto onde um trem bala passa ao longe, jardins verticais, árvores e floreiras, e painéis brancos pendurados no lugar dos cartazes de papel. Referências: Oculus (WTC), Zaragoza-Delicias, West Kowloon, "Train Station in the Forest" (MAD), Jönköping e o jardim de Atocha;
@@ -66,10 +72,10 @@ O visual é uma animação híbrida 2D/3D com acabamento pintado, no espírito d
 | **Conversa 1** | cartazes 01, 02, 03 legíveis, chamada "Onde isso encontra o seu cliente?", "A seguir: quatro cases…" | fala |
 | Play 3 · estações 04–06 | opção A (ElevenLabs): uma versão por case, como foi composta; as cenas seguem a música | 4:42 |
 | **Conversa 2** | cartazes 04, 05, 06, chamada "Qual desafio pode virar o próximo case?" | fala |
-| Play 4 · 07, clímax e letreiro | final orquestral (ElevenLabs), inteiro; termina com o vídeo | 1:11 |
+| Play 4 · 07 e letreiro | final orquestral (ElevenLabs) com 11 compassos a menos (v7.15); termina com o vídeo | 0:45 |
 | **Encerramento** | letreiro vivo; clique ou → abre o cartaz 07 | fala |
 
-São **8:48 de vídeo**. Com as conversas, a sessão cabe em 20 minutos.
+São **8:22 de vídeo** (v7.15). Com as conversas, a sessão cabe em 20 minutos.
 
 **Nas conversas, com o mouse:**
 - **Conversa 0:**
@@ -159,13 +165,17 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
     - **Automação:** a pausa de 2 tempos composta na própria música é o interruptor, e o drop dela acende o neon. O acorde final soa no mergulho.
     - **IA:** a cena começa com o crescendo de 16 compassos da versão; o maior drop da parte cai na escala, e o acorde final soa até a 05.
     - **05 e 06:** 16 compassos de groove, e o acorde final cai na conclusão da 06.
-  - **Parte 3 · 07, clímax e letreiro (1:11):** final orquestral, 100 BPM, **sem o coro**, tocado **inteiro, do jeito que foi composto** (v7.5).
+  - **Parte 3 · 07 e letreiro (0:45):** final orquestral, 100 BPM, **sem o coro**.
     - Toca a gravação original até pouco antes do coro e, depois, a versão sem coro, alinhada à amostra.
-    - O filme se ajusta à música (v7.7):
-      - os 5 cards do clímax entram um por compasso desde que a batida começa (30,0 s) e viram 2 tempos depois (v7.11);
-      - a frase-chave aparece no grande ataque da orquestra (46,8 s);
-      - o letreiro acende no prato da cadência final (67,2 s);
-      - o vídeo termina com a cauda desse acorde (71,4 s).
+    - **v7.15, um corte de 11 compassos** (`CUT3` em `tools/eleven_fit.py`), escolhido pelo usuário entre duas prévias:
+      - o piano segue até 22,773 s e emenda, no tempo forte, na volta da orquestra depois da pausa (49,173 s da versão inteira), com 80 ms de transição;
+      - mesmo tom dos dois lados, sem filtros ou efeitos; o corte vem depois da masterização da peça inteira;
+      - saíram a construção da orquestra e o grande ataque, onde ficava a frase-chave do antigo clímax.
+    - O filme se ajusta à música:
+      - a estação "?" da 07 aparece com a volta da orquestra (22,8 s);
+      - o letreiro e "Tudo se resume a *Analytics*." acendem no prato da cadência final (40,8 s);
+      - o vídeo termina com a cauda desse acorde (44,97 s).
+    - A versão inteira fica em `musica/parte3-inteira.mp3` (fora do Git).
 - **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
   - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
   - **Partes 2 e 3:** nada além do nível; cada versão só é deslocada inteira (`PARTE2_A`), e o filme acompanha (a grade e as seções saem delas).
@@ -191,7 +201,7 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
 ```
 src/
   00-head.html     HTML + CSS, bloco de dados (pa-data) e blocos de música
-  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, conversas, textos (estações, capítulos, missão, futuro, cases do clímax)
+  01-config.js     ★ CONFIG: plays, cenas casadas aos compassos, conversas, textos (estações, capítulos, missão, futuro, métodos da 03)
   01-data.js       ★ DADOS: lê o JSON, acessos seguros (SEC, CASE, HEADLINES) e formatação pt-BR (FMT)
   02-core.js · 03-collage.js · 03-components.js · 04-viz.js   primitivas, papel, ícones, agentes, visualizações
   05-audio.js      trilha sintetizada do embarque + SFX + cues
@@ -211,7 +221,7 @@ src/
   21-trecho1.js    estações 01, 02, 03, cartazes 01–03, catálogo de modelos e Conversa 1
   22-cases.js      estação 04 e os 4 cases
   23-scale.js      estações 05 e 06, cartazes 04–06 e Conversa 2
-  24-final.js      estação 07, clímax (5 cases que viram), letreiro final, cartaz 07 e encerramento
+  24-final.js      estação 07, letreiro final (com "Tudo se resume a Analytics"), cartaz 07 e encerramento
   90-player.js     modo apresentação (HUD depois da pintura; interface das conversas por cima, sem pintura)
 data/presentation.json
 tools/build.py       monta o HTML (python3; ffmpeg para as músicas)
@@ -245,8 +255,8 @@ build.sh             atalho para tools/build.py
 | `src/01-config.js` | `mode` | `'show'` (conversas em loop) ou `'reel'` (direto) |
 | | `scenes[].dur` | duração de cada cena; casada com os compassos da faixa |
 | | `text.mission`, `text.chapters`, `text.stations` | missão, capítulos do mapa e textos das estações |
-| | `text.future`, `text.climaxCases` | direções do futuro e os 5 cases do clímax (case, método, técnicas; `etc` acrescenta "e outras técnicas") |
-| | `motion.beatBase`, `motion.paint` | batida fora dos clímax; acabamento pintado (0 desliga) |
+| | `text.future`, `text.methods`, `text.finalKey` | direções do futuro; os métodos da estação 03 (`group` pred/presc, método, exemplo, desenho, técnicas; `etc` acrescenta "e outras técnicas"; `key` é a técnica do cartaz); a frase do letreiro final |
+| | `motion.beatBase`, `motion.paint` | batida fora dos picos das cenas; acabamento pintado (0 desliga) |
 | `src/14-v7.js` | `TY`, `LAY` | tamanhos de texto e posições do contrato de tela |
 | arquivos de cena | `SCENES[id].script` | o roteiro de tela: título, explicação, conclusão e os tempos |
 | `src/10-ui.js` | `SLIDES` | quais trechos viram cenas montadas (em loop) nas conversas |

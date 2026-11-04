@@ -17,10 +17,11 @@ Parte 1 (estações 01–03, 154,544 s): andamento ajustado 0,95% para a grade d
 Parte 2 (04, cases, 05, 06: 282,222 s, 108 BPM, grade a partir de 0): a opção A (v7.7), uma versão por case, cada uma
   tocada como foi composta (PARTE2_A): sem filtros, efeitos, compassos repetidos ou silêncios. Cada versão só é
   deslocada inteira, para os blocos e drops dela caírem nas soluções; o filme foi reajustado às durações delas.
-Parte 3 (07, disciplinas, letreiro: 71,373 s, 100 BPM): a opção A tocada inteira, sem cortes (v7.5): a gravação
-  original até pouco antes do coro e a versão sem coro depois. O filme se ajusta a ela (v7.7–v7.8): as disciplinas
-  nos tempos fortes, a frase-chave no grande ataque (46,77), o letreiro no prato da cadência final (67,17) e o vídeo termina
-  com a cauda do acorde.
+Parte 3 (07 e letreiro: 44,973 s, 100 BPM): a opção A, a gravação original até pouco antes do coro e a versão sem
+  coro depois. v7.15: o clímax saiu do filme e a música perdeu 11 compassos (26,4 s), num corte só (CUT3): o piano
+  segue até 22,773 s e emenda, no tempo forte, na volta da orquestra depois da pausa (49,173 s da versão inteira),
+  com 80 ms de transição. Mesmo tom dos dois lados, sem filtros ou efeitos. O letreiro continua no prato da cadência
+  final (67,17 → 40,773) e o vídeo termina com a cauda do acorde.
 
 Uso: python3 tools/eleven_fit.py [parte1|parte2|parte3|todas] [pasta_de_saida]
 """
@@ -184,6 +185,16 @@ def parte2(dur=282.222):
 
 
 # ---------------------------------------------------------------- parte 3 · 07, disciplinas, letreiro
+CUT3 = (22.773, 49.173, .08)   # v7.15: (de, até, transição em s): 11 compassos de 2,4 s saem; o prato do letreiro vai de 67,173 a 40,773
+
+
+def cut(y, t0, t1, xf):
+    """tira [t0, t1) e emenda com uma transição de potência constante de xf segundos centrada no tempo forte"""
+    i0, i1, h = int(round(t0 * SR)), int(round(t1 * SR)), int(round(xf * SR / 2))
+    w = np.sin(np.linspace(0, np.pi / 2, 2 * h))[:, None]
+    return np.concatenate([y[:i0 - h], y[i0 - h:i0 + h] * w[::-1] + y[i1 - h:i1 + h] * w, y[i1 + h:]])
+
+
 def parte3(dur=71.373):
     """a opção A tocada inteira, do jeito que foi composta (sem cortes, repetições ou cauda): a gravação original
     até pouco antes do coro e, dali em diante, a versão sem coro (Demucs), alinhada à amostra e cruzada em 1 s.
@@ -217,7 +228,10 @@ def parte3(dur=71.373):
     info = {'atraso_do_sem_coro_amostras': lag, 'coro_entra': round(onset, 2), 'troca_para_sem_coro': [round(t0, 2), round(t1, 2)],
             'entrada_da_orquestra': round(E, 2), 'subida_db': round(rise, 1), 'grade': [100.0, round(anchor, 3)],
             'ataque_da_frase_chave': round(key, 3), 'prato_do_letreiro': round(chord, 3), 'fim_do_video': dur}
-    return R.master(y, -11.0), info
+    # v7.15: o corte de 11 compassos vem depois da masterização da peça inteira (é o mesmo som da prévia aprovada)
+    y = cut(R.master(y, -11.0), *CUT3)
+    info.update({'corte': list(CUT3[:2]), 'prato_do_letreiro_no_filme': round(chord - (CUT3[1] - CUT3[0]), 3), 'fim_do_video': round(len(y) / SR, 3)})
+    return y, info
 
 
 def main():

@@ -308,14 +308,14 @@ const SLIDES = {
   1: [['s01', 11.6, 'As perguntas de negócio', 3.9, 12.2], ['s01', 35.0, 'A ponte: os 4 serviços', 19.8, 35.6], ['s01', 46.0, 'Do diagnóstico à mensuração', 35.8, 46.9]],
   2: [['s02', 19.5, 'Receita da track', 3.9, 20.2], ['s02', 29.5, 'Projetos e receita por tipo', 20.6, 30.3], ['s02', 41.0, 'Capacidade do time', 30.8, 43.4]],
   3: [['s03', 15.0, 'Onde aplicamos', 3.8, 15.2], ['s03', 25.0, 'O que entregamos', 16.1, 25.2], ['s03', 33.5, 'Junto com as outras tracks', 26.1, 33.4],
-    ['s03', 43.5, 'Modelos preditivos', 34.5, 43.4], ['s03', 51.5, 'Modelos prescritivos', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
+    ['s03', 43.0, 'Preditivos · técnicas', 34.5, 43.4], ['s03', 51.4, 'Prescritivos · técnicas', 44.3, 51.6], ['@catalog', 0, 'Catálogo: 20 modelos', 0, 6]],
   4: [['banana', 23.5, 'Cestas · os dados', 12.6, 24.2], ['banana', 31.5, 'Cestas · como fizemos (ALS)', 24.5, 35.4], ['banana', 52.5, 'Cestas · solução e resultado', 35.6, 53.1],
     ['manga', 34.5, 'Principalidade · como fizemos', 24.5, 35.4], ['manga', 45.5, 'Principalidade · reordenação', 35.6, 46.6], ['manga', 58.5, 'Principalidade · resultado', 46.8, 59.8],
     ['lightsoff', 11, 'Relatórios · antes', 2.4, 11.9], ['lightsoff', 35.5, 'Relatórios · como fizemos', 20.4, 36.5], ['lightsoff', 49.6, 'Relatórios · luz apagada, resultado e dashboard', 36.6, 50.6],
     ['insight', 26.8, 'Agentes · avaliar e corrigir', 18.6, 27.4], ['insight', 45.6, 'Agentes · escala', 35.6, 46.5], ['insight', 54.6, 'Agentes · situação', 46.7, 55.4]],
   5: [['s05', 19.5, 'A mesma equipe, mais alcance', 3.8, 19.8]],
   6: [['s06', 24.0, 'Pilares e contribuições', 3.8, 24.3]],
-  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3], ['climax', 19.5, 'Por trás de tudo · métodos e técnicas', 0, 26.3]]
+  7: [['s07', 9.0, 'Decisões e integração', .6, 9.3], ['s07', 17.8, 'Automação, eficiência e escala', 9.4, 18.1], ['s07', 26, 'User-Pay', 18.2, 26.3]]
 };
 /** telas extras das paradas (lupa) que não são cenas do filme: SLIDES com nome '@tela' */
 const SLIDE_SCREENS = {};
