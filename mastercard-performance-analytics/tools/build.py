@@ -43,8 +43,14 @@ def music_blocks(prev):
     for mid in MUSIC_IDS:
         # ElevenLabs encaixada (tools/eleven_fit.py) → trilha Pixabay: versão animada (remix) → remontagem → original
         src = next((ROOT / 'musica' / f for f in (ELEVEN[mid], f'{mid}-mix.mp3', f'{mid}-edit.mp3', f'{mid}.mp3') if (ROOT / 'musica' / f).exists()), ROOT / 'musica' / f'{mid}.mp3')
-        if mid == 'pausa' and os.environ.get('PA_PAUSA'):
-            src = pathlib.Path(os.environ['PA_PAUSA']).resolve()   # v7.17: outra música das conversas só neste build
+        if mid == 'pausa':
+            # v7.17: a música das conversas só entra quando é pedida (PA_PAUSA=arquivo, ou musica/pausa.mp3 existindo) e nunca é
+            # reaproveitada do HTML anterior: o HTML do repositório (público) sai sem ela, e as cópias de apresentação usam PA_PAUSA
+            pa = os.environ.get('PA_PAUSA', '').strip()
+            src = None if pa.lower() == 'none' else (pathlib.Path(pa).resolve() if pa else ROOT / 'musica' / 'pausa.mp3')
+            if not src or not src.exists():
+                print('aviso: sem música das conversas neste build (a abertura usa a trilha sintetizada e as paradas ficam sem música)')
+                continue
         attrs = pause_attrs(src) if mid == 'pausa' else ''
         if src.exists():
             mp3 = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(src), '-map_metadata', '-1', '-ac', '2',

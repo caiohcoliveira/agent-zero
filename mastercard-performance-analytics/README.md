@@ -10,7 +10,9 @@
 > - **música das conversas = trilha da abertura:** a mesma música toca na abertura (a parte zero), no nível do filme, e segue sem recomeçar para a Conversa 0, onde desce para o fundo em 2 s.
 >   - Depois entra do começo nas duas baldeações e no encerramento (depois do letreiro PERFORMANCE ANALYTICS), sempre em loop sem fim até alguém apertar uma tecla.
 >   - Na abertura, a trilha sintetizada e os pulsos de 120 BPM saem.
-> - **música escolhida pelo usuário:** veio como arquivo (MP4 só com áudio, 2:45) e fica **só nas cópias locais**: o repositório é público e a gravação é de terceiros. O HTML do Git mantém a música da ElevenLabs no lugar.
+> - **música escolhida pelo usuário:** veio como arquivo (MP4 só com áudio, 2:45) e é a música de **todas as cópias de apresentação**. Não vai para o Git: o repositório é público e a gravação é de terceiros.
+>   - O HTML do Git sai **sem música das conversas**: a da ElevenLabs saiu a pedido do usuário. A abertura volta para a trilha sintetizada, e as paradas ficam em silêncio.
+>   - Se o repositório ficar privado, a música pode entrar no HTML do Git também.
 >   - Por ser uma música conhecida, o loop é a música inteira: do fim volta ao começo, como "repetir" num player (`tools/pausa.py --inteira`).
 >   - O laço e o volume viajam com a faixa (`data-*` no bloco `music-pausa`). `PA_PAUSA=musica/pausa-usuario.mp3 python3 tools/build.py dados.json saida.html` monta a cópia com ela.
 >
@@ -198,7 +200,11 @@ Os números e resultados vêm de um JSON embutido no topo do HTML, no bloco `<sc
       - Mede o LUFS e grava `DESTINO.json` com o laço, a transição e os dois volumes: `gain` deixa a música ≈ 10 dB abaixo do filme nas paradas; `openGain` deixa no nível do filme na abertura.
       - `--inteira` faz o laço da música inteira (para uma música conhecida); sem a opção, o laço é um trecho de frases (para música ambiente).
     - O build embute esses valores no bloco (`data-loop`, `data-xfade`, `data-gain`, `data-open-gain`).
-    - `PA_PAUSA=arquivo` troca a faixa só naquele build: é assim que as cópias locais levam a música escolhida pelo usuário, que não vai para o Git (`musica/usuario/`, `musica/pausa-usuario.mp3`).
+    - **Build:** a música das conversas só entra quando é pedida, com `PA_PAUSA=arquivo` ou com `musica/pausa.mp3` existindo, e nunca é reaproveitada do HTML anterior.
+      - O `./build.sh` padrão monta o HTML do repositório sem ela.
+      - As cópias de apresentação usam `PA_PAUSA=musica/pausa-usuario.mp3 python3 tools/build.py dados.json saida.html`.
+      - A música fica fora do Git: `musica/usuario/` e `musica/pausa-usuario.mp3`.
+      - A geração da ElevenLabs ficou guardada em `musica/elevenlabs/pausa/`.
 - **Encaixe** (`tools/eleven_fit.py`): a ElevenLabs respeita estilo e andamento, mas não os tempos internos.
   - **Parte 1:** cortes de compassos, intro abafada, a quebra "rádio" (só médios) antes da parte B, riser, impacto e pratos (camadas de `tools/remix.py`). Tem o andamento ajustado (0,95%, rubberband) para a grade de 110 BPM das cenas.
   - **Partes 2 e 3:** nada além do nível; cada versão só é deslocada inteira (`PARTE2_A`), e o filme acompanha (a grade e as seções saem delas).

@@ -497,5 +497,8 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - na Conversa 0, a mesma volta (sem recomeçar) e o volume descendo;
   - na estação 01, o fade de saída;
   - no encerramento e na Conversa 2, a música em loop;
-  - console limpo.
+  - console limpo.- [x] **A pedido do usuário, a música dele vale para todas as versões de apresentação, e a da ElevenLabs sai da versão pública.**
+  - O HTML do Git sai sem música das conversas (abertura sintetizada, paradas em silêncio). A gravação é de terceiros e o repositório é público.
+  - O build só embute a música das conversas quando ela é pedida (`PA_PAUSA` ou `musica/pausa.mp3`) e nunca reaproveita a do HTML anterior. Assim ela não entra no HTML do Git por acidente.
+  - Testado: no HTML do Git, a abertura toca a trilha sintetizada, as paradas ficam sem música e o console fica limpo; nas cópias de apresentação, a música do usuário segue da abertura para a Conversa 0 e repete no encerramento.
 
