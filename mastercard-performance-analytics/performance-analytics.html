@@ -41,12 +41,15 @@
       revenue_performance_analytics_usd_millions .... tela 1: receita por ano ("2026_forecast" = previsão)
       business_scale_AAAA.projects_delivered ........ tela 2: número de projetos
         (projects_delivered_display curto, como "+30", substitui o número na tela)
+      business_scale_AAAA.highlight_project_type .... tela 2: a frente em destaque (opcional; sem ele, a de
+        maior receita). Valor = revenue_share da frente × business_scale_AAAA.revenue_usd_millions_approx
       revenue_contribution_by_project_type_AAAA ..... tela 2: receita por tipo de projeto
         (project_type, revenue_share e delivery_model: "Track" = só a track; "Track + Outra" = com outra track)
       revenue_contribution_summary_AAAA ............. tela 2: receita só da track × com outras tracks
       project_mix_AAAA.projects_with_other_tracks_approx .. tela 2: % de projetos com outras tracks
       team_structure_AAAA ........................... tela 3: pessoas por nível
-        (levels: level, current_internal_positions, current_contractors; e os totais current_*)
+        (levels: level, current_internal_positions; e o total current_internal_positions.
+         Só as posições internas aparecem: os contractors ficam fora da tela)
     Seção 3 (client_types, capabilities) ............ estação 03
     Seção 4 · cases, NESTA ORDEM .................... estação 04
       1º cestas de produtos · 2º principalidade · 3º relatórios automatizados · 4º agentes de IA
@@ -3604,7 +3607,7 @@ const SAY = {
     para(c, s, x + pad + 12, y + pad + (o.label ? 50 : 0), inner, { size, weight: 700, color: dark ? '#FFF' : INK, accent: dark ? C.yellow : C.red });
   },
   concl(c, s, o, dark, e) {
-    const size = TY.concl, maxW = 1580, L = wrapRich(c, s, maxW, size, 800), lh = size * 1.2, h = L.lines.length * lh + 40, w = Math.min(1780, L.w + 170), x = W / 2 - w / 2, y = LAY.conclY - h / 2 + (1 - e) * 22;
+    const size = TY.concl, maxW = 1580, L = wrapRich(c, s, maxW, size, 800), lh = size * 1.2, h = L.lines.length * lh + 40, w = Math.min(1780, L.w + 170), x = W / 2 - w / 2, y = LAY.conclY + (lh + 40) / 2 - h + (1 - e) * 22;   // v7.14: com 2 linhas, o painel cresce para cima (a base fica onde está a de 1 linha)
     rr(c, x + 6, y + 9, w, h, 16); c.fillStyle = 'rgba(0,0,0,.5)'; c.fill();
     rr(c, x, y, w, h, 16); c.fillStyle = 'rgba(15,11,9,.95)'; c.fill(); c.strokeStyle = 'rgba(255,233,214,.28)'; c.lineWidth = 3; c.stroke();
     c.fillStyle = C.orange; rr(c, x + 26, y - 4, (w - 52) * e, 8, 4); c.fill();

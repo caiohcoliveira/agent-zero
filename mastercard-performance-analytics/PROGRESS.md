@@ -435,6 +435,7 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
 - [x] **Capacidade (estação 02):** só as posições internas (sem contractors). As barras, o total ("N pessoas hoje · em posições internas") e a frase usam os mesmos números.
 - [x] **Estação 07:** o título virou "Para onde *vamos*" (e o teaser do mapa, "para onde vamos"). Saíram as linhas coloridas que subiam em curva até a linha laranja.
 - [x] **Prática (06):** a conclusão virou "Ao mesmo tempo que traz *governança*, a prática permite a *evolução das técnicas* e da *jornada analytics*."
+  - É a única conclusão em 2 linhas. O painel agora cresce para cima, com a base no mesmo lugar das conclusões de 1 linha, e não encosta no aviso do canto. As conclusões de 1 linha ficaram idênticas.
 - [x] **LEIA-ME e README:** o campo da frente em destaque e a regra "só posições internas" entraram no mapa "campo → tela".
 - [x] **QA:**
   - varredura sem exceções (528,14 s);

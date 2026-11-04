@@ -146,7 +146,7 @@ const SAY = {
     para(c, s, x + pad + 12, y + pad + (o.label ? 50 : 0), inner, { size, weight: 700, color: dark ? '#FFF' : INK, accent: dark ? C.yellow : C.red });
   },
   concl(c, s, o, dark, e) {
-    const size = TY.concl, maxW = 1580, L = wrapRich(c, s, maxW, size, 800), lh = size * 1.2, h = L.lines.length * lh + 40, w = Math.min(1780, L.w + 170), x = W / 2 - w / 2, y = LAY.conclY - h / 2 + (1 - e) * 22;
+    const size = TY.concl, maxW = 1580, L = wrapRich(c, s, maxW, size, 800), lh = size * 1.2, h = L.lines.length * lh + 40, w = Math.min(1780, L.w + 170), x = W / 2 - w / 2, y = LAY.conclY + (lh + 40) / 2 - h + (1 - e) * 22;   // v7.14: com 2 linhas, o painel cresce para cima (a base fica onde está a de 1 linha)
     rr(c, x + 6, y + 9, w, h, 16); c.fillStyle = 'rgba(0,0,0,.5)'; c.fill();
     rr(c, x, y, w, h, 16); c.fillStyle = 'rgba(15,11,9,.95)'; c.fill(); c.strokeStyle = 'rgba(255,233,214,.28)'; c.lineWidth = 3; c.stroke();
     c.fillStyle = C.orange; rr(c, x + 26, y - 4, (w - 52) * e, 8, 4); c.fill();
