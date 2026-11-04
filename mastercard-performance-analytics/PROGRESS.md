@@ -373,3 +373,31 @@ Próximo passo: o usuário compara com a v5.4 e decide qual linha seguir.
   - medidor de leitura: 79 telas, 0 curtas;
   - navegação, clique e console limpos;
   - fotos de cada cena, das paradas e dos trens conferidas.
+
+### v7.12 — textos, sem tinta, o eixo da v5 no clímax e ajustes de layout
+
+- [x] **Textos:**
+  - saem o "PRÓXIMA PARADA" do letreiro final e o aviso de LED antes das conversas;
+  - "Linha Performance Analytics" vira "Performance Analytics" no bilhete, no pré-show e no painel da estação;
+  - a frase final vira "Tudo se resume a *Analytics*.".
+- [x] **Sem tinta:**
+  - os títulos em pincelada viraram faixas lisas;
+  - saíram os respingos do letreiro;
+  - saiu a textura de pinceladas sobre o quadro (`motion.strokes` = 0; a gradação e o brilho ficam);
+  - a coroa da carteira é uma forma limpa.
+- [x] **Clímax:** volta o eixo da v5 (`src/legacy/17-scenes-end.js`), escolhido para o grande ataque, junto da frase:
+  - 12 técnicas do mais simples ao mais complexo;
+  - uma varredura acende cada técnica até o último tempo forte (25,17 s);
+  - a música não muda.
+- [x] **Relatórios automatizados:** a imagem do dashboard sai do centro.
+  - Os painéis saem do monitor e se empilham no canto inferior esquerdo, com o contador.
+  - O ANTES × DEPOIS fica compacto, ao lado.
+  - A tela não escurece, e o equalizador saiu.
+- [x] **Case de IA:** volta o dashboard desenhado da v5 (a imagem fica no case de relatórios).
+- [x] **07:** as outras linhas correm alinhadas, paralelas à linha laranja, e sobem a 45° até a estação; o painel 07 do encerramento fica reto.
+- [x] **05:** o leque de linhas sai da borda direita do ativo reutilizável, sem passar por cima do ícone.
+- [x] **QA:**
+  - varredura sem exceções (528,14 s);
+  - medidor de leitura: 79 telas, 0 curtas;
+  - navegação, clique e console limpos;
+  - músicas idênticas às da v7.11.

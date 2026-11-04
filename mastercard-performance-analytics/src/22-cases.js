@@ -364,7 +364,7 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
         cc.setTransform(mi); text(cc, l, 0, 50, { size: 28, weight: 900, color: i === 1 ? INK : '#FFF', align: 'center' }); cc.restore(); }); ctx.restore(); });
     vslab(ctx, -260, -40, 520, 240, 28, '#5A3A22', { lw: 5 });
     late(ctx, c => text(c, 'a carteira do cliente', 0, 100, { size: 30, weight: 800, color: '#F3E6D6', align: 'center' }));
-    const cp = P(t, T0 + 2.0, .5); if (cp > 0) { scribble(ctx, 'crown', 40, -420, 120, C.yellow, 4, cp, { glow: true }); late(ctx, c => { c.globalAlpha *= cp; tag(c, 230, -420, 'o banco principal', { size: 30, fill: C.yellow }); }); }
+    const cp = P(t, T0 + 2.0, .5); if (cp > 0) { { const s = 120 * E.outBack(cp); ctx.save(); ctx.translate(40, -420); ctx.beginPath(); ctx.moveTo(-s * .45, s * .25); ctx.lineTo(-s * .45, -s * .2); ctx.lineTo(-s * .2, s * .02); ctx.lineTo(0, -s * .32); ctx.lineTo(s * .2, s * .02); ctx.lineTo(s * .45, -s * .2); ctx.lineTo(s * .45, s * .25); ctx.closePath(); ctx.fillStyle = C.yellow; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore(); } late(ctx, c => { c.globalAlpha *= cp; tag(c, 230, -420, 'o banco principal', { size: 30, fill: C.yellow }); }); }
     ctx.restore();
   }
   function data(ctx, t) {
@@ -504,7 +504,7 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
   cue(id, T_IDEA, 'chime', { f: 784, up: 7 }); for (let k = 0; k < 10; k++) cue(id, T_PIPE + k * .55, 'type', { n: 5, gap: .04 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.1, 'pop', { p: .8 + i * .1, v: .18 }));
   // no interruptor a música segue tocando (v7.6): só o clique; sem os batimentos do antigo silêncio
   cue(id, T_SIG, 'whoosh', { dur: 4, v: .15 }); cue(id, T_OFF, 'click', { v: 1 }); cue(id, T_DROP, 'impact', { size: 1.3 }); cue(id, T_DROP + .02, 'shimmer', { dur: 2 });
-  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_DASH, 'pop', { p: 1.15, v: .22 }); cue(id, T_NEXT - .55, 'whoosh', { dur: .5, v: .15 }); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
+  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_DASH, 'pop', { p: 1.15, v: .22 }); for (let k = 1; k < 5; k++) cue(id, T_DASH + k * .28, 'pop', { p: 1.15 + k * .08, v: .12 }); cue(id, T_NEXT - .55, 'whoosh', { dur: .5, v: .15 }); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
   const SCRIPT = CASEKIT.script(id, 3, 'CASE 3 DE 4 · RELATÓRIOS DE FRAUDE', '#F3EBDD', 'Relatórios automatizados', [
     [T0, T_COST, 'ANTES', 'Cada relatório de fraude para o board era *montado manualmente*.', { y: 236, ...BOD }],
     [T_COST, T_IDEA, 'PROBLEMA', 'O trabalho *se repetia* a cada relatório e consumia *tempo da equipe*.', { y: 236, ...BOD }],
@@ -665,8 +665,6 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
     ctx.save(); ctx.globalAlpha *= a;
     lightCone(ctx, SEAT, 110, 70, 420, FLOOR - 110, '#FFB070', .55); glow(ctx, SEAT, FLOOR - 160, 240, C.orange, .25);
     chair(ctx, SEAT, FLOOR - 6, lt * 3.4, 1);
-    for (let k = 0; k < 9; k++) { const x = 1390 + k * 36, h = 40 + 150 * clamp(.35 * BT.level + .5 * BT.kick * (k % 3 === 0 ? 1 : .6) + .3 * Math.abs(Math.sin(t * (3 + k * .7) + k))), c = [C.orange, '#FF5FA2', C.yellow][k % 3];
-      ctx.save(); if (!QUALITY.low) { ctx.shadowColor = c; ctx.shadowBlur = 14; } ctx.strokeStyle = c; ctx.lineWidth = 4; ctx.strokeRect(x, 860 - h, 24, h); ctx.restore(); }
     for (let k = 0; k < 14; k++) { const d = ((lt * .5 + k / 14) % 1), ang = hash(k * 3.3) * 1.6 - .8 - Math.PI / 2, dist = d * 620, x = nx(4) + Math.cos(ang) * dist, y = NY + Math.sin(ang) * dist + d * d * 520;
       ctx.save(); ctx.globalAlpha *= 1 - d; ctx.translate(x, y); ctx.rotate(d * 9 + k); ctx.scale(Math.cos(d * 12 + k) * .8 + .2, 1); paper(ctx, -16, -21, 32, 42, { r: 3, fill: '#FFF6E8', shadow: 2, lw: 2, volume: false }); icon(ctx, 'check', 0, 0, 20, C.orange, 6); ctx.restore(); }
     ctx.restore();
@@ -683,31 +681,41 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
   /** a imagem do dashboard: o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque pelo real,
    *  com o mesmo nome). Sem o arquivo (ou com o campo vazio), o popup mostra o dashboard desenhado, marcado como ilustrativo */
   const DASH = DASHIMG;
-  /** com a rotina automatizada, o relatório que vai ao board abre numa janela (popup) que sai do monitor e volta para ele */
+  /** v7.12: com a rotina automatizada, os painéis saem do monitor um atrás do outro e se empilham no canto inferior esquerdo,
+   *  sem cobrir a animação da automação: a automação gera vários painéis, muito mais rápido. O da frente mostra a imagem
+   *  dashboard_image (ou o dashboard desenhado, marcado como ilustrativo) */
+  const DN = 5, DPW = 540, DPH = 330, DX0 = 70, DY0 = 650;
   function dashPopup(ctx, t) {
-    const op = E.outBack(P(t, T_DASH, .55)), cl = E.inCubic(P(t, T_NEXT - .55, .45)), a = P(t, T_DASH, .25) * (1 - cl); if (a <= 0) return;
-    const WW = 920, WH = 560, k = lerp(.3, 1, op) * (1 - .7 * cl), cx = lerp(MON.x, 760, op * (1 - cl)), cy = lerp(MON.y, 520, op * (1 - cl));
+    const a = P(t, T_DASH, .25) * (1 - P(t, T_NEXT - .45, .45)); if (a <= 0) return;
+    const img = DASH();
     hud(ctx, c => {
-      c.fillStyle = 'rgba(4,6,14,.55)'; c.fillRect(0, 0, W, H);                      // o resto da cena escurece
-      c.translate(cx, cy); c.scale(k, k); c.translate(-WW / 2, -WH / 2);
-      panel(c, 0, 0, WW, WH, { dark: true, accent: C.yellow });
-      [C.red, C.yellow, '#9BD27A'].forEach((col, i) => circle(c, 44 + i * 24, 30, 7, col));
-      text(c, 'Dashboard de fraude · board', 124, 38, { size: 22, weight: 800, mono: true, color: '#F3E6D6' });
-      tag(c, WW - 170, 30, 'gerado automaticamente', { size: 20, fill: C.yellow });
-      const img = DASH(), X = 34, Y = 60, IW = WW - 56, IH = WH - 80;
-      if (img) { const s = Math.min(IW / img.naturalWidth, IH / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s;
-        rr(c, X, Y, IW, IH, 10); c.fillStyle = '#FFF'; c.fill(); c.drawImage(img, X + (IW - w) / 2, Y + (IH - h) / 2, w, h); }
-      else { dashboard(c, X, Y, IW, IH, { t: t - T_DASH, seed: 9 }); tag(c, X + IW - 190, Y + 32, 'ilustrativo', { size: 18, fill: '#E9DCC8' }); }
+      for (let k = DN - 1; k >= 0; k--) {
+        const f = E.inOutCubic(P(t, T_DASH + (DN - 1 - k) * .28, .55)); if (f <= 0) continue;          // o de trás sai primeiro; o da frente por último
+        const tx = DX0 + k * 16, ty = DY0 - k * 16, s = lerp(.22, 1, f), cx = lerp(MON.x, tx + DPW / 2, f), cy = lerp(MON.y, ty + DPH / 2, f);
+        c.save(); c.translate(cx, cy); c.scale(s, s); c.translate(-DPW / 2, -DPH / 2);
+        rr(c, 6, 8, DPW, DPH, 14); c.fillStyle = 'rgba(0,0,0,.45)'; c.fill();
+        rr(c, 0, 0, DPW, DPH, 14); c.fillStyle = '#14100D'; c.fill(); c.strokeStyle = k ? 'rgba(243,230,214,.35)' : C.yellow; c.lineWidth = 3; c.stroke();
+        [C.red, C.yellow, '#9BD27A'].forEach((col, i) => circle(c, 22 + i * 18, 20, 5, col));
+        if (!k) text(c, 'Dashboard de fraude · board', 84, 21, { size: 17, weight: 800, mono: true, color: '#F3E6D6' });
+        const X = 12, Y = 38, IW = DPW - 24, IH = DPH - 50;
+        if (img) { const q = Math.min(IW / img.naturalWidth, IH / img.naturalHeight), w = img.naturalWidth * q, h = img.naturalHeight * q; rr(c, X, Y, IW, IH, 8); c.fillStyle = '#FFF'; c.fill(); c.drawImage(img, X + (IW - w) / 2, Y + (IH - h) / 2, w, h); }
+        else { dashboard(c, X, Y, IW, IH, { t: t - T_DASH, seed: 9 + k, mini: true }); if (!k) tag(c, X + IW - 90, Y + 24, 'ilustrativo', { size: 15, fill: '#E9DCC8' }); }
+        c.restore();
+      }
+      const n = Math.min(DN, Math.floor(Math.max(0, t - T_DASH) / .28) + 1), cnt = n + Math.floor(clamp((t - T_DASH - .5) / 4) * 120);
+      c.globalAlpha *= P(t, T_DASH + .3, .3);
+      tag(c, DX0 + 150, DY0 - 104, 'gerado automaticamente', { size: 19, fill: C.yellow });
+      tag(c, DX0 + DPW - 90, DY0 - 104, `painéis: ${cnt}`, { size: 19, fill: '#F6EEDF' });
     }, a);
   }
   function beforeAfter(ctx, t) {
     const a = P(t, T_RESULT + .3, .5) * (1 - P(t, T_NEXT - .3, .5)); if (a <= 0) return;
-    hud(ctx, c => { c.translate(96, 700); const PW = Math.max(980, GEST.reduce((s, [, l]) => s + measure(c, l, 26, 800) + 44, 190) + 26); panel(c, 0, 0, PW, 250, { dark: true });
-      text(c, 'ANTES', 40, 60, { size: 26, weight: 900, mono: true, color: C.red, ls: 3 });
-      let x = 190; GEST.forEach(([n, l]) => { const w = measure(c, l, 26, 800) + 30; rr(c, x, 38, w, 46, 23); c.fillStyle = '#3A1A16'; c.fill(); c.strokeStyle = C.red; c.lineWidth = 2.5; c.stroke(); text(c, l, x + 15, 62, { size: 26, weight: 800, color: '#FFD9CF' }); x += w + 14; });
-      text(c, 'DEPOIS', 40, 170, { size: 26, weight: 900, mono: true, color: C.yellow, ls: 3 });
-      const l2 = 'automático, do dado ao board'; rr(c, 190, 146, measure(c, l2, 30, 900) + 40, 52, 26); c.fillStyle = C.orange; c.fill(); c.strokeStyle = '#FFF'; c.lineWidth = 2.5; c.stroke(); text(c, l2, 210, 173, { size: 30, weight: 900, color: '#FFF' });
-      icon(c, 'check', 190 + measure(c, l2, 30, 900) + 80, 172, 44, C.yellow, 10); }, a);
+    hud(ctx, c => { c.translate(690, 726); const PW = GEST.reduce((s, [, l]) => s + measure(c, l, 22, 800) + 36, 150) + 18; panel(c, 0, 0, PW, 206, { dark: true });   // v7.12: compacto, à direita da pilha de painéis
+      text(c, 'ANTES', 36, 56, { size: 22, weight: 900, mono: true, color: C.red, ls: 3 });
+      let x = 150; GEST.forEach(([n, l]) => { const w = measure(c, l, 22, 800) + 26; rr(c, x, 36, w, 40, 20); c.fillStyle = '#3A1A16'; c.fill(); c.strokeStyle = C.red; c.lineWidth = 2.5; c.stroke(); text(c, l, x + 13, 57, { size: 22, weight: 800, color: '#FFD9CF' }); x += w + 10; });
+      text(c, 'DEPOIS', 36, 148, { size: 22, weight: 900, mono: true, color: C.yellow, ls: 3 });
+      const l2 = 'automático, do dado ao board'; rr(c, 150, 124, measure(c, l2, 26, 900) + 36, 48, 24); c.fillStyle = C.orange; c.fill(); c.strokeStyle = '#FFF'; c.lineWidth = 2.5; c.stroke(); text(c, l2, 168, 149, { size: 26, weight: 900, color: '#FFF' });
+      icon(c, 'check', 150 + measure(c, l2, 26, 900) + 72, 148, 40, C.yellow, 10); }, a);
   }
   SCENES[id] = {
     themeAt: t => t < T_OFF ? 'light' : 'dark', fx: { invert: true }, script: SCRIPT,
@@ -811,26 +819,21 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
       text(c, 'REPORT DE FRAUDE · BOARD', R.x + 18, R.y + 80, { size: 16, weight: 800, mono: true, color: '#6A6056', ls: 1.5 });
       ['0,08%', '−12%', '3 alertas'].forEach((v, i) => { const bx = R.x + 18 + i * (R.w - 36) / 3; text(c, v, bx + 12, R.y + 131, { size: 21, weight: 900, color: INK }); }); });
   }
-  /** a pilha de painéis gerados automaticamente (a imagem do case de relatórios); a faixa do insight entra no painel da frente */
+  /** o dashboard (v5): a faixa do insight entra no topo */
   function panels(ctx, t, banner) {
-    const img = DASHIMG(), n = Math.min(5, 1 + Math.floor(Math.max(0, t - T_GEN - .3) / .22)), D = DSH;
-    for (let k = n - 1; k >= 0; k--) { const a = k === 0 ? E.outBack(P(t, T_GEN + .3, .4)) : 1, x = D.x + k * 16, y = D.y - k * 16;
-      ctx.save(); ctx.translate(x + D.w / 2, y + D.h / 2); ctx.scale(a, a); ctx.translate(-D.w / 2, -D.h / 2);
-      paper(ctx, 0, 0, D.w, D.h, { r: 10, fill: '#FFFFFF', shadow: 6, shadowColor: '#000', lw: 2.5 });
-      if (img) { const s = Math.min((D.w - 16) / img.naturalWidth, (D.h - 16) / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s; ctx.drawImage(img, (D.w - w) / 2, (D.h - h) / 2, w, h); }
-      else dashboard(ctx, 8, 8, D.w - 16, D.h - 16, { t, seed: 3 + k, mini: true });
-      if (k === 0 && banner > 0) { rr(ctx, 8, 10, (D.w - 16) * clamp(banner * 1.4), 44, 8); ctx.fillStyle = C.orange; ctx.fill(); }
-      ctx.restore(); }
-    const cnt = Math.floor(clamp((t - T_GEN - .3) / 12) * 240) + n;
-    late(ctx, c => { tag(c, D.x + D.w - 120, D.y + D.h + 30, `painéis gerados: ${cnt}`, { size: 20, fill: C.yellow });
-      if (banner > 0) { c.globalAlpha *= clamp(banner * 2); text(c, SHORT, D.x + 22, D.y + 32, { size: fitSize(c, SHORT, 18, D.w - 44), weight: 800, color: '#FFF' }); } });
+    const D = DSH, a = E.outBack(P(t, T_GEN + .3, .4)); if (a <= 0) return;
+    ctx.save(); ctx.translate(D.x + D.w / 2, D.y + D.h / 2); ctx.scale(a, a); ctx.translate(-D.w / 2, -D.h / 2);
+    dashboard(ctx, 0, 0, D.w, D.h, { t, seed: 3, mini: true });
+    if (banner > 0) { rr(ctx, 8, 10, (D.w - 16) * clamp(banner * 1.4), 44, 8); ctx.fillStyle = C.orange; ctx.fill(); }
+    ctx.restore();
+    if (banner > 0) late(ctx, c => { c.globalAlpha *= clamp(banner * 2); text(c, SHORT, D.x + 22, D.y + 32, { size: fitSize(c, SHORT, 18, D.w - 44), weight: 800, color: '#FFF' }); });
   }
   function stage(ctx, t) {
     const a = P(t, T_GEN - .2, .5) * (1 - P(t, T_QUAL - .3, .4)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     const head = P(t, T_REP + .75, .9), banner = P(t, T_DSH + .75, .6);
     miniReport(ctx, t, head); panels(ctx, t, banner);
-    late(ctx, c => { [[REP, 'relatório', C.red, '#FFF'], [DSH, 'painéis', C.yellow, INK]].forEach(([R, lb, f, col], k) => { c.save(); c.translate(R.x + R.w - 60, R.y - (k ? 70 : 8)); c.rotate(.04); tag(c, 0, 0, lb, { size: 20, fill: f, color: col }); c.restore(); }); });
+    late(ctx, c => { [[REP, 'relatório', C.red, '#FFF'], [DSH, 'dashboard', C.yellow, INK]].forEach(([R, lb, f, col], k) => { c.save(); c.translate(R.x + R.w - 60, R.y - 8); c.rotate(.04); tag(c, 0, 0, lb, { size: 20, fill: f, color: col }); c.restore(); }); });
     // "refazer": a seta tracejada vermelha volta do Validador para os geradores (por baixo dos rascunhos)
     const loopP = P(t, T_NO + .2, .6, E.inOutCubic) * (1 - P(t, T_DR2, .4));
     if (loopP > 0) { ctx.save(); ctx.beginPath(); ctx.moveTo(VX - 30, VY + 86); ctx.bezierCurveTo(VX - 80, 960, GX + 220, 975, GX + 8, GY[2] + 80);

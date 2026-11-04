@@ -1,4 +1,4 @@
-# Performance Analytics — "A Linha" (v7.11, experimento)
+# Performance Analytics — "A Linha" (v7.12, experimento)
 
 > **Branch experimental** (`claude/mastercard-analytics-video-experimento`). A v5.4 continua intacta na branch `claude/mastercard-analytics-video-4cof1t`. Esta versão segue o roteiro criativo v7 ("cada tela se explica sozinha"), com quatro escolhas da v5.4 mantidas a pedido:
 > - relatórios de fraude em versão híbrida: a explosão acende só o fluxo e a placa LIGHTS OFF RPA;
@@ -11,8 +11,15 @@
 > - **trem bala:** o vagão antigo virou um trem bala de dois vagões (nariz aerodinâmico, faixa contínua de janelas, saia lisa e as cores da Mastercard), no embarque, na ponte, no viaduto, na 07, na passagem entre estações e ao fundo da estação;
 > - **telas com gráfico minimalistas:** sem fachos de luz, poeira, partículas, objetos flutuando, fitas 3D, grade neon, rastros de velocidade e prédios ao fundo. A cidade só aparece onde o trem passa (ponte da 01, viaduto da 06 e cidade da 07);
 > - **barras chapadas** (sem volume 3D nem brilho) e números-manchete sem respingo;
-> - **cases:** os clusters 3D da v5 na principalidade e a resolução de erros da v5 no case de IA, com a pilha de painéis gerados (a imagem do dashboard) no canto inferior esquerdo;
+> - **cases:** os clusters 3D da v5 na principalidade e a resolução de erros da v5 no case de IA;
 > - **clímax:** 5 cases que entram nos compassos e viram (frente: case e método; verso: técnicas).
+>
+> **v7.12:**
+> - **sem "próxima parada"** (o letreiro final e o aviso antes das conversas) e **sem "linha" no nome**: "Performance Analytics" no bilhete, no pré-show e no painel da estação;
+> - **sem tinta:** títulos em faixa lisa (sem pincelada, respingo ou contorno), sem respingos no letreiro e sem a textura de pinceladas por cima do quadro (`motion.strokes` = 0);
+> - **clímax:** a frase final é "Tudo se resume a *Analytics*." e volta o eixo da v5: 12 técnicas, do mais simples ao mais complexo, acesas por uma varredura até o último tempo forte;
+> - **relatórios automatizados:** os painéis saem do monitor e se empilham no canto inferior esquerdo, com o contador, sem cobrir a animação da automação; o ANTES × DEPOIS fica ao lado;
+> - **ajustes:** as linhas da 07 correm alinhadas à linha laranja; o leque da 05 sai da borda do ativo reutilizável; o painel 07 do encerramento fica reto; o case de IA volta ao painel desenhado da v5.
 >
 > **v7.2:**
 > - **sem personagem:** cada aparição virou outra solução visual (o bilhete sozinho, um trem que cruza a ponte, a equipe em ícones planos, a tela e o interruptor contando a fraude, um trem que segue pela cidade);

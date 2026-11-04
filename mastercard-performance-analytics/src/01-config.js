@@ -33,7 +33,8 @@ const CONFIG = {
     onTwos: true,          // snaps "em dois" (textura stop motion)
     grain: 0.06,           // granulação de filme (0 desliga)
     beat: 1.0,             // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
-    paint: 1.0,            // acabamento pintado: pinceladas, gradação de cor e brilho (0 desliga)
+    paint: 1.0,            // acabamento: gradação de cor e brilho (0 desliga)
+    strokes: 0,            // v7.12: textura de pinceladas por cima do quadro (0 = sem tinta; .55 era o valor antigo)
     beatBase: 0.15         // fora dos clímax a batida fica contida nesse nível (os picos de cada cena ficam em SCENES[id].peaks)
   },
 
@@ -94,7 +95,7 @@ const CONFIG = {
 
   // ---------------------------------------------------------------- TEXTOS-CHAVE
   text: {
-    line: 'LINHA PERFORMANCE ANALYTICS',
+    line: 'PERFORMANCE ANALYTICS',   // v7.12: sem "LINHA"
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
       { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'conectamos perguntas de negócio aos dados, do diagnóstico à mensuração',
@@ -163,14 +164,14 @@ const CONFIG = {
       { name: 'Forecast', method: 'séries temporais', tech: ['ARIMA', 'SARIMAX', 'boosting', 'componentes de Fourier'] },
       { name: 'Pricing / dimensionamento', method: 'otimização', tech: ['PO · pesquisa operacional', 'simulação de Monte Carlo', 'programação linear', 'modelos de estoque'] }
     ],
-    climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
+    climaxKey: 'Tudo se resume a *Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },
 
   // ---------------------------------------------------------------- NARRAÇÃO (opcional, desligada por padrão)
   // at = segundos desde o início da cena · também serve de roteiro para quem apresenta
   narration: [
-    { scene: 'open', at: 1.0, text: 'Bem-vindos à linha Performance Analytics.' },
+    { scene: 'open', at: 1.0, text: 'Bem-vindos à Performance Analytics.' },
     { scene: 's01', at: 1.0, text: 'Próxima estação: analytics como capacidade estratégica da consultoria.' },
     { scene: 's01', at: 8.0, text: 'Todo projeto começa com uma pergunta de negócio.' },
     { scene: 's01', at: 22.0, text: 'Transformamos dados em decisões, decisões em impacto… e impacto em valor.' },

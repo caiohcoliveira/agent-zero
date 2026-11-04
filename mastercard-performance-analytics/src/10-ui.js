@@ -274,7 +274,7 @@ function platform(ctx, tl, o = {}) {
     intersection(ctx, x0 + 44, 170, 11, 14);
     text(ctx, o.sign, W / 2 + 26, 171, { size: 22, weight: 900, color: '#FFFFFF', align: 'center', ls: 4 }); }
   // painel digital de partidas e relógio
-  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   EMBARQUE PELA FAIXA AMARELA   ', lx = 120, lw = 300, ly = 150;
+  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   PERFORMANCE ANALYTICS   ·   EMBARQUE PELA FAIXA AMARELA   ', lx = 120, lw = 300, ly = 150;
     rr(ctx, lx, ly, lw, 40, 10); ctx.fillStyle = '#1F2B30'; ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.rect(lx + 10, ly + 3, lw - 20, 34); ctx.clip(); ctx.font = font(18, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 60) % mw;
     ctx.fillStyle = '#7FE0C4'; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 10 - off, ly + 21); ctx.restore();

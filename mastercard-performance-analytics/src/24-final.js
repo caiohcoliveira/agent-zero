@@ -122,8 +122,9 @@ const FUTURE_ART = {
       layer(ctx, cam, 1, () => {
         const g = ctx.createLinearGradient(0, RAIL, 0, H); g.addColorStop(0, '#24160E'); g.addColorStop(1, '#0C0806'); ctx.fillStyle = g; ctx.fillRect(-800, RAIL - 10, 7600, 400);
         const xt = trainX(t); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], (xt + 600) / 6800, { w: 22, head: false, glow: 14 });
-        // as outras linhas (tracks) chegando à cidade, atrás dos painéis
-        [[C.red, -300, 160], [C.yellow, 2200, 120], ['#E9DCC8', 4300, 180]].forEach(([col, x0, y0], k) => { const p = E.inOutSine(P(t, T_G[Math.min(k, 2)] + 1.2, 2)); LINE.draw(ctx, [[x0, y0], [x0 + 500, 500], [x0 + 860, RAIL]], p, { w: 10, col, shadow: false, alpha: .45 }); });
+        // as outras linhas (tracks) chegam alinhadas: paralelas à linha laranja, por baixo dela, e sobem a 45° para encontrá-la na estação
+        [[C.red, 1360], [C.yellow, 3400], ['#E9DCC8', 5040]].forEach(([col, xm], k) => { const p = E.inOutSine(P(t, T_G[k] + 1.2, 2)), yk = RAIL + 44;
+          LINE.draw(ctx, [[xm - 1500, yk], [xm - 60 - (yk - RAIL), yk], [xm - 60, RAIL]], p, { w: 10, col, shadow: false, alpha: .6 }); });
         for (let i = 0; i < 5; i++) panelArt(ctx, t, i);
         // uma estação ainda em aberto
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
@@ -145,10 +146,17 @@ const FUTURE_ART = {
   const TW = 330, TH = 470, GAP = 22, TX0 = (W - (N * TW + (N - 1) * GAP)) / 2, TY0 = 322;
   for (let k = 0; k < N; k++) { cue(id, T_IN(k), 'hit', { size: .3 + k * .05 }); cue(id, T_FLIP(k), 'whoosh', { dur: .3, v: .18 }); }
   cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
+  // v7.12: o eixo da v5 — as técnicas do mais simples ao mais complexo, acesas por uma varredura até o último tempo forte (25,17)
+  const AXT = [['Estatística', 'gaussian'], ['Regressão', 'regression'], ['Séries temporais', 'forecast'], ['Otimização', 'lp'], ['Clusters', 'clusters'], ['Árvores', 'tree'],
+    ['Gradient boosting', 'ensemble'], ['Recomendação', 'recommend'], ['Embeddings', 'embeddings'], ['Redes neurais', 'mlp'], ['Transformers', 'transformer'], ['Agentes de IA', 'agents']];
+  const AX0 = 180, AX1 = 1740, AY = 820, axX = k => AX0 + k * (AX1 - AX0) / (AXT.length - 1), CW = 128, CH = 118;
+  const T_AX = T_KEY + .5, T_SW0 = T_KEY + .9, T_SW1 = onBeat(id, 25.17, 'bar'), SWX = u => lerp(AX0 - 50, AX1 + 50, E.inOutSine(u));
+  const T_LIT = AXT.map((_, k) => T_SW0 + Math.acos(1 - 2 * clamp((axX(k) - AX0 + 50) / (AX1 - AX0 + 100))) / Math.PI * (T_SW1 - T_SW0));
+  cue(id, T_SW0, 'riser', { dur: T_SW1 - T_SW0, v: .22 }); T_LIT.forEach((t0, k) => cue(id, t0, 'tick', { f: 1400 + k * 90, v: .12 })); cue(id, T_SW1, 'shimmer', { dur: 1.2 });
   const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *métodos* e *técnicas*']]);
   SAY.reg(id, CC.map((c, k) => [T_IN(k), T_KEY + .3, 'label', c.name + ' · ' + c.method]));     // o nome do case fica nos dois lados do card
   SAY.reg(id, CC.map((c, k) => [T_FLIP(k), T_KEY + .3, 'label', c.tech.join(', ')]));
-  SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey]]);
+  SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey], [T_AX, 26.6, 'label', 'do mais simples ao mais complexo']]);
   /** teste A/B: duas distribuições (A e B) e a diferença entre as médias */
   function abViz(ctx, x, y, w, h, p) {
     const bell = (m, s, col, fill) => { ctx.beginPath(); for (let i = 0; i <= 60; i++) { const u = i / 60, px = x + u * w, py = y + h - Math.exp(-((u - m) ** 2) / (2 * s * s)) * h * .85 * p; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
@@ -180,8 +188,8 @@ const FUTURE_ART = {
     themeAt: () => 'dark',
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' });
-      // na frase-chave os cards recuam (encolhem e escurecem): só a frase fica legível
-      const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - .82 * kd;
+      // na frase-chave os cards saem (encolhem e somem): ficam a frase e o eixo das técnicas
+      const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - kd;
       for (let k = 0; k < N; k++) {
         const p = P(t, T_IN(k), .5); if (p <= 0) continue;
         const f = E.inOutCubic(P(t, T_FLIP(k), .5)), sx = Math.max(.02, Math.abs(Math.cos(f * Math.PI))), lift = 1 + .06 * Math.sin(f * Math.PI), s = lerp(1.15, 1, E.outExpo(p)) * lift * (1 - .08 * kd);
@@ -190,12 +198,28 @@ const FUTURE_ART = {
         if (f < .5) front(ctx, k, t, CC[k]); else back(ctx, k, CC[k]);
         ctx.restore();
       }
-      if (t >= T_KEY) { const p = P(t, T_KEY, .5);
-        const band = ctx.createRadialGradient(W / 2, H / 2 - 20, 80, W / 2, H / 2 - 20, 1000); band.addColorStop(0, rgba('#0A0604', .78 * p)); band.addColorStop(1, rgba('#0A0604', 0)); ctx.fillStyle = band; ctx.fillRect(0, 0, W, H);
-        glow(ctx, W / 2, H / 2, 700, C.orange, .3 + .2 * BT.level);
-        hud(ctx, c => { c.translate(W / 2, H / 2); const s = lerp(1.3, 1, E.outExpo(p)); c.scale(s, s);
+      if (t >= T_KEY) { const p = P(t, T_KEY, .5), end = P(t, T_SW1, .5);
+        glow(ctx, W / 2, 330, 640, C.orange, .26 + .14 * BT.level + .2 * end);
+        hud(ctx, c => { c.translate(W / 2, 330); const s = lerp(1.3, 1, E.outExpo(p)) * (1 + .05 * Math.sin(Math.PI * end)); c.scale(s, s);
           const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); text(c, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
-          rich(c, k2 || '', 0, 30, { size: 100, weight: 900, color: '#FFF', accent: C.orange }); }, P(t, T_KEY + .2, .45)); }
+          rich(c, k2 || '', 0, 30, { size: 110, weight: 900, color: '#FFF', accent: C.orange }); }, P(t, T_KEY + .2, .45));
+        // o eixo: as técnicas, da mais simples à mais complexa; a varredura acende uma a uma
+        const ax = P(t, T_AX, .6), sw = clamp((t - T_SW0) / (T_SW1 - T_SW0)), sx = SWX(sw);
+        if (ax > 0) { ctx.save(); ctx.globalAlpha *= ax;
+          line(ctx, AX0, AY, AX1, AY, 'rgba(245,241,234,.22)', 4); if (sw > 0) line(ctx, AX0, AY, Math.min(Math.max(sx, AX0), AX1), AY, C.orange, 6);
+          circle(ctx, AX0, AY, 10, C.cream); circle(ctx, AX1, AY, 10, sw >= 1 ? C.orange : '#5A4E44');
+          AXT.forEach(([nm, vz], k) => { const x = axX(k), pop = E.outBack(P(t, T_AX + k * .06, .4)), lit = t >= T_LIT[k]; if (pop <= 0) return;
+            line(ctx, x, AY - 18, x, AY, lit ? C.orange : 'rgba(245,241,234,.25)', 3);
+            ctx.save(); ctx.translate(x, AY - 30 - CH / 2); ctx.scale(pop, pop); ctx.globalAlpha *= lit ? 1 : .42;
+            rr(ctx, -CW / 2, -CH / 2, CW, CH, 12); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = lit ? C.orange : 'rgba(245,241,234,.3)'; ctx.lineWidth = 3; ctx.stroke();
+            ctx.save(); rr(ctx, -CW / 2, -CH / 2, CW, CH, 12); ctx.clip(); VIZ[vz](ctx, -CW / 2 + 12, -CH / 2 + 8, CW - 24, 58, lit ? 1 : .6, { t, theme: 'dark' }); ctx.restore();
+            late(ctx, c => para(c, nm, 0, 14, CW - 14, { size: 16, weight: 800, color: lit ? '#FFF' : '#BFB3A3', align: 'center', lh: 1.05 }));
+            ctx.restore(); });
+          if (sw > 0 && sw < 1) { glow(ctx, sx, AY - 90, 200, C.orange, .45); line(ctx, sx, AY - 200, sx, AY + 16, 'rgba(255,230,200,.9)', 4); }
+          ctx.restore();
+          late(ctx, c => { c.globalAlpha *= ax; text(c, 'mais simples', AX0, AY + 46, { size: 26, weight: 800, mono: true, color: '#E9DCC8', align: 'center' });
+            text(c, 'mais complexo', AX1, AY + 46, { size: 26, weight: 800, mono: true, color: C.orange, align: 'center' });
+            text(c, 'do mais simples ao mais complexo', W / 2, 560, { size: 34, weight: 800, color: '#E9DCC8', align: 'center' }); }); } }
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
@@ -213,16 +237,15 @@ const CLOSE = (() => {
     glow(ctx, W / 2, 300, 560, C.orange, .2 + .25 * gA + .15 * br + .15 * BT.level);
     const meet = E.inOutCubic(P(t, .2, 1.2));
     intersection(ctx, W / 2, 300, 150, lerp(1400, 190, meet), { hot: Math.exp(-Math.max(0, t - T_CHORD) * 1.6) * (t > T_CHORD) * .8 + .15 * br });
-    [[380, 300, 140, C.red], [1540, 330, 160, C.yellow]].forEach(([x, y, r, c], i) => splat(ctx, x, y, r, c, 300 + i, E.outBack(P(t, T_CHORD + i * .06, .35)), .8));
-    const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, header: 'PRÓXIMA PARADA', headerCol: C.red, glowA: gA });
+    const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, glowA: gA });
     if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x, b.y - 40, b.w, b.h + 40, 18); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
     text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 860, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
     scanlines(ctx, .06);
   }
   SCENES[id] = { themeAt: () => 'dark', fx: { chroma: .7 }, draw(ctx, t) { draw(ctx, t); },
     peaks: [[T_CHORD - .1, T_CHORD + 1.8]],
-    caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*', 'PRÓXIMA PARADA'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*', 'PRÓXIMA PARADA'],
-      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*', 'PRÓXIMA PARADA'], [T_CHORD + .4, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
+    caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*'],
+      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*'], [T_CHORD + .4, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
   return { draw, T_CHORD };
 })();
 
@@ -235,7 +258,7 @@ STOPSCN.end = {
   ui(ctx, tl, item, prevItem, p, ui) {
     ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
     const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0, L = slideRects(7), ph = L.top - 90, pw = ph * .78;
-    if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H); HUD.begin(ctx); poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); HUD.flush(ctx); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
+    if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H); HUD.begin(ctx); poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { cables: false }); HUD.flush(ctx); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
     if (item === 1) slidePopup(ctx, 7, ui);
     if (!item) text(ctx, 'clique no letreiro para rever a estação 07', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .4 + .2 * Math.sin(tl * 2.4) });
     hint(ctx, tl, item === 0 ? '→' : '←');

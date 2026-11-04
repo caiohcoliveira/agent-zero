@@ -120,15 +120,14 @@ function hatch(ctx, pathFn, x, y, w, h, o = {}) {
   if (o.cross) for (let k = -h; k < w + h; k += g * 1.4) { ctx.moveTo(x + k, y); ctx.lineTo(x + k + h * a, y + h); }
   ctx.stroke(); ctx.restore();
 }
-/** título pintado: pincelada + letras com contorno de tinta e sombra chapada + respingos */
+/** título em faixa (v7.12: sem tinta — nem pincelada, nem respingo, nem contorno): faixa arredondada na cor do fundo + letras brancas */
 function paintTitle(ctx, str, x, y, o = {}) {
-  const size = o.size || 96, w = measure(ctx, str, size, 900) + size * .8, p = o.p == null ? 1 : o.p;
-  const bx = o.align === 'left' ? x - size * .3 : x - w / 2;
-  brush(ctx, bx, y - size * .62, w, size * 1.24, o.bg || C.orange, o.seed || 3, E.outCubic(clamp(p * 1.4)));
-  if (o.splat !== false) splat(ctx, bx + w - size * .2, y - size * .45, size * .32, o.splatCol || C.yellow, (o.seed || 3) + 5, E.outBack(clamp(p * 2 - .6)), .9);
+  const size = o.size || 96, w = measure(ctx, str, size, 900) + size * .9, h = size * 1.3, p = o.p == null ? 1 : o.p;
+  const bx = o.align === 'left' ? x - size * .3 : x - w / 2, bp = E.outCubic(clamp(p * 1.4));
+  if (bp > 0) { rr(ctx, bx + 6, y - h / 2 + 8, w * bp, h, h * .2); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fill(); rr(ctx, bx, y - h / 2, w * bp, h, h * .2); ctx.fillStyle = o.bg || C.orange; ctx.fill(); }
   const ap = clamp(p * 2 - .4); if (ap <= 0) return;
   ctx.save(); ctx.globalAlpha *= ap;
-  retroText(ctx, str, o.align === 'left' ? x : x, y + (1 - E.outBack(ap)) * size * .3, { size, weight: 900, color: o.color || '#FFF', align: o.align || 'center', ls: o.ls || 0 });
+  text(ctx, str, x, y + (1 - E.outBack(ap)) * size * .3 + size * .04, { size, weight: 900, color: o.color || '#FFF', align: o.align || 'center', ls: o.ls || 0 });
   ctx.restore();
 }
 

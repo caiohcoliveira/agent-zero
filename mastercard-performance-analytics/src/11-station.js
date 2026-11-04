@@ -103,7 +103,8 @@ function nextStationLED(ctx, T) {
   let nk = 0, Tn = 0;
   for (let k = 1; k <= 7; k++) { const Ts = CONFIG.stationStart[k]; if (Ts != null && Ts > T) { nk = k; Tn = Ts; break; } }
   const stop = CONFIG.mode !== 'reel' ? CONFIG.stops.find(st => st.after && st.T > T && (!nk || st.T <= Tn)) : null;
-  const target = stop ? stop.T : Tn; if (!target || target - T > 4.5) return;
+  if (stop) return;   // v7.12: sem o aviso "próxima parada"
+  const target = Tn; if (!target || target - T > 4.5) return;
   const a = clamp((4.5 - (target - T)) / .3) * clamp((target - T - .1) / .3); if (a <= 0) return;
   const label = stop ? `PRÓXIMA PARADA  ›  ${stop.id === 'end' ? 'ENCERRAMENTO' : 'CONVERSA COM AS APRESENTADORAS'}` : `PRÓXIMA ESTAÇÃO  ›  ${TX.stations[nk - 1].n} ${TX.stations[nk - 1].short}`;
   const w = measure(ctx, label, 20, 800, true, 3) + 64, x = W - 64 - w, y = 214, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;   // v7: abaixo do mini-mapa
@@ -123,7 +124,7 @@ function ticket(ctx, x, y, s, o = {}) {
   intersection(ctx, -255, -40, 30, 38);
   text(ctx, 'BILHETE', -255, 50, { size: 22, weight: 900, mono: true, color: '#FFF', align: 'center', ls: 3 });
   ctx.save(); ctx.setLineDash([8, 8]); line(ctx, -170, -110, -170, 110, INK, 3); ctx.restore();
-  text(ctx, 'LINHA PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
+  text(ctx, 'PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
   text(ctx, 'DE  dados', -140, -22, { size: 30, weight: 800, mono: true, color: '#4A4038' });
   text(ctx, 'PARA  valor', -140, 22, { size: 30, weight: 800, mono: true, color: C.red });
   text(ctx, '7 estações · 2 baldeações', -140, 72, { size: 20, weight: 700, mono: true, color: '#6A6056' });
@@ -164,7 +165,7 @@ function bridgeCard(ctx, a, kicker, str, o = {}) {
   if (kicker) { const kw = measure(ctx, kicker, 26, 800, true, 6) + 70; ctx.save(); ctx.translate(W / 2, H / 2 - 150); ctx.rotate(-.02);
     paper(ctx, -kw / 2, -28, kw, 56, { r: 6, fill: C.red, shadow: 6, shadowColor: '#000', lw: 3 }); text(ctx, kicker, 0, 2, { size: 26, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
   ctx.save(); ctx.translate(W / 2, H / 2 - 20); ctx.scale(lerp(1.25, 1, e), lerp(1.25, 1, e));
-  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; brush(ctx, -pw / 2, -size * .62, pw, size * 1.24, '#2A1E15', o.seed || 9, E.outCubic(clamp(a * 1.6)));
+  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; rr(ctx, -pw / 2, -size * .62, pw, size * 1.24, size * .2); ctx.fillStyle = '#2A1E15'; ctx.fill();   // v7.12: faixa lisa, sem pincelada
   rich(ctx, str, 0, 0, { size, weight: 900, color: '#FFF', accent: C.orange, retro: true, depth: 6, lw: 5 });
   ctx.restore();
   if (o.sub) text(ctx, o.sub, W / 2, H / 2 + 100, { size: 34, weight: 700, color: '#E9DDCC', align: 'center', alpha: clamp(a * 2 - .8) });

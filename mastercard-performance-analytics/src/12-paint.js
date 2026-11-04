@@ -39,9 +39,9 @@ const PAINT = (() => {
       ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = (o.grade == null ? .38 : o.grade) * k;
       const g = ctx.createLinearGradient(0, 0, W * .7, H * 1.1); g.addColorStop(0, '#FFB878'); g.addColorStop(.5, '#808080'); g.addColorStop(1, '#25415E');
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      // pinceladas
-      if (!pat) pat = ctx.createPattern(STROKES, 'repeat');
-      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = (o.strokes == null ? .55 : o.strokes) * k; ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H);
+      // pinceladas (v7.12: desligadas por padrão — CONFIG.motion.strokes > 0 liga de novo)
+      const sk = o.strokes == null ? (CONFIG.motion.strokes || 0) : o.strokes;
+      if (sk > 0) { if (!pat) pat = ctx.createPattern(STROKES, 'repeat'); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = sk * k; ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H); }
       ctx.restore();
     }
   };

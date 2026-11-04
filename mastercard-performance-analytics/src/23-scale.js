@@ -38,14 +38,15 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       LINE.draw(ctx, [[N.team[0] + 150, N.team[1]], N.motor, N.asset], lp, { w: 20, head: lp < .99, glow: 12 });
       const mp = E.outBack(P(t, T_MOTOR, .5));
       if (mp > 0) { ctx.save(); ctx.translate(...N.motor); ctx.scale(mp, mp); vslab(ctx, -110, -90, 220, 180, 34, '#3A3640', { lw: 4 }); for (let k = 0; k < 2; k++) { ctx.save(); ctx.translate(-40 + k * 80, -10); ctx.rotate(t * (k ? -2 : 2)); icon(ctx, 'gear', 0, 0, 74, C.orange, 9); ctx.restore(); } ctx.restore(); }
-      const ap = E.outBack(P(t, T_ASSET, .6));
+      const ap = E.outBack(P(t, T_ASSET, .6)), A0 = [N.asset[0] + 118, N.asset[1]];
+      // projetos em contextos diferentes, ligados ao mesmo ativo: as linhas saem da borda direita do ativo e passam por trás dele
+      const path = (x, y) => [A0, [lerp(A0[0], x, .45), lerp(A0[1], y, .2)], [x - 60, y]];
+      PROJ.forEach(([x, y], i) => { const p = E.inOutSine(P(t, T_PI[i], .7)); if (p <= 0) return;
+        LINE.draw(ctx, path(x, y), p, { w: 10, col: [C.red, C.orange, C.yellow, C.orange, C.red][i], head: p < .99, shadow: false });
+        if (p > .95) for (let k = 0; k < 2; k++) { const u = (t * .5 + k * .5 + i * .13) % 1, [px, py] = LINE.at(path(x, y), u); circle(ctx, px, py, 6, '#FFE7B0'); } });
       if (ap > 0) { glow(ctx, ...N.asset, 260, C.yellow, .45 * ap + .1 * BT.level); ctx.save(); ctx.translate(...N.asset); ctx.scale(ap, ap); ctx.rotate(Math.sin(t * .8) * .05);
         holo(ctx, -110, -110, 220, 220, { color: C.yellow }); icon(ctx, 'grid', 0, 0, 120, C.yellow, 9); ctx.restore(); }
-      // projetos em contextos diferentes, ligados ao mesmo ativo
-      PROJ.forEach(([x, y, ic], i) => { const p = E.inOutSine(P(t, T_PI[i], .7)); if (p <= 0) return;
-        LINE.draw(ctx, [N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], p, { w: 10, col: [C.red, C.orange, C.yellow, C.orange, C.red][i], head: p < .99, shadow: false });
-        if (p > .95) for (let k = 0; k < 2; k++) { const u = (t * .5 + k * .5 + i * .13) % 1, [px, py] = LINE.at([N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], u); circle(ctx, px, py, 6, '#FFE7B0'); }
-        const s = E.outBack(P(t, T_PI[i] + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
+      PROJ.forEach(([x, y, ic], i) => { const s = E.outBack(P(t, T_PI[i] + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
       // rótulos obrigatórios
       const la = k => clamp(P(t, [T_TEAM, T_MOTOR, T_ASSET, T_PROJ + 1][k] + .3, .4));
       hud(ctx, c => { c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;

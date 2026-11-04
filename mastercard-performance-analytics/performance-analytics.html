@@ -672,7 +672,8 @@ const CONFIG = {
     onTwos: true,          // snaps "em dois" (textura stop motion)
     grain: 0.06,           // granulação de filme (0 desliga)
     beat: 1.0,             // quanto a música mexe na câmera, nas cores e nos elementos (0 desliga)
-    paint: 1.0,            // acabamento pintado: pinceladas, gradação de cor e brilho (0 desliga)
+    paint: 1.0,            // acabamento: gradação de cor e brilho (0 desliga)
+    strokes: 0,            // v7.12: textura de pinceladas por cima do quadro (0 = sem tinta; .55 era o valor antigo)
     beatBase: 0.15         // fora dos clímax a batida fica contida nesse nível (os picos de cada cena ficam em SCENES[id].peaks)
   },
 
@@ -733,7 +734,7 @@ const CONFIG = {
 
   // ---------------------------------------------------------------- TEXTOS-CHAVE
   text: {
-    line: 'LINHA PERFORMANCE ANALYTICS',
+    line: 'PERFORMANCE ANALYTICS',   // v7.12: sem "LINHA"
     // short = placa da estação (mapa, letreiro, mini-mapa) · title = nome completo · teaser = o que a estação mostra
     stations: [
       { n: '01', short: 'PAPEL ESTRATÉGICO',        title: 'Analytics como capacidade estratégica da consultoria', teaser: 'conectamos perguntas de negócio aos dados, do diagnóstico à mensuração',
@@ -802,14 +803,14 @@ const CONFIG = {
       { name: 'Forecast', method: 'séries temporais', tech: ['ARIMA', 'SARIMAX', 'boosting', 'componentes de Fourier'] },
       { name: 'Pricing / dimensionamento', method: 'otimização', tech: ['PO · pesquisa operacional', 'simulação de Monte Carlo', 'programação linear', 'modelos de estoque'] }
     ],
-    climaxKey: 'Tudo se resume a *Analytics & Advanced Analytics*.',
+    climaxKey: 'Tudo se resume a *Analytics*.',
     flap: ['WELCOME TO THE FUTURE', 'WELCOME TO AI', 'WELCOME TO ANALYTICS', 'PERFORMANCE ANALYTICS']
   },
 
   // ---------------------------------------------------------------- NARRAÇÃO (opcional, desligada por padrão)
   // at = segundos desde o início da cena · também serve de roteiro para quem apresenta
   narration: [
-    { scene: 'open', at: 1.0, text: 'Bem-vindos à linha Performance Analytics.' },
+    { scene: 'open', at: 1.0, text: 'Bem-vindos à Performance Analytics.' },
     { scene: 's01', at: 1.0, text: 'Próxima estação: analytics como capacidade estratégica da consultoria.' },
     { scene: 's01', at: 8.0, text: 'Todo projeto começa com uma pergunta de negócio.' },
     { scene: 's01', at: 22.0, text: 'Transformamos dados em decisões, decisões em impacto… e impacto em valor.' },
@@ -2307,15 +2308,14 @@ function hatch(ctx, pathFn, x, y, w, h, o = {}) {
   if (o.cross) for (let k = -h; k < w + h; k += g * 1.4) { ctx.moveTo(x + k, y); ctx.lineTo(x + k + h * a, y + h); }
   ctx.stroke(); ctx.restore();
 }
-/** título pintado: pincelada + letras com contorno de tinta e sombra chapada + respingos */
+/** título em faixa (v7.12: sem tinta — nem pincelada, nem respingo, nem contorno): faixa arredondada na cor do fundo + letras brancas */
 function paintTitle(ctx, str, x, y, o = {}) {
-  const size = o.size || 96, w = measure(ctx, str, size, 900) + size * .8, p = o.p == null ? 1 : o.p;
-  const bx = o.align === 'left' ? x - size * .3 : x - w / 2;
-  brush(ctx, bx, y - size * .62, w, size * 1.24, o.bg || C.orange, o.seed || 3, E.outCubic(clamp(p * 1.4)));
-  if (o.splat !== false) splat(ctx, bx + w - size * .2, y - size * .45, size * .32, o.splatCol || C.yellow, (o.seed || 3) + 5, E.outBack(clamp(p * 2 - .6)), .9);
+  const size = o.size || 96, w = measure(ctx, str, size, 900) + size * .9, h = size * 1.3, p = o.p == null ? 1 : o.p;
+  const bx = o.align === 'left' ? x - size * .3 : x - w / 2, bp = E.outCubic(clamp(p * 1.4));
+  if (bp > 0) { rr(ctx, bx + 6, y - h / 2 + 8, w * bp, h, h * .2); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fill(); rr(ctx, bx, y - h / 2, w * bp, h, h * .2); ctx.fillStyle = o.bg || C.orange; ctx.fill(); }
   const ap = clamp(p * 2 - .4); if (ap <= 0) return;
   ctx.save(); ctx.globalAlpha *= ap;
-  retroText(ctx, str, o.align === 'left' ? x : x, y + (1 - E.outBack(ap)) * size * .3, { size, weight: 900, color: o.color || '#FFF', align: o.align || 'center', ls: o.ls || 0 });
+  text(ctx, str, x, y + (1 - E.outBack(ap)) * size * .3 + size * .04, { size, weight: 900, color: o.color || '#FFF', align: o.align || 'center', ls: o.ls || 0 });
   ctx.restore();
 }
 
@@ -2637,7 +2637,7 @@ function platform(ctx, tl, o = {}) {
     intersection(ctx, x0 + 44, 170, 11, 14);
     text(ctx, o.sign, W / 2 + 26, 171, { size: 22, weight: 900, color: '#FFFFFF', align: 'center', ls: 4 }); }
   // painel digital de partidas e relógio
-  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   LINHA PERFORMANCE ANALYTICS   ·   EMBARQUE PELA FAIXA AMARELA   ', lx = 120, lw = 300, ly = 150;
+  if (o.led !== false) { const msg = '   PRÓXIMO TREM · 2 MIN   ·   PERFORMANCE ANALYTICS   ·   EMBARQUE PELA FAIXA AMARELA   ', lx = 120, lw = 300, ly = 150;
     rr(ctx, lx, ly, lw, 40, 10); ctx.fillStyle = '#1F2B30'; ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.rect(lx + 10, ly + 3, lw - 20, 34); ctx.clip(); ctx.font = font(18, 800, F.mono); const mw = ctx.measureText(msg).width, off = (tl * 60) % mw;
     ctx.fillStyle = '#7FE0C4'; ctx.textBaseline = 'middle'; ctx.fillText(msg + msg, lx + 10 - off, ly + 21); ctx.restore();
@@ -2976,7 +2976,8 @@ function nextStationLED(ctx, T) {
   let nk = 0, Tn = 0;
   for (let k = 1; k <= 7; k++) { const Ts = CONFIG.stationStart[k]; if (Ts != null && Ts > T) { nk = k; Tn = Ts; break; } }
   const stop = CONFIG.mode !== 'reel' ? CONFIG.stops.find(st => st.after && st.T > T && (!nk || st.T <= Tn)) : null;
-  const target = stop ? stop.T : Tn; if (!target || target - T > 4.5) return;
+  if (stop) return;   // v7.12: sem o aviso "próxima parada"
+  const target = Tn; if (!target || target - T > 4.5) return;
   const a = clamp((4.5 - (target - T)) / .3) * clamp((target - T - .1) / .3); if (a <= 0) return;
   const label = stop ? `PRÓXIMA PARADA  ›  ${stop.id === 'end' ? 'ENCERRAMENTO' : 'CONVERSA COM AS APRESENTADORAS'}` : `PRÓXIMA ESTAÇÃO  ›  ${TX.stations[nk - 1].n} ${TX.stations[nk - 1].short}`;
   const w = measure(ctx, label, 20, 800, true, 3) + 64, x = W - 64 - w, y = 214, blink = Math.floor(NOW * 2.5) % 2 ? 1 : .55;   // v7: abaixo do mini-mapa
@@ -2996,7 +2997,7 @@ function ticket(ctx, x, y, s, o = {}) {
   intersection(ctx, -255, -40, 30, 38);
   text(ctx, 'BILHETE', -255, 50, { size: 22, weight: 900, mono: true, color: '#FFF', align: 'center', ls: 3 });
   ctx.save(); ctx.setLineDash([8, 8]); line(ctx, -170, -110, -170, 110, INK, 3); ctx.restore();
-  text(ctx, 'LINHA PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
+  text(ctx, 'PERFORMANCE ANALYTICS', -140, -72, { size: 26, weight: 900, color: INK, ls: 1 });
   text(ctx, 'DE  dados', -140, -22, { size: 30, weight: 800, mono: true, color: '#4A4038' });
   text(ctx, 'PARA  valor', -140, 22, { size: 30, weight: 800, mono: true, color: C.red });
   text(ctx, '7 estações · 2 baldeações', -140, 72, { size: 20, weight: 700, mono: true, color: '#6A6056' });
@@ -3037,7 +3038,7 @@ function bridgeCard(ctx, a, kicker, str, o = {}) {
   if (kicker) { const kw = measure(ctx, kicker, 26, 800, true, 6) + 70; ctx.save(); ctx.translate(W / 2, H / 2 - 150); ctx.rotate(-.02);
     paper(ctx, -kw / 2, -28, kw, 56, { r: 6, fill: C.red, shadow: 6, shadowColor: '#000', lw: 3 }); text(ctx, kicker, 0, 2, { size: 26, weight: 800, mono: true, color: '#FFF', align: 'center', ls: 6 }); ctx.restore(); }
   ctx.save(); ctx.translate(W / 2, H / 2 - 20); ctx.scale(lerp(1.25, 1, e), lerp(1.25, 1, e));
-  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; brush(ctx, -pw / 2, -size * .62, pw, size * 1.24, '#2A1E15', o.seed || 9, E.outCubic(clamp(a * 1.6)));
+  const pw = measure(ctx, str.replace(/\*/g, ''), size, 900) + 140; rr(ctx, -pw / 2, -size * .62, pw, size * 1.24, size * .2); ctx.fillStyle = '#2A1E15'; ctx.fill();   // v7.12: faixa lisa, sem pincelada
   rich(ctx, str, 0, 0, { size, weight: 900, color: '#FFF', accent: C.orange, retro: true, depth: 6, lw: 5 });
   ctx.restore();
   if (o.sub) text(ctx, o.sub, W / 2, H / 2 + 100, { size: 34, weight: 700, color: '#E9DDCC', align: 'center', alpha: clamp(a * 2 - .8) });
@@ -3086,9 +3087,9 @@ const PAINT = (() => {
       ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = (o.grade == null ? .38 : o.grade) * k;
       const g = ctx.createLinearGradient(0, 0, W * .7, H * 1.1); g.addColorStop(0, '#FFB878'); g.addColorStop(.5, '#808080'); g.addColorStop(1, '#25415E');
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      // pinceladas
-      if (!pat) pat = ctx.createPattern(STROKES, 'repeat');
-      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = (o.strokes == null ? .55 : o.strokes) * k; ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H);
+      // pinceladas (v7.12: desligadas por padrão — CONFIG.motion.strokes > 0 liga de novo)
+      const sk = o.strokes == null ? (CONFIG.motion.strokes || 0) : o.strokes;
+      if (sk > 0) { if (!pat) pat = ctx.createPattern(STROKES, 'repeat'); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = sk * k; ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H); }
       ctx.restore();
     }
   };
@@ -4743,7 +4744,7 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
         cc.setTransform(mi); text(cc, l, 0, 50, { size: 28, weight: 900, color: i === 1 ? INK : '#FFF', align: 'center' }); cc.restore(); }); ctx.restore(); });
     vslab(ctx, -260, -40, 520, 240, 28, '#5A3A22', { lw: 5 });
     late(ctx, c => text(c, 'a carteira do cliente', 0, 100, { size: 30, weight: 800, color: '#F3E6D6', align: 'center' }));
-    const cp = P(t, T0 + 2.0, .5); if (cp > 0) { scribble(ctx, 'crown', 40, -420, 120, C.yellow, 4, cp, { glow: true }); late(ctx, c => { c.globalAlpha *= cp; tag(c, 230, -420, 'o banco principal', { size: 30, fill: C.yellow }); }); }
+    const cp = P(t, T0 + 2.0, .5); if (cp > 0) { { const s = 120 * E.outBack(cp); ctx.save(); ctx.translate(40, -420); ctx.beginPath(); ctx.moveTo(-s * .45, s * .25); ctx.lineTo(-s * .45, -s * .2); ctx.lineTo(-s * .2, s * .02); ctx.lineTo(0, -s * .32); ctx.lineTo(s * .2, s * .02); ctx.lineTo(s * .45, -s * .2); ctx.lineTo(s * .45, s * .25); ctx.closePath(); ctx.fillStyle = C.yellow; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.stroke(); ctx.restore(); } late(ctx, c => { c.globalAlpha *= cp; tag(c, 230, -420, 'o banco principal', { size: 30, fill: C.yellow }); }); }
     ctx.restore();
   }
   function data(ctx, t) {
@@ -4883,7 +4884,7 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
   cue(id, T_IDEA, 'chime', { f: 784, up: 7 }); for (let k = 0; k < 10; k++) cue(id, T_PIPE + k * .55, 'type', { n: 5, gap: .04 }); NODES.forEach((_, i) => cue(id, T_PIPE + i * 1.1, 'pop', { p: .8 + i * .1, v: .18 }));
   // no interruptor a música segue tocando (v7.6): só o clique; sem os batimentos do antigo silêncio
   cue(id, T_SIG, 'whoosh', { dur: 4, v: .15 }); cue(id, T_OFF, 'click', { v: 1 }); cue(id, T_DROP, 'impact', { size: 1.3 }); cue(id, T_DROP + .02, 'shimmer', { dur: 2 });
-  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_DASH, 'pop', { p: 1.15, v: .22 }); cue(id, T_NEXT - .55, 'whoosh', { dur: .5, v: .15 }); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
+  NODES.forEach((_, i) => cue(id, T_DROP + .5 + i * .3, 'ping', { f: 880 * Math.pow(2, i * 2 / 12) })); cue(id, T_RESULT, 'ding'); cue(id, T_DASH, 'pop', { p: 1.15, v: .22 }); for (let k = 1; k < 5; k++) cue(id, T_DASH + k * .28, 'pop', { p: 1.15 + k * .08, v: .12 }); cue(id, T_NEXT - .55, 'whoosh', { dur: .5, v: .15 }); cue(id, T_NEXT, 'chime', { f: 659, up: 7 }); cue(id, T_DIVE, 'whoosh', { dur: 1.4, dir: 'down', v: .45 });
   const SCRIPT = CASEKIT.script(id, 3, 'CASE 3 DE 4 · RELATÓRIOS DE FRAUDE', '#F3EBDD', 'Relatórios automatizados', [
     [T0, T_COST, 'ANTES', 'Cada relatório de fraude para o board era *montado manualmente*.', { y: 236, ...BOD }],
     [T_COST, T_IDEA, 'PROBLEMA', 'O trabalho *se repetia* a cada relatório e consumia *tempo da equipe*.', { y: 236, ...BOD }],
@@ -5044,8 +5045,6 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
     ctx.save(); ctx.globalAlpha *= a;
     lightCone(ctx, SEAT, 110, 70, 420, FLOOR - 110, '#FFB070', .55); glow(ctx, SEAT, FLOOR - 160, 240, C.orange, .25);
     chair(ctx, SEAT, FLOOR - 6, lt * 3.4, 1);
-    for (let k = 0; k < 9; k++) { const x = 1390 + k * 36, h = 40 + 150 * clamp(.35 * BT.level + .5 * BT.kick * (k % 3 === 0 ? 1 : .6) + .3 * Math.abs(Math.sin(t * (3 + k * .7) + k))), c = [C.orange, '#FF5FA2', C.yellow][k % 3];
-      ctx.save(); if (!QUALITY.low) { ctx.shadowColor = c; ctx.shadowBlur = 14; } ctx.strokeStyle = c; ctx.lineWidth = 4; ctx.strokeRect(x, 860 - h, 24, h); ctx.restore(); }
     for (let k = 0; k < 14; k++) { const d = ((lt * .5 + k / 14) % 1), ang = hash(k * 3.3) * 1.6 - .8 - Math.PI / 2, dist = d * 620, x = nx(4) + Math.cos(ang) * dist, y = NY + Math.sin(ang) * dist + d * d * 520;
       ctx.save(); ctx.globalAlpha *= 1 - d; ctx.translate(x, y); ctx.rotate(d * 9 + k); ctx.scale(Math.cos(d * 12 + k) * .8 + .2, 1); paper(ctx, -16, -21, 32, 42, { r: 3, fill: '#FFF6E8', shadow: 2, lw: 2, volume: false }); icon(ctx, 'check', 0, 0, 20, C.orange, 6); ctx.restore(); }
     ctx.restore();
@@ -5062,31 +5061,41 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
   /** a imagem do dashboard: o arquivo dashboard_image do JSON, na mesma pasta do HTML (dashboard-fraude.png: troque pelo real,
    *  com o mesmo nome). Sem o arquivo (ou com o campo vazio), o popup mostra o dashboard desenhado, marcado como ilustrativo */
   const DASH = DASHIMG;
-  /** com a rotina automatizada, o relatório que vai ao board abre numa janela (popup) que sai do monitor e volta para ele */
+  /** v7.12: com a rotina automatizada, os painéis saem do monitor um atrás do outro e se empilham no canto inferior esquerdo,
+   *  sem cobrir a animação da automação: a automação gera vários painéis, muito mais rápido. O da frente mostra a imagem
+   *  dashboard_image (ou o dashboard desenhado, marcado como ilustrativo) */
+  const DN = 5, DPW = 540, DPH = 330, DX0 = 70, DY0 = 650;
   function dashPopup(ctx, t) {
-    const op = E.outBack(P(t, T_DASH, .55)), cl = E.inCubic(P(t, T_NEXT - .55, .45)), a = P(t, T_DASH, .25) * (1 - cl); if (a <= 0) return;
-    const WW = 920, WH = 560, k = lerp(.3, 1, op) * (1 - .7 * cl), cx = lerp(MON.x, 760, op * (1 - cl)), cy = lerp(MON.y, 520, op * (1 - cl));
+    const a = P(t, T_DASH, .25) * (1 - P(t, T_NEXT - .45, .45)); if (a <= 0) return;
+    const img = DASH();
     hud(ctx, c => {
-      c.fillStyle = 'rgba(4,6,14,.55)'; c.fillRect(0, 0, W, H);                      // o resto da cena escurece
-      c.translate(cx, cy); c.scale(k, k); c.translate(-WW / 2, -WH / 2);
-      panel(c, 0, 0, WW, WH, { dark: true, accent: C.yellow });
-      [C.red, C.yellow, '#9BD27A'].forEach((col, i) => circle(c, 44 + i * 24, 30, 7, col));
-      text(c, 'Dashboard de fraude · board', 124, 38, { size: 22, weight: 800, mono: true, color: '#F3E6D6' });
-      tag(c, WW - 170, 30, 'gerado automaticamente', { size: 20, fill: C.yellow });
-      const img = DASH(), X = 34, Y = 60, IW = WW - 56, IH = WH - 80;
-      if (img) { const s = Math.min(IW / img.naturalWidth, IH / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s;
-        rr(c, X, Y, IW, IH, 10); c.fillStyle = '#FFF'; c.fill(); c.drawImage(img, X + (IW - w) / 2, Y + (IH - h) / 2, w, h); }
-      else { dashboard(c, X, Y, IW, IH, { t: t - T_DASH, seed: 9 }); tag(c, X + IW - 190, Y + 32, 'ilustrativo', { size: 18, fill: '#E9DCC8' }); }
+      for (let k = DN - 1; k >= 0; k--) {
+        const f = E.inOutCubic(P(t, T_DASH + (DN - 1 - k) * .28, .55)); if (f <= 0) continue;          // o de trás sai primeiro; o da frente por último
+        const tx = DX0 + k * 16, ty = DY0 - k * 16, s = lerp(.22, 1, f), cx = lerp(MON.x, tx + DPW / 2, f), cy = lerp(MON.y, ty + DPH / 2, f);
+        c.save(); c.translate(cx, cy); c.scale(s, s); c.translate(-DPW / 2, -DPH / 2);
+        rr(c, 6, 8, DPW, DPH, 14); c.fillStyle = 'rgba(0,0,0,.45)'; c.fill();
+        rr(c, 0, 0, DPW, DPH, 14); c.fillStyle = '#14100D'; c.fill(); c.strokeStyle = k ? 'rgba(243,230,214,.35)' : C.yellow; c.lineWidth = 3; c.stroke();
+        [C.red, C.yellow, '#9BD27A'].forEach((col, i) => circle(c, 22 + i * 18, 20, 5, col));
+        if (!k) text(c, 'Dashboard de fraude · board', 84, 21, { size: 17, weight: 800, mono: true, color: '#F3E6D6' });
+        const X = 12, Y = 38, IW = DPW - 24, IH = DPH - 50;
+        if (img) { const q = Math.min(IW / img.naturalWidth, IH / img.naturalHeight), w = img.naturalWidth * q, h = img.naturalHeight * q; rr(c, X, Y, IW, IH, 8); c.fillStyle = '#FFF'; c.fill(); c.drawImage(img, X + (IW - w) / 2, Y + (IH - h) / 2, w, h); }
+        else { dashboard(c, X, Y, IW, IH, { t: t - T_DASH, seed: 9 + k, mini: true }); if (!k) tag(c, X + IW - 90, Y + 24, 'ilustrativo', { size: 15, fill: '#E9DCC8' }); }
+        c.restore();
+      }
+      const n = Math.min(DN, Math.floor(Math.max(0, t - T_DASH) / .28) + 1), cnt = n + Math.floor(clamp((t - T_DASH - .5) / 4) * 120);
+      c.globalAlpha *= P(t, T_DASH + .3, .3);
+      tag(c, DX0 + 150, DY0 - 104, 'gerado automaticamente', { size: 19, fill: C.yellow });
+      tag(c, DX0 + DPW - 90, DY0 - 104, `painéis: ${cnt}`, { size: 19, fill: '#F6EEDF' });
     }, a);
   }
   function beforeAfter(ctx, t) {
     const a = P(t, T_RESULT + .3, .5) * (1 - P(t, T_NEXT - .3, .5)); if (a <= 0) return;
-    hud(ctx, c => { c.translate(96, 700); const PW = Math.max(980, GEST.reduce((s, [, l]) => s + measure(c, l, 26, 800) + 44, 190) + 26); panel(c, 0, 0, PW, 250, { dark: true });
-      text(c, 'ANTES', 40, 60, { size: 26, weight: 900, mono: true, color: C.red, ls: 3 });
-      let x = 190; GEST.forEach(([n, l]) => { const w = measure(c, l, 26, 800) + 30; rr(c, x, 38, w, 46, 23); c.fillStyle = '#3A1A16'; c.fill(); c.strokeStyle = C.red; c.lineWidth = 2.5; c.stroke(); text(c, l, x + 15, 62, { size: 26, weight: 800, color: '#FFD9CF' }); x += w + 14; });
-      text(c, 'DEPOIS', 40, 170, { size: 26, weight: 900, mono: true, color: C.yellow, ls: 3 });
-      const l2 = 'automático, do dado ao board'; rr(c, 190, 146, measure(c, l2, 30, 900) + 40, 52, 26); c.fillStyle = C.orange; c.fill(); c.strokeStyle = '#FFF'; c.lineWidth = 2.5; c.stroke(); text(c, l2, 210, 173, { size: 30, weight: 900, color: '#FFF' });
-      icon(c, 'check', 190 + measure(c, l2, 30, 900) + 80, 172, 44, C.yellow, 10); }, a);
+    hud(ctx, c => { c.translate(690, 726); const PW = GEST.reduce((s, [, l]) => s + measure(c, l, 22, 800) + 36, 150) + 18; panel(c, 0, 0, PW, 206, { dark: true });   // v7.12: compacto, à direita da pilha de painéis
+      text(c, 'ANTES', 36, 56, { size: 22, weight: 900, mono: true, color: C.red, ls: 3 });
+      let x = 150; GEST.forEach(([n, l]) => { const w = measure(c, l, 22, 800) + 26; rr(c, x, 36, w, 40, 20); c.fillStyle = '#3A1A16'; c.fill(); c.strokeStyle = C.red; c.lineWidth = 2.5; c.stroke(); text(c, l, x + 13, 57, { size: 22, weight: 800, color: '#FFD9CF' }); x += w + 10; });
+      text(c, 'DEPOIS', 36, 148, { size: 22, weight: 900, mono: true, color: C.yellow, ls: 3 });
+      const l2 = 'automático, do dado ao board'; rr(c, 150, 124, measure(c, l2, 26, 900) + 36, 48, 24); c.fillStyle = C.orange; c.fill(); c.strokeStyle = '#FFF'; c.lineWidth = 2.5; c.stroke(); text(c, l2, 168, 149, { size: 26, weight: 900, color: '#FFF' });
+      icon(c, 'check', 150 + measure(c, l2, 26, 900) + 72, 148, 40, C.yellow, 10); }, a);
   }
   SCENES[id] = {
     themeAt: t => t < T_OFF ? 'light' : 'dark', fx: { invert: true }, script: SCRIPT,
@@ -5190,26 +5199,21 @@ DASHIMG();   // começa a carregar a imagem já na abertura da página
       text(c, 'REPORT DE FRAUDE · BOARD', R.x + 18, R.y + 80, { size: 16, weight: 800, mono: true, color: '#6A6056', ls: 1.5 });
       ['0,08%', '−12%', '3 alertas'].forEach((v, i) => { const bx = R.x + 18 + i * (R.w - 36) / 3; text(c, v, bx + 12, R.y + 131, { size: 21, weight: 900, color: INK }); }); });
   }
-  /** a pilha de painéis gerados automaticamente (a imagem do case de relatórios); a faixa do insight entra no painel da frente */
+  /** o dashboard (v5): a faixa do insight entra no topo */
   function panels(ctx, t, banner) {
-    const img = DASHIMG(), n = Math.min(5, 1 + Math.floor(Math.max(0, t - T_GEN - .3) / .22)), D = DSH;
-    for (let k = n - 1; k >= 0; k--) { const a = k === 0 ? E.outBack(P(t, T_GEN + .3, .4)) : 1, x = D.x + k * 16, y = D.y - k * 16;
-      ctx.save(); ctx.translate(x + D.w / 2, y + D.h / 2); ctx.scale(a, a); ctx.translate(-D.w / 2, -D.h / 2);
-      paper(ctx, 0, 0, D.w, D.h, { r: 10, fill: '#FFFFFF', shadow: 6, shadowColor: '#000', lw: 2.5 });
-      if (img) { const s = Math.min((D.w - 16) / img.naturalWidth, (D.h - 16) / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s; ctx.drawImage(img, (D.w - w) / 2, (D.h - h) / 2, w, h); }
-      else dashboard(ctx, 8, 8, D.w - 16, D.h - 16, { t, seed: 3 + k, mini: true });
-      if (k === 0 && banner > 0) { rr(ctx, 8, 10, (D.w - 16) * clamp(banner * 1.4), 44, 8); ctx.fillStyle = C.orange; ctx.fill(); }
-      ctx.restore(); }
-    const cnt = Math.floor(clamp((t - T_GEN - .3) / 12) * 240) + n;
-    late(ctx, c => { tag(c, D.x + D.w - 120, D.y + D.h + 30, `painéis gerados: ${cnt}`, { size: 20, fill: C.yellow });
-      if (banner > 0) { c.globalAlpha *= clamp(banner * 2); text(c, SHORT, D.x + 22, D.y + 32, { size: fitSize(c, SHORT, 18, D.w - 44), weight: 800, color: '#FFF' }); } });
+    const D = DSH, a = E.outBack(P(t, T_GEN + .3, .4)); if (a <= 0) return;
+    ctx.save(); ctx.translate(D.x + D.w / 2, D.y + D.h / 2); ctx.scale(a, a); ctx.translate(-D.w / 2, -D.h / 2);
+    dashboard(ctx, 0, 0, D.w, D.h, { t, seed: 3, mini: true });
+    if (banner > 0) { rr(ctx, 8, 10, (D.w - 16) * clamp(banner * 1.4), 44, 8); ctx.fillStyle = C.orange; ctx.fill(); }
+    ctx.restore();
+    if (banner > 0) late(ctx, c => { c.globalAlpha *= clamp(banner * 2); text(c, SHORT, D.x + 22, D.y + 32, { size: fitSize(c, SHORT, 18, D.w - 44), weight: 800, color: '#FFF' }); });
   }
   function stage(ctx, t) {
     const a = P(t, T_GEN - .2, .5) * (1 - P(t, T_QUAL - .3, .4)); if (a <= 0) return;
     ctx.save(); ctx.globalAlpha *= a;
     const head = P(t, T_REP + .75, .9), banner = P(t, T_DSH + .75, .6);
     miniReport(ctx, t, head); panels(ctx, t, banner);
-    late(ctx, c => { [[REP, 'relatório', C.red, '#FFF'], [DSH, 'painéis', C.yellow, INK]].forEach(([R, lb, f, col], k) => { c.save(); c.translate(R.x + R.w - 60, R.y - (k ? 70 : 8)); c.rotate(.04); tag(c, 0, 0, lb, { size: 20, fill: f, color: col }); c.restore(); }); });
+    late(ctx, c => { [[REP, 'relatório', C.red, '#FFF'], [DSH, 'dashboard', C.yellow, INK]].forEach(([R, lb, f, col], k) => { c.save(); c.translate(R.x + R.w - 60, R.y - 8); c.rotate(.04); tag(c, 0, 0, lb, { size: 20, fill: f, color: col }); c.restore(); }); });
     // "refazer": a seta tracejada vermelha volta do Validador para os geradores (por baixo dos rascunhos)
     const loopP = P(t, T_NO + .2, .6, E.inOutCubic) * (1 - P(t, T_DR2, .4));
     if (loopP > 0) { ctx.save(); ctx.beginPath(); ctx.moveTo(VX - 30, VY + 86); ctx.bezierCurveTo(VX - 80, 960, GX + 220, 975, GX + 8, GY[2] + 80);
@@ -5358,14 +5362,15 @@ const NUMW = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 
       LINE.draw(ctx, [[N.team[0] + 150, N.team[1]], N.motor, N.asset], lp, { w: 20, head: lp < .99, glow: 12 });
       const mp = E.outBack(P(t, T_MOTOR, .5));
       if (mp > 0) { ctx.save(); ctx.translate(...N.motor); ctx.scale(mp, mp); vslab(ctx, -110, -90, 220, 180, 34, '#3A3640', { lw: 4 }); for (let k = 0; k < 2; k++) { ctx.save(); ctx.translate(-40 + k * 80, -10); ctx.rotate(t * (k ? -2 : 2)); icon(ctx, 'gear', 0, 0, 74, C.orange, 9); ctx.restore(); } ctx.restore(); }
-      const ap = E.outBack(P(t, T_ASSET, .6));
+      const ap = E.outBack(P(t, T_ASSET, .6)), A0 = [N.asset[0] + 118, N.asset[1]];
+      // projetos em contextos diferentes, ligados ao mesmo ativo: as linhas saem da borda direita do ativo e passam por trás dele
+      const path = (x, y) => [A0, [lerp(A0[0], x, .45), lerp(A0[1], y, .2)], [x - 60, y]];
+      PROJ.forEach(([x, y], i) => { const p = E.inOutSine(P(t, T_PI[i], .7)); if (p <= 0) return;
+        LINE.draw(ctx, path(x, y), p, { w: 10, col: [C.red, C.orange, C.yellow, C.orange, C.red][i], head: p < .99, shadow: false });
+        if (p > .95) for (let k = 0; k < 2; k++) { const u = (t * .5 + k * .5 + i * .13) % 1, [px, py] = LINE.at(path(x, y), u); circle(ctx, px, py, 6, '#FFE7B0'); } });
       if (ap > 0) { glow(ctx, ...N.asset, 260, C.yellow, .45 * ap + .1 * BT.level); ctx.save(); ctx.translate(...N.asset); ctx.scale(ap, ap); ctx.rotate(Math.sin(t * .8) * .05);
         holo(ctx, -110, -110, 220, 220, { color: C.yellow }); icon(ctx, 'grid', 0, 0, 120, C.yellow, 9); ctx.restore(); }
-      // projetos em contextos diferentes, ligados ao mesmo ativo
-      PROJ.forEach(([x, y, ic], i) => { const p = E.inOutSine(P(t, T_PI[i], .7)); if (p <= 0) return;
-        LINE.draw(ctx, [N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], p, { w: 10, col: [C.red, C.orange, C.yellow, C.orange, C.red][i], head: p < .99, shadow: false });
-        if (p > .95) for (let k = 0; k < 2; k++) { const u = (t * .5 + k * .5 + i * .13) % 1, [px, py] = LINE.at([N.asset, [lerp(N.asset[0], x, .5), lerp(N.asset[1], y, .2)], [x - 60, y]], u); circle(ctx, px, py, 6, '#FFE7B0'); }
-        const s = E.outBack(P(t, T_PI[i] + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
+      PROJ.forEach(([x, y, ic], i) => { const s = E.outBack(P(t, T_PI[i] + .5, .4)); if (s > 0) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); vball(ctx, 0, 0, 44, '#F6EEDF', { lw: 4 }); icon(ctx, ic, 0, 0, 52, INK, 7); ctx.restore(); } });
       // rótulos obrigatórios
       const la = k => clamp(P(t, [T_TEAM, T_MOTOR, T_ASSET, T_PROJ + 1][k] + .3, .4));
       hud(ctx, c => { c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 12;
@@ -5574,8 +5579,9 @@ const FUTURE_ART = {
       layer(ctx, cam, 1, () => {
         const g = ctx.createLinearGradient(0, RAIL, 0, H); g.addColorStop(0, '#24160E'); g.addColorStop(1, '#0C0806'); ctx.fillStyle = g; ctx.fillRect(-800, RAIL - 10, 7600, 400);
         const xt = trainX(t); LINE.draw(ctx, [[-600, RAIL], [6200, RAIL]], (xt + 600) / 6800, { w: 22, head: false, glow: 14 });
-        // as outras linhas (tracks) chegando à cidade, atrás dos painéis
-        [[C.red, -300, 160], [C.yellow, 2200, 120], ['#E9DCC8', 4300, 180]].forEach(([col, x0, y0], k) => { const p = E.inOutSine(P(t, T_G[Math.min(k, 2)] + 1.2, 2)); LINE.draw(ctx, [[x0, y0], [x0 + 500, 500], [x0 + 860, RAIL]], p, { w: 10, col, shadow: false, alpha: .45 }); });
+        // as outras linhas (tracks) chegam alinhadas: paralelas à linha laranja, por baixo dela, e sobem a 45° para encontrá-la na estação
+        [[C.red, 1360], [C.yellow, 3400], ['#E9DCC8', 5040]].forEach(([col, xm], k) => { const p = E.inOutSine(P(t, T_G[k] + 1.2, 2)), yk = RAIL + 44;
+          LINE.draw(ctx, [[xm - 1500, yk], [xm - 60 - (yk - RAIL), yk], [xm - 60, RAIL]], p, { w: 10, col, shadow: false, alpha: .6 }); });
         for (let i = 0; i < 5; i++) panelArt(ctx, t, i);
         // uma estação ainda em aberto
         const op = P(t, 23.2, .8); if (op > 0) { const x = 5760; ctx.save(); ctx.globalAlpha *= op; ctx.setLineDash([12, 10]); ctx.lineDashOffset = -t * 30; circle(ctx, x, RAIL, 46, 'rgba(255,255,255,.06)', C.yellow, 5); ctx.restore();
@@ -5597,10 +5603,17 @@ const FUTURE_ART = {
   const TW = 330, TH = 470, GAP = 22, TX0 = (W - (N * TW + (N - 1) * GAP)) / 2, TY0 = 322;
   for (let k = 0; k < N; k++) { cue(id, T_IN(k), 'hit', { size: .3 + k * .05 }); cue(id, T_FLIP(k), 'whoosh', { dur: .3, v: .18 }); }
   cue(id, T_KEY, 'impact', { size: 1 }); cue(id, T_KEY, 'combo');
+  // v7.12: o eixo da v5 — as técnicas do mais simples ao mais complexo, acesas por uma varredura até o último tempo forte (25,17)
+  const AXT = [['Estatística', 'gaussian'], ['Regressão', 'regression'], ['Séries temporais', 'forecast'], ['Otimização', 'lp'], ['Clusters', 'clusters'], ['Árvores', 'tree'],
+    ['Gradient boosting', 'ensemble'], ['Recomendação', 'recommend'], ['Embeddings', 'embeddings'], ['Redes neurais', 'mlp'], ['Transformers', 'transformer'], ['Agentes de IA', 'agents']];
+  const AX0 = 180, AX1 = 1740, AY = 820, axX = k => AX0 + k * (AX1 - AX0) / (AXT.length - 1), CW = 128, CH = 118;
+  const T_AX = T_KEY + .5, T_SW0 = T_KEY + .9, T_SW1 = onBeat(id, 25.17, 'bar'), SWX = u => lerp(AX0 - 50, AX1 + 50, E.inOutSine(u));
+  const T_LIT = AXT.map((_, k) => T_SW0 + Math.acos(1 - 2 * clamp((axX(k) - AX0 + 50) / (AX1 - AX0 + 100))) / Math.PI * (T_SW1 - T_SW0));
+  cue(id, T_SW0, 'riser', { dur: T_SW1 - T_SW0, v: .22 }); T_LIT.forEach((t0, k) => cue(id, t0, 'tick', { f: 1400 + k * 90, v: .12 })); cue(id, T_SW1, 'shimmer', { dur: 1.2 });
   const SCRIPT = SAY.reg(id, [[.3, T_KEY - .1, 'title', 'Por trás de tudo, *métodos* e *técnicas*']]);
   SAY.reg(id, CC.map((c, k) => [T_IN(k), T_KEY + .3, 'label', c.name + ' · ' + c.method]));     // o nome do case fica nos dois lados do card
   SAY.reg(id, CC.map((c, k) => [T_FLIP(k), T_KEY + .3, 'label', c.tech.join(', ')]));
-  SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey]]);
+  SAY.reg(id, [[T_KEY + .2, 26.6, 'big', TX.climaxKey], [T_AX, 26.6, 'label', 'do mais simples ao mais complexo']]);
   /** teste A/B: duas distribuições (A e B) e a diferença entre as médias */
   function abViz(ctx, x, y, w, h, p) {
     const bell = (m, s, col, fill) => { ctx.beginPath(); for (let i = 0; i <= 60; i++) { const u = i / 60, px = x + u * w, py = y + h - Math.exp(-((u - m) ** 2) / (2 * s * s)) * h * .85 * p; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
@@ -5632,8 +5645,8 @@ const FUTURE_ART = {
     themeAt: () => 'dark',
     draw(ctx, t) {
       bgDark(ctx, t, { centerA: .9, center: '#2E1A0C' });
-      // na frase-chave os cards recuam (encolhem e escurecem): só a frase fica legível
-      const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - .82 * kd;
+      // na frase-chave os cards saem (encolhem e somem): ficam a frase e o eixo das técnicas
+      const kd = E.inOutCubic(P(t, T_KEY, .6)), dim = 1 - kd;
       for (let k = 0; k < N; k++) {
         const p = P(t, T_IN(k), .5); if (p <= 0) continue;
         const f = E.inOutCubic(P(t, T_FLIP(k), .5)), sx = Math.max(.02, Math.abs(Math.cos(f * Math.PI))), lift = 1 + .06 * Math.sin(f * Math.PI), s = lerp(1.15, 1, E.outExpo(p)) * lift * (1 - .08 * kd);
@@ -5642,12 +5655,28 @@ const FUTURE_ART = {
         if (f < .5) front(ctx, k, t, CC[k]); else back(ctx, k, CC[k]);
         ctx.restore();
       }
-      if (t >= T_KEY) { const p = P(t, T_KEY, .5);
-        const band = ctx.createRadialGradient(W / 2, H / 2 - 20, 80, W / 2, H / 2 - 20, 1000); band.addColorStop(0, rgba('#0A0604', .78 * p)); band.addColorStop(1, rgba('#0A0604', 0)); ctx.fillStyle = band; ctx.fillRect(0, 0, W, H);
-        glow(ctx, W / 2, H / 2, 700, C.orange, .3 + .2 * BT.level);
-        hud(ctx, c => { c.translate(W / 2, H / 2); const s = lerp(1.3, 1, E.outExpo(p)); c.scale(s, s);
+      if (t >= T_KEY) { const p = P(t, T_KEY, .5), end = P(t, T_SW1, .5);
+        glow(ctx, W / 2, 330, 640, C.orange, .26 + .14 * BT.level + .2 * end);
+        hud(ctx, c => { c.translate(W / 2, 330); const s = lerp(1.3, 1, E.outExpo(p)) * (1 + .05 * Math.sin(Math.PI * end)); c.scale(s, s);
           const [k1, k2] = TX.climaxKey.split(/\s(?=\*)/); text(c, k1, 0, -80, { size: 64, weight: 900, color: '#FFE9D6', align: 'center' });
-          rich(c, k2 || '', 0, 30, { size: 100, weight: 900, color: '#FFF', accent: C.orange }); }, P(t, T_KEY + .2, .45)); }
+          rich(c, k2 || '', 0, 30, { size: 110, weight: 900, color: '#FFF', accent: C.orange }); }, P(t, T_KEY + .2, .45));
+        // o eixo: as técnicas, da mais simples à mais complexa; a varredura acende uma a uma
+        const ax = P(t, T_AX, .6), sw = clamp((t - T_SW0) / (T_SW1 - T_SW0)), sx = SWX(sw);
+        if (ax > 0) { ctx.save(); ctx.globalAlpha *= ax;
+          line(ctx, AX0, AY, AX1, AY, 'rgba(245,241,234,.22)', 4); if (sw > 0) line(ctx, AX0, AY, Math.min(Math.max(sx, AX0), AX1), AY, C.orange, 6);
+          circle(ctx, AX0, AY, 10, C.cream); circle(ctx, AX1, AY, 10, sw >= 1 ? C.orange : '#5A4E44');
+          AXT.forEach(([nm, vz], k) => { const x = axX(k), pop = E.outBack(P(t, T_AX + k * .06, .4)), lit = t >= T_LIT[k]; if (pop <= 0) return;
+            line(ctx, x, AY - 18, x, AY, lit ? C.orange : 'rgba(245,241,234,.25)', 3);
+            ctx.save(); ctx.translate(x, AY - 30 - CH / 2); ctx.scale(pop, pop); ctx.globalAlpha *= lit ? 1 : .42;
+            rr(ctx, -CW / 2, -CH / 2, CW, CH, 12); ctx.fillStyle = '#1C1612'; ctx.fill(); ctx.strokeStyle = lit ? C.orange : 'rgba(245,241,234,.3)'; ctx.lineWidth = 3; ctx.stroke();
+            ctx.save(); rr(ctx, -CW / 2, -CH / 2, CW, CH, 12); ctx.clip(); VIZ[vz](ctx, -CW / 2 + 12, -CH / 2 + 8, CW - 24, 58, lit ? 1 : .6, { t, theme: 'dark' }); ctx.restore();
+            late(ctx, c => para(c, nm, 0, 14, CW - 14, { size: 16, weight: 800, color: lit ? '#FFF' : '#BFB3A3', align: 'center', lh: 1.05 }));
+            ctx.restore(); });
+          if (sw > 0 && sw < 1) { glow(ctx, sx, AY - 90, 200, C.orange, .45); line(ctx, sx, AY - 200, sx, AY + 16, 'rgba(255,230,200,.9)', 4); }
+          ctx.restore();
+          late(ctx, c => { c.globalAlpha *= ax; text(c, 'mais simples', AX0, AY + 46, { size: 26, weight: 800, mono: true, color: '#E9DCC8', align: 'center' });
+            text(c, 'mais complexo', AX1, AY + 46, { size: 26, weight: 800, mono: true, color: C.orange, align: 'center' });
+            text(c, 'do mais simples ao mais complexo', W / 2, 560, { size: 34, weight: 800, color: '#E9DCC8', align: 'center' }); }); } }
       SAY.draw(ctx, t, SCRIPT, 'dark');
     }
   };
@@ -5665,16 +5694,15 @@ const CLOSE = (() => {
     glow(ctx, W / 2, 300, 560, C.orange, .2 + .25 * gA + .15 * br + .15 * BT.level);
     const meet = E.inOutCubic(P(t, .2, 1.2));
     intersection(ctx, W / 2, 300, 150, lerp(1400, 190, meet), { hot: Math.exp(-Math.max(0, t - T_CHORD) * 1.6) * (t > T_CHORD) * .8 + .15 * br });
-    [[380, 300, 140, C.red], [1540, 330, 160, C.yellow]].forEach(([x, y, r, c], i) => splat(ctx, x, y, r, c, 300 + i, E.outBack(P(t, T_CHORD + i * .06, .35)), .8));
-    const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, header: 'PRÓXIMA PARADA', headerCol: C.red, glowA: gA });
+    const b = FLAP.board(ctx, W / 2, 680, FL, T_F, o.flicker ? t : Math.min(t, 40), { tw: 70, th: 104, hiFrom: HI, glowA: gA });
     if (gA > 0) { ctx.save(); ctx.globalAlpha *= gA; rr(ctx, b.x, b.y - 40, b.w, b.h + 40, 18); ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.shadowColor = C.orange; ctx.shadowBlur = 24 + 16 * br; ctx.stroke(); ctx.restore(); }
     text(ctx, ((DATA.presentation_context || {}).organization || 'Mastercard Advisors').toUpperCase() + '  ·  PERFORMANCE ANALYTICS', W / 2, 860, { size: 22, weight: 800, mono: true, color: '#E9DDCC', align: 'center', ls: 5, alpha: gA });
     scanlines(ctx, .06);
   }
   SCENES[id] = { themeAt: () => 'dark', fx: { chroma: .7 }, draw(ctx, t) { draw(ctx, t); },
     peaks: [[T_CHORD - .1, T_CHORD + 1.8]],
-    caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*', 'PRÓXIMA PARADA'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*', 'PRÓXIMA PARADA'],
-      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*', 'PRÓXIMA PARADA'], [T_CHORD + .4, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
+    caps: [[T_F[0] + .3, T_F[1] - .1, 'Bem-vindos ao *futuro*'], [T_F[1] + .3, T_F[2] - .1, 'Bem-vindos à *IA*'],
+      [T_F[2] + .3, T_F[3] - .1, 'Bem-vindos a *analytics*'], [T_CHORD + .4, 18.77, 'Obrigado! Agora a conversa é com *vocês*', 'FIM DA LINHA']] };
   return { draw, T_CHORD };
 })();
 
@@ -5687,7 +5715,7 @@ STOPSCN.end = {
   ui(ctx, tl, item, prevItem, p, ui) {
     ui = ui || { hover: null, pop: null, prevPop: null, popP: 1 };
     const show = item === 1 ? E.inOutCubic(p) : prevItem === 1 ? 1 - E.inOutCubic(p) : 0, L = slideRects(7), ph = L.top - 90, pw = ph * .78;
-    if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H); HUD.begin(ctx); poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { rot: -.01 }); HUD.flush(ctx); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
+    if (show > 0) { ctx.save(); ctx.fillStyle = rgba('#0B0807', .7 * show); ctx.fillRect(0, 0, W, H); HUD.begin(ctx); poster(ctx, W / 2, 40 + ph / 2 + (1 - show) * 700, pw, ph, 7, tl, { cables: false }); HUD.flush(ctx); ctx.restore(); slideStrip(ctx, 7, show, ui); SLIDE.pump(); }
     if (item === 1) slidePopup(ctx, 7, ui);
     if (!item) text(ctx, 'clique no letreiro para rever a estação 07', W / 2, H - 46, { size: 22, weight: 700, mono: true, color: '#FFF', align: 'center', ls: 2, alpha: .4 + .2 * Math.sin(tl * 2.4) });
     hint(ctx, tl, item === 0 ? '→' : '←');

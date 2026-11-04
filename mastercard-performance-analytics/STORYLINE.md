@@ -66,7 +66,7 @@
    - O trem encosta vindo da esquerda, com o farol varrendo a plataforma.
 2. **Propósito (6–14 s)**, como na v5.4, a pedido:
    - As portas abrem no tempo cheio da música e o painel apaga.
-   - O bilhete sobe em close: "LINHA PERFORMANCE ANALYTICS · DE *dados* · PARA *valor* · 7 estações · 2 baldeações". O carimbo bate: **EMBARQUE ✓ validado**.
+   - O bilhete sobe em close: "PERFORMANCE ANALYTICS · DE *dados* · PARA *valor* · 7 estações · 2 baldeações". O carimbo bate: **EMBARQUE ✓ validado**.
    - Título "Dos *dados* ao *valor*" e explicação "Combinamos conhecimento de negócio, analytics e implementação para orientar decisões."
    - A câmera mergulha pela porta aberta.
 3. **Percurso (14–20 s)**
@@ -186,7 +186,7 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Problema | O trabalho *se repetia*… e consumia *tempo da equipe*. | a câmera abre: cadeira vazia, relógio acelerado, pilhas crescendo, o dia vira noite, "↻ de novo · relatório N" (sem contador de horas inventado) |
 | Como fizemos | *Automatizamos* o fluxo de dados até a geração e o envio do relatório. | a lâmpada da ideia acende na tela; o código se escreve com a barra "automação %"; faíscas saem da tela e montam o fluxo nomeado: Entrada dos dados → Validação → Processamento → Relatório → Envio ao board |
 | Solução | *Lights Off*: a rotina continua funcionando *sem montagem manual*. | o sinal da automação corre pelo cabo e o interruptor desliga sozinho; clique seco e escuro na pausa composta da própria música; no drop só o fluxo acende em neon, com a placa **LIGHTS OFF RPA**, o dado corre sozinho e a tela mostra "rodando sozinha" (sem contador, para não parecer métrica); o escritório fica escuro |
-| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); um popup sai do monitor com o dashboard enviado ao board (o arquivo dashboard-fraude.png ao lado do HTML: ilustrativo no Git, o real na cópia local); a cadeira vazia gira num foco de luz, um equalizador neon pulsa e os relatórios voam como confete |
+| Resultado | Relatórios gerados *automaticamente*, no formato do board. | ANTES (4 etapas manuais) × DEPOIS (automático, do dado ao board); v7.12: os painéis saem do monitor um atrás do outro e se empilham no canto inferior esquerdo, com "gerado automaticamente" e o contador de painéis, sem cobrir a animação (o da frente é o arquivo dashboard-fraude.png ao lado do HTML: ilustrativo no Git, o real na cópia local); o ANTES × DEPOIS fica ao lado; a cadeira vazia gira num foco de luz e os relatórios voam como confete |
 | Próximo passo | Próxima possibilidade: integrar *agentes* para automatizar também a escrita de *insights*. | ligação tracejada para "Insight Agent · integração possível"; o fluxo se apaga e a câmera mergulha nela |
 
 ### Case 4 · Agentes de IA para insights (Insight Agent · adquirentes, 56 s)
@@ -194,8 +194,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
 | Etapa | Texto | Visual |
 |---|---|---|
 | Problema | A escrita manual de insights *não acompanhava* o volume… | painel "Market share e share of wallet · adquirentes", insight escrito à mão, fila de páginas |
-| Gerar | Agentes *geradores* produzem versões… para *diferentes públicos*. | v7.11, como na v5: o relatório "REPORT DE FRAUDE · BOARD" com o DESTAQUE vazio e, no canto inferior esquerdo, a pilha de painéis gerados pela automação (a imagem do dashboard do case 3, com o contador); Analista, Business e C-Level caem no palco, leem o relatório e os painéis e escrevem (exemplos ilustrativos) |
-| Avaliar e corrigir | Agentes *avaliam* os textos e encaminham os *reprovados*… | os rascunhos vão ao Validador, que reprova (✕, "reprovado: sem período de comparação"); eles voltam pela seta tracejada "refazer"; saem as versões 2, o Validador aprova (✓), o Embalador fecha o título e ele entra no DESTAQUE do relatório e como faixa no painel da frente |
+| Gerar | Agentes *geradores* produzem versões… para *diferentes públicos*. | v7.11, como na v5: o relatório "REPORT DE FRAUDE · BOARD" com o DESTAQUE vazio e o dashboard embaixo, à esquerda; Analista, Business e C-Level caem no palco, leem o relatório e os painéis e escrevem (exemplos ilustrativos) |
+| Avaliar e corrigir | Agentes *avaliam* os textos e encaminham os *reprovados*… | os rascunhos vão ao Validador, que reprova (✕, "reprovado: sem período de comparação"); eles voltam pela seta tracejada "refazer"; saem as versões 2, o Validador aprova (✓), o Embalador fecha o título e ele entra no DESTAQUE do relatório e como faixa no dashboard |
 | Qualidade | *Regras* e *modelos* avaliam critérios de qualidade do texto. | Regex · regras textuais; BERT · modelo de linguagem; Random Forest · nota de qualidade (164 características); "é uma avaliação do sistema, não uma garantia" |
 | Escala (drop) | O mesmo processo se repete em *milhares* de páginas e painéis. | a parede de páginas se abre; uma janela ampliada mostra o ciclo em cada página |
 | Situação | 8 adquirentes ativos. 22 oportunidades adicionais. Universo apresentado: 30. | 30 marcas: 8 acesas e 22 tracejadas, com legenda |
@@ -239,8 +239,8 @@ A câmera viaja por uma avenida noturna, com a linha no chão.
    - Forecast · séries temporais → ARIMA, SARIMAX, boosting, componentes de Fourier
    - Pricing / dimensionamento · otimização → PO (pesquisa operacional), simulação de Monte Carlo, programação linear, modelos de estoque
 
-   No fecho, os cards recuam e escurecem e só a frase fica: "Tudo se resume a *Analytics & Advanced Analytics*."
-3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português; o prato da cadência final acende o letreiro, e o vídeo termina com a cauda do acorde.
+   No grande ataque (v7.12), os cards saem e a frase sobe: "Tudo se resume a *Analytics*." Embaixo dela volta o eixo da v5, "do mais simples ao mais complexo": 12 técnicas em cards com mini-visualização (estatística, regressão, séries temporais, otimização, clusters, árvores, gradient boosting, recomendação, embeddings, redes neurais, transformers, agentes de IA), acesas uma a uma por uma varredura que termina no último tempo forte da música.
+3. **Letreiro (19 s, como na v5.4):** WELCOME TO THE FUTURE → AI → ANALYTICS → PERFORMANCE ANALYTICS, com legendas em português (v7.12: sem "próxima parada"); o prato da cadência final acende o letreiro, e o vídeo termina com a cauda do acorde.
 
 ## Encerramento
 
